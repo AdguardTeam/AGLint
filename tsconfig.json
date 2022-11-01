@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "module": "es2015",
+        "moduleResolution": "node",
+        "types": [
+            "node",
+            "jest"
+        ],
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true
+    },
+    "include": ["./src/"],
+    "exclude": ["node_modules", "dist"]
+}
