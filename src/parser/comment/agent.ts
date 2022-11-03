@@ -51,9 +51,8 @@ export class AgentParser {
 
         // Since this function rarely runs, it's okay to use regex here
         const splitted = trimmed.split(" ");
-        const len = splitted.length;
 
-        for (let i = 0; i < len; i++) {
+        for (let i = 0; i < splitted.length; i++) {
             // Part contains dot or number
             if (splitted[i].indexOf(".") > -1 || /\d/.test(splitted[i])) {
                 // Missing adblock name
