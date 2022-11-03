@@ -1,12 +1,14 @@
 import { IPreProcessor, PreProcessorParser } from "../../../src/parser/comment/preprocessor";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
+import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("PreProcessorParser", () => {
     test("isPreProcessor", () => {
         // Invalid
-        expect(PreProcessorParser.isPreProcessor("")).toBe(false);
-        expect(PreProcessorParser.isPreProcessor(" ")).toBe(false);
+        expect(PreProcessorParser.isPreProcessor(EMPTY)).toBe(false);
+        expect(PreProcessorParser.isPreProcessor(SPACE)).toBe(false);
+
         expect(PreProcessorParser.isPreProcessor("!")).toBe(false);
         expect(PreProcessorParser.isPreProcessor("!##")).toBe(false);
         expect(PreProcessorParser.isPreProcessor("##")).toBe(false);

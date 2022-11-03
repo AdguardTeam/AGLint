@@ -1,3 +1,5 @@
+import { SPACE } from "./constants";
+
 export enum CosmeticRuleSeparator {
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
     AbpCSSElemhide = "##",
@@ -252,7 +254,7 @@ export class CosmeticRuleSeparatorUtils {
         if (h > -1) {
             // Filter out comments, tink 127.0.0.1 localhost ## comment
             // ##
-            if (rule[h + 1] == "#" && (h == 0 || rule[h - 1] != " ")) {
+            if (rule[h + 1] == "#" && (h == 0 || rule[h - 1] != SPACE)) {
                 // ##+js
                 if (rule[h + 2] == "+" && rule[h + 3] == "j" && rule[h + 4] == "s") {
                     return [h, h + 5, CosmeticRuleSeparator.uBoScriptlet, false];

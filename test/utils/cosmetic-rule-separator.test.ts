@@ -1,3 +1,4 @@
+import { EMPTY, SPACE } from "../../src/utils/constants";
 import { CosmeticRuleSeparatorUtils } from "../../src/utils/cosmetic-rule-separator";
 
 describe("CosmeticRuleSeparator", () => {
@@ -118,8 +119,9 @@ describe("CosmeticRuleSeparator", () => {
         ]);
 
         // Invalid rules
-        expect(CosmeticRuleSeparatorUtils.find("")).toEqual([-1, -1, null, null]);
-        expect(CosmeticRuleSeparatorUtils.find(" ")).toEqual([-1, -1, null, null]);
+        expect(CosmeticRuleSeparatorUtils.find(EMPTY)).toEqual([-1, -1, null, null]);
+        expect(CosmeticRuleSeparatorUtils.find(SPACE)).toEqual([-1, -1, null, null]);
+
         expect(CosmeticRuleSeparatorUtils.find("#")).toEqual([-1, -1, null, null]);
         expect(CosmeticRuleSeparatorUtils.find("$")).toEqual([-1, -1, null, null]);
         expect(CosmeticRuleSeparatorUtils.find("$ $")).toEqual([-1, -1, null, null]);

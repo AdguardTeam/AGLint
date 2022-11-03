@@ -1,13 +1,14 @@
 import { IModifierList, ModifierListParser, MODIFIER_LIST_TYPE } from "../../../src/parser/common/modifier-list";
+import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("ModifierListParser", () => {
     test("parse", () => {
         // Empty modifiers
-        expect(ModifierListParser.parse("")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse(EMPTY)).toEqual(<IModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [],
         });
-        expect(ModifierListParser.parse("   ")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse(SPACE)).toEqual(<IModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [],
         });

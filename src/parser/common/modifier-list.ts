@@ -1,3 +1,4 @@
+import { EMPTY } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 
 const MODIFIERS_SEPARATOR = ",";
@@ -34,7 +35,7 @@ export class ModifierListParser {
         const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(rawModifiers, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
-        if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == "") {
+        if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == EMPTY) {
             return result;
         }
 

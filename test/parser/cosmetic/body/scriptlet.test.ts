@@ -1,4 +1,5 @@
 import { ScriptletBodyParser } from "../../../../src/parser/cosmetic/body/scriptlet";
+import { EMPTY } from "../../../../src/utils/constants";
 
 describe("ScriptletBodyParser", () => {
     test("parseAdgAndUboScriptletCall", () => {
@@ -420,7 +421,7 @@ describe("ScriptletBodyParser", () => {
         });
 
         // Empty case
-        expect(() => ScriptletBodyParser.parseAbpSnippetCall("")).toThrowError(
+        expect(() => ScriptletBodyParser.parseAbpSnippetCall(EMPTY)).toThrowError(
             /^No scriptlet specified at the following scriptlet call/
         );
     });

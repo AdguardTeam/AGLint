@@ -3,12 +3,13 @@ import { CommentRuleType } from "../../../src/parser/comment/common";
 import { IMetadata } from "../../../src/parser/comment/metadata";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
+import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("CommentParser", () => {
     test("isComment", () => {
         // Empty
-        expect(CommentParser.isComment("")).toBe(false);
-        expect(CommentParser.isComment(" ")).toBe(false);
+        expect(CommentParser.isComment(EMPTY)).toBe(false);
+        expect(CommentParser.isComment(SPACE)).toBe(false);
 
         // Begins with !
         expect(CommentParser.isComment("!")).toBe(true);
@@ -53,8 +54,8 @@ describe("CommentParser", () => {
 
     test("parse", () => {
         // Empty / not comment
-        expect(CommentParser.parse("")).toBe(null);
-        expect(CommentParser.parse(" ")).toBe(null);
+        expect(CommentParser.parse(EMPTY)).toBe(null);
+        expect(CommentParser.parse(SPACE)).toBe(null);
         expect(CommentParser.parse("##.ad")).toBe(null);
         expect(CommentParser.parse("#@#.ad")).toBe(null);
 

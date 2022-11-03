@@ -119,7 +119,7 @@ export class CssTree {
      * @returns {string} CSS selector as string
      */
     public static generateSelector(ast: Selector): string {
-        let result = "";
+        let result = EMPTY;
 
         let inAttributeSelector = false;
         let depth = 0;

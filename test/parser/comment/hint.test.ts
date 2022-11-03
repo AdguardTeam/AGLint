@@ -1,11 +1,12 @@
 import { HintParser, IHint } from "../../../src/parser/comment/hint";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
+import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("HintParser", () => {
     test("isHint", () => {
-        expect(HintParser.isHint("")).toBe(false);
-        expect(HintParser.isHint(" ")).toBe(false);
+        expect(HintParser.isHint(EMPTY)).toBe(false);
+        expect(HintParser.isHint(SPACE)).toBe(false);
         expect(HintParser.isHint("! comment")).toBe(false);
         expect(HintParser.isHint("# comment")).toBe(false);
         expect(HintParser.isHint("#+")).toBe(false);
@@ -82,7 +83,7 @@ describe("HintParser", () => {
             hints: [
                 {
                     name: "HINT_NAME1",
-                    params: [""],
+                    params: [EMPTY],
                 },
             ],
         });
@@ -94,7 +95,7 @@ describe("HintParser", () => {
             hints: [
                 {
                     name: "HINT_NAME1",
-                    params: [""],
+                    params: [EMPTY],
                 },
             ],
         });
@@ -106,11 +107,11 @@ describe("HintParser", () => {
             hints: [
                 {
                     name: "HINT_NAME1",
-                    params: [""],
+                    params: [EMPTY],
                 },
                 {
                     name: "HINT_NAME2",
-                    params: [""],
+                    params: [EMPTY],
                 },
             ],
         });
@@ -127,7 +128,7 @@ describe("HintParser", () => {
                 },
                 {
                     name: "HINT_NAME2",
-                    params: [""],
+                    params: [EMPTY],
                 },
             ],
         });
@@ -161,7 +162,7 @@ describe("HintParser", () => {
                 hints: [
                     {
                         name: "HINT_NAME",
-                        params: ["param0", "", "param1"],
+                        params: ["param0", EMPTY, "param1"],
                     },
                 ],
             }
@@ -176,7 +177,7 @@ describe("HintParser", () => {
                 hints: [
                     {
                         name: "HINT_NAME",
-                        params: ["param0", "", "", ""],
+                        params: ["param0", EMPTY, EMPTY, EMPTY],
                     },
                 ],
             }
@@ -191,7 +192,7 @@ describe("HintParser", () => {
                 hints: [
                     {
                         name: "HINT_NAME",
-                        params: ["", "", "", ""],
+                        params: [EMPTY, EMPTY, EMPTY, EMPTY],
                     },
                 ],
             }
@@ -206,7 +207,7 @@ describe("HintParser", () => {
                 hints: [
                     {
                         name: "HINT_NAME",
-                        params: ["", "", "", ""],
+                        params: [EMPTY, EMPTY, EMPTY, EMPTY],
                     },
                 ],
             }

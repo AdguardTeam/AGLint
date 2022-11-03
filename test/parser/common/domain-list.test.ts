@@ -1,4 +1,5 @@
 import { DomainListParser, DomainListSeparator, IDomainList } from "../../../src/parser/common/domain-list";
+import { EMPTY } from "../../../src/utils/constants";
 
 describe("DomainListParser", () => {
     test("parse", () => {
@@ -96,7 +97,7 @@ describe("DomainListParser", () => {
         });
 
         // Invalid cases
-        expect(() => DomainListParser.parse("")).toThrowError(/^Empty domain specified in domain list/);
+        expect(() => DomainListParser.parse(EMPTY)).toThrowError(/^Empty domain specified in domain list/);
 
         expect(() => DomainListParser.parse("~")).toThrowError(/^Empty domain specified in domain list/);
 

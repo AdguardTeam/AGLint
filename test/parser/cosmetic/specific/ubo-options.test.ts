@@ -1,4 +1,5 @@
 import { UBlockModifierListParser, UBO_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/ubo-options";
+import { EMPTY } from "../../../../src/utils/constants";
 
 describe("UBlockModifierListParser", () => {
     test("parse", async () => {
@@ -30,7 +31,7 @@ describe("UBlockModifierListParser", () => {
             modifiers: [
                 {
                     modifier: "matches-path",
-                    value: "",
+                    value: EMPTY,
                 },
             ],
             rest: ".ad",
@@ -70,17 +71,17 @@ describe("UBlockModifierListParser", () => {
             rest: ".ad:-abp-has(.something)",
         });
 
-        expect(UBlockModifierListParser.parse("")).toEqual({
+        expect(UBlockModifierListParser.parse(EMPTY)).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [],
-            rest: "",
+            rest: EMPTY,
         });
 
         // trim
         expect(UBlockModifierListParser.parse("  ")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [],
-            rest: "",
+            rest: EMPTY,
         });
     });
 

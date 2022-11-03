@@ -251,7 +251,7 @@ export class CssInjectionBodyParser {
                     .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
                 // Rule body (remove or another declarations)
-                result += " ";
+                result += SPACE;
 
                 if (!ast.block) {
                     result += `${CSS_BLOCK_OPEN} ${CSS_BLOCK_CLOSE}`;

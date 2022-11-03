@@ -1,12 +1,13 @@
 import { AgentParser, IAgent } from "../../../src/parser/comment/agent";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
+import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("AgentParser", () => {
     test("isAgent", () => {
         // Invalid
-        expect(AgentParser.isAgent("")).toBe(false);
-        expect(AgentParser.isAgent(" ")).toBe(false);
+        expect(AgentParser.isAgent(EMPTY)).toBe(false);
+        expect(AgentParser.isAgent(SPACE)).toBe(false);
         expect(AgentParser.isAgent("[")).toBe(false);
 
         // Cosmetic rule modifiers
@@ -26,8 +27,8 @@ describe("AgentParser", () => {
         expect(AgentParser.parse('##[class="ad"]')).toBeNull();
 
         // Empty agents
-        expect(AgentParser.parse("")).toBeNull();
-        expect(AgentParser.parse(" ")).toBeNull();
+        expect(AgentParser.parse(EMPTY)).toBeNull();
+        expect(AgentParser.parse(SPACE)).toBeNull();
 
         // Valid agents
         expect(AgentParser.parse("[]")).toEqual(<IAgent>{

@@ -1,11 +1,13 @@
 import { IMetadata, MetadataParser } from "../../../src/parser/comment/metadata";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
+import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("MetadataParser", () => {
     test("parse", () => {
-        expect(MetadataParser.parse("")).toBe(null);
-        expect(MetadataParser.parse(" ")).toBe(null);
+        expect(MetadataParser.parse(EMPTY)).toBe(null);
+        expect(MetadataParser.parse(SPACE)).toBe(null);
+
         expect(MetadataParser.parse("!")).toBe(null);
         expect(MetadataParser.parse("!##")).toBe(null);
         expect(MetadataParser.parse("##")).toBe(null);

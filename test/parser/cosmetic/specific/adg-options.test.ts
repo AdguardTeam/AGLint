@@ -3,14 +3,15 @@ import {
     AdGuardModifierListParser,
     ADG_MODIFIER_LIST_TYPE,
 } from "../../../../src/parser/cosmetic/specific/adg-options";
+import { EMPTY } from "../../../../src/utils/constants";
 
 describe("AdGuardModifierListParser", () => {
     test("parse", async () => {
         // Empty
-        expect(AdGuardModifierListParser.parse("")).toEqual({
+        expect(AdGuardModifierListParser.parse(EMPTY)).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [],
-            rest: "",
+            rest: EMPTY,
         });
 
         // Valid cases (please note that modifier parser are tested in another test file)
@@ -49,7 +50,7 @@ describe("AdGuardModifierListParser", () => {
                     value: "v2",
                 },
             ],
-            rest: "",
+            rest: EMPTY,
         });
 
         // Spaces
@@ -61,7 +62,7 @@ describe("AdGuardModifierListParser", () => {
                     value: "/test",
                 },
             ],
-            rest: "",
+            rest: EMPTY,
         });
 
         // Complicated case

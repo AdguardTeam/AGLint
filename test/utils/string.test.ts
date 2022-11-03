@@ -1,3 +1,4 @@
+import { EMPTY, SPACE } from "../../src/utils/constants";
 import { StringUtils } from "../../src/utils/string";
 
 describe("String utils", () => {
@@ -5,18 +6,18 @@ describe("String utils", () => {
         expect(StringUtils.findNextUnescapedCharacter(` \\,\\, , ,`, ",")).toEqual(6);
         expect(StringUtils.findNextUnescapedCharacter(` \\,\\, , ,`, ",", 7)).toEqual(8);
 
-        expect(StringUtils.findNextUnescapedCharacter("", ",")).toEqual(-1);
-        expect(StringUtils.findNextUnescapedCharacter(" ", ",")).toEqual(-1);
+        expect(StringUtils.findNextUnescapedCharacter(EMPTY, ",")).toEqual(-1);
+        expect(StringUtils.findNextUnescapedCharacter(SPACE, ",")).toEqual(-1);
     });
 
     test("findLastUnescapedCharacter", () => {
         expect(StringUtils.findLastUnescapedCharacter("aaa\\a\\aa", "a")).toEqual(7);
-        expect(StringUtils.findLastUnescapedCharacter("", "a")).toEqual(-1);
+        expect(StringUtils.findLastUnescapedCharacter(EMPTY, "a")).toEqual(-1);
     });
 
     test("findLastUnescapedCharacterThatNotFollowedBy", () => {
         expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy("$\\$\\$$f$ok", "$", "f")).toEqual(7);
-        expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy("", "$", "/")).toEqual(-1);
+        expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy(EMPTY, "$", "/")).toEqual(-1);
     });
 
     test("findUnescapedNonStringNonRegexChar", () => {
@@ -25,7 +26,7 @@ describe("String utils", () => {
         expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ \\a   a`, "a")).toEqual(24);
 
         expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ /a/`, "a")).toEqual(-1);
-        expect(StringUtils.findUnescapedNonStringNonRegexChar("", "a")).toEqual(-1);
+        expect(StringUtils.findUnescapedNonStringNonRegexChar(EMPTY, "a")).toEqual(-1);
     });
 
     test("findNextUnquotedUnescapedCharacter", () => {
@@ -40,8 +41,8 @@ describe("String utils", () => {
         expect(StringUtils.findNextUnquotedUnescapedCharacter('"a,b"', ",")).toEqual(-1);
 
         // empty strings
-        expect(StringUtils.findNextUnquotedUnescapedCharacter("", ",")).toEqual(-1);
-        expect(StringUtils.findNextUnquotedUnescapedCharacter(" ", ",")).toEqual(-1);
+        expect(StringUtils.findNextUnquotedUnescapedCharacter(EMPTY, ",")).toEqual(-1);
+        expect(StringUtils.findNextUnquotedUnescapedCharacter(SPACE, ",")).toEqual(-1);
     });
 
     test("splitStringByUnquotedUnescapedCharacter", () => {
