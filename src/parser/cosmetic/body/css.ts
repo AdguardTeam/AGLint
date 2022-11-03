@@ -4,6 +4,14 @@
 
 import { Selector, SelectorList, MediaQueryList, Block, Rule, generate as generateCss } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
+import {
+    CSS_MEDIA_MARKER,
+    CSS_PSEUDO_CLOSE,
+    CSS_PSEUDO_MARKER,
+    CSS_PSEUDO_OPEN,
+    EMPTY,
+    SPACE,
+} from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
 
 /**
@@ -23,9 +31,14 @@ const REMOVE_BLOCK = "{ remove: true; }";
 const CSS_SELECTORS_SEPARATOR = ",";
 const CSS_BLOCK_OPEN = "{";
 const CSS_BLOCK_CLOSE = "}";
+const UBO_STYLE = "style";
+const UBO_REMOVE = "remove";
+const UBO_STYLE_MARKER = CSS_PSEUDO_MARKER + UBO_STYLE + CSS_PSEUDO_OPEN;
+const UBO_REMOVE_MARKER = CSS_PSEUDO_MARKER + UBO_REMOVE + CSS_PSEUDO_OPEN;
 
-export type RemoveBlock = "remove";
-export type CssInjectionBlock = Block | RemoveBlock;
+export const REMOVE_BLOCK_TYPE = "remove";
+
+export type CssInjectionBlock = Block | typeof REMOVE_BLOCK_TYPE;
 
 export interface ICssRuleBody {
     mediaQueryList?: MediaQueryList;
@@ -35,7 +48,7 @@ export interface ICssRuleBody {
 
 export class CssInjectionBodyParser {
     /**
-     * Since it has to run for every elementhide rule, the regex would be slow, so firstly we search for the keywords.
+     * Checks if a selector is a uBlock CSS injection.
      *
      * @param {string} raw - Raw selector body
      * @returns {boolean} true/false
@@ -43,20 +56,36 @@ export class CssInjectionBodyParser {
     public static isUblockCssInjection(raw: string): boolean {
         const trimmed = raw.trim();
 
-        if (trimmed.indexOf(":style(") != -1 || trimmed.endsWith(":remove()")) {
+        // Since it has to run for every elementhide rule, the regex would be slow,
+        // so firstly we search for the keywords.
+        if (trimmed.indexOf(UBO_STYLE_MARKER) != -1 || trimmed.indexOf(UBO_REMOVE_MARKER) != -1) {
             return UBO_CSS_INJECTION_PATTERN.test(trimmed);
         }
 
         return false;
     }
 
+    /**
+     * Checks if a selector is an AdGuard CSS injection.
+     *
+     * @param {string} raw - Raw selector body
+     * @returns {boolean} true/false
+     */
     public static isAdGuardCssInjection(raw: string) {
         return ADG_CSS_INJECTION_PATTERN.test(raw.trim());
     }
 
+    /**
+     * Parses a raw selector as an AdGuard CSS injection.
+     *
+     * @param {string} raw - Raw rule
+     * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
+     * as AdGuard CSS injection)
+     */
     public static parseAdGuardCssInjection(raw: string): ICssRuleBody | null {
         const trimmed = raw.trim();
 
+        // Check pattern first
         if (!CssInjectionBodyParser.isAdGuardCssInjection(trimmed)) {
             return null;
         }
@@ -98,7 +127,7 @@ export class CssInjectionBodyParser {
 
         block.children.forEach((node) => {
             if (node.type === "Declaration") {
-                if (node.property == "remove") {
+                if (node.property == REMOVE_BLOCK_TYPE) {
                     if (removeDeclFound) {
                         throw new Error(`Multiple remove property found in the following CSS injection body: "${raw}"`);
                     }
@@ -117,7 +146,7 @@ export class CssInjectionBodyParser {
         }
 
         if (removeDeclFound) {
-            block = "remove";
+            block = REMOVE_BLOCK_TYPE;
         }
 
         return {
@@ -127,10 +156,17 @@ export class CssInjectionBodyParser {
         };
     }
 
+    /**
+     * Parses a raw selector as a uBlock CSS injection.
+     *
+     * @param {string} raw - Raw rule
+     * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
+     * as uBlock CSS injection)
+     */
     public static parseUblockCssInjection(raw: string): ICssRuleBody | null {
         const trimmed = raw.trim();
 
-        // uBlock CSS injection
+        // Check pattern first
         const uBlockCssInjection = trimmed.match(UBO_CSS_INJECTION_PATTERN);
         if (!(uBlockCssInjection && uBlockCssInjection.groups)) {
             return null;
@@ -152,7 +188,7 @@ export class CssInjectionBodyParser {
             // }
         });
 
-        let block: CssInjectionBlock = "remove";
+        let block: CssInjectionBlock = REMOVE_BLOCK_TYPE;
 
         if (uBlockCssInjection.groups.declarations) {
             const rawDeclarations = uBlockCssInjection.groups.declarations.trim();
@@ -167,6 +203,13 @@ export class CssInjectionBodyParser {
         };
     }
 
+    /**
+     * Parses a raw selector as a CSS injection. It determines the syntax automatically.
+     *
+     * @param {string} raw - Raw rule
+     * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
+     * as CSS injection)
+     */
     public static parse(raw: string): ICssRuleBody | null {
         const trimmed = raw.trim();
 
@@ -180,39 +223,53 @@ export class CssInjectionBodyParser {
         return CssInjectionBodyParser.parseUblockCssInjection(trimmed);
     }
 
+    /**
+     * Converts a CSS injection AST to a string.
+     *
+     * @param {ICssRuleBody} ast - CSS injection rule body AST
+     * @param {AdblockSyntax} syntax - Desired syntax of the generated result
+     * @returns {string} Raw string
+     */
     public static generate(ast: ICssRuleBody, syntax: AdblockSyntax): string {
-        let result = "";
+        let result = EMPTY;
 
         switch (syntax) {
-            case AdblockSyntax.AdGuard:
+            case AdblockSyntax.AdGuard: {
                 if (ast.mediaQueryList) {
-                    result += "@media ";
+                    result += CSS_MEDIA_MARKER;
+                    result += SPACE;
                     result += generateCss(ast.mediaQueryList);
-                    result += " " + CSS_BLOCK_OPEN + " ";
+                    result += SPACE;
+                    result += CSS_BLOCK_OPEN;
+                    result += SPACE;
                 }
 
                 // Selectors (comma separated)
                 result += ast.selectors
                     .map((selector) => CssTree.generateSelector(selector))
-                    .join(CSS_SELECTORS_SEPARATOR + " ");
+                    .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
                 // Rule body (remove or another declarations)
                 result += " ";
 
                 if (!ast.block) {
                     result += `${CSS_BLOCK_OPEN} ${CSS_BLOCK_CLOSE}`;
-                } else if (ast.block === "remove") {
+                } else if (ast.block === REMOVE_BLOCK_TYPE) {
                     result += REMOVE_BLOCK;
                 } else {
-                    result += CSS_BLOCK_OPEN + " ";
+                    result += CSS_BLOCK_OPEN;
+                    result += SPACE;
                     result += CssTree.generateBlock(ast.block);
-                    result += " " + CSS_BLOCK_CLOSE;
+                    result += SPACE;
+                    result += CSS_BLOCK_CLOSE;
                 }
 
                 if (ast.mediaQueryList) {
-                    result += " " + CSS_BLOCK_CLOSE;
+                    result += SPACE;
+                    result += CSS_BLOCK_CLOSE;
                 }
                 break;
+            }
 
             case AdblockSyntax.uBlockOrigin: {
                 if (ast.mediaQueryList !== undefined) {
@@ -222,19 +279,32 @@ export class CssInjectionBodyParser {
                 // Selectors (comma separated)
                 result += ast.selectors
                     .map((selector) => CssTree.generateSelector(selector))
-                    .join(CSS_SELECTORS_SEPARATOR + " ");
+                    .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
                 // Add :remove() or :style() at the end of the injection
                 if (!ast.block) {
-                    result += ":style()";
-                } else if (ast.block === "remove") {
-                    result += ":remove()";
+                    result += CSS_PSEUDO_MARKER;
+                    result += UBO_STYLE;
+                    result += CSS_PSEUDO_OPEN;
+                    result += CSS_PSEUDO_CLOSE;
+                } else if (ast.block === REMOVE_BLOCK_TYPE) {
+                    result += CSS_PSEUDO_MARKER;
+                    result += UBO_REMOVE;
+                    result += CSS_PSEUDO_OPEN;
+                    result += CSS_PSEUDO_CLOSE;
                 } else {
-                    result += ":style(";
+                    result += CSS_PSEUDO_MARKER;
+                    result += UBO_STYLE;
+                    result += CSS_PSEUDO_OPEN;
                     result += CssTree.generateBlock(ast.block);
-                    result += ")";
+                    result += CSS_PSEUDO_CLOSE;
                 }
+
+                break;
             }
+
+            default:
+                throw new SyntaxError(`Unsupported syntax: ${syntax}`);
         }
 
         return result;

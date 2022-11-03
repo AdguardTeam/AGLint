@@ -1,8 +1,9 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { StringUtils } from "../../utils/string";
-import { IRuleModifier, ModifierListParser } from "../common/modifier-list";
+import { IRuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
 import { IRule, RuleCategories } from "../common";
 import { NetworkRuleType } from "./common";
+import { EMPTY } from "../../utils/constants";
 
 const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
@@ -20,6 +21,12 @@ export interface INetworkRule extends IRule {
 }
 
 export class NetworkRuleParser {
+    /**
+     * Parses a network rule (also known as basic rule). Make sure you parse the cosmetic rules first!
+     *
+     * @param {string} raw - Raw rule
+     * @returns {INetworkRule} Network rule AST
+     */
     public static parse(raw: string): INetworkRule {
         let rule = raw.trim();
 
@@ -67,13 +74,13 @@ export class NetworkRuleParser {
     }
 
     /**
-     * Converts AST to String.
+     * Converts a network rule (basic rule) AST to a string.
      *
      * @param {INetworkRule} ast - Network rule AST
-     * @returns {string} Raw data
+     * @returns {string} Raw string
      */
     public static generate(ast: INetworkRule): string {
-        let result = "";
+        let result = EMPTY;
 
         if (ast.exception) {
             result += NETWORK_RULE_EXCEPTION_MARKER;
@@ -85,7 +92,7 @@ export class NetworkRuleParser {
             result += NETWORK_RULE_SEPARATOR;
 
             result += ModifierListParser.generate({
-                type: "ModifierList",
+                type: MODIFIER_LIST_TYPE,
                 modifiers: ast.modifiers,
             });
         }

@@ -1,4 +1,5 @@
 import { AdblockSyntax } from "../../utils/adblockers";
+import { SPACE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 import { RuleCategories } from "../common";
 import { CommentMarker, CommentRuleType, IComment } from "./common";
@@ -51,7 +52,7 @@ export class AgentParser {
         const trimmed = raw.trim();
 
         // Since this function rarely runs, it's okay to use regex here
-        const splitted = trimmed.split(" ");
+        const splitted = trimmed.split(SPACE);
 
         for (let i = 0; i < splitted.length; i++) {
             // Part contains dot or number
@@ -62,8 +63,8 @@ export class AgentParser {
                 }
 
                 return {
-                    adblock: splitted.slice(0, i).join(" "),
-                    version: splitted.slice(i).join(" "),
+                    adblock: splitted.slice(0, i).join(SPACE),
+                    version: splitted.slice(i).join(SPACE),
                 };
             }
         }
@@ -143,12 +144,13 @@ export class AgentParser {
                 let subresult = adblock;
 
                 if (version) {
-                    subresult += " " + version;
+                    subresult += SPACE;
+                    subresult += version;
                 }
 
                 return subresult;
             })
-            .join(AGENT_SEPARATOR + " ");
+            .join(AGENT_SEPARATOR + SPACE);
 
         result += AGENT_LIST_CLOSE;
 

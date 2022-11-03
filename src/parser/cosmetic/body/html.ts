@@ -4,8 +4,9 @@
 
 import { Selector, SelectorList } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
+import { ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
-import { ESCAPE_CHARACTER, StringUtils } from "../../../utils/string";
+import { StringUtils } from "../../../utils/string";
 
 const CSS_SELECTORS_SEPARATOR = ",";
 
@@ -66,11 +67,20 @@ export class HtmlBodyParser {
         return result;
     }
 
+    /**
+     * Parses a raw cosmetic rule body as an HTML filtering rule body.
+     * Please note that compatibility is not yet checked at this point.
+     *
+     * @param {string} raw - Raw body
+     * @returns {IHtmlRuleBody | null} HTML filtering rule body AST
+     */
     public static parse(raw: string): IHtmlRuleBody {
+        const trimmed = raw.trim();
+
         const selectors: Selector[] = [];
 
-        // Convert "" -> \\"
-        const escapedRawBody = HtmlBodyParser.escapeDoubleQuotes(raw);
+        // Convert "" to \\" (this theoretically does not affect the uBlock rules)
+        const escapedRawBody = HtmlBodyParser.escapeDoubleQuotes(trimmed);
 
         // Selector
         if (StringUtils.findNextUnescapedCharacter(escapedRawBody, CSS_SELECTORS_SEPARATOR) == -1) {
@@ -92,11 +102,19 @@ export class HtmlBodyParser {
         };
     }
 
+    /**
+     * Converts an HTML filtering rule body AST to a string.
+     *
+     * @param {IHtmlRuleBody} ast - HTML filtering rule body AST
+     * @param {AdblockSyntax} syntax - Desired syntax of the generated result
+     * @returns {string} Raw string
+     */
     public static generate(ast: IHtmlRuleBody, syntax: AdblockSyntax): string {
         let result = ast.selectors
             .map((selector) => CssTree.generateSelector(selector))
-            .join(CSS_SELECTORS_SEPARATOR + " ");
+            .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
+        // In the case of AdGuard syntax, the "" case must be handled
         if (syntax == AdblockSyntax.AdGuard) {
             result = HtmlBodyParser.unescapeDoubleQuotes(result);
         }

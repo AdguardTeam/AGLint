@@ -14,18 +14,19 @@ import {
     Block,
 } from "css-tree";
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from "../converter/pseudo";
-
-const CLASS_MARKER = ".";
-const ID_MARKER = "#";
-const ATTRIBUTE_SELECTOR_OPEN = "[";
-const ATTRIBUTE_SELECTOR_CLOSE = "]";
-const PSEUDO_MARKER = ":";
-const PSEUDO_OPEN = "(";
-const PSEUDO_CLOSE = ")";
-const IMPORTANT = "!important";
-const DECLARATION_END = ";";
-const DECLARATION_SEPARATOR = ":";
-const SPACE = " ";
+import {
+    CSS_ATTRIBUTE_SELECTOR_CLOSE,
+    CSS_ATTRIBUTE_SELECTOR_OPEN,
+    CSS_CLASS_MARKER,
+    CSS_DECLARATION_END,
+    CSS_DECLARATION_SEPARATOR,
+    CSS_ID_MARKER,
+    CSS_IMPORTANT,
+    CSS_PSEUDO_CLOSE,
+    CSS_PSEUDO_MARKER,
+    CSS_PSEUDO_OPEN,
+    SPACE,
+} from "./constants";
 
 export interface IExtendedCssNodes {
     pseudos: PseudoClassSelector[];
@@ -139,12 +140,12 @@ export class CssTree {
                         break;
 
                     case "ClassSelector":
-                        result += CLASS_MARKER;
+                        result += CSS_CLASS_MARKER;
                         result += node.name;
                         break;
 
                     case "IdSelector":
-                        result += ID_MARKER;
+                        result += CSS_ID_MARKER;
                         result += node.name;
                         break;
 
@@ -202,7 +203,7 @@ export class CssTree {
                         break;
 
                     case "AttributeSelector":
-                        result += ATTRIBUTE_SELECTOR_OPEN;
+                        result += CSS_ATTRIBUTE_SELECTOR_OPEN;
 
                         // Identifier name
                         if (node.name) {
@@ -233,28 +234,28 @@ export class CssTree {
                             result += node.flags;
                         }
 
-                        result += ATTRIBUTE_SELECTOR_CLOSE;
+                        result += CSS_ATTRIBUTE_SELECTOR_CLOSE;
 
                         inAttributeSelector = true;
                         break;
 
                     case "PseudoElementSelector":
-                        result += PSEUDO_MARKER;
-                        result += PSEUDO_MARKER;
+                        result += CSS_PSEUDO_MARKER;
+                        result += CSS_PSEUDO_MARKER;
                         result += node.name;
 
                         if (node.children !== null) {
-                            result += PSEUDO_OPEN;
+                            result += CSS_PSEUDO_OPEN;
                         }
 
                         break;
 
                     case "PseudoClassSelector":
-                        result += PSEUDO_MARKER;
+                        result += CSS_PSEUDO_MARKER;
                         result += node.name;
 
                         if (node.children !== null) {
-                            result += PSEUDO_OPEN;
+                            result += CSS_PSEUDO_OPEN;
                         }
                         break;
                 }
@@ -284,7 +285,7 @@ export class CssTree {
                     case "PseudoElementSelector":
                     case "PseudoClassSelector":
                         if (node.children !== null) {
-                            result += PSEUDO_CLOSE;
+                            result += CSS_PSEUDO_CLOSE;
                         }
                         break;
                 }
@@ -310,7 +311,7 @@ export class CssTree {
                         result += node.property;
 
                         if (node.value) {
-                            result += DECLARATION_SEPARATOR;
+                            result += CSS_DECLARATION_SEPARATOR;
                             result += SPACE;
 
                             // Fallback to CSSTree's default generate function for the value (enough at this point)
@@ -321,7 +322,7 @@ export class CssTree {
                             // FIXME: Space before important?
                             // See https://github.com/AdguardTeam/AdguardFilters/pull/132240#discussion_r996684483
                             result += SPACE;
-                            result += IMPORTANT;
+                            result += CSS_IMPORTANT;
                         }
 
                         break;
@@ -331,7 +332,7 @@ export class CssTree {
             leave: (node: CssNode) => {
                 switch (node.type) {
                     case "Declaration": {
-                        result += DECLARATION_END;
+                        result += CSS_DECLARATION_END;
                         result += SPACE;
                         break;
                     }

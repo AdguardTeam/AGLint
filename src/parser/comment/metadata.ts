@@ -4,6 +4,7 @@
 
 import { METADATA_HEADERS } from "../../converter/metadata";
 import { AdblockSyntax } from "../../utils/adblockers";
+import { SPACE } from "../../utils/constants";
 import { RuleCategories } from "../common";
 import { CommentMarker, CommentRuleType, IComment } from "./common";
 
@@ -59,10 +60,10 @@ export class MetadataParser {
      * @returns {string} Raw string
      */
     public static generate(ast: IMetadata): string {
-        let result = ast.marker + " ";
+        let result = ast.marker + SPACE;
 
         result += ast.header;
-        result += METADATA_SEPARATOR + " ";
+        result += METADATA_SEPARATOR + SPACE;
         result += ast.value;
 
         return result;

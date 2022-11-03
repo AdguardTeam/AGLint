@@ -10,11 +10,12 @@ import { CssInjectionBodyParser, ICssRuleBody } from "./body/css";
 import { ElementHidingBodyParser, IElementHidingRuleBody } from "./body/elementhiding";
 import { ScriptletBodyParser, IScriptletRuleBody } from "./body/scriptlet";
 import { HtmlBodyParser, IHtmlRuleBody } from "./body/html";
-import { DomainListParser, IDomain } from "../common/domain-list";
-import { AdGuardModifierListParser } from "./specific/adg-options";
+import { DomainListParser, DOMAIN_LIST_TYPE, IDomain } from "../common/domain-list";
+import { AdGuardModifierListParser, ADG_MODIFIER_LIST_TYPE } from "./specific/adg-options";
 import { IRuleModifier } from "../common/modifier-list";
-import { UBlockModifierListParser } from "./specific/ubo-options";
+import { UBlockModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-options";
 import { CosmeticRuleType } from "./common";
+import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
 
 export interface ICosmeticRule extends IRule {
     category: RuleCategories.Cosmetic;
@@ -52,12 +53,20 @@ export interface IJsRule extends ICosmeticRule {
 }
 
 export class CosmeticRuleParser {
-    public static isCosmetic(rawRule: string) {
-        if (CommentParser.isComment(rawRule)) {
+    /**
+     * Determines whether a rule is a cosmetic rule.
+     *
+     * @param {string} raw - Raw rule
+     * @returns {boolean} true/false
+     */
+    public static isCosmetic(raw: string) {
+        const trimmed = raw.trim();
+
+        if (CommentParser.isComment(trimmed)) {
             return false;
         }
 
-        const [start] = CosmeticRuleSeparatorUtils.find(rawRule);
+        const [start] = CosmeticRuleSeparatorUtils.find(trimmed);
 
         return start != -1;
     }
@@ -281,22 +290,28 @@ export class CosmeticRuleParser {
         return null;
     }
 
+    /**
+     * Converts a cosmetic rule AST into a string.
+     *
+     * @param {ICosmeticRule} ast - Cosmetic rule AST
+     * @returns {string} Raw string
+     */
     public static generate(ast: ICosmeticRule): string {
-        let result = "";
+        let result = EMPTY;
 
         // AdGuard modifiers
         if (ast.syntax == AdblockSyntax.AdGuard && ast.modifiers.length > 0) {
             result += AdGuardModifierListParser.generate({
-                type: "AdGuardModifierList",
+                type: ADG_MODIFIER_LIST_TYPE,
                 modifiers: ast.modifiers,
-                rest: "",
+                rest: EMPTY,
             });
         }
 
         // Domains
         result += DomainListParser.generate({
-            type: "DomainList",
-            separator: ",",
+            type: DOMAIN_LIST_TYPE,
+            separator: COMMA,
             domains: ast.domains,
         });
 
@@ -306,7 +321,7 @@ export class CosmeticRuleParser {
 
                 if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
                     result += UBlockModifierListParser.generate({
-                        type: "uBlockModifierList",
+                        type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
                         rest: ElementHidingBodyParser.generate(<IElementHidingRuleBody>ast.body),
                     });
@@ -320,7 +335,7 @@ export class CosmeticRuleParser {
 
                 if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
                     result += UBlockModifierListParser.generate({
-                        type: "uBlockModifierList",
+                        type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
                         rest: CssInjectionBodyParser.generate(<ICssRuleBody>ast.body, ast.syntax),
                     });
@@ -334,7 +349,7 @@ export class CosmeticRuleParser {
 
                 if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
                     result += UBlockModifierListParser.generate({
-                        type: "uBlockModifierList",
+                        type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
                         rest: HtmlBodyParser.generate(<IHtmlRuleBody>ast.body, ast.syntax),
                     });
@@ -357,7 +372,7 @@ export class CosmeticRuleParser {
                 const scriptlets = ScriptletBodyParser.generate(<IScriptletRuleBody>ast.body, ast.syntax);
 
                 if (ast.syntax == AdblockSyntax.AdblockPlus) {
-                    result += scriptlets.join("; ");
+                    result += scriptlets.join(SEMICOLON + SPACE);
                     return result;
                 } else {
                     const rules = [];
@@ -367,7 +382,7 @@ export class CosmeticRuleParser {
                         rules.push(result + scriptlet);
                     }
 
-                    return rules.join("\n");
+                    return rules.join(NEWLINE);
                 }
         }
 

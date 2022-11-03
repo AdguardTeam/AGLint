@@ -161,11 +161,11 @@ describe("ScriptletBodyParser", () => {
 
         // Invalid cases
         expect(() => ScriptletBodyParser.parseAdgAndUboScriptletCall("scriptlet0, arg0, arg1, arg2")).toThrowError(
-            /^Invalid uBlock\/AdGuard scriptlet call, no opening bracket "\(" at call:/
+            /^Invalid uBlock\/AdGuard scriptlet call, no opening parentheses "\(" at call:/
         );
 
         expect(() => ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, arg0, arg1, arg2")).toThrowError(
-            /^Invalid uBlock\/AdGuard scriptlet call, no closing bracket "\)" at call:/
+            /^Invalid uBlock\/AdGuard scriptlet call, no closing parentheses "\)" at call:/
         );
     });
 

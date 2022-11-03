@@ -5,11 +5,13 @@
  */
 
 import { AdblockSyntax } from "../../utils/adblockers";
+import { EMPTY, SPACE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 import { RuleCategories } from "../common";
 import { CommentRuleType, IComment } from "./common";
 
 const HINT_MARKER = "!+";
+const HINT_MARKER_LEN = 2;
 const HINT_PARAMS_OPEN = "(";
 const HINT_PARAMS_CLOSE = ")";
 const HINT_PARAMS_SEPARATOR = ",";
@@ -54,10 +56,10 @@ export class HintParser {
         const collectedMembers: IHintMember[] = [];
 
         let openingBracketIndex = -1;
-        let collectedHintName = "";
+        let collectedHintName = EMPTY;
 
         // Skip !+ or #+, so start from index 2
-        for (let i = 2; i < trimmed.length; i++) {
+        for (let i = HINT_MARKER_LEN; i < trimmed.length; i++) {
             // Bracket opening
             if (trimmed[i] == HINT_PARAMS_OPEN) {
                 if (collectedHintName.length == 0) {
@@ -90,7 +92,7 @@ export class HintParser {
                 });
 
                 openingBracketIndex = -1;
-                collectedHintName = "";
+                collectedHintName = EMPTY;
             }
 
             // Spaces between hints
@@ -159,19 +161,19 @@ export class HintParser {
      * @returns {string} Raw string
      */
     public static generate(ast: IHint): string {
-        let result = HINT_MARKER + " ";
+        let result = HINT_MARKER + SPACE;
 
         result += ast.hints
             .map(({ name, params }) => {
                 let subresult = name;
 
                 if (params && params.length > 0) {
-                    subresult += HINT_PARAMS_OPEN + params.join(HINT_PARAMS_SEPARATOR + " ") + HINT_PARAMS_CLOSE;
+                    subresult += HINT_PARAMS_OPEN + params.join(HINT_PARAMS_SEPARATOR + SPACE) + HINT_PARAMS_CLOSE;
                 }
 
                 return subresult;
             })
-            .join(" ");
+            .join(SPACE);
 
         return result.trim();
     }

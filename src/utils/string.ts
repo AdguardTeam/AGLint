@@ -2,7 +2,11 @@
  * String helpers
  */
 
-export const ESCAPE_CHARACTER = "\\";
+import { EMPTY, ESCAPE_CHARACTER, SPACE } from "./constants";
+
+export const SINGLE_QUOTE_MARKER = "'";
+export const DOUBLE_QUOTE_MARKER = '"';
+export const REGEX_MARKER = "/";
 
 export class StringUtils {
     /**
@@ -84,77 +88,6 @@ export class StringUtils {
     }
 
     /**
-     * Finds the first occurrence of a character that:
-     * - isn't part of any RegExp expression (/regexp/)
-     * - isn't preceded by an escape character
-     *
-     * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
-     * @param {number} start - Start index
-     * @param {string} escapeCharacter
-     * @returns {number} Index or -1 if the character not found
-     */
-    // public static findFirstNonRegexUnescapedCharacter(
-    //     pattern: string,
-    //     searchedCharacter: string,
-    //     start = 0,
-    //     escapeCharacter = ESCAPE_CHARACTER
-    // ) {
-    //     let regexOpen = false;
-
-    //     for (let i = start; i < pattern.length; i++) {
-    //         // Unescaped /
-    //         if (pattern[i] == "/" && pattern[i - 1] != escapeCharacter) {
-    //             regexOpen = !regexOpen;
-    //         }
-    //         // Unescaped character
-    //         else if (pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
-    //             if (!regexOpen) {
-    //                 return i;
-    //             }
-    //         }
-    //     }
-
-    //     return -1;
-    // }
-
-    /**
-     * Finds the last occurrence of a character that:
-     * - isn't part of any RegExp expression (/regexp/)
-     * - isn't preceded by an escape character
-     *
-     * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
-     * @param {number} start - Start index
-     * @param {string} escapeCharacter
-     * @returns {number} Index or -1 if the character not found
-     */
-    // public static findLastNonRegexUnescapedCharacter(
-    //     pattern: string,
-    //     searchedCharacter: string,
-    //     start = 0,
-    //     escapeCharacter = ESCAPE_CHARACTER
-    // ) {
-    //     let regexOpen = false;
-    //     let foundIndex = -1;
-
-    //     for (let i = start; i < pattern.length; i++) {
-    //         // Unescaped /
-    //         if (pattern[i] == "/" && pattern[i - 1] != escapeCharacter) {
-    //             regexOpen = !regexOpen;
-    //         }
-    //         // Unescaped character
-    //         else if (pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
-    //             if (!regexOpen) {
-    //                 foundIndex = i;
-    //             }
-    //         }
-    //     }
-
-    //     return foundIndex;
-    // }
-
-    /**
      * Finds the next occurrence of a character that:
      * - isn't part of any string literal ('literal' or "literal")
      * - isn't part of any RegExp expression (/regexp/)
@@ -168,13 +101,18 @@ export class StringUtils {
         let open: string | null = null;
 
         for (let i = start; i < pattern.length; i++) {
-            if ((pattern[i] == "'" || pattern[i] == '"' || pattern[i] == "/") && pattern[i - 1] != "\\") {
+            if (
+                (pattern[i] == SINGLE_QUOTE_MARKER ||
+                    pattern[i] == DOUBLE_QUOTE_MARKER ||
+                    pattern[i] == REGEX_MARKER) &&
+                pattern[i - 1] != ESCAPE_CHARACTER
+            ) {
                 if (open === pattern[i]) {
                     open = null;
                 } else {
                     open = pattern[i];
                 }
-            } else if (open === null && pattern[i] == searchedCharacter && pattern[i - 1] != "\\") {
+            } else if (open === null && pattern[i] == searchedCharacter && pattern[i - 1] != ESCAPE_CHARACTER) {
                 return i;
             }
         }
@@ -203,7 +141,10 @@ export class StringUtils {
 
         for (let i = start; i < pattern.length; i++) {
             // Unescaped ' or "
-            if ((pattern[i] == "'" || pattern[i] == '"') && pattern[i - 1] != escapeCharacter) {
+            if (
+                (pattern[i] == SINGLE_QUOTE_MARKER || pattern[i] == DOUBLE_QUOTE_MARKER) &&
+                pattern[i - 1] != escapeCharacter
+            ) {
                 if (!openQuote) openQuote = pattern[i];
                 else if (openQuote == pattern[i]) openQuote = null;
             }
@@ -304,7 +245,7 @@ export class StringUtils {
      * @returns {boolean} true/false
      */
     public static isWhitespace(character: string): boolean {
-        return character == " " || character == "\t";
+        return character == SPACE || character == "\t";
     }
 
     /**
@@ -347,15 +288,23 @@ export class StringUtils {
     public static isRegexPattern(pattern: string): boolean {
         const trimmedPattern = pattern.trim();
         const lastIndex = trimmedPattern.length - 1;
-        if (trimmedPattern.length > 2 && trimmedPattern[0] == "/") {
-            const last = StringUtils.findNextUnescapedCharacter(trimmedPattern, "/", 1);
+        if (trimmedPattern.length > 2 && trimmedPattern[0] == REGEX_MARKER) {
+            const last = StringUtils.findNextUnescapedCharacter(trimmedPattern, REGEX_MARKER, 1);
             return last == lastIndex;
         }
         return false;
     }
 
+    /**
+     * Escapes a specified character in the string.
+     *
+     * @param {string} pattern - Input string
+     * @param {string} character - Character to escape
+     * @param {string} escapeCharacter - Escape character (optional)
+     * @returns {boolean} true/false
+     */
     public static escapeCharacter(pattern: string, character: string, escapeCharacter = ESCAPE_CHARACTER): string {
-        let result = "";
+        let result = EMPTY;
 
         for (let i = 0; i < pattern.length; i++) {
             if (pattern[i] == character && pattern[i - 1] != escapeCharacter) {

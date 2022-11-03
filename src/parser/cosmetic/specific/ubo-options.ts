@@ -1,38 +1,45 @@
+import { CSS_PSEUDO_CLOSE, CSS_PSEUDO_MARKER, CSS_PSEUDO_OPEN, EMPTY, SPACE } from "../../../utils/constants";
 import { StringUtils } from "../../../utils/string";
 import { IRuleModifier } from "../../common/modifier-list";
 
-const PSEUDO_MARKER = ":";
-const PSEUDO_OPEN = "(";
-const PSEUDO_CLOSE = ")";
-
 const UBO_COSMETIC_MODIFIERS = ["matches-path"];
 
+export const UBO_MODIFIER_LIST_TYPE = "uBlockModifierList";
+
 export interface IuBlockModifierList {
-    type: "uBlockModifierList";
+    type: typeof UBO_MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
     rest: string;
 }
 
 export class UBlockModifierListParser {
-    public static parse(rawBody: string): IuBlockModifierList {
+    /**
+     * Parses a uBO modifier (option) list.
+     *
+     * @param {string} raw - Raw pattern
+     * @returns {IuBlockModifierList} Modifier list AST
+     */
+    public static parse(raw: string): IuBlockModifierList {
+        const trimmed = raw.trim();
         const modifiers: IRuleModifier[] = [];
-        let rest = "";
+
+        let rest = EMPTY;
 
         let i = 0;
-        while (i < rawBody.length) {
-            if (rawBody[i] == PSEUDO_MARKER) {
+        while (i < trimmed.length) {
+            if (trimmed[i] == CSS_PSEUDO_MARKER) {
                 const modifier = UBO_COSMETIC_MODIFIERS.find(
                     // eslint-disable-next-line @typescript-eslint/no-loop-func
-                    (m) => rawBody.indexOf(`${m}${PSEUDO_OPEN}`, i + 1) == i + 1
+                    (m) => trimmed.indexOf(`${m}${CSS_PSEUDO_OPEN}`, i + 1) == i + 1
                 );
                 if (modifier) {
                     const contentStart = i + modifier.length + 2;
 
-                    const contentEnd = StringUtils.findNextUnescapedCharacter(rawBody, PSEUDO_CLOSE, contentStart);
+                    const contentEnd = StringUtils.findNextUnescapedCharacter(trimmed, CSS_PSEUDO_CLOSE, contentStart);
 
                     modifiers.push({
                         modifier,
-                        value: rawBody.substring(contentStart, contentEnd),
+                        value: trimmed.substring(contentStart, contentEnd),
                     });
 
                     i = contentEnd + 1;
@@ -41,39 +48,45 @@ export class UBlockModifierListParser {
             }
 
             // Store anything else
-            rest += rawBody[i];
+            rest += trimmed[i];
             i++;
         }
 
         return {
-            type: "uBlockModifierList",
+            type: UBO_MODIFIER_LIST_TYPE,
             modifiers,
             rest: rest.trim(),
         };
     }
 
+    /**
+     * Converts a uBO modifier (option) list AST to a string.
+     *
+     * @param {IuBlockModifierList} ast - Modifier list AST
+     * @returns {string} Raw string
+     */
     public static generate(ast: IuBlockModifierList): string {
-        let result = "";
+        let result = EMPTY;
 
         result += ast.modifiers
             .map(({ modifier, value }) => {
-                let subresult = "";
+                let subresult = EMPTY;
 
-                subresult += PSEUDO_MARKER + modifier.trim();
-                subresult += PSEUDO_OPEN;
+                subresult += CSS_PSEUDO_MARKER + modifier.trim();
+                subresult += CSS_PSEUDO_OPEN;
 
                 if (value) {
                     subresult += value.trim();
                 }
 
-                subresult += PSEUDO_CLOSE;
+                subresult += CSS_PSEUDO_CLOSE;
 
                 return subresult;
             })
-            .join("");
+            .join(EMPTY);
 
         if (result.length > 0) {
-            result += " ";
+            result += SPACE;
         }
 
         result += ast.rest;

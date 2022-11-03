@@ -1,14 +1,17 @@
+import { EMPTY } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 
 const DOMAIN_EXCEPTION_MARKER = "~";
 const CLASSIC_DOMAIN_SEPARATOR = ",";
 const MODIFIER_DOMAIN_SEPARATOR = "|";
 
+export const DOMAIN_LIST_TYPE = "DomainList";
+
 /** "," for the classic domain list, and "|" for the "domain" modifier parameter  */
 export type DomainListSeparator = typeof CLASSIC_DOMAIN_SEPARATOR | typeof MODIFIER_DOMAIN_SEPARATOR;
 
 export interface IDomainList {
-    type: "DomainList";
+    type: typeof DOMAIN_LIST_TYPE;
     separator: DomainListSeparator;
     domains: IDomain[];
 }
@@ -31,7 +34,6 @@ export class DomainListParser {
      */
     public static parse(raw: string, separator: DomainListSeparator = CLASSIC_DOMAIN_SEPARATOR): IDomainList {
         const domains: IDomain[] = [];
-
         const rawDomains = raw.trim().split(separator);
 
         for (const rawDomain of rawDomains) {
@@ -58,7 +60,7 @@ export class DomainListParser {
         }
 
         return {
-            type: "DomainList",
+            type: DOMAIN_LIST_TYPE,
             separator,
             domains,
         };
@@ -73,7 +75,7 @@ export class DomainListParser {
     public static generate(ast: IDomainList): string {
         const result = ast.domains
             .map(({ domain, exception }) => {
-                let subresult = "";
+                let subresult = EMPTY;
 
                 if (exception) {
                     subresult += DOMAIN_EXCEPTION_MARKER;

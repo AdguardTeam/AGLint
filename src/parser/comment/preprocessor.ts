@@ -6,6 +6,7 @@
  */
 
 import { AdblockSyntax } from "../../utils/adblockers";
+import { EMPTY, HASHMARK } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 import { RuleCategories } from "../common";
 import { CommentRuleType, IComment } from "./common";
@@ -35,7 +36,7 @@ export class PreProcessorParser {
         const trimmed = raw.trim();
 
         // The following (typically occurring) rule is not a pre-processor comment: !#####
-        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[2] != "#";
+        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[2] != HASHMARK;
     }
 
     /**
@@ -56,7 +57,7 @@ export class PreProcessorParser {
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.PreProcessor,
-            name: "",
+            name: EMPTY,
         };
 
         const spaceIndex = StringUtils.findNextUnescapedCharacter(trimmed, PREPROCESSOR_SEPARATOR, 2);
