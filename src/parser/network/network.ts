@@ -2,6 +2,7 @@ import { AdblockSyntax } from "../../utils/adblockers";
 import { StringUtils } from "../../utils/string";
 import { IRuleModifier, ModifierListParser } from "../common/modifier-list";
 import { IRule, RuleCategories } from "../common";
+import { NetworkRuleType } from "./common";
 
 const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
@@ -10,7 +11,7 @@ const REGEX_PATTERN_MARKER = "/";
 
 export interface INetworkRule extends IRule {
     category: RuleCategories.Network;
-    type: "NetworkRule";
+    type: NetworkRuleType;
     syntax: AdblockSyntax;
     regex: boolean;
     exception: boolean;
@@ -23,7 +24,7 @@ export class NetworkRuleParser {
         let rule = raw.trim();
 
         const result: INetworkRule = {
-            type: "NetworkRule",
+            type: NetworkRuleType.BasicNetworkRule,
             category: RuleCategories.Network,
             syntax: AdblockSyntax.Unknown,
             regex: false,
