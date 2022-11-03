@@ -1,10 +1,7 @@
 import { IRule, RuleCategories } from "../common";
 
 // Utils
-import {
-    CosmeticRuleSeparator,
-    CosmeticRuleSeparatorUtils,
-} from "../../utils/cosmetic-rule-separator";
+import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
 import { AdblockSyntax } from "../../utils/adblockers";
 
 // Parsers
@@ -16,7 +13,7 @@ import { HtmlBodyParser, IHtmlRuleBody } from "./body/html";
 import { DomainListParser, IDomain } from "../common/domain-list";
 import { AdGuardModifierListParser } from "./specific/adg-options";
 import { IRuleModifier } from "../common/modifier-list";
-import { uBlockModifierListParser } from "./specific/ubo-options";
+import { UBlockModifierListParser } from "./specific/ubo-options";
 import { CosmeticRuleType } from "./common";
 
 export interface ICosmeticRule extends IRule {
@@ -72,7 +69,8 @@ export class CosmeticRuleParser {
      *  - body
      *
      * @param {string} rawRule - Raw cosmetic rule
-     * @returns {IElementHidingRule | ICssRule | IScriptletRule | IHtmlRule | IJsRule | null} Parsed cosmetic rule AST or null if it failed to parse based on the known cosmetic rules
+     * @returns {IElementHidingRule | ICssRule | IScriptletRule | IHtmlRule | IJsRule | null}
+     * Parsed cosmetic rule AST or null if it failed to parse based on the known cosmetic rules
      */
     public static parse(rawRule: string) {
         // Skip regular comments
@@ -97,8 +95,7 @@ export class CosmeticRuleParser {
         const modifiers: IRuleModifier[] = [];
 
         // Handle pattern
-        const { modifiers: adgModifiers, rest: adgRest } =
-            AdGuardModifierListParser.parse(rawPattern);
+        const { modifiers: adgModifiers, rest: adgRest } = AdGuardModifierListParser.parse(rawPattern);
 
         if (adgModifiers.length > 0) {
             modifiers.push(...adgModifiers);
@@ -117,8 +114,7 @@ export class CosmeticRuleParser {
 
         // Element hiding / uBO CSS inject
         if (CosmeticRuleSeparatorUtils.isElementHiding(separator)) {
-            const { modifiers: uboModifiers, rest: uboRest } =
-                uBlockModifierListParser.parse(rawBody);
+            const { modifiers: uboModifiers, rest: uboRest } = UBlockModifierListParser.parse(rawBody);
 
             if (uboModifiers.length > 0) {
                 if (syntax == AdblockSyntax.AdGuard) {
@@ -133,9 +129,7 @@ export class CosmeticRuleParser {
 
             if (CssInjectionBodyParser.isUblockCssInjection(rawBody)) {
                 if (syntax == AdblockSyntax.AdGuard) {
-                    throw new SyntaxError(
-                        `Cannot use AdGuard modifier list with uBO's CSS injection`
-                    );
+                    throw new SyntaxError(`Cannot use AdGuard modifier list with uBO's CSS injection`);
                 }
 
                 syntax = AdblockSyntax.uBlockOrigin;
@@ -212,7 +206,7 @@ export class CosmeticRuleParser {
             CosmeticRuleSeparatorUtils.isUblockScriptlet(separator)
         ) {
             // Set syntax
-            let syntax: AdblockSyntax = AdblockSyntax.AdGuard;
+            syntax = AdblockSyntax.AdGuard;
             if (CosmeticRuleSeparatorUtils.isUblockScriptlet(separator)) {
                 syntax = AdblockSyntax.uBlockOrigin;
             }
@@ -235,21 +229,17 @@ export class CosmeticRuleParser {
             CosmeticRuleSeparatorUtils.isAdGuardHtml(separator)
         ) {
             // Special case: uBO's network rule
-            if (
-                CosmeticRuleSeparatorUtils.isUblockHtml(separator) &&
-                rawBody.startsWith("responseheader(")
-            ) {
+            if (CosmeticRuleSeparatorUtils.isUblockHtml(separator) && rawBody.startsWith("responseheader(")) {
                 return null;
             }
 
             // Set syntax
-            let syntax: AdblockSyntax = AdblockSyntax.AdGuard;
+            syntax = AdblockSyntax.AdGuard;
             if (CosmeticRuleSeparatorUtils.isUblockScriptlet(separator)) {
                 syntax = AdblockSyntax.uBlockOrigin;
             }
 
-            const { modifiers: uboModifiers, rest: uboRest } =
-                uBlockModifierListParser.parse(rawBody);
+            const { modifiers: uboModifiers, rest: uboRest } = UBlockModifierListParser.parse(rawBody);
 
             if (uboModifiers.length > 0) {
                 if (syntax == AdblockSyntax.AdGuard) {
@@ -315,7 +305,7 @@ export class CosmeticRuleParser {
                 result += ast.separator;
 
                 if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
-                    result += uBlockModifierListParser.generate({
+                    result += UBlockModifierListParser.generate({
                         type: "uBlockModifierList",
                         modifiers: ast.modifiers,
                         rest: ElementHidingBodyParser.generate(<IElementHidingRuleBody>ast.body),
@@ -329,7 +319,7 @@ export class CosmeticRuleParser {
                 result += ast.separator;
 
                 if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
-                    result += uBlockModifierListParser.generate({
+                    result += UBlockModifierListParser.generate({
                         type: "uBlockModifierList",
                         modifiers: ast.modifiers,
                         rest: CssInjectionBodyParser.generate(<ICssRuleBody>ast.body, ast.syntax),
@@ -343,7 +333,7 @@ export class CosmeticRuleParser {
                 result += ast.separator;
 
                 if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
-                    result += uBlockModifierListParser.generate({
+                    result += UBlockModifierListParser.generate({
                         type: "uBlockModifierList",
                         modifiers: ast.modifiers,
                         rest: HtmlBodyParser.generate(<IHtmlRuleBody>ast.body, ast.syntax),
@@ -364,10 +354,7 @@ export class CosmeticRuleParser {
                 result += ast.separator;
 
                 // eslint-disable-next-line no-case-declarations
-                const scriptlets = ScriptletBodyParser.generate(
-                    <IScriptletRuleBody>ast.body,
-                    ast.syntax
-                );
+                const scriptlets = ScriptletBodyParser.generate(<IScriptletRuleBody>ast.body, ast.syntax);
 
                 if (ast.syntax == AdblockSyntax.AdblockPlus) {
                     result += scriptlets.join("; ");

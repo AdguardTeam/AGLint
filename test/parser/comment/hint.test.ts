@@ -263,14 +263,10 @@ describe("HintParser", () => {
             'Invalid character + in hint name at position 2 in comment "!++"'
         );
 
-        expect(() => HintParser.parse("!+ (arg0)")).toThrowError(
-            /^Missing hint name, invalid opening bracket found/
-        );
+        expect(() => HintParser.parse("!+ (arg0)")).toThrowError(/^Missing hint name, invalid opening bracket found/);
 
         // Missing parentheses
-        expect(() => HintParser.parse("!+ HINT_NAME(")).toThrowError(
-            /^Unclosed opening bracket at/
-        );
+        expect(() => HintParser.parse("!+ HINT_NAME(")).toThrowError(/^Unclosed opening bracket at/);
 
         expect(() => HintParser.parse("!+ HINT_NAME)")).toThrowError(
             /^No opening bracket found for closing bracket at position/
@@ -298,9 +294,7 @@ describe("HintParser", () => {
         expect(parseAndGenerate("!+ NOT_OPTIMIZED()")).toEqual("!+ NOT_OPTIMIZED()");
         expect(parseAndGenerate("!+    NOT_OPTIMIZED   ")).toEqual("!+ NOT_OPTIMIZED");
 
-        expect(parseAndGenerate("!+ NOT_OPTIMIZED PLATFORM(windows)")).toEqual(
-            "!+ NOT_OPTIMIZED PLATFORM(windows)"
-        );
+        expect(parseAndGenerate("!+ NOT_OPTIMIZED PLATFORM(windows)")).toEqual("!+ NOT_OPTIMIZED PLATFORM(windows)");
 
         expect(parseAndGenerate("!+      NOT_OPTIMIZED     PLATFORM(     windows   )    ")).toEqual(
             "!+ NOT_OPTIMIZED PLATFORM(windows)"
@@ -310,8 +304,8 @@ describe("HintParser", () => {
             "!+ NOT_OPTIMIZED PLATFORM(windows) NOT_PLATFORM(mac)"
         );
 
-        expect(
-            parseAndGenerate("!+  NOT_OPTIMIZED  PLATFORM( windows )  NOT_PLATFORM( mac )")
-        ).toEqual("!+ NOT_OPTIMIZED PLATFORM(windows) NOT_PLATFORM(mac)");
+        expect(parseAndGenerate("!+  NOT_OPTIMIZED  PLATFORM( windows )  NOT_PLATFORM( mac )")).toEqual(
+            "!+ NOT_OPTIMIZED PLATFORM(windows) NOT_PLATFORM(mac)"
+        );
     });
 });

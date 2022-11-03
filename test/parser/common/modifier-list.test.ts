@@ -38,9 +38,7 @@ describe("ModifierListParser", () => {
             modifiers: [{ modifier: "modifier1", value: "value1" }],
         });
 
-        expect(ModifierListParser.parse("   modifier1   =    value1       ")).toEqual(<
-            IModifierList
-        >{
+        expect(ModifierListParser.parse("   modifier1   =    value1       ")).toEqual(<IModifierList>{
             type: "ModifierList",
             modifiers: [{ modifier: "modifier1", value: "value1" }],
         });
@@ -50,9 +48,7 @@ describe("ModifierListParser", () => {
             modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2", value: "value2" }],
         });
 
-        expect(ModifierListParser.parse("modifier1=value1,modifier2=value2")).toEqual(<
-            IModifierList
-        >{
+        expect(ModifierListParser.parse("modifier1=value1,modifier2=value2")).toEqual(<IModifierList>{
             type: "ModifierList",
             modifiers: [
                 { modifier: "modifier1", value: "value1" },
@@ -103,26 +99,18 @@ describe("ModifierListParser", () => {
         expect(parseAndGenerate("modifier1")).toEqual("modifier1");
         expect(parseAndGenerate("modifier1=value1")).toEqual("modifier1=value1");
 
-        expect(parseAndGenerate("modifier1=value1,modifier2")).toEqual(
-            "modifier1=value1,modifier2"
-        );
+        expect(parseAndGenerate("modifier1=value1,modifier2")).toEqual("modifier1=value1,modifier2");
 
-        expect(parseAndGenerate("modifier1,modifier2=value2")).toEqual(
-            "modifier1,modifier2=value2"
-        );
+        expect(parseAndGenerate("modifier1,modifier2=value2")).toEqual("modifier1,modifier2=value2");
 
         expect(parseAndGenerate("modifier1,modifier2")).toEqual("modifier1,modifier2");
 
-        expect(parseAndGenerate("modifier1=value1,modifier2=value2")).toEqual(
-            "modifier1=value1,modifier2=value2"
-        );
+        expect(parseAndGenerate("modifier1=value1,modifier2=value2")).toEqual("modifier1=value1,modifier2=value2");
 
         expect(
             parseAndGenerate(
                 "path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i"
             )
-        ).toEqual(
-            "path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i"
-        );
+        ).toEqual("path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i");
     });
 });

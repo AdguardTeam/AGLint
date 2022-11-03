@@ -13,8 +13,11 @@ export interface IAdGuardModifierList {
 
 export class AdGuardModifierListParser {
     /**
+     * Parses an AdGuard modifier (option) list.
+     *
+     * @param {string} raw - Raw pattern
+     * @returns {IAdGuardModifierList} Modifier list AST
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#non-basic-rules-modifiers}
-     * @param {string} rawPattern
      */
     public static parse(raw: string): IAdGuardModifierList {
         let modifiers: IRuleModifier[] = [];
@@ -23,9 +26,7 @@ export class AdGuardModifierListParser {
 
         if (raw[0] == MODIFIER_LIST_OPEN) {
             if (raw[1] != MODIFIERS_MARKER) {
-                throw new SyntaxError(
-                    `Missing modifier marker "${MODIFIERS_MARKER}" at pattern "${raw}"`
-                );
+                throw new SyntaxError(`Missing modifier marker "${MODIFIERS_MARKER}" at pattern "${raw}"`);
             }
 
             // Find closing pair
@@ -33,9 +34,7 @@ export class AdGuardModifierListParser {
 
             // Handle missing closing case
             if (closeIndex == -1) {
-                throw new SyntaxError(
-                    `Missing closing bracket "${MODIFIER_LIST_CLOSE}" at pattern "${raw}"`
-                );
+                throw new SyntaxError(`Missing closing bracket "${MODIFIER_LIST_CLOSE}" at pattern "${raw}"`);
             }
 
             // Parse modifiers: [$<modofiers>]
@@ -54,6 +53,12 @@ export class AdGuardModifierListParser {
         };
     }
 
+    /**
+     * Converts an AdGuard modifier (option) list AST to a string.
+     *
+     * @param {IAdGuardModifierList} ast - Modifier list AST
+     * @returns {string} Raw string
+     */
     public static generate(ast: IAdGuardModifierList) {
         let result = "";
 

@@ -18,18 +18,18 @@ export class CommentParser {
     /**
      * Determines whether a rule is a regular comment.
      *
-     * @param {string} raw
+     * @param {string} raw - Raw data
      * @returns {boolean} true/false
      */
     public static isRegularComment(raw: string): boolean {
-        return raw[0] == CommentMarker.Regular;
+        return raw.trim()[0] == CommentMarker.Regular;
     }
 
     /**
      * Determines whether a rule is a comment.
      *
      * @param {string} raw - Raw rule
-     * @returns {boolean}
+     * @returns {boolean} true/false
      */
     public static isComment(raw: string): boolean {
         // Regular comments
@@ -49,8 +49,7 @@ export class CommentParser {
                 if (
                     !raw[end + 1] ||
                     StringUtils.isWhitespace(raw[end + 1]) ||
-                    (raw[end + 1] == CommentMarker.Hashmark &&
-                        raw[end + 2] == CommentMarker.Hashmark)
+                    (raw[end + 1] == CommentMarker.Hashmark && raw[end + 2] == CommentMarker.Hashmark)
                 ) {
                     return true;
                 }
@@ -61,7 +60,13 @@ export class CommentParser {
         return AgentParser.isAgent(raw);
     }
 
-    public static parse(raw: string) {
+    /**
+     * Parses a raw rule as comment.
+     *
+     * @param {string} raw - Raw rule
+     * @returns {IComment | null} Comment AST or null (if the raw rule cannot be parsed as comment)
+     */
+    public static parse(raw: string): IComment | null {
         if (!CommentParser.isComment(raw)) {
             return null;
         }
@@ -82,10 +87,10 @@ export class CommentParser {
     }
 
     /**
-     * Converts AST to String.
+     * Converts a comment AST to a string.
      *
-     * @param {IAgent} ast
-     * @returns {string} Raw data
+     * @param {IComment} ast - Comment AST
+     * @returns {string} Raw string
      */
     public static generate(ast: IComment): string {
         switch (ast.type) {

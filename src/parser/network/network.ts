@@ -54,9 +54,7 @@ export class NetworkRuleParser {
         if (separatorIndex != -1) {
             result.pattern = rule.substring(0, separatorIndex);
 
-            result.modifiers = ModifierListParser.parse(
-                rule.substring(separatorIndex + 1)
-            ).modifiers;
+            result.modifiers = ModifierListParser.parse(rule.substring(separatorIndex + 1)).modifiers;
         }
 
         // Pattern starts with / and ends with /
@@ -70,7 +68,7 @@ export class NetworkRuleParser {
     /**
      * Converts AST to String.
      *
-     * @param {IDomainList} ast
+     * @param {INetworkRule} ast - Network rule AST
      * @returns {string} Raw data
      */
     public static generate(ast: INetworkRule): string {

@@ -13,7 +13,7 @@ export interface IuBlockModifierList {
     rest: string;
 }
 
-export class uBlockModifierListParser {
+export class UBlockModifierListParser {
     public static parse(rawBody: string): IuBlockModifierList {
         const modifiers: IRuleModifier[] = [];
         let rest = "";
@@ -22,16 +22,13 @@ export class uBlockModifierListParser {
         while (i < rawBody.length) {
             if (rawBody[i] == PSEUDO_MARKER) {
                 const modifier = UBO_COSMETIC_MODIFIERS.find(
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func
                     (m) => rawBody.indexOf(`${m}${PSEUDO_OPEN}`, i + 1) == i + 1
                 );
                 if (modifier) {
                     const contentStart = i + modifier.length + 2;
 
-                    const contentEnd = StringUtils.findNextUnescapedCharacter(
-                        rawBody,
-                        PSEUDO_CLOSE,
-                        contentStart
-                    );
+                    const contentEnd = StringUtils.findNextUnescapedCharacter(rawBody, PSEUDO_CLOSE, contentStart);
 
                     modifiers.push({
                         modifier,

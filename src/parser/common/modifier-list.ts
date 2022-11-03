@@ -29,10 +29,7 @@ export class ModifierListParser {
             modifiers: [],
         };
 
-        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(
-            rawModifiers,
-            MODIFIERS_SEPARATOR
-        );
+        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(rawModifiers, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
         if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == "") {
@@ -63,10 +60,10 @@ export class ModifierListParser {
     }
 
     /**
-     * Converts AST to String.
+     * Converts a modifier list AST to a string.
      *
-     * @param {IModifierList} ast
-     * @returns {string} Raw data
+     * @param {IModifierList} ast - Modifier list AST
+     * @returns {string} Raw string
      */
     public static generate(ast: IModifierList): string {
         const result = ast.modifiers

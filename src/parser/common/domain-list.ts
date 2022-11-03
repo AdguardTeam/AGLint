@@ -5,9 +5,7 @@ const CLASSIC_DOMAIN_SEPARATOR = ",";
 const MODIFIER_DOMAIN_SEPARATOR = "|";
 
 /** "," for the classic domain list, and "|" for the "domain" modifier parameter  */
-export type DomainListSeparator =
-    | typeof CLASSIC_DOMAIN_SEPARATOR
-    | typeof MODIFIER_DOMAIN_SEPARATOR;
+export type DomainListSeparator = typeof CLASSIC_DOMAIN_SEPARATOR | typeof MODIFIER_DOMAIN_SEPARATOR;
 
 export interface IDomainList {
     type: "DomainList";
@@ -27,24 +25,21 @@ export class DomainListParser {
     /**
      * Parses a domain list, eg. `example.com,example.org`
      *
-     * @param {string} rawDomainList - Raw domain list
+     * @param {string} raw - Raw domain list
      * @param {DomainListSeparator} separator - Separator character
-     * @returns {IDomainList} Parsed domain list interface
+     * @returns {IDomainList} Domain list AST
      */
-    public static parse(
-        rawDomainList: string,
-        separator: DomainListSeparator = CLASSIC_DOMAIN_SEPARATOR
-    ): IDomainList {
+    public static parse(raw: string, separator: DomainListSeparator = CLASSIC_DOMAIN_SEPARATOR): IDomainList {
         const domains: IDomain[] = [];
 
-        const rawDomains = rawDomainList.split(separator);
+        const rawDomains = raw.trim().split(separator);
 
         for (const rawDomain of rawDomains) {
             const trimmedRawDomain = rawDomain.trim();
 
             // Handle empty parts
             if (trimmedRawDomain.length < 1 || trimmedRawDomain == DOMAIN_EXCEPTION_MARKER) {
-                throw new SyntaxError(`Empty domain specified in domain list "${rawDomainList}"`);
+                throw new SyntaxError(`Empty domain specified in domain list "${raw}"`);
             }
 
             // Handle exceptions
@@ -70,10 +65,10 @@ export class DomainListParser {
     }
 
     /**
-     * Converts AST to String.
+     * Converts a domain list AST to a string.
      *
-     * @param {IDomainList} ast
-     * @returns {string} Raw data
+     * @param {IDomainList} ast - Domain list AST
+     * @returns {string} Raw string
      */
     public static generate(ast: IDomainList): string {
         const result = ast.domains

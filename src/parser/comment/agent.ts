@@ -22,7 +22,7 @@ export class AgentParser {
      * Determines whether a rule is an adblock agent.
      *
      * @param {string} raw - Raw rule
-     * @returns {boolean}
+     * @returns {boolean} true/false
      */
     public static isAgent(raw: string): boolean {
         if (raw[0] == AGENT_LIST_OPEN) {
@@ -36,11 +36,10 @@ export class AgentParser {
     }
 
     /**
-     * Parses an adblock agent.
+     * Parses an adblock agent member.
      *
-     * @param {string} raw - Raw agent, eg `Adblock Plus 2.0`
-     * @returns {IAdblockAgentData}
-     *
+     * @param {string} raw - Raw agent member, eg `Adblock Plus 2.0`
+     * @returns {IAgentMember} - Agent member AST
      * @example
      * ```js
      * AgentParser.parseAgent('Adblock Plus 2.0');
@@ -75,20 +74,10 @@ export class AgentParser {
     }
 
     /**
-     * Parses the rule that specifying adblock agents. If the rule doesn't match the adblock agent pattern,
-     * it returns null. If it matches and there is an invalid agent, it throws a syntax error.
+     * Parses a raw rule as an adblock agent comment.
      *
-     * @param {string} raw - Raw agent rule, eg `[Adblock Plus 2.0; AdGuard]`
-     * @returns {IAdblockAgent[] | null}
-     * @throws {SyntaxError} If there is an invalid agent.
-     *
-     * @example
-     * ```js
-     * // Single agent
-     * AgentParser.parse('[Adblock Plus 2.0]')
-     * // Multiple agents
-     * AgentParser.parse('[Adblock Plus 2.0; AdGuard]')
-     * ```
+     * @param {string} raw - Raw rule
+     * @returns {IAgent | null} Adblock agent AST or null (if the raw rule cannot be parsed as an adblock agent comment)
      */
     public static parse(raw: string): IAgent | null {
         // Check basic adblock agents pattern: [...], ![...], ! [...], #[...], etc.
@@ -104,9 +93,7 @@ export class AgentParser {
                 } else {
                     // Skip comment marker
                     const shift = 1;
-                    const firstNonWhitespaceIndex = StringUtils.findFirstNonWhitespaceCharacter(
-                        raw.slice(shift)
-                    );
+                    const firstNonWhitespaceIndex = StringUtils.findFirstNonWhitespaceCharacter(raw.slice(shift));
                     if (raw[firstNonWhitespaceIndex + shift] == AGENT_LIST_OPEN) {
                         openingBracketIndex = firstNonWhitespaceIndex + shift;
                     }
@@ -114,7 +101,7 @@ export class AgentParser {
             }
         }
 
-        // Parse content between [ and ]
+        // Parse content between brackets
         if (openingBracketIndex != -1) {
             const collectedAgents: IAgentMember[] = [];
             const rawAgents = raw.slice(openingBracketIndex + 1, -1);
@@ -141,10 +128,10 @@ export class AgentParser {
     }
 
     /**
-     * Converts AST to String.
+     * Converts an adblock agent AST to a string.
      *
-     * @param {IAgent} ast
-     * @returns {string} Raw data
+     * @param {IAgent} ast - Agent AST
+     * @returns {string} Raw string
      */
     public static generate(ast: IAgent): string {
         let result = AGENT_LIST_OPEN;

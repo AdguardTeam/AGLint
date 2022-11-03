@@ -5,25 +5,17 @@ describe("HtmlBodyParser", () => {
     test("escapeDoubleQuotes", () => {
         expect(HtmlBodyParser.escapeDoubleQuotes('[tag-content="a"]')).toBe('[tag-content="a"]');
 
-        expect(HtmlBodyParser.escapeDoubleQuotes('[tag-content="""a"""]')).toBe(
-            '[tag-content="\\"a\\""]'
-        );
+        expect(HtmlBodyParser.escapeDoubleQuotes('[tag-content="""a"""]')).toBe('[tag-content="\\"a\\""]');
 
-        expect(HtmlBodyParser.escapeDoubleQuotes('[tag-content="""""a"""""]')).toBe(
-            '[tag-content="\\"\\"a\\"\\""]'
-        );
+        expect(HtmlBodyParser.escapeDoubleQuotes('[tag-content="""""a"""""]')).toBe('[tag-content="\\"\\"a\\"\\""]');
     });
 
     test("unescapeDoubleQuotes", () => {
         expect(HtmlBodyParser.unescapeDoubleQuotes('[tag-content="a"]')).toBe('[tag-content="a"]');
 
-        expect(HtmlBodyParser.unescapeDoubleQuotes('[tag-content="\\"a\\""]')).toBe(
-            '[tag-content="""a"""]'
-        );
+        expect(HtmlBodyParser.unescapeDoubleQuotes('[tag-content="\\"a\\""]')).toBe('[tag-content="""a"""]');
 
-        expect(HtmlBodyParser.unescapeDoubleQuotes('[tag-content="\\"\\"a\\"\\""]')).toBe(
-            '[tag-content="""""a"""""]'
-        );
+        expect(HtmlBodyParser.unescapeDoubleQuotes('[tag-content="\\"\\"a\\"\\""]')).toBe('[tag-content="""""a"""""]');
     });
 
     test("parse", () => {

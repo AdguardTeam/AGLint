@@ -2,14 +2,7 @@
  * CSS injection rule body parser
  */
 
-import {
-    Selector,
-    SelectorList,
-    MediaQueryList,
-    Block,
-    Rule,
-    generate as generateCss,
-} from "css-tree";
+import { Selector, SelectorList, MediaQueryList, Block, Rule, generate as generateCss } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
 import { CssTree } from "../../../utils/csstree";
 
@@ -44,32 +37,36 @@ export class CssInjectionBodyParser {
     /**
      * Since it has to run for every elementhide rule, the regex would be slow, so firstly we search for the keywords.
      *
-     * @param {string} rawBody
+     * @param {string} raw - Raw selector body
      * @returns {boolean} true/false
      */
-    public static isUblockCssInjection(rawBody: string): boolean {
-        if (rawBody.indexOf(":style(") != -1 || rawBody.endsWith(":remove()")) {
-            return UBO_CSS_INJECTION_PATTERN.test(rawBody);
+    public static isUblockCssInjection(raw: string): boolean {
+        const trimmed = raw.trim();
+
+        if (trimmed.indexOf(":style(") != -1 || trimmed.endsWith(":remove()")) {
+            return UBO_CSS_INJECTION_PATTERN.test(trimmed);
         }
 
         return false;
     }
 
-    public static isAdGuardCssInjection(rawBody: string) {
-        return ADG_CSS_INJECTION_PATTERN.test(rawBody);
+    public static isAdGuardCssInjection(raw: string) {
+        return ADG_CSS_INJECTION_PATTERN.test(raw.trim());
     }
 
-    public static parseAdGuardCssInjection(rawBody: string): ICssRuleBody | null {
-        if (!CssInjectionBodyParser.isAdGuardCssInjection(rawBody)) {
+    public static parseAdGuardCssInjection(raw: string): ICssRuleBody | null {
+        const trimmed = raw.trim();
+
+        if (!CssInjectionBodyParser.isAdGuardCssInjection(trimmed)) {
             return null;
         }
 
         let mediaQueryList: MediaQueryList | undefined = undefined;
         const selectors: Selector[] = [];
-        let rawRule = rawBody;
+        let rawRule = trimmed;
 
         // Parse media queries (if any)
-        const mediaQueryMatch = rawBody.match(MEDIA_QUERY_PATTERN);
+        const mediaQueryMatch = trimmed.match(MEDIA_QUERY_PATTERN);
         if (mediaQueryMatch && mediaQueryMatch.groups) {
             mediaQueryList = <MediaQueryList>(
                 CssTree.parse(mediaQueryMatch.groups.mediaQueryList.trim(), "mediaQueryList")
@@ -82,9 +79,7 @@ export class CssInjectionBodyParser {
         const ruleAst = <Rule>CssTree.parse(rawRule, "rule");
 
         if (ruleAst.prelude.type !== "SelectorList") {
-            throw new Error(
-                `No selector list found in the following CSS injection body: "${rawBody}"`
-            );
+            throw new Error(`No selector list found in the following CSS injection body: "${raw}"`);
         }
 
         const selectorListAst = ruleAst.prelude;
@@ -105,9 +100,7 @@ export class CssInjectionBodyParser {
             if (node.type === "Declaration") {
                 if (node.property == "remove") {
                     if (removeDeclFound) {
-                        throw new Error(
-                            `Multiple remove property found in the following CSS injection body: "${rawBody}"`
-                        );
+                        throw new Error(`Multiple remove property found in the following CSS injection body: "${raw}"`);
                     }
                     removeDeclFound = true;
                 } else {
@@ -118,7 +111,8 @@ export class CssInjectionBodyParser {
 
         if (removeDeclFound && nonRemoveDeclFound) {
             throw new Error(
-                `In addition to the remove property, the following CSS injection body also uses other properties: "${rawBody}"`
+                // eslint-disable-next-line max-len
+                `In addition to the remove property, the following CSS injection body also uses other properties: "${raw}"`
             );
         }
 
@@ -133,9 +127,11 @@ export class CssInjectionBodyParser {
         };
     }
 
-    public static parseUblockCssInjection(rawBody: string): ICssRuleBody | null {
+    public static parseUblockCssInjection(raw: string): ICssRuleBody | null {
+        const trimmed = raw.trim();
+
         // uBlock CSS injection
-        const uBlockCssInjection = rawBody.match(UBO_CSS_INJECTION_PATTERN);
+        const uBlockCssInjection = trimmed.match(UBO_CSS_INJECTION_PATTERN);
         if (!(uBlockCssInjection && uBlockCssInjection.groups)) {
             return null;
         }
@@ -151,7 +147,7 @@ export class CssInjectionBodyParser {
             }
             // else {
             //     throw new Error(
-            //         `Invalid selector found in the following CSS injection body: "${rawBody}"`
+            //         `Invalid selector found in the following CSS injection body: "${raw}"`
             //     );
             // }
         });
@@ -171,15 +167,17 @@ export class CssInjectionBodyParser {
         };
     }
 
-    public static parse(rawBody: string): ICssRuleBody | null {
+    public static parse(raw: string): ICssRuleBody | null {
+        const trimmed = raw.trim();
+
         // AdGuard CSS injection
-        const result = CssInjectionBodyParser.parseAdGuardCssInjection(rawBody);
+        const result = CssInjectionBodyParser.parseAdGuardCssInjection(trimmed);
         if (result) {
             return result;
         }
 
         // uBlock CSS injection
-        return CssInjectionBodyParser.parseUblockCssInjection(rawBody);
+        return CssInjectionBodyParser.parseUblockCssInjection(trimmed);
     }
 
     public static generate(ast: ICssRuleBody, syntax: AdblockSyntax): string {

@@ -17,10 +17,10 @@ export class HtmlBodyParser {
     /**
      * Convert "" to \" within strings. The CSS parser does not recognize "".
      *
-     * @param selector
-     * @returns
+     * @param {string} selector - CSS selector string
+     * @returns {string} Escaped CSS selector
      */
-    public static escapeDoubleQuotes(selector: string) {
+    public static escapeDoubleQuotes(selector: string): string {
         let withinString = false;
         let result = "";
 
@@ -45,10 +45,10 @@ export class HtmlBodyParser {
     /**
      * Convert \" to "" within strings.
      *
-     * @param selector
-     * @returns
+     * @param {string} selector - CSS selector string
+     * @returns {string} Unescaped CSS selector
      */
-    public static unescapeDoubleQuotes(selector: string) {
+    public static unescapeDoubleQuotes(selector: string): string {
         let withinString = false;
         let result = "";
 
@@ -66,11 +66,11 @@ export class HtmlBodyParser {
         return result;
     }
 
-    public static parse(rawBody: string): IHtmlRuleBody {
+    public static parse(raw: string): IHtmlRuleBody {
         const selectors: Selector[] = [];
 
         // Convert "" -> \\"
-        const escapedRawBody = HtmlBodyParser.escapeDoubleQuotes(rawBody);
+        const escapedRawBody = HtmlBodyParser.escapeDoubleQuotes(raw);
 
         // Selector
         if (StringUtils.findNextUnescapedCharacter(escapedRawBody, CSS_SELECTORS_SEPARATOR) == -1) {

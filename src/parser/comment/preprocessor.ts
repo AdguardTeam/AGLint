@@ -26,22 +26,24 @@ export interface IPreProcessor extends IComment {
 
 export class PreProcessorParser {
     /**
+     * Determines whether the rule is a pre-processor rule.
+     *
      * @param {string} raw - Raw rule
-     * @returns {boolean}
+     * @returns {boolean} true/false
      */
     public static isPreProcessor(raw: string): boolean {
         const trimmed = raw.trim();
 
-        return (
-            trimmed[0] == PREPROCESSOR_MARKER[0] &&
-            trimmed[1] == PREPROCESSOR_MARKER[1] &&
-            trimmed[2] != PREPROCESSOR_MARKER[1]
-        );
+        // The following (typically occurring) rule is not a pre-processor comment: !#####
+        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[2] != "#";
     }
 
     /**
+     * Parses a raw rule as a pre-processor comment.
+     *
      * @param {string} raw - Raw rule
      * @returns {IPreProcessor | null}
+     * Pre-processor comment AST or null (if the raw rule cannot be parsed as a pre-processor comment)
      */
     public static parse(raw: string): IPreProcessor | null {
         const trimmed = raw.trim();
@@ -57,11 +59,7 @@ export class PreProcessorParser {
             name: "",
         };
 
-        const spaceIndex = StringUtils.findNextUnescapedCharacter(
-            trimmed,
-            PREPROCESSOR_SEPARATOR,
-            2
-        );
+        const spaceIndex = StringUtils.findNextUnescapedCharacter(trimmed, PREPROCESSOR_SEPARATOR, 2);
 
         if (spaceIndex == -1) {
             result.name = trimmed.substring(2);
@@ -73,6 +71,12 @@ export class PreProcessorParser {
         return result;
     }
 
+    /**
+     * Converts a pre-processor comment AST to a string.
+     *
+     * @param {IPreProcessor} ast - Pre-processor comment AST
+     * @returns {string} Raw string
+     */
     public static generate(ast: IPreProcessor): string {
         let result = PREPROCESSOR_MARKER;
 

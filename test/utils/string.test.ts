@@ -15,24 +15,16 @@ describe("String utils", () => {
     });
 
     test("findLastUnescapedCharacterThatNotFollowedBy", () => {
-        expect(
-            StringUtils.findLastUnescapedCharacterThatNotFollowedBy("$\\$\\$$f$ok", "$", "f")
-        ).toEqual(7);
+        expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy("$\\$\\$$f$ok", "$", "f")).toEqual(7);
         expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy("", "$", "/")).toEqual(-1);
     });
 
     test("findUnescapedNonStringNonRegexChar", () => {
-        expect(
-            StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ a`, "a")
-        ).toEqual(19);
+        expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ a`, "a")).toEqual(19);
 
-        expect(
-            StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ \\a   a`, "a")
-        ).toEqual(24);
+        expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ \\a   a`, "a")).toEqual(24);
 
-        expect(
-            StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ /a/`, "a")
-        ).toEqual(-1);
+        expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ /a/`, "a")).toEqual(-1);
         expect(StringUtils.findUnescapedNonStringNonRegexChar("", "a")).toEqual(-1);
     });
 
@@ -57,26 +49,18 @@ describe("String utils", () => {
 
         expect(StringUtils.splitStringByUnquotedUnescapedCharacter(`  `, "|")).toEqual([`  `]);
 
-        expect(
-            StringUtils.splitStringByUnquotedUnescapedCharacter(
-                `'aa|bb' "aaa | bb" \\|\\| | bbb`,
-                "|"
-            )
-        ).toEqual([`'aa|bb' "aaa | bb" \\|\\| `, ` bbb`]);
+        expect(StringUtils.splitStringByUnquotedUnescapedCharacter(`'aa|bb' "aaa | bb" \\|\\| | bbb`, "|")).toEqual([
+            `'aa|bb' "aaa | bb" \\|\\| `,
+            ` bbb`,
+        ]);
 
-        expect(
-            StringUtils.splitStringByUnquotedUnescapedCharacter(
-                `'aa|bb' "aaa | bb" \\|\\| | bbb|ccc`,
-                "|"
-            )
-        ).toEqual([`'aa|bb' "aaa | bb" \\|\\| `, ` bbb`, `ccc`]);
+        expect(StringUtils.splitStringByUnquotedUnescapedCharacter(`'aa|bb' "aaa | bb" \\|\\| | bbb|ccc`, "|")).toEqual(
+            [`'aa|bb' "aaa | bb" \\|\\| `, ` bbb`, `ccc`]
+        );
 
-        expect(
-            StringUtils.splitStringByUnquotedUnescapedCharacter(
-                `'aa|bb' "aaa | bb" \\|\\| \\| bbb`,
-                "|"
-            )
-        ).toEqual([`'aa|bb' "aaa | bb" \\|\\| \\| bbb`]);
+        expect(StringUtils.splitStringByUnquotedUnescapedCharacter(`'aa|bb' "aaa | bb" \\|\\| \\| bbb`, "|")).toEqual([
+            `'aa|bb' "aaa | bb" \\|\\| \\| bbb`,
+        ]);
     });
 
     test("splitStringByUnescapedNonStringNonRegexChar", () => {
@@ -85,24 +69,15 @@ describe("String utils", () => {
         expect(StringUtils.splitStringByUnescapedNonStringNonRegexChar(`  `, "|")).toEqual([`  `]);
 
         expect(
-            StringUtils.splitStringByUnescapedNonStringNonRegexChar(
-                `'aa|bb' "aaa | bb" \\|\\| /aa|bb/ | bbb`,
-                "|"
-            )
+            StringUtils.splitStringByUnescapedNonStringNonRegexChar(`'aa|bb' "aaa | bb" \\|\\| /aa|bb/ | bbb`, "|")
         ).toEqual([`'aa|bb' "aaa | bb" \\|\\| /aa|bb/ `, ` bbb`]);
 
         expect(
-            StringUtils.splitStringByUnescapedNonStringNonRegexChar(
-                `'aa|bb' "aaa | bb" \\|\\| /aa|bb/ | bbb|ccc`,
-                "|"
-            )
+            StringUtils.splitStringByUnescapedNonStringNonRegexChar(`'aa|bb' "aaa | bb" \\|\\| /aa|bb/ | bbb|ccc`, "|")
         ).toEqual([`'aa|bb' "aaa | bb" \\|\\| /aa|bb/ `, ` bbb`, `ccc`]);
 
         expect(
-            StringUtils.splitStringByUnescapedNonStringNonRegexChar(
-                `'aa|bb' "aaa | bb" \\|\\| \\| bbb`,
-                "|"
-            )
+            StringUtils.splitStringByUnescapedNonStringNonRegexChar(`'aa|bb' "aaa | bb" \\|\\| \\| bbb`, "|")
         ).toEqual([`'aa|bb' "aaa | bb" \\|\\| \\| bbb`]);
     });
 
@@ -111,26 +86,18 @@ describe("String utils", () => {
 
         expect(StringUtils.splitStringByUnescapedCharacter(`  `, "|")).toEqual([`  `]);
 
-        expect(
-            StringUtils.splitStringByUnescapedCharacter(
-                `aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd|eeee`,
-                "|"
-            )
-        ).toEqual([`aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd`, `eeee`]);
+        expect(StringUtils.splitStringByUnescapedCharacter(`aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd|eeee`, "|")).toEqual([
+            `aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd`,
+            `eeee`,
+        ]);
 
         expect(
-            StringUtils.splitStringByUnescapedCharacter(
-                `aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd|eeee|'ffff'`,
-                "|"
-            )
+            StringUtils.splitStringByUnescapedCharacter(`aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd|eeee|'ffff'`, "|")
         ).toEqual([`aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd`, `eeee`, `'ffff'`]);
 
-        expect(
-            StringUtils.splitStringByUnescapedCharacter(
-                `aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd\\|eeee`,
-                "|"
-            )
-        ).toEqual([`aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd\\|eeee`]);
+        expect(StringUtils.splitStringByUnescapedCharacter(`aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd\\|eeee`, "|")).toEqual([
+            `aaaa\\|bbbb\\|\\|ccc\\|\\|\\\\|dddd\\|eeee`,
+        ]);
     });
 
     test("findFirstNonWhitespaceCharacter", () => {

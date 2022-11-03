@@ -107,11 +107,7 @@ describe("CommentParser", () => {
             ],
         });
 
-        expect(
-            CommentParser.parse(
-                "!+ NOT_OPTIMIZED PLATFORM(windows, mac) NOT_PLATFORM(android, ios)"
-            )
-        ).toEqual({
+        expect(CommentParser.parse("!+ NOT_OPTIMIZED PLATFORM(windows, mac) NOT_PLATFORM(android, ios)")).toEqual({
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
             type: CommentRuleType.Hint,
@@ -166,9 +162,7 @@ describe("CommentParser", () => {
             value: "Filter",
         });
 
-        expect(
-            CommentParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")
-        ).toEqual(<IMetadata>{
+        expect(CommentParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
             type: "Metadata",
@@ -177,9 +171,7 @@ describe("CommentParser", () => {
             value: "https://github.com/AdguardTeam/some-repo/wiki",
         });
 
-        expect(
-            CommentParser.parse("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")
-        ).toEqual(<IMetadata>{
+        expect(CommentParser.parse("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
             type: "Metadata",
@@ -235,9 +227,7 @@ describe("CommentParser", () => {
 
         expect(parseAndGenerate("[Adblock Plus 2.0]")).toEqual("[Adblock Plus 2.0]");
 
-        expect(parseAndGenerate("[Adblock Plus 2.0; AdGuard]")).toEqual(
-            "[Adblock Plus 2.0; AdGuard]"
-        );
+        expect(parseAndGenerate("[Adblock Plus 2.0; AdGuard]")).toEqual("[Adblock Plus 2.0; AdGuard]");
 
         expect(parseAndGenerate("!+ NOT_OPTIMIZED")).toEqual("!+ NOT_OPTIMIZED");
 
@@ -249,9 +239,9 @@ describe("CommentParser", () => {
             "!#if (adguard && !adguard_ext_safari)"
         );
 
-        expect(
-            parseAndGenerate("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")
-        ).toEqual("! Homepage: https://github.com/AdguardTeam/some-repo/wiki");
+        expect(parseAndGenerate("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(
+            "! Homepage: https://github.com/AdguardTeam/some-repo/wiki"
+        );
 
         expect(parseAndGenerate("! This is just a comment")).toEqual("! This is just a comment");
     });

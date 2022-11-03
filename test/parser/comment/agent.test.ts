@@ -185,9 +185,7 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(
-            AgentParser.parse("[Adblock Plus 3.1; AdGuard 1.4; uBlock Origin 1.0.15.0]")
-        ).toEqual(<IAgent>{
+        expect(AgentParser.parse("[Adblock Plus 3.1; AdGuard 1.4; uBlock Origin 1.0.15.0]")).toEqual(<IAgent>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
             type: "Agent",
@@ -297,11 +295,7 @@ describe("AgentParser", () => {
         expect(parseAndGenerate("[AdGuard;]")).toEqual("[AdGuard]");
         expect(parseAndGenerate("[AdGuard ; ]")).toEqual("[AdGuard]");
         expect(parseAndGenerate("[Adblock Plus 2.0]")).toEqual("[Adblock Plus 2.0]");
-        expect(parseAndGenerate("[Adblock Plus 2.0; AdGuard]")).toEqual(
-            "[Adblock Plus 2.0; AdGuard]"
-        );
-        expect(parseAndGenerate("[  Adblock Plus 2.0  ; AdGuard  ]")).toEqual(
-            "[Adblock Plus 2.0; AdGuard]"
-        );
+        expect(parseAndGenerate("[Adblock Plus 2.0; AdGuard]")).toEqual("[Adblock Plus 2.0; AdGuard]");
+        expect(parseAndGenerate("[  Adblock Plus 2.0  ; AdGuard  ]")).toEqual("[Adblock Plus 2.0; AdGuard]");
     });
 });

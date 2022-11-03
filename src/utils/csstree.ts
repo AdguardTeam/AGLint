@@ -36,9 +36,10 @@ export class CssTree {
     /**
      * Helper function for parsing CSS parts.
      *
-     * @param {string} raw
-     * @param {string} context
-     * @returns {CssNode}
+     * @param {string} raw - Raw CSS input
+     * @param {string} context - CSSTree context
+     * @see {@link https://github.com/csstree/csstree/blob/master/docs/parsing.md#context}
+     * @returns {CssNode} - CSSTree node (AST)
      */
     public static parse(raw: string, context: string): CssNode {
         return parse(raw, {
@@ -56,9 +57,9 @@ export class CssTree {
     /**
      * Helper function for creating attribute selectors.
      *
-     * @param {string} attribute
-     * @param {string} value
-     * @returns {AttributeSelector}
+     * @param {string} attribute - Attribute name
+     * @param {string} value - Attribute value
+     * @returns {AttributeSelector} - Attribute selector AST
      */
     public static createAttributeSelector(attribute: string, value: string): AttributeSelector {
         return {
@@ -78,7 +79,7 @@ export class CssTree {
 
     /**
      *
-     * @param {Selector} selectorAst
+     * @param {Selector} selectorAst - CSSTree Selector AST
      * @returns {IExtendedCssNodes} Extended CSS Nodes
      */
     public static getSelectorExtendedCssNodes(selectorAst: Selector): IExtendedCssNodes {
@@ -108,7 +109,8 @@ export class CssTree {
     }
 
     /**
-     * Selector generation based on CSSTree's AST. This is necessary because CSSTree only adds spaces in some edge cases.
+     * Selector generation based on CSSTree's AST. This is necessary because CSSTree
+     * only adds spaces in some edge cases.
      *
      * @param {CssNode} ast - CSS Tree AST
      * @returns {string} CSS selector as string
@@ -316,7 +318,8 @@ export class CssTree {
                         }
 
                         if (node.important) {
-                            // FIXME: Space before important? See https://github.com/AdguardTeam/AdguardFilters/pull/132240#discussion_r996684483
+                            // FIXME: Space before important?
+                            // See https://github.com/AdguardTeam/AdguardFilters/pull/132240#discussion_r996684483
                             result += SPACE;
                             result += IMPORTANT;
                         }

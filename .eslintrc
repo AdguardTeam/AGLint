@@ -1,10 +1,38 @@
 {
     "root": true,
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint", "prettier"],
-    "extends": ["eslint:recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+    "parserOptions": {
+        "project": "tsconfig.eslint.json"
+    },
+    "plugins": ["import", "@typescript-eslint", "prettier"],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "airbnb-typescript/base",
+        "plugin:jsdoc/recommended",
+        "prettier"
+    ],
     "rules": {
-        "no-console": 1,
-        "prettier/prettier": 2
+        "prettier/prettier": 2,
+
+        "max-len": [
+            "error",
+            {
+                "code": 120,
+                "comments": 120,
+                "tabWidth": 4,
+                "ignoreUrls": false,
+                "ignoreTrailingComments": false,
+                "ignoreComments": false
+            }
+        ],
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ]
     }
 }

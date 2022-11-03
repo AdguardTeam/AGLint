@@ -1,16 +1,16 @@
+/* eslint-disable max-len */
 import { Block, Selector } from "css-tree";
 import { CssTree } from "../../src/utils/csstree";
 
 describe("CSSTree utils", () => {
     test("getSelectorExtendedCssNodes", () => {
-        expect(
-            CssTree.getSelectorExtendedCssNodes(<Selector>CssTree.parse("#test", "selector"))
-        ).toEqual({ attributes: [], pseudos: [] });
+        expect(CssTree.getSelectorExtendedCssNodes(<Selector>CssTree.parse("#test", "selector"))).toEqual({
+            attributes: [],
+            pseudos: [],
+        });
 
         expect(
-            CssTree.getSelectorExtendedCssNodes(
-                <Selector>CssTree.parse(`#test[-ext-contains="something"]`, "selector")
-            )
+            CssTree.getSelectorExtendedCssNodes(<Selector>CssTree.parse(`#test[-ext-contains="something"]`, "selector"))
         ).toMatchObject({
             attributes: [CssTree.createAttributeSelector("-ext-contains", "something")],
             pseudos: [],
@@ -78,16 +78,12 @@ describe("CSSTree utils", () => {
             parseAndGenerate(
                 'div[data-advert] > #test ~ div[class="advert"][id="something"]:nth-child(3n+0):first-child'
             )
-        ).toEqual(
-            `div[data-advert] > #test ~ div[class="advert"][id="something"]:nth-child(3n+0):first-child`
-        );
+        ).toEqual(`div[data-advert] > #test ~ div[class="advert"][id="something"]:nth-child(3n+0):first-child`);
 
         expect(parseAndGenerate(":not(:not([name]))")).toEqual(`:not(:not([name]))`);
 
         // "Sub selector lists"
-        expect(parseAndGenerate(":not(:not([name]):contains(2))")).toEqual(
-            `:not(:not([name]):contains(2))`
-        );
+        expect(parseAndGenerate(":not(:not([name]):contains(2))")).toEqual(`:not(:not([name]):contains(2))`);
 
         expect(
             parseAndGenerate(
@@ -110,8 +106,6 @@ describe("CSSTree utils", () => {
         expect(parseAndGenerate("padding: 0 !important")).toEqual("padding: 0 !important;");
         expect(parseAndGenerate("padding: 0!important;")).toEqual("padding: 0 !important;");
         expect(parseAndGenerate("padding: 0 !important;")).toEqual("padding: 0 !important;");
-        expect(parseAndGenerate("padding: 0!important; margin: 2px")).toEqual(
-            "padding: 0 !important; margin: 2px;"
-        );
+        expect(parseAndGenerate("padding: 0!important; margin: 2px")).toEqual("padding: 0 !important; margin: 2px;");
     });
 });

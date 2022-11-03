@@ -78,13 +78,9 @@ describe("AdGuardModifierListParser", () => {
         });
 
         // Invalid cases
-        expect(AdGuardModifierListParser.parse("[")).toThrowError(
-            /^Missing modifier marker "\$" at pattern/
-        );
+        expect(AdGuardModifierListParser.parse("[")).toThrowError(/^Missing modifier marker "\$" at pattern/);
 
-        expect(AdGuardModifierListParser.parse("[ ")).toThrowError(
-            /^Missing modifier marker "\$" at pattern/
-        );
+        expect(AdGuardModifierListParser.parse("[ ")).toThrowError(/^Missing modifier marker "\$" at pattern/);
 
         expect(AdGuardModifierListParser.parse("[m1]example.com")).toThrowError(
             /^Missing modifier marker "\$" at pattern/
@@ -94,11 +90,7 @@ describe("AdGuardModifierListParser", () => {
             /^Missing closing bracket "]" at pattern/
         );
 
-        expect(AdGuardModifierListParser.parse("[$]example.com")).toThrowError(
-            /^No modifiers specified at pattern/
-        );
-        expect(AdGuardModifierListParser.parse("[$  ]example.com")).toThrowError(
-            /^No modifiers specified at pattern/
-        );
+        expect(AdGuardModifierListParser.parse("[$]example.com")).toThrowError(/^No modifiers specified at pattern/);
+        expect(AdGuardModifierListParser.parse("[$  ]example.com")).toThrowError(/^No modifiers specified at pattern/);
     });
 });

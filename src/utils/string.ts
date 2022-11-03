@@ -10,9 +10,9 @@ export class StringUtils {
      * - isn't preceded by an escape character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
+     * @param {string} searchedCharacter - Searched character
      * @param {number} start - Start index
-     * @param {string} escapeCharacter
+     * @param {string} escapeCharacter - Escape character, \ by default
      * @returns {number} Index or -1 if the character not found
      */
     public static findNextUnescapedCharacter(
@@ -35,9 +35,8 @@ export class StringUtils {
      * - isn't preceded by an escape character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
-     * @param {number} start - Start index
-     * @param {string} escapeCharacter
+     * @param {string} searchedCharacter - Searched character
+     * @param {string} escapeCharacter - Escape character, \ by default
      * @returns {number} Index or -1 if the character not found
      */
     public static findLastUnescapedCharacter(
@@ -60,9 +59,9 @@ export class StringUtils {
      * - isn't followed by the specified character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
-     * @param {string} notFollowedBy
-     * @param {string} escapeCharacter
+     * @param {string} searchedCharacter - Searched character
+     * @param {string} notFollowedBy - Searched character not followed by this character
+     * @param {string} escapeCharacter - Escape character, \ by default
      * @returns {number} Index or -1 if the character not found
      */
     public static findLastUnescapedCharacterThatNotFollowedBy(
@@ -161,22 +160,15 @@ export class StringUtils {
      * - isn't part of any RegExp expression (/regexp/)
      *
      * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
+     * @param {string} searchedCharacter - Searched character
      * @param {number} start - Start index
      * @returns {number} Index or -1 if the character not found
      */
-    public static findUnescapedNonStringNonRegexChar(
-        pattern: string,
-        searchedCharacter: string,
-        start = 0
-    ) {
+    public static findUnescapedNonStringNonRegexChar(pattern: string, searchedCharacter: string, start = 0) {
         let open: string | null = null;
 
         for (let i = start; i < pattern.length; i++) {
-            if (
-                (pattern[i] == "'" || pattern[i] == '"' || pattern[i] == "/") &&
-                pattern[i - 1] != "\\"
-            ) {
+            if ((pattern[i] == "'" || pattern[i] == '"' || pattern[i] == "/") && pattern[i - 1] != "\\") {
                 if (open === pattern[i]) {
                     open = null;
                 } else {
@@ -196,8 +188,9 @@ export class StringUtils {
      * - isn't preceded by an escape character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} searchedCharacter
+     * @param {string} searchedCharacter - Searched character
      * @param {number} start - Start index
+     * @param {string} escapeCharacter - Escape character, \ by default
      * @returns {number} Index or -1 if the character not found
      */
     public static findNextUnquotedUnescapedCharacter(
@@ -230,13 +223,10 @@ export class StringUtils {
      * - isn't preceded by an escape character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} delimeterCharacter
+     * @param {string} delimeterCharacter - Delimeter character
      * @returns {string[]} Splitted string
      */
-    public static splitStringByUnquotedUnescapedCharacter(
-        pattern: string,
-        delimeterCharacter: string
-    ): string[] {
+    public static splitStringByUnquotedUnescapedCharacter(pattern: string, delimeterCharacter: string): string[] {
         const parts: string[] = [];
         let delimeterIndex = -1;
         do {
@@ -262,13 +252,10 @@ export class StringUtils {
      * - isn't preceded by an escape character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} delimeterCharacter
+     * @param {string} delimeterCharacter - Delimeter character
      * @returns {string[]} Splitted string
      */
-    public static splitStringByUnescapedNonStringNonRegexChar(
-        pattern: string,
-        delimeterCharacter: string
-    ): string[] {
+    public static splitStringByUnescapedNonStringNonRegexChar(pattern: string, delimeterCharacter: string): string[] {
         const parts: string[] = [];
         let delimeterIndex = -1;
         do {
@@ -292,22 +279,15 @@ export class StringUtils {
      * - isn't preceded by an escape character
      *
      * @param {string} pattern - Source pattern
-     * @param {string} delimeterCharacter
+     * @param {string} delimeterCharacter - Delimeter character
      * @returns {string[]} Splitted string
      */
-    public static splitStringByUnescapedCharacter(
-        pattern: string,
-        delimeterCharacter: string
-    ): string[] {
+    public static splitStringByUnescapedCharacter(pattern: string, delimeterCharacter: string): string[] {
         const parts: string[] = [];
         let delimeterIndex = -1;
         do {
             const prevDelimeterIndex = delimeterIndex;
-            delimeterIndex = StringUtils.findNextUnescapedCharacter(
-                pattern,
-                delimeterCharacter,
-                delimeterIndex + 1
-            );
+            delimeterIndex = StringUtils.findNextUnescapedCharacter(pattern, delimeterCharacter, delimeterIndex + 1);
             if (delimeterIndex != -1) {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, delimeterIndex));
             } else {
@@ -320,7 +300,7 @@ export class StringUtils {
     /**
      *Checks if a character is whitespace.
      *
-     * @param {string} character
+     * @param {string} character - Character to check
      * @returns {boolean} true/false
      */
     public static isWhitespace(character: string): boolean {
@@ -361,7 +341,7 @@ export class StringUtils {
     /**
      * Checks whether a string is a RegExp pattern.
      *
-     * @param {string} pattern
+     * @param {string} pattern - Pattern to check
      * @returns {boolean} true/false
      */
     public static isRegexPattern(pattern: string): boolean {
@@ -374,11 +354,7 @@ export class StringUtils {
         return false;
     }
 
-    public static escapeCharacter(
-        pattern: string,
-        character: string,
-        escapeCharacter = ESCAPE_CHARACTER
-    ): string {
+    public static escapeCharacter(pattern: string, character: string, escapeCharacter = ESCAPE_CHARACTER): string {
         let result = "";
 
         for (let i = 0; i < pattern.length; i++) {

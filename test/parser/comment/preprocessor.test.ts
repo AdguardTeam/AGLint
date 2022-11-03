@@ -52,9 +52,7 @@ describe("PreProcessorParser", () => {
 
         expect(parseAndGenerate("!#endif")).toEqual("!#endif");
 
-        expect(parseAndGenerate("!#include ../sections/ads.txt")).toEqual(
-            "!#include ../sections/ads.txt"
-        );
+        expect(parseAndGenerate("!#include ../sections/ads.txt")).toEqual("!#include ../sections/ads.txt");
 
         expect(parseAndGenerate("!#safari_cb_affinity(content_blockers)")).toEqual(
             "!#safari_cb_affinity(content_blockers)"

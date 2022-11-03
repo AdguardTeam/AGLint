@@ -25,22 +25,17 @@ export class ScriptletBodyParser {
     public static parseAdgAndUboScriptletCall(rawCall: string): IScriptletRuleBody {
         // Call should contain: (arg0, arg1,...)
         if (rawCall[0] != "(") {
-            throw new Error(
-                `Invalid uBlock/AdGuard scriptlet call, no opening bracket "(" at call: "${rawCall}"`
-            );
+            throw new Error(`Invalid uBlock/AdGuard scriptlet call, no opening bracket "(" at call: "${rawCall}"`);
         } else if (!rawCall.endsWith(")")) {
-            throw new Error(
-                `Invalid uBlock/AdGuard scriptlet call, no closing bracket ")" at call: "${rawCall}"`
-            );
+            throw new Error(`Invalid uBlock/AdGuard scriptlet call, no closing bracket ")" at call: "${rawCall}"`);
         }
 
         // Remove parentheses
         const rawParameterList = rawCall.slice(1, -1);
 
-        const splittedRawParameterList = StringUtils.splitStringByUnquotedUnescapedCharacter(
-            rawParameterList,
-            ","
-        ).map((param) => param.trim());
+        const splittedRawParameterList = StringUtils.splitStringByUnquotedUnescapedCharacter(rawParameterList, ",").map(
+            (param) => param.trim()
+        );
 
         // Empty case
         if (splittedRawParameterList[0] == "") {
@@ -90,9 +85,7 @@ export class ScriptletBodyParser {
             if ((args[i] == '"' || args[i] == "'") && args[i - 1] != "\\") {
                 if (!openedQuote) {
                     if (unquotedArgStartIndex != -1) {
-                        result.push(
-                            collectedWhitespaces + args.substring(unquotedArgStartIndex, i)
-                        );
+                        result.push(collectedWhitespaces + args.substring(unquotedArgStartIndex, i));
                         unquotedArgStartIndex = -1;
                         collectedWhitespaces = "";
                     }
@@ -109,9 +102,7 @@ export class ScriptletBodyParser {
                 if (!openedQuote) {
                     // If this space follows an unquoted argument, the argument must be stored
                     if (unquotedArgStartIndex != -1) {
-                        result.push(
-                            collectedWhitespaces + args.substring(unquotedArgStartIndex, i)
-                        );
+                        result.push(collectedWhitespaces + args.substring(unquotedArgStartIndex, i));
                         unquotedArgStartIndex = -1;
                         collectedWhitespaces = args[i];
                     } else {
@@ -145,21 +136,16 @@ export class ScriptletBodyParser {
         }
 
         // It can contain multiple scriptlet calls delimeted by semicolon
-        const rawScriptletCalls = StringUtils.splitStringByUnescapedNonStringNonRegexChar(
-            trimmedRawCall,
-            ";"
-        );
+        const rawScriptletCalls = StringUtils.splitStringByUnescapedNonStringNonRegexChar(trimmedRawCall, ";");
 
         for (const rawScriptletCall of rawScriptletCalls) {
-            const splittedRawParameterList = ScriptletBodyParser.splitAbpSnippetParameters(
-                rawScriptletCall
-            ).map((param) => param.trim());
+            const splittedRawParameterList = ScriptletBodyParser.splitAbpSnippetParameters(rawScriptletCall).map(
+                (param) => param.trim()
+            );
 
             // The scriptlet must be specified (parameters are optional)
             if (!splittedRawParameterList[0] || splittedRawParameterList[0] == "") {
-                throw new SyntaxError(
-                    `No scriptlet specified at the following scriptlet call: "${rawCall}"`
-                );
+                throw new SyntaxError(`No scriptlet specified at the following scriptlet call: "${rawCall}"`);
             }
 
             const parameterList = ScriptletBodyParser.decodeParameters(splittedRawParameterList);

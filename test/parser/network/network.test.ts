@@ -250,9 +250,7 @@ describe("NetworkRuleParser", () => {
 
         // Complicated case
         expect(
-            NetworkRuleParser.parse(
-                "@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/"
-            )
+            NetworkRuleParser.parse("@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/")
         ).toEqual({
             category: RuleCategories.Network,
             type: "NetworkRule",
@@ -284,9 +282,7 @@ describe("NetworkRuleParser", () => {
         });
 
         expect(
-            NetworkRuleParser.parse(
-                `@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i`
-            )
+            NetworkRuleParser.parse(`@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i`)
         ).toEqual({
             category: RuleCategories.Network,
             type: "NetworkRule",
@@ -323,10 +319,8 @@ describe("NetworkRuleParser", () => {
         expect(parseAndGenerate("/regex-pattern/$script")).toEqual("/regex-pattern/$script");
         expect(parseAndGenerate("@@/regex-pattern/$script")).toEqual("@@/regex-pattern/$script");
 
-        expect(
-            parseAndGenerate(
-                "@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/"
-            )
-        ).toEqual("@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/");
+        expect(parseAndGenerate("@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/")).toEqual(
+            "@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/"
+        );
     });
 });

@@ -52,9 +52,7 @@ describe("MetadataParser", () => {
             value: "Filter",
         });
 
-        expect(
-            MetadataParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")
-        ).toEqual(<IMetadata>{
+        expect(MetadataParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
             type: "Metadata",
@@ -79,12 +77,12 @@ describe("MetadataParser", () => {
         expect(parseAndGenerate("!   Title: Filter   ")).toEqual("! Title: Filter");
         expect(parseAndGenerate("# Title: Filter")).toEqual("# Title: Filter");
 
-        expect(
-            parseAndGenerate("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")
-        ).toEqual("! Homepage: https://github.com/AdguardTeam/some-repo/wiki");
+        expect(parseAndGenerate("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(
+            "! Homepage: https://github.com/AdguardTeam/some-repo/wiki"
+        );
 
-        expect(
-            parseAndGenerate("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")
-        ).toEqual("# Homepage: https://github.com/AdguardTeam/some-repo/wiki");
+        expect(parseAndGenerate("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(
+            "# Homepage: https://github.com/AdguardTeam/some-repo/wiki"
+        );
     });
 });

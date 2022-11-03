@@ -1,8 +1,8 @@
-import { uBlockModifierListParser } from "../../../../src/parser/cosmetic/specific/ubo-options";
+import { UBlockModifierListParser } from "../../../../src/parser/cosmetic/specific/ubo-options";
 
-describe("uBlockModifierListParser", () => {
+describe("UBlockModifierListParser", () => {
     test("parse", async () => {
-        expect(uBlockModifierListParser.parse(":matches-path(/path).ad")).toEqual({
+        expect(UBlockModifierListParser.parse(":matches-path(/path).ad")).toEqual({
             modifiers: [
                 {
                     modifier: "matches-path",
@@ -13,7 +13,7 @@ describe("uBlockModifierListParser", () => {
         });
 
         // trim
-        expect(uBlockModifierListParser.parse(":matches-path(/path) .ad")).toEqual({
+        expect(UBlockModifierListParser.parse(":matches-path(/path) .ad")).toEqual({
             modifiers: [
                 {
                     modifier: "matches-path",
@@ -23,7 +23,7 @@ describe("uBlockModifierListParser", () => {
             rest: ".ad",
         });
 
-        expect(uBlockModifierListParser.parse(":matches-path() .ad")).toEqual({
+        expect(UBlockModifierListParser.parse(":matches-path() .ad")).toEqual({
             modifiers: [
                 {
                     modifier: "matches-path",
@@ -34,7 +34,7 @@ describe("uBlockModifierListParser", () => {
         });
 
         expect(
-            uBlockModifierListParser.parse(
+            UBlockModifierListParser.parse(
                 ":matches-path(a) .ad:matches-path(b):matches-path(c) > .something:matches-path(d) > .advert"
             )
         ).toEqual({
@@ -60,18 +60,18 @@ describe("uBlockModifierListParser", () => {
         });
 
         // No uBO modifier
-        expect(uBlockModifierListParser.parse(".ad:-abp-has(.something)")).toEqual({
+        expect(UBlockModifierListParser.parse(".ad:-abp-has(.something)")).toEqual({
             modifiers: [],
             rest: ".ad:-abp-has(.something)",
         });
 
-        expect(uBlockModifierListParser.parse("")).toEqual({
+        expect(UBlockModifierListParser.parse("")).toEqual({
             modifiers: [],
             rest: "",
         });
 
         // trim
-        expect(uBlockModifierListParser.parse("  ")).toEqual({
+        expect(UBlockModifierListParser.parse("  ")).toEqual({
             modifiers: [],
             rest: "",
         });

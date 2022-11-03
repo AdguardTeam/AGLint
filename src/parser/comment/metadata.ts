@@ -19,13 +19,15 @@ export interface IMetadata extends IComment {
 
 export class MetadataParser {
     /**
+     * Parses a raw rule as a metadata comment.
+     *
      * @param {string} raw - Raw rule
-     * @returns {IPreProcessor | null}
+     * @returns {IMetadata | null} Metadata comment AST or null (if the raw rule cannot be parsed as a metadata comment)
      */
     public static parse(raw: string): IMetadata | null {
         const trimmed = raw.trim();
 
-        if (raw[0] == CommentMarker.Regular || raw[0] == CommentMarker.Hashmark) {
+        if (trimmed[0] == CommentMarker.Regular || trimmed[0] == CommentMarker.Hashmark) {
             const commentText = trimmed.substring(1);
             const separatorIndex = commentText.indexOf(METADATA_SEPARATOR);
 
@@ -38,7 +40,7 @@ export class MetadataParser {
                             category: RuleCategories.Comment,
                             syntax: AdblockSyntax.Unknown,
                             type: CommentRuleType.Metadata,
-                            marker: raw[0],
+                            marker: trimmed[0],
                             header,
                             value: commentText.substring(separatorIndex + 1).trim(),
                         };
@@ -50,6 +52,12 @@ export class MetadataParser {
         return null;
     }
 
+    /**
+     * Converts a metadata comment AST to a string.
+     *
+     * @param {IMetadata} ast - Metadata comment AST
+     * @returns {string} Raw string
+     */
     public static generate(ast: IMetadata): string {
         let result = ast.marker + " ";
 

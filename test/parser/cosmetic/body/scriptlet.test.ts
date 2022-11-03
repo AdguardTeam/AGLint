@@ -76,9 +76,7 @@ describe("ScriptletBodyParser", () => {
             ],
         });
 
-        expect(
-            ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, arg0, arg1, arg2)")
-        ).toEqual({
+        expect(ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, arg0, arg1, arg2)")).toEqual({
             scriptlets: [
                 {
                     scriptlet: {
@@ -103,43 +101,39 @@ describe("ScriptletBodyParser", () => {
             ],
         });
 
-        expect(
-            ScriptletBodyParser.parseAdgAndUboScriptletCall(
-                "(scriptlet0, 'arg0', \"arg1\", /arg2/, arg3)"
-            )
-        ).toEqual({
-            scriptlets: [
-                {
-                    scriptlet: {
-                        type: "Unquoted",
-                        value: "scriptlet0",
-                    },
-                    parameters: [
-                        {
-                            type: "SingleQuoted",
-                            value: "arg0",
-                        },
-                        {
-                            type: "DoubleQuoted",
-                            value: "arg1",
-                        },
-                        {
-                            type: "RegExp",
-                            value: "arg2",
-                        },
-                        {
+        expect(ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, 'arg0', \"arg1\", /arg2/, arg3)")).toEqual(
+            {
+                scriptlets: [
+                    {
+                        scriptlet: {
                             type: "Unquoted",
-                            value: "arg3",
+                            value: "scriptlet0",
                         },
-                    ],
-                },
-            ],
-        });
+                        parameters: [
+                            {
+                                type: "SingleQuoted",
+                                value: "arg0",
+                            },
+                            {
+                                type: "DoubleQuoted",
+                                value: "arg1",
+                            },
+                            {
+                                type: "RegExp",
+                                value: "arg2",
+                            },
+                            {
+                                type: "Unquoted",
+                                value: "arg3",
+                            },
+                        ],
+                    },
+                ],
+            }
+        );
 
         expect(
-            ScriptletBodyParser.parseAdgAndUboScriptletCall(
-                "(scriptlet0, 'ar\\'g0', \"ar\\\"g1\", /ar\\/g2/)"
-            )
+            ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, 'ar\\'g0', \"ar\\\"g1\", /ar\\/g2/)")
         ).toEqual({
             scriptlets: [
                 {
@@ -166,13 +160,13 @@ describe("ScriptletBodyParser", () => {
         });
 
         // Invalid cases
-        expect(() =>
-            ScriptletBodyParser.parseAdgAndUboScriptletCall("scriptlet0, arg0, arg1, arg2")
-        ).toThrowError(/^Invalid uBlock\/AdGuard scriptlet call, no opening bracket "\(" at call:/);
+        expect(() => ScriptletBodyParser.parseAdgAndUboScriptletCall("scriptlet0, arg0, arg1, arg2")).toThrowError(
+            /^Invalid uBlock\/AdGuard scriptlet call, no opening bracket "\(" at call:/
+        );
 
-        expect(() =>
-            ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, arg0, arg1, arg2")
-        ).toThrowError(/^Invalid uBlock\/AdGuard scriptlet call, no closing bracket "\)" at call:/);
+        expect(() => ScriptletBodyParser.parseAdgAndUboScriptletCall("(scriptlet0, arg0, arg1, arg2")).toThrowError(
+            /^Invalid uBlock\/AdGuard scriptlet call, no closing bracket "\)" at call:/
+        );
     });
 
     test("splitAbpSnippetParameters & parseAbpSnippetCall", () => {
@@ -307,11 +301,7 @@ describe("ScriptletBodyParser", () => {
         });
 
         // Multiple scriptlets
-        expect(
-            ScriptletBodyParser.parseAbpSnippetCall(
-                "scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0"
-            )
-        ).toEqual({
+        expect(ScriptletBodyParser.parseAbpSnippetCall("scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0")).toEqual({
             scriptlets: [
                 {
                     scriptlet: {

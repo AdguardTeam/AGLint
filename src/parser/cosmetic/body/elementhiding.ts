@@ -37,8 +37,6 @@ export class ElementHidingBodyParser {
     }
 
     public static generate(ast: IElementHidingRuleBody): string {
-        return ast.selectors
-            .map((selector) => CssTree.generateSelector(selector))
-            .join(CSS_SELECTORS_SEPARATOR + " ");
+        return ast.selectors.map((selector) => CssTree.generateSelector(selector)).join(CSS_SELECTORS_SEPARATOR + " ");
     }
 }
