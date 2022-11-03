@@ -25,9 +25,10 @@ export class AgentParser {
      * @returns {boolean} true/false
      */
     public static isAgent(raw: string): boolean {
-        if (raw[0] == AGENT_LIST_OPEN) {
-            const len = raw.length;
-            if (raw[len - 1] == AGENT_LIST_CLOSE) {
+        const trimmed = raw.trim();
+
+        if (trimmed[0] == AGENT_LIST_OPEN) {
+            if (trimmed[trimmed.length - 1] == AGENT_LIST_CLOSE) {
                 return true;
             }
         }
@@ -79,21 +80,23 @@ export class AgentParser {
      * @returns {IAgent | null} Adblock agent AST or null (if the raw rule cannot be parsed as an adblock agent comment)
      */
     public static parse(raw: string): IAgent | null {
+        const trimmed = raw.trim();
+
         // Check basic adblock agents pattern: [...], ![...], ! [...], #[...], etc.
         let openingBracketIndex = -1;
-        const ruleLength = raw.length;
+        const ruleLength = trimmed.length;
 
-        if (ruleLength > 1 && raw[ruleLength - 1] == AGENT_LIST_CLOSE) {
-            if (raw[0] == AGENT_LIST_OPEN) {
+        if (ruleLength > 1 && trimmed[ruleLength - 1] == AGENT_LIST_CLOSE) {
+            if (trimmed[0] == AGENT_LIST_OPEN) {
                 openingBracketIndex = 0;
-            } else if (raw[0] == CommentMarker.Regular || raw[0] == CommentMarker.Hashmark) {
-                if (raw[1] == AGENT_LIST_OPEN) {
+            } else if (trimmed[0] == CommentMarker.Regular || trimmed[0] == CommentMarker.Hashmark) {
+                if (trimmed[1] == AGENT_LIST_OPEN) {
                     openingBracketIndex = 1;
                 } else {
                     // Skip comment marker
                     const shift = 1;
-                    const firstNonWhitespaceIndex = StringUtils.findFirstNonWhitespaceCharacter(raw.slice(shift));
-                    if (raw[firstNonWhitespaceIndex + shift] == AGENT_LIST_OPEN) {
+                    const firstNonWhitespaceIndex = StringUtils.findFirstNonWhitespaceCharacter(trimmed.slice(shift));
+                    if (trimmed[firstNonWhitespaceIndex + shift] == AGENT_LIST_OPEN) {
                         openingBracketIndex = firstNonWhitespaceIndex + shift;
                     }
                 }
@@ -103,7 +106,7 @@ export class AgentParser {
         // Parse content between brackets
         if (openingBracketIndex != -1) {
             const collectedAgents: IAgentMember[] = [];
-            const rawAgents = raw.slice(openingBracketIndex + 1, -1);
+            const rawAgents = trimmed.slice(openingBracketIndex + 1, -1);
             const agents = rawAgents.split(AGENT_SEPARATOR);
             for (const agent of agents) {
                 const trimmedAgent = agent.trim();
