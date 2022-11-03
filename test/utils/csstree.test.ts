@@ -1,16 +1,21 @@
 /* eslint-disable max-len */
 import { Block, Selector } from "css-tree";
 import { CssTree } from "../../src/utils/csstree";
+import { CssTreeParserContext } from "../../src/utils/csstree-constants";
 
 describe("CSSTree utils", () => {
     test("getSelectorExtendedCssNodes", () => {
-        expect(CssTree.getSelectorExtendedCssNodes(<Selector>CssTree.parse("#test", "selector"))).toEqual({
+        expect(
+            CssTree.getSelectorExtendedCssNodes(<Selector>CssTree.parse("#test", CssTreeParserContext.selector))
+        ).toEqual({
             attributes: [],
             pseudos: [],
         });
 
         expect(
-            CssTree.getSelectorExtendedCssNodes(<Selector>CssTree.parse(`#test[-ext-contains="something"]`, "selector"))
+            CssTree.getSelectorExtendedCssNodes(
+                <Selector>CssTree.parse(`#test[-ext-contains="something"]`, CssTreeParserContext.selector)
+            )
         ).toMatchObject({
             attributes: [CssTree.createAttributeSelector("-ext-contains", "something")],
             pseudos: [],
@@ -41,7 +46,7 @@ describe("CSSTree utils", () => {
                 <Selector>(
                     CssTree.parse(
                         `#test[-ext-contains="something"]:-abp-has(.ad):if-not([ad]):not([some])::before`,
-                        "selector"
+                        CssTreeParserContext.selector
                     )
                 )
             )
@@ -64,7 +69,7 @@ describe("CSSTree utils", () => {
     // Customized selector generation
     test("generateSelector", () => {
         const parseAndGenerate = (rawSelector: string) => {
-            return CssTree.generateSelector(<Selector>CssTree.parse(rawSelector, "selector"));
+            return CssTree.generateSelector(<Selector>CssTree.parse(rawSelector, CssTreeParserContext.selector));
         };
 
         expect(parseAndGenerate("#test")).toEqual("#test");
@@ -95,9 +100,9 @@ describe("CSSTree utils", () => {
     });
 
     test("generateBlock", () => {
-        const parseAndGenerate = (rawBlock: string) => {
+        const parseAndGenerate = (declarationList: string) => {
             // Automatically put {}
-            return CssTree.generateBlock(<Block>CssTree.parse(`{${rawBlock}}`, "block"));
+            return CssTree.generateBlock(<Block>CssTree.parse(declarationList, CssTreeParserContext.declarationList));
         };
 
         expect(parseAndGenerate("padding: 0;")).toEqual("padding: 0;");

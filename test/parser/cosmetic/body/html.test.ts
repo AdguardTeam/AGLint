@@ -1,5 +1,6 @@
 import { HtmlBodyParser } from "../../../../src/parser/cosmetic/body/html";
 import { CssTree } from "../../../../src/utils/csstree";
+import { CssTreeParserContext } from "../../../../src/utils/csstree-constants";
 
 describe("HtmlBodyParser", () => {
     test("escapeDoubleQuotes", () => {
@@ -20,17 +21,17 @@ describe("HtmlBodyParser", () => {
 
     test("parse", () => {
         expect(HtmlBodyParser.parse('[tag-content="""a"""]')).toEqual({
-            selectors: [CssTree.parse('[tag-content="\\"a\\""]', "selector")],
+            selectors: [CssTree.parse('[tag-content="\\"a\\""]', CssTreeParserContext.selector)],
         });
 
         expect(HtmlBodyParser.parse('[tag-content="""""a"""""]')).toEqual({
-            selectors: [CssTree.parse('[tag-content="\\"\\"a\\"\\""]', "selector")],
+            selectors: [CssTree.parse('[tag-content="\\"\\"a\\"\\""]', CssTreeParserContext.selector)],
         });
 
         expect(HtmlBodyParser.parse("script:has-text(a), script:has-text(b)")).toEqual({
             selectors: [
-                CssTree.parse("script:has-text(a)", "selector"),
-                CssTree.parse("script:has-text(b)", "selector"),
+                CssTree.parse("script:has-text(a)", CssTreeParserContext.selector),
+                CssTree.parse("script:has-text(b)", CssTreeParserContext.selector),
             ],
         });
     });

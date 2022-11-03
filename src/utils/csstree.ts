@@ -15,6 +15,7 @@ import {
 } from "css-tree";
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from "../converter/pseudo";
 import {
+    COMMA,
     CSS_ATTRIBUTE_SELECTOR_CLOSE,
     CSS_ATTRIBUTE_SELECTOR_OPEN,
     CSS_CLASS_MARKER,
@@ -25,8 +26,10 @@ import {
     CSS_PSEUDO_CLOSE,
     CSS_PSEUDO_MARKER,
     CSS_PSEUDO_OPEN,
+    EMPTY,
     SPACE,
 } from "./constants";
+import { CssTreeNodeType, CssTreeParserContext } from "./csstree-constants";
 
 export interface IExtendedCssNodes {
     pseudos: PseudoClassSelector[];
@@ -39,10 +42,9 @@ export class CssTree {
      *
      * @param {string} raw - Raw CSS input
      * @param {string} context - CSSTree context
-     * @see {@link https://github.com/csstree/csstree/blob/master/docs/parsing.md#context}
      * @returns {CssNode} - CSSTree node (AST)
      */
-    public static parse(raw: string, context: string): CssNode {
+    public static parse(raw: string, context: CssTreeParserContext): CssNode {
         return parse(raw, {
             context,
             parseAtrulePrelude: true,
@@ -64,14 +66,14 @@ export class CssTree {
      */
     public static createAttributeSelector(attribute: string, value: string): AttributeSelector {
         return {
-            type: "AttributeSelector",
+            type: CssTreeNodeType.AttributeSelector,
             name: {
-                type: "Identifier",
+                type: CssTreeNodeType.Identifier,
                 name: attribute,
             },
             matcher: "=",
             value: {
-                type: "String",
+                type: CssTreeNodeType.String,
                 value: value,
             },
             flags: null,
@@ -89,14 +91,14 @@ export class CssTree {
 
         walk(selectorAst, (node: CssNode) => {
             // Pseudo classes
-            if (node.type === "PseudoClassSelector") {
+            if (node.type === CssTreeNodeType.PseudoClassSelector) {
                 // ExtCSS pseudo classes
                 if (EXTCSS_PSEUDO_CLASSES.includes(node.name)) {
                     pseudos.push(node);
                 }
             }
             // Attribute selectors
-            else if (node.type === "AttributeSelector") {
+            else if (node.type === CssTreeNodeType.AttributeSelector) {
                 if (EXTCSS_ATTRIBUTES.includes(node.name.name)) {
                     attributes.push(node);
                 }
@@ -135,66 +137,66 @@ export class CssTree {
 
                 switch (node.type) {
                     // "Trivial" nodes
-                    case "TypeSelector":
+                    case CssTreeNodeType.TypeSelector:
                         result += node.name;
                         break;
 
-                    case "ClassSelector":
+                    case CssTreeNodeType.ClassSelector:
                         result += CSS_CLASS_MARKER;
                         result += node.name;
                         break;
 
-                    case "IdSelector":
+                    case CssTreeNodeType.IdSelector:
                         result += CSS_ID_MARKER;
                         result += node.name;
                         break;
 
-                    case "Identifier":
+                    case CssTreeNodeType.Identifier:
                         result += SPACE;
                         result += node.name;
                         result += SPACE;
                         break;
 
-                    case "Raw":
+                    case CssTreeNodeType.Raw:
                         result += node.value;
                         break;
 
                     // "Advanced" nodes
-                    case "Nth":
+                    case CssTreeNodeType.Nth:
                         result += generate(node);
                         break;
 
                     // For example :not([id], [name])
-                    case "SelectorList":
+                    case CssTreeNodeType.SelectorList:
                         // eslint-disable-next-line no-case-declarations
                         const selectors: string[] = [];
 
                         node.children.forEach((selector) => {
                             // Selector
-                            if (selector.type == "Selector") {
+                            if (selector.type == CssTreeNodeType.Selector) {
                                 selectors.push(CssTree.generateSelector(selector));
                             }
                             // Raw
-                            else if (selector.type == "Raw") {
+                            else if (selector.type == CssTreeNodeType.Raw) {
                                 selectors.push(selector.value);
                             }
                         });
 
                         // Join selector lists
-                        result += selectors.join(", ");
+                        result += selectors.join(COMMA + SPACE);
 
                         // Skip nodes here
                         selectorListDepth = depth;
                         break;
 
-                    case "Combinator":
+                    case CssTreeNodeType.Combinator:
                         if (node.name == SPACE) {
                             result += node.name;
                             break;
                         }
 
                         // Prevent this case (unnecessary space): has( > .something)
-                        if (prevNode.type !== "Selector") {
+                        if (prevNode.type !== CssTreeNodeType.Selector) {
                             result += SPACE;
                         }
 
@@ -202,7 +204,7 @@ export class CssTree {
                         result += SPACE;
                         break;
 
-                    case "AttributeSelector":
+                    case CssTreeNodeType.AttributeSelector:
                         result += CSS_ATTRIBUTE_SELECTOR_OPEN;
 
                         // Identifier name
@@ -217,11 +219,11 @@ export class CssTree {
                             // Value can be String, Identifier or null
                             if (node.value !== null) {
                                 // String node
-                                if (node.value.type == "String") {
+                                if (node.value.type == CssTreeNodeType.String) {
                                     result += generate(node.value);
                                 }
                                 // Identifier node
-                                else if (node.value.type == "Identifier") {
+                                else if (node.value.type == CssTreeNodeType.Identifier) {
                                     result += node.value.name;
                                 }
                             }
@@ -239,7 +241,7 @@ export class CssTree {
                         inAttributeSelector = true;
                         break;
 
-                    case "PseudoElementSelector":
+                    case CssTreeNodeType.PseudoElementSelector:
                         result += CSS_PSEUDO_MARKER;
                         result += CSS_PSEUDO_MARKER;
                         result += node.name;
@@ -250,7 +252,7 @@ export class CssTree {
 
                         break;
 
-                    case "PseudoClassSelector":
+                    case CssTreeNodeType.PseudoClassSelector:
                         result += CSS_PSEUDO_MARKER;
                         result += node.name;
 
@@ -265,7 +267,7 @@ export class CssTree {
             leave: (node: CssNode) => {
                 depth--;
 
-                if (node.type == "SelectorList" && depth + 1 == selectorListDepth) {
+                if (node.type == CssTreeNodeType.SelectorList && depth + 1 == selectorListDepth) {
                     selectorListDepth = -1;
                 }
 
@@ -273,7 +275,7 @@ export class CssTree {
                     return;
                 }
 
-                if (node.type == "AttributeSelector") {
+                if (node.type == CssTreeNodeType.AttributeSelector) {
                     inAttributeSelector = false;
                 }
 
@@ -282,8 +284,8 @@ export class CssTree {
                 }
 
                 switch (node.type) {
-                    case "PseudoElementSelector":
-                    case "PseudoClassSelector":
+                    case CssTreeNodeType.PseudoElementSelector:
+                    case CssTreeNodeType.PseudoClassSelector:
                         if (node.children !== null) {
                             result += CSS_PSEUDO_CLOSE;
                         }
@@ -302,12 +304,12 @@ export class CssTree {
      * @returns {string} CSS selector as string
      */
     public static generateBlock(ast: Block): string {
-        let result = "";
+        let result = EMPTY;
 
         walk(ast, {
             enter: (node: CssNode) => {
                 switch (node.type) {
-                    case "Declaration": {
+                    case CssTreeNodeType.Declaration: {
                         result += node.property;
 
                         if (node.value) {
@@ -331,7 +333,7 @@ export class CssTree {
             },
             leave: (node: CssNode) => {
                 switch (node.type) {
-                    case "Declaration": {
+                    case CssTreeNodeType.Declaration: {
                         result += CSS_DECLARATION_END;
                         result += SPACE;
                         break;

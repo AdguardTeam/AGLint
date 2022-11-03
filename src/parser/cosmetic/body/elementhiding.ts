@@ -5,6 +5,7 @@
 import { Selector, SelectorList } from "css-tree";
 import { SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
+import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 import { StringUtils } from "../../../utils/string";
 
 const CSS_SELECTORS_SEPARATOR = ",";
@@ -27,14 +28,14 @@ export class ElementHidingBodyParser {
 
         // Selector
         if (StringUtils.findNextUnescapedCharacter(trimmed, CSS_SELECTORS_SEPARATOR) == -1) {
-            selectors.push(<Selector>CssTree.parse(trimmed, "selector"));
+            selectors.push(<Selector>CssTree.parse(trimmed, CssTreeParserContext.selector));
         }
 
         // SelectorList
         else {
-            const selectorListAst = <SelectorList>CssTree.parse(trimmed, "selectorList");
+            const selectorListAst = <SelectorList>CssTree.parse(trimmed, CssTreeParserContext.selectorList);
             selectorListAst.children.forEach((child) => {
-                if (child.type === "Selector") {
+                if (child.type === CssTreeNodeType.Selector) {
                     selectors.push(child);
                 }
             });

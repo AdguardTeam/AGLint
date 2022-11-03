@@ -13,6 +13,7 @@ import {
     SPACE,
 } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
+import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 
 /**
  * `@media <mediaQueryList> { rule }` where rule is `selectorList { declarations block }`
@@ -98,14 +99,14 @@ export class CssInjectionBodyParser {
         const mediaQueryMatch = trimmed.match(MEDIA_QUERY_PATTERN);
         if (mediaQueryMatch && mediaQueryMatch.groups) {
             mediaQueryList = <MediaQueryList>(
-                CssTree.parse(mediaQueryMatch.groups.mediaQueryList.trim(), "mediaQueryList")
+                CssTree.parse(mediaQueryMatch.groups.mediaQueryList.trim(), CssTreeParserContext.mediaQueryList)
             );
 
             rawRule = mediaQueryMatch.groups.rule.trim();
         }
 
         // Parse rule part (rule = selector list + declaration block)
-        const ruleAst = <Rule>CssTree.parse(rawRule, "rule");
+        const ruleAst = <Rule>CssTree.parse(rawRule, CssTreeParserContext.rule);
 
         if (ruleAst.prelude.type !== "SelectorList") {
             throw new Error(`No selector list found in the following CSS injection body: "${raw}"`);
@@ -114,7 +115,7 @@ export class CssInjectionBodyParser {
         const selectorListAst = ruleAst.prelude;
 
         selectorListAst.children.forEach((node) => {
-            if (node.type == "Selector") {
+            if (node.type == CssTreeNodeType.Selector) {
                 selectors.push(node);
             }
         });
@@ -175,10 +176,10 @@ export class CssInjectionBodyParser {
         const selectors: Selector[] = [];
 
         const rawSelectorList = uBlockCssInjection.groups.selectors.trim();
-        const selectorListAst = <SelectorList>CssTree.parse(rawSelectorList, "selectorList");
+        const selectorListAst = <SelectorList>CssTree.parse(rawSelectorList, CssTreeParserContext.selectorList);
 
         selectorListAst.children.forEach((node) => {
-            if (node.type == "Selector") {
+            if (node.type == CssTreeNodeType.Selector) {
                 selectors.push(node);
             }
             // else {
@@ -194,7 +195,7 @@ export class CssInjectionBodyParser {
             const rawDeclarations = uBlockCssInjection.groups.declarations.trim();
 
             // Hack: CSS parser waits for `{declarations}` pattern, so we need { and } chars:
-            block = <Block>CssTree.parse(`{${rawDeclarations}}`, "block");
+            block = <Block>CssTree.parse(`{${rawDeclarations}}`, CssTreeParserContext.block);
         }
 
         return {
