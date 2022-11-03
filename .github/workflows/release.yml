@@ -66,6 +66,8 @@ jobs:
       - name: Run build script
         run: yarn build
 
+      # TODO: Artifact / Create release:
+
       # - name: Create release artifact
       #   uses: actions/upload-artifact@v3
       #   with:
