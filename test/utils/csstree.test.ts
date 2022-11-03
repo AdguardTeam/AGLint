@@ -72,12 +72,19 @@ describe("CSSTree utils", () => {
             return CssTree.generateSelector(<Selector>CssTree.parse(rawSelector, CssTreeParserContext.selector));
         };
 
+        expect(parseAndGenerate("div")).toEqual("div");
         expect(parseAndGenerate("#test")).toEqual("#test");
         expect(parseAndGenerate(".test")).toEqual(".test");
-        expect(parseAndGenerate("div")).toEqual("div");
+        expect(parseAndGenerate(".test .test")).toEqual(".test .test");
+        expect(parseAndGenerate("[a=b]")).toEqual("[a=b]");
+        expect(parseAndGenerate('[a="b"i]')).toEqual('[a="b" i]');
+        expect(parseAndGenerate('[a="b" i]')).toEqual('[a="b" i]');
+        expect(parseAndGenerate("div::first-child")).toEqual("div::first-child");
+        expect(parseAndGenerate("div::a(b)")).toEqual("div::a(b)");
         expect(parseAndGenerate("div.test")).toEqual("div.test");
         expect(parseAndGenerate("div#test")).toEqual("div#test");
         expect(parseAndGenerate("div[data-advert]")).toEqual("div[data-advert]");
+        expect(parseAndGenerate(":lang(hu-hu)")).toEqual(":lang(hu-hu)");
 
         expect(
             parseAndGenerate(

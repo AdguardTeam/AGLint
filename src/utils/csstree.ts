@@ -152,9 +152,7 @@ export class CssTree {
                         break;
 
                     case CssTreeNodeType.Identifier:
-                        result += SPACE;
                         result += node.name;
-                        result += SPACE;
                         break;
 
                     case CssTreeNodeType.Raw:
@@ -176,10 +174,10 @@ export class CssTree {
                             if (selector.type == CssTreeNodeType.Selector) {
                                 selectors.push(CssTree.generateSelector(selector));
                             }
-                            // Raw
-                            else if (selector.type == CssTreeNodeType.Raw) {
-                                selectors.push(selector.value);
-                            }
+                            // Raw (theoretically, CSSTree only parses selectors in this case)
+                            // else if (selector.type == CssTreeNodeType.Raw) {
+                            //     selectors.push(selector.value);
+                            // }
                         });
 
                         // Join selector lists
