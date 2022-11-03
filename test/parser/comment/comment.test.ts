@@ -19,6 +19,8 @@ describe("CommentParser", () => {
         expect(CommentParser.isComment("!#comment")).toBe(true);
         expect(CommentParser.isComment("!#########################")).toBe(true);
         expect(CommentParser.isComment("! #########################")).toBe(true);
+        expect(CommentParser.isComment(" !")).toBe(true);
+        expect(CommentParser.isComment("  !")).toBe(true);
 
         // Begins with #
         expect(CommentParser.isComment("#")).toBe(true);
@@ -29,11 +31,14 @@ describe("CommentParser", () => {
         expect(CommentParser.isComment("#+comment")).toBe(true);
         expect(CommentParser.isComment("#########################")).toBe(true);
         expect(CommentParser.isComment("# ########################")).toBe(true);
+        expect(CommentParser.isComment(" #")).toBe(true);
+        expect(CommentParser.isComment("  ##")).toBe(true);
 
         // Cosmetic rules (also begins with #)
         expect(CommentParser.isComment("##.selector")).toBe(false);
         expect(CommentParser.isComment("#@#.selector")).toBe(false);
         expect(CommentParser.isComment("#%#//scriptlet('scriptlet')")).toBe(false);
+        expect(CommentParser.isComment(" #%#//scriptlet('scriptlet')")).toBe(false);
 
         // Adblock agents
         expect(CommentParser.isComment("[Adblock Plus 2.0]")).toBe(true);
@@ -42,6 +47,8 @@ describe("CommentParser", () => {
         expect(CommentParser.isComment("[Adblock Plus 2.0; AdGuard 1.0]")).toBe(true);
         expect(CommentParser.isComment("[uBlock]")).toBe(true);
         expect(CommentParser.isComment("[uBlock Origin]")).toBe(true);
+        expect(CommentParser.isComment("[Adblock Plus 2.0]")).toBe(true);
+        expect(CommentParser.isComment("  [Adblock Plus 2.0]")).toBe(true);
     });
 
     test("parse", () => {

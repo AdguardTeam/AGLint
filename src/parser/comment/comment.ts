@@ -32,14 +32,16 @@ export class CommentParser {
      * @returns {boolean} true/false
      */
     public static isComment(raw: string): boolean {
+        const trimmed = raw.trim();
+
         // Regular comments
-        if (CommentParser.isRegularComment(raw)) {
+        if (CommentParser.isRegularComment(trimmed)) {
             return true;
         }
 
         // Hashmark based comments
-        else if (raw[0] == CommentMarker.Hashmark) {
-            const [start, end] = CosmeticRuleSeparatorUtils.find(raw);
+        else if (trimmed[0] == CommentMarker.Hashmark) {
+            const [start, end] = CosmeticRuleSeparatorUtils.find(trimmed);
 
             // No separator
             if (start == -1) {
@@ -47,9 +49,9 @@ export class CommentParser {
             } else {
                 // No valid selector
                 if (
-                    !raw[end + 1] ||
-                    StringUtils.isWhitespace(raw[end + 1]) ||
-                    (raw[end + 1] == CommentMarker.Hashmark && raw[end + 2] == CommentMarker.Hashmark)
+                    !trimmed[end + 1] ||
+                    StringUtils.isWhitespace(trimmed[end + 1]) ||
+                    (trimmed[end + 1] == CommentMarker.Hashmark && trimmed[end + 2] == CommentMarker.Hashmark)
                 ) {
                     return true;
                 }
@@ -57,7 +59,7 @@ export class CommentParser {
         }
 
         // Agents
-        return AgentParser.isAgent(raw);
+        return AgentParser.isAgent(trimmed);
     }
 
     /**
