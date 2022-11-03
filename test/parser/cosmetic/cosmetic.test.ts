@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { DomainListParser } from "../../../src/parser/common/domain-list";
 import { CssInjectionBodyParser } from "../../../src/parser/cosmetic/body/css";
 import { ElementHidingBodyParser } from "../../../src/parser/cosmetic/body/elementhiding";
@@ -159,6 +160,51 @@ describe("CosmeticRuleParser", () => {
             domains: DomainListParser.parse("example.com,~example.net").domains,
             separator: "#@$#",
             body: CssInjectionBodyParser.parse("body { padding: 0; }"),
+        });
+
+        // Media queries
+        expect(
+            CosmeticRuleParser.parse("#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }")
+        ).toMatchObject({
+            type: CosmeticRuleType.CssRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: false,
+            modifiers: [],
+            domains: [],
+            separator: "#$#",
+            body: CssInjectionBodyParser.parse(
+                "@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse("#$#@media(min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }")
+        ).toMatchObject({
+            type: CosmeticRuleType.CssRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: false,
+            modifiers: [],
+            domains: [],
+            separator: "#$#",
+            body: CssInjectionBodyParser.parse(
+                "@media(min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                "example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
+            )
+        ).toMatchObject({
+            type: CosmeticRuleType.CssRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: false,
+            modifiers: [],
+            domains: DomainListParser.parse("example.com,~example.net").domains,
+            separator: "#$#",
+            body: CssInjectionBodyParser.parse(
+                "@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
+            ),
         });
 
         // Valid ExtendedCSS inject (AdGuard)
@@ -829,6 +875,30 @@ describe("CosmeticRuleParser", () => {
             "example.com,~example.net#@$?#body:-abp-has(.ad) { padding: 0; }"
         );
 
+        // Media queries
+        expect(parseAndGenerate("#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }")).toEqual(
+            "#$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }"
+        );
+
+        // Tolerant
+        expect(parseAndGenerate("#$?#@media(min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }")).toEqual(
+            "#$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }"
+        );
+
+        expect(
+            parseAndGenerate(
+                "example.com,~example.net#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }"
+            )
+        ).toEqual("example.com,~example.net#$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }");
+        expect(parseAndGenerate("#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }")).toEqual(
+            "#@$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }"
+        );
+        expect(
+            parseAndGenerate(
+                "example.com,~example.net#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }"
+            )
+        ).toEqual("example.com,~example.net#@$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }");
+
         // Valid CSS inject (uBlock)
         expect(parseAndGenerate("##body:style(padding: 0;)")).toEqual("##body:style(padding: 0;)");
         expect(parseAndGenerate("example.com,~example.net##body:style(padding: 0;)")).toEqual(
@@ -896,6 +966,20 @@ describe("CosmeticRuleParser", () => {
         expect(parseAndGenerate("example.com,~example.net#@$#scriptlet0 arg0 arg1;")).toEqual(
             "example.com,~example.net#@$#scriptlet0 arg0 arg1"
         );
+
+        // Multiple ABP snippets
+        expect(parseAndGenerate("#$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21")).toEqual(
+            "#$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21"
+        );
+        expect(
+            parseAndGenerate("example.com,~example.net#$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21")
+        ).toEqual("example.com,~example.net#$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21");
+        expect(parseAndGenerate("#@$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21")).toEqual(
+            "#@$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21"
+        );
+        expect(
+            parseAndGenerate("example.com,~example.net#@$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21")
+        ).toEqual("example.com,~example.net#@$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21");
 
         // Valid HTML filters (AdGuard)
         expect(parseAndGenerate('$$script[tag-content="adblock"]')).toEqual('$$script[tag-content="adblock"]');

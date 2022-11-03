@@ -19,7 +19,7 @@ import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-co
  * `@media <mediaQueryList> { rule }` where rule is `selectorList { declarations block }`
  * This method is much faster than direct parsing (try `atrule`, then `rule` context).
  */
-const MEDIA_QUERY_PATTERN = /^(?:@media\s+(?<mediaQueryList>[^{]+))\s*{\s*(?<rule>.+)\s*}$/;
+const MEDIA_QUERY_PATTERN = /^(?:@media\s*(?<mediaQueryList>[^{]+))\s*{\s*(?<rule>.+)\s*}$/;
 
 /** selectorList:style(declarations) or selectorList:remove() */
 const UBO_CSS_INJECTION_PATTERN =

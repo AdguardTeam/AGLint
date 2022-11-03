@@ -44,8 +44,9 @@ console.log(RuleParser.generate(RuleParser.parse("/ad.js$script,third-party")));
 
 // AdGuard-specific rules:
 console.log(RuleParser.generate(RuleParser.parse("!+ NOT_OPTIMIZED PLATFORM(windows, mac)")));
+console.log(RuleParser.generate(RuleParser.parse("!+ NOT_OPTIMIZED PLATFORM( windows, mac )")));
 console.log(RuleParser.generate(RuleParser.parse("[$app=com.apple.Safari]example.org#%#//scriptlet('prevent-setInterval', 'check', '!300')")));
-console.log(RuleParser.generate(RuleParser.parse("[$path=/path]example.com,~example.net##+js(scriptlet,  , arg1)")));
+console.log(RuleParser.generate(RuleParser.parse("example.com,~example.net#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }")));
 console.log(RuleParser.generate(RuleParser.parse("!#if (adguard)")));
 console.log(RuleParser.generate(RuleParser.parse(`@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i`)));
 
@@ -56,7 +57,7 @@ console.log(RuleParser.generate(RuleParser.parse("example.com##^script:has-text(
 
 // Adblock Plus specific rules:
 console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0 arg1")));
-console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0\\ arg0 arg1; scriptlet2;         scriptlet3;")));
+console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0\\ arg0 arg1; scriptlet2;   scriptlet3;")));
 ```
 
 ### Converter (WIP)

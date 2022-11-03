@@ -1,7 +1,8 @@
 export const EMPTY = "";
 export const SPACE = " ";
 export const COMMA = ",";
-export const SEMICOLON = ":";
+export const COLON = ":";
+export const SEMICOLON = ";";
 export const HASHMARK = "#";
 export const UNDERSCORE = "_";
 export const TAB = "\t";
