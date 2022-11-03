@@ -69,21 +69,23 @@ export class CommentParser {
      * @returns {IComment | null} Comment AST or null (if the raw rule cannot be parsed as comment)
      */
     public static parse(raw: string): IComment | null {
-        if (!CommentParser.isComment(raw)) {
+        const trimmed = raw.trim();
+
+        if (!CommentParser.isComment(trimmed)) {
             return null;
         }
 
         return (
-            AgentParser.parse(raw) ||
-            HintParser.parse(raw) ||
-            PreProcessorParser.parse(raw) ||
-            MetadataParser.parse(raw) ||
+            AgentParser.parse(trimmed) ||
+            HintParser.parse(trimmed) ||
+            PreProcessorParser.parse(trimmed) ||
+            MetadataParser.parse(trimmed) ||
             <IComment>{
                 syntax: AdblockSyntax.Unknown,
                 category: RuleCategories.Comment,
                 type: CommentRuleType.Comment,
-                marker: raw[0],
-                text: raw.substring(1),
+                marker: trimmed[0],
+                text: trimmed.substring(1),
             }
         );
     }
