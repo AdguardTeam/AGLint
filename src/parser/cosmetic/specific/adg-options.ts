@@ -37,7 +37,7 @@ export class AdGuardModifierListParser {
                 throw new SyntaxError(`Missing closing bracket "${MODIFIER_LIST_CLOSE}" at pattern "${raw}"`);
             }
 
-            // Parse modifiers: [$<modofiers>]
+            // Parse modifiers: [$<modifiers>]
             const rawModifiers = raw.substring(2, closeIndex).trim();
             if (rawModifiers.length == 0) {
                 throw new SyntaxError(`No modifiers specified at pattern "${raw}"`);
