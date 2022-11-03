@@ -105,13 +105,13 @@ describe("DomainListParser", () => {
         );
 
         expect(() => DomainListParser.parse(" ~ ~ ~ ")).toThrowError(
-            "Exception marker is followed by a whirespace character"
+            "Exception marker is followed by a whitespace character"
         );
 
         expect(() => DomainListParser.parse("~,~,~")).toThrowError(/^Empty domain specified in domain list/);
 
         expect(() => DomainListParser.parse("~  example.com")).toThrowError(
-            "Exception marker is followed by a whirespace character"
+            "Exception marker is followed by a whitespace character"
         );
     });
 

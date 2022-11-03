@@ -45,7 +45,7 @@ export class DomainListParser {
             // Handle exceptions
             if (trimmedRawDomain[0] == DOMAIN_EXCEPTION_MARKER) {
                 if (StringUtils.isWhitespace(trimmedRawDomain[1])) {
-                    throw new Error("Exception marker is followed by a whirespace character");
+                    throw new Error("Exception marker is followed by a whitespace character");
                 } else if (trimmedRawDomain[1] == DOMAIN_EXCEPTION_MARKER) {
                     throw new Error("Exception marker is followed by another exception marker");
                 }
