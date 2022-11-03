@@ -3,8 +3,10 @@ import { StringUtils } from "../../utils/string";
 const MODIFIERS_SEPARATOR = ",";
 const MODIFIER_ASSIGN_OPERATOR = "=";
 
+export const MODIFIER_LIST_TYPE = "ModifierList";
+
 export interface IModifierList {
-    type: "ModifierList";
+    type: typeof MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
 }
 
@@ -25,7 +27,7 @@ export class ModifierListParser {
      */
     public static parse(rawModifiers: string): IModifierList {
         const result: IModifierList = {
-            type: "ModifierList",
+            type: MODIFIER_LIST_TYPE,
             modifiers: [],
         };
 
