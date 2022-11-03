@@ -1,4 +1,5 @@
-import { ScriptletBodyParser } from "../../../../src/parser/cosmetic/body/scriptlet";
+import { ScriptletBodyParser, ScriptletParameterType } from "../../../../src/parser/cosmetic/body/scriptlet";
+import { AdblockSyntax } from "../../../../src/utils/adblockers";
 import { EMPTY } from "../../../../src/utils/constants";
 
 describe("ScriptletBodyParser", () => {
@@ -513,5 +514,50 @@ describe("ScriptletBodyParser", () => {
                 },
             ],
         });
+    });
+
+    test("generate", () => {
+        const parseAndGenerate = (raw: string, syntax: AdblockSyntax) => {
+            const ast = ScriptletBodyParser.parse(raw);
+
+            if (ast) {
+                return ScriptletBodyParser.generate(ast, syntax);
+            }
+
+            return null;
+        };
+
+        expect(parseAndGenerate("()", AdblockSyntax.AdGuard)).toEqual([]);
+
+        expect(
+            ScriptletBodyParser.generate(
+                {
+                    scriptlets: [
+                        {
+                            scriptlet: {
+                                type: ScriptletParameterType.Unquoted,
+                                value: "scriptlet1",
+                            },
+                        },
+                    ],
+                },
+                AdblockSyntax.AdGuard
+            )
+        ).toEqual(["(scriptlet1)"]);
+
+        expect(parseAndGenerate("(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")", AdblockSyntax.AdGuard)).toEqual([
+            "(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")",
+        ]);
+
+        expect(
+            parseAndGenerate(
+                "scriptlet0 arg0 /a;b/ 'a;b' \"a;b\"; scriptlet-1; scriptlet2 'arg0' arg1\\ something;",
+                AdblockSyntax.AdblockPlus
+            )
+        ).toEqual(["scriptlet0 arg0 /a;b/ 'a;b' \"a;b\"", "scriptlet-1", "scriptlet2 'arg0' arg1\\ something"]);
+
+        expect(
+            parseAndGenerate("scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0", AdblockSyntax.AdblockPlus)
+        ).toEqual(["scriptlet0 arg0 arg1", "scriptlet1", "scriptlet2 arg0"]);
     });
 });

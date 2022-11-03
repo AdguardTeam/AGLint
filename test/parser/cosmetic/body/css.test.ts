@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+import { Selector } from "css-tree";
 import { CssInjectionBodyParser, ICssRuleBody, REMOVE_BLOCK_TYPE } from "../../../../src/parser/cosmetic/body/css";
 import { AdblockSyntax } from "../../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../../src/utils/constants";
@@ -249,6 +251,8 @@ describe("CssInjectionBodyParser", () => {
             "body { padding: 0 !important; }"
         );
 
+        expect(parseAndGenerate("body > .ad:remove()", AdblockSyntax.uBlockOrigin)).toEqual("body > .ad:remove()");
+
         expect(
             parseAndGenerate(
                 // eslint-disable-next-line max-len
@@ -258,5 +262,39 @@ describe("CssInjectionBodyParser", () => {
         ).toEqual(
             "@media (min-width:1000px) and (max-width:2000px) { body, section:has(.something) { remove: true; } }"
         );
+
+        expect(
+            CssInjectionBodyParser.generate(
+                {
+                    selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
+                },
+                AdblockSyntax.AdGuard
+            )
+        ).toEqual(".test { }");
+
+        expect(
+            CssInjectionBodyParser.generate(
+                {
+                    selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
+                },
+                AdblockSyntax.uBlockOrigin
+            )
+        ).toEqual(".test:style()");
+
+        expect(() =>
+            CssInjectionBodyParser.generate(
+                {
+                    selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
+                },
+                AdblockSyntax.AdblockPlus
+            )
+        ).toThrowError(/^Unsupported syntax:/);
+
+        expect(() =>
+            parseAndGenerate(
+                "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { remove: true; } }",
+                AdblockSyntax.uBlockOrigin
+            )
+        ).toThrowError("uBlock doesn't support media queries");
     });
 });

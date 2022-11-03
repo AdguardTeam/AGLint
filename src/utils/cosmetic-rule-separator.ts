@@ -203,7 +203,7 @@ export class CosmeticRuleSeparatorUtils {
      * @param {string} separator - Separator as string
      * @returns {boolean} true/false
      */
-    public static isException(separator: string | undefined): boolean {
+    public static isException(separator?: string): boolean {
         if (!separator) {
             return false;
         }

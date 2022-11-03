@@ -108,7 +108,7 @@ export class CssInjectionBodyParser {
         // Parse rule part (rule = selector list + declaration block)
         const ruleAst = <Rule>CssTree.parse(rawRule, CssTreeParserContext.rule);
 
-        if (ruleAst.prelude.type !== "SelectorList") {
+        if (ruleAst.prelude.type !== CssTreeNodeType.SelectorList) {
             throw new Error(`No selector list found in the following CSS injection body: "${raw}"`);
         }
 
@@ -127,7 +127,7 @@ export class CssInjectionBodyParser {
         let nonRemoveDeclFound = false;
 
         block.children.forEach((node) => {
-            if (node.type === "Declaration") {
+            if (node.type === CssTreeNodeType.Declaration) {
                 if (node.property == REMOVE_BLOCK_TYPE) {
                     if (removeDeclFound) {
                         throw new Error(`Multiple remove property found in the following CSS injection body: "${raw}"`);

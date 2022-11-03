@@ -145,9 +145,9 @@ export class CosmeticRuleParser {
 
                 const body = CssInjectionBodyParser.parseUblockCssInjection(rawBody);
 
-                if (!body) {
-                    throw new SyntaxError(`Invalid uBlock CSS injection: "${rawBody}"`);
-                }
+                // if (!body) {
+                //     throw new SyntaxError(`Invalid uBlock CSS injection: "${rawBody}"`);
+                // }
 
                 return <ICssRule>{
                     category: RuleCategories.Cosmetic,
@@ -181,9 +181,9 @@ export class CosmeticRuleParser {
             if (CssInjectionBodyParser.isAdGuardCssInjection(rawBody)) {
                 const body = CssInjectionBodyParser.parseAdGuardCssInjection(rawBody);
 
-                if (!body) {
-                    throw new SyntaxError(`Invalid AdGuard CSS injection: "${rawBody}"`);
-                }
+                // if (!body) {
+                //     throw new SyntaxError(`Invalid AdGuard CSS injection: "${rawBody}"`);
+                // }
 
                 return <ICssRule>{
                     category: RuleCategories.Cosmetic,
@@ -243,15 +243,20 @@ export class CosmeticRuleParser {
             }
 
             // Set syntax
-            syntax = AdblockSyntax.AdGuard;
-            if (CosmeticRuleSeparatorUtils.isUblockScriptlet(separator)) {
+            if (CosmeticRuleSeparatorUtils.isUblockHtml(separator)) {
                 syntax = AdblockSyntax.uBlockOrigin;
+            } else {
+                syntax = AdblockSyntax.AdGuard;
             }
 
             const { modifiers: uboModifiers, rest: uboRest } = UBlockModifierListParser.parse(rawBody);
 
             if (uboModifiers.length > 0) {
-                if (syntax == AdblockSyntax.AdGuard) {
+                if (CosmeticRuleSeparatorUtils.isAdGuardHtml(separator)) {
+                    throw new SyntaxError(`Cannot use uBO options with ADG HTML filtering`);
+                }
+
+                if (syntax == AdblockSyntax.AdGuard || adgModifiers.length > 0) {
                     throw new SyntaxError(`Cannot use AdGuard modifier list with uBO options`);
                 }
 

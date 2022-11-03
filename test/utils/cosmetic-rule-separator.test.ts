@@ -2,6 +2,76 @@ import { EMPTY, SPACE } from "../../src/utils/constants";
 import { CosmeticRuleSeparatorUtils } from "../../src/utils/cosmetic-rule-separator";
 
 describe("CosmeticRuleSeparator", () => {
+    test("isElementHiding", () => {
+        expect(CosmeticRuleSeparatorUtils.isElementHiding("##")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isElementHiding("#@#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isElementHiding("#?#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isElementHiding("#@?#")).toBe(true);
+    });
+
+    test("isAdGuardCss", () => {
+        expect(CosmeticRuleSeparatorUtils.isAdGuardCss("#$#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardCss("#@$#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardCss("#$?#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardCss("#@$?#")).toBe(true);
+    });
+
+    test("isAdblockPlusSnippet", () => {
+        expect(CosmeticRuleSeparatorUtils.isAdblockPlusSnippet("#$#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdblockPlusSnippet("#@$#")).toBe(true);
+    });
+
+    test("isUblockScriptlet", () => {
+        expect(CosmeticRuleSeparatorUtils.isUblockScriptlet("##+js")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isUblockScriptlet("#@#+js")).toBe(true);
+
+        expect(CosmeticRuleSeparatorUtils.isUblockScriptlet("#?#+js")).toBe(false);
+        expect(CosmeticRuleSeparatorUtils.isUblockScriptlet("#@?#+js")).toBe(false);
+    });
+
+    test("isAdGuardScriptlet", () => {
+        expect(CosmeticRuleSeparatorUtils.isAdGuardScriptlet("#%#//scriptlet")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardScriptlet("#@%#//scriptlet")).toBe(true);
+
+        expect(CosmeticRuleSeparatorUtils.isAdGuardScriptlet("#?%#//scriptlet")).toBe(false);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardScriptlet("#@?%#//scriptlet")).toBe(false);
+    });
+
+    test("isAdGuardJs", () => {
+        expect(CosmeticRuleSeparatorUtils.isAdGuardJs("#%#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardJs("#@%#")).toBe(true);
+    });
+
+    test("isUblockHtml", () => {
+        expect(CosmeticRuleSeparatorUtils.isUblockHtml("##^")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isUblockHtml("#@#^")).toBe(true);
+    });
+
+    test("isAdGuardHtml", () => {
+        expect(CosmeticRuleSeparatorUtils.isAdGuardHtml("$$")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isAdGuardHtml("$@$")).toBe(true);
+    });
+
+    test("isScriptlet", () => {
+        expect(CosmeticRuleSeparatorUtils.isScriptlet("#%#//scriptlet")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isScriptlet("#@%#//scriptlet")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isScriptlet("##+js")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isScriptlet("#@#+js")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isScriptlet("#$#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isScriptlet("#@$#")).toBe(true);
+    });
+
+    test("isException", () => {
+        expect(CosmeticRuleSeparatorUtils.isException("##")).toBe(false);
+        expect(CosmeticRuleSeparatorUtils.isException("#@#")).toBe(true);
+        expect(CosmeticRuleSeparatorUtils.isException("#?#")).toBe(false);
+        expect(CosmeticRuleSeparatorUtils.isException("#@?#")).toBe(true);
+
+        // Invalid separator
+        expect(CosmeticRuleSeparatorUtils.isException(undefined)).toBe(false);
+        expect(CosmeticRuleSeparatorUtils.isException("#?@#")).toBe(false);
+    });
+
     test("find", () => {
         // Elemhide
         expect(CosmeticRuleSeparatorUtils.find("##.ad")).toEqual([0, 2, "##", false]);
