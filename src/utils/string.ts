@@ -2,7 +2,7 @@
  * String helpers
  */
 
-import { EMPTY, ESCAPE_CHARACTER, SPACE } from "./constants";
+import { EMPTY, ESCAPE_CHARACTER, SPACE, TAB } from "./constants";
 
 export const SINGLE_QUOTE_MARKER = "'";
 export const DOUBLE_QUOTE_MARKER = '"';
@@ -245,7 +245,7 @@ export class StringUtils {
      * @returns {boolean} true/false
      */
     public static isWhitespace(character: string): boolean {
-        return character == SPACE || character == "\t";
+        return character == SPACE || character == TAB;
     }
 
     /**

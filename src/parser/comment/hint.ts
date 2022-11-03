@@ -5,7 +5,7 @@
  */
 
 import { AdblockSyntax } from "../../utils/adblockers";
-import { EMPTY, SPACE } from "../../utils/constants";
+import { EMPTY, SPACE, UNDERSCORE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 import { RuleCategories } from "../common";
 import { CommentRuleType, IComment } from "./common";
@@ -109,7 +109,7 @@ export class HintParser {
                         params: [],
                     });
 
-                    collectedHintName = "";
+                    collectedHintName = EMPTY;
                 }
             }
 
@@ -121,7 +121,7 @@ export class HintParser {
                         (trimmed[i] >= "a" && trimmed[i] <= "z") ||
                         (trimmed[i] >= "A" && trimmed[i] <= "Z") ||
                         (trimmed[i] >= "0" && trimmed[i] <= "9") ||
-                        trimmed[i] == "_"
+                        trimmed[i] == UNDERSCORE
                     ) {
                         collectedHintName += trimmed[i];
                     } else {
