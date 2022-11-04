@@ -12,6 +12,7 @@ import { RuleCategories } from "../common";
 import { CommentRuleType, IComment } from "./common";
 
 const PREPROCESSOR_MARKER = "!#";
+const PREPROCESSOR_MARKER_LEN = 2;
 const PREPROCESSOR_SEPARATOR = " ";
 
 export interface IPreProcessor extends IComment {
@@ -36,7 +37,7 @@ export class PreProcessorParser {
         const trimmed = raw.trim();
 
         // The following (typically occurring) rule is not a pre-processor comment: !#####
-        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[2] != HASHMARK;
+        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[PREPROCESSOR_MARKER_LEN] != HASHMARK;
     }
 
     /**
@@ -60,13 +61,17 @@ export class PreProcessorParser {
             name: EMPTY,
         };
 
-        const spaceIndex = StringUtils.findNextUnescapedCharacter(trimmed, PREPROCESSOR_SEPARATOR, 2);
+        const spaceIndex = StringUtils.findNextNotBracketedUnescapedCharacter(
+            trimmed,
+            PREPROCESSOR_SEPARATOR,
+            PREPROCESSOR_MARKER_LEN
+        );
 
         if (spaceIndex == -1) {
-            result.name = trimmed.substring(2);
+            result.name = trimmed.substring(PREPROCESSOR_MARKER_LEN);
         } else {
-            result.name = trimmed.substring(2, spaceIndex);
-            result.params = trimmed.substring(spaceIndex + 1);
+            result.name = trimmed.substring(PREPROCESSOR_MARKER_LEN, spaceIndex);
+            result.params = trimmed.substring(spaceIndex + 1).trim();
         }
 
         return result;

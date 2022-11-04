@@ -1,4 +1,4 @@
-import { EMPTY, SPACE } from "../../src/utils/constants";
+import { EMPTY, ESCAPE_CHARACTER, SPACE } from "../../src/utils/constants";
 import { StringUtils } from "../../src/utils/string";
 
 describe("String utils", () => {
@@ -43,6 +43,20 @@ describe("String utils", () => {
         // empty strings
         expect(StringUtils.findNextUnquotedUnescapedCharacter(EMPTY, ",")).toEqual(-1);
         expect(StringUtils.findNextUnquotedUnescapedCharacter(SPACE, ",")).toEqual(-1);
+    });
+
+    test("findNextNotBracketedUnescapedCharacter", () => {
+        expect(StringUtils.findNextNotBracketedUnescapedCharacter("(a,b,c),(a,b,c)", ",")).toEqual(7);
+        expect(StringUtils.findNextNotBracketedUnescapedCharacter("(a,b,c)\\,(a,b,c),(a)", ",")).toEqual(16);
+
+        // empty strings
+        expect(StringUtils.findNextNotBracketedUnescapedCharacter(EMPTY, ",")).toEqual(-1);
+        expect(StringUtils.findNextNotBracketedUnescapedCharacter(SPACE, ",")).toEqual(-1);
+
+        // invalid
+        expect(() =>
+            StringUtils.findNextNotBracketedUnescapedCharacter(EMPTY, ",", 0, ESCAPE_CHARACTER, "(", "(")
+        ).toThrowError("Open and close bracket cannot be the same");
     });
 
     test("splitStringByUnquotedUnescapedCharacter", () => {

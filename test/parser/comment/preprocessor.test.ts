@@ -15,7 +15,7 @@ describe("PreProcessorParser", () => {
     });
 
     test("parse", () => {
-        // Valid agents
+        // Valid pre-processors
         expect(PreProcessorParser.parse("!#endif")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
@@ -37,6 +37,40 @@ describe("PreProcessorParser", () => {
             syntax: AdblockSyntax.Unknown,
             type: "PreProcessor",
             name: "include",
+            params: undefined,
+        });
+
+        expect(PreProcessorParser.parse("!#if (conditions)")).toEqual(<IPreProcessor>{
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: "PreProcessor",
+            name: "if",
+            params: "(conditions)",
+        });
+
+        expect(PreProcessorParser.parse("!#if      (conditions)")).toEqual(<IPreProcessor>{
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: "PreProcessor",
+            name: "if",
+            params: "(conditions)",
+        });
+
+        expect(PreProcessorParser.parse("!#safari_cb_affinity(content_blockers)")).toEqual(<IPreProcessor>{
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: "PreProcessor",
+            // !#if is an operator, safari_cb_affinity is more of a "command" here
+            name: "safari_cb_affinity(content_blockers)",
+            params: undefined,
+        });
+
+        // If the parenthesis is open, do not split it in half along the space:
+        expect(PreProcessorParser.parse("!#aaa(bbb ccc)")).toEqual(<IPreProcessor>{
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: "PreProcessor",
+            name: "aaa(bbb ccc)",
             params: undefined,
         });
     });

@@ -159,6 +159,47 @@ export class StringUtils {
     }
 
     /**
+     * Finds the next occurrence of a character that:
+     * - isn't "bracketed"
+     * - isn't preceded by an escape character
+     *
+     * @param {string} pattern - Source pattern
+     * @param {string} searchedCharacter - Searched character
+     * @param {number} start - Start index
+     * @param {string} escapeCharacter - Escape character, \ by default
+     * @param {string} openBracket - Open bracket, ( by default
+     * @param {string} closeBracket - Close bracket, ( by default
+     * @throws If the opening and closing brackets are the same
+     * @returns {number} Index or -1 if the character not found
+     */
+    public static findNextNotBracketedUnescapedCharacter(
+        pattern: string,
+        searchedCharacter: string,
+        start = 0,
+        escapeCharacter = ESCAPE_CHARACTER,
+        openBracket = "(",
+        closeBracket = ")"
+    ): number {
+        if (openBracket == closeBracket) {
+            throw new Error("Open and close bracket cannot be the same");
+        }
+
+        let depth = 0;
+
+        for (let i = start; i < pattern.length; i++) {
+            if (pattern[i] == openBracket) {
+                depth++;
+            } else if (pattern[i] == closeBracket) {
+                depth--;
+            } else if (depth < 1 && pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * Splits the source pattern along characters that:
      * - isn't part of any string literal ('literal' or "literal")
      * - isn't preceded by an escape character
