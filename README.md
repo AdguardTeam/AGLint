@@ -90,7 +90,7 @@ RuleParser.generate(ast);
 ```
 
 Which returns the rule as string:
-```
+```adblock
 example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 ```
 
