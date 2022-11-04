@@ -21,6 +21,8 @@ export class HtmlBodyParser {
      *
      * @param {string} selector - CSS selector string
      * @returns {string} Escaped CSS selector
+     * @throws
+     *   - If the selector is invalid according to the CSS syntax
      */
     public static escapeDoubleQuotes(selector: string): string {
         let withinString = false;

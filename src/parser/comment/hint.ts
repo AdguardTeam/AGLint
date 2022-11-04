@@ -44,6 +44,7 @@ export class HintParser {
      *
      * @param {string} raw - Raw rule
      * @returns {IHint | null} Hint AST or null (if the raw rule cannot be parsed as a hint comment)
+     * @throws If the input matches the HINT pattern but syntactically invalid
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints-1}
      */
     public static parse(raw: string): IHint | null {

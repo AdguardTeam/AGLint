@@ -20,6 +20,8 @@ export class ElementHidingBodyParser {
      *
      * @param {string} raw - Raw body
      * @returns {IElementHidingRuleBody | null} Element hiding rule body AST
+     * @throws
+     *   - If the selector is invalid according to the CSS syntax
      */
     public static parse(raw: string): IElementHidingRuleBody {
         const trimmed = raw.trim();

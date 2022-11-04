@@ -82,6 +82,11 @@ export class CssInjectionBodyParser {
      * @param {string} raw - Raw rule
      * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
      * as AdGuard CSS injection)
+     * @throws
+     *   - If the selector is invalid according to the CSS syntax
+     *   - If no selector is found
+     *   - If several remove properties have been declared
+     *   - If there are other declarations in addition to the remove property
      */
     public static parseAdGuardCssInjection(raw: string): ICssRuleBody | null {
         const trimmed = raw.trim();
@@ -230,6 +235,9 @@ export class CssInjectionBodyParser {
      * @param {ICssRuleBody} ast - CSS injection rule body AST
      * @param {AdblockSyntax} syntax - Desired syntax of the generated result
      * @returns {string} Raw string
+     * @throws
+     *   - If you generate a media query with uBlock syntax
+     *   - If you enter unsupported syntax
      */
     public static generate(ast: ICssRuleBody, syntax: AdblockSyntax): string {
         let result = EMPTY;

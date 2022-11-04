@@ -20,6 +20,7 @@ export class AdGuardModifierListParser {
      *
      * @param {string} raw - Raw pattern
      * @returns {IAdGuardModifierList} Modifier list AST
+     * @throws If the modifier list is syntactically invalid
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#non-basic-rules-modifiers}
      */
     public static parse(raw: string): IAdGuardModifierList {

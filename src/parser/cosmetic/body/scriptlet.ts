@@ -39,6 +39,7 @@ export class ScriptletBodyParser {
      *
      * @param {string} raw - Raw body
      * @returns {IScriptletRuleBody} Scriptlet rule body AST
+     * @throws If there is no opening/closing parenthesis
      */
     public static parseAdgAndUboScriptletCall(raw: string): IScriptletRuleBody {
         const trimmed = raw.trim();
@@ -151,6 +152,7 @@ export class ScriptletBodyParser {
      *
      * @param {string} raw - Raw body
      * @returns {IScriptletRuleBody | null} Scriptlet rule body AST
+     * @throws If no scriptlet is specified
      */
     public static parseAbpSnippetCall(raw: string): IScriptletRuleBody {
         const scriptlets: IScriptlet[] = [];

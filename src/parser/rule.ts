@@ -19,6 +19,7 @@ export class RuleParser {
      * @param {string} raw - Raw rule
      * @returns {IComment | ICssRule | IElementHidingRule | IScriptletRule | IHtmlRule | IJsRule | INetworkRule}
      * Network rule AST
+     * @throws If the input matches a pattern but syntactically invalid
      */
     public static parse(
         raw: string

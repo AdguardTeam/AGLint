@@ -31,6 +31,7 @@ export class DomainListParser {
      * @param {string} raw - Raw domain list
      * @param {DomainListSeparator} separator - Separator character
      * @returns {IDomainList} Domain list AST
+     * @throws If the domain list is syntactically invalid
      */
     public static parse(raw: string, separator: DomainListSeparator = CLASSIC_DOMAIN_SEPARATOR): IDomainList {
         const domains: IDomain[] = [];
