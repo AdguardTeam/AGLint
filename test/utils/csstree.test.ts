@@ -21,26 +21,6 @@ describe("CSSTree utils", () => {
             pseudos: [],
         });
 
-        // instead of createAttributeSelector:
-
-        // .toMatchObject({
-        //     attributes: [
-        //         {
-        //             type: "AttributeSelector",
-        //             name: {
-        //                 type: "Identifier",
-        //                 name: "-ext-contains",
-        //             },
-        //             matcher: "=",
-        //             value: {
-        //                 type: "String",
-        //                 value: "something",
-        //             },
-        //         },
-        //     ],
-        //     pseudos: [],
-        // });
-
         expect(
             CssTree.getSelectorExtendedCssNodes(
                 <Selector>(
@@ -108,7 +88,6 @@ describe("CSSTree utils", () => {
 
     test("generateBlock", () => {
         const parseAndGenerate = (declarationList: string) => {
-            // Automatically put {}
             return CssTree.generateBlock(<Block>CssTree.parse(declarationList, CssTreeParserContext.declarationList));
         };
 

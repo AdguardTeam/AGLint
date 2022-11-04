@@ -164,7 +164,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("! Title: Filter")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "!",
             header: "Title",
             value: "Filter",
@@ -173,7 +173,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "!",
             header: "Homepage",
             value: "https://github.com/AdguardTeam/some-repo/wiki",
@@ -182,7 +182,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "#",
             header: "Homepage",
             value: "https://github.com/AdguardTeam/some-repo/wiki",

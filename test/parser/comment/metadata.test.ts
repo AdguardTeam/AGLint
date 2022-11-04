@@ -1,3 +1,4 @@
+import { CommentRuleType } from "../../../src/parser/comment/common";
 import { IMetadata, MetadataParser } from "../../../src/parser/comment/metadata";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
@@ -21,7 +22,7 @@ describe("MetadataParser", () => {
         expect(MetadataParser.parse("! Title: Filter")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "!",
             header: "Title",
             value: "Filter",
@@ -30,7 +31,7 @@ describe("MetadataParser", () => {
         expect(MetadataParser.parse("# Title: Filter")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "#",
             header: "Title",
             value: "Filter",
@@ -39,7 +40,7 @@ describe("MetadataParser", () => {
         expect(MetadataParser.parse("! title: Filter")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "!",
             header: "title",
             value: "Filter",
@@ -48,7 +49,7 @@ describe("MetadataParser", () => {
         expect(MetadataParser.parse("!    title:    Filter   ")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "!",
             header: "title",
             value: "Filter",
@@ -57,7 +58,7 @@ describe("MetadataParser", () => {
         expect(MetadataParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "Metadata",
+            type: CommentRuleType.Metadata,
             marker: "!",
             header: "Homepage",
             value: "https://github.com/AdguardTeam/some-repo/wiki",

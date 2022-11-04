@@ -1,5 +1,5 @@
 import { AdblockSyntax } from "../../utils/adblockers";
-import { StringUtils } from "../../utils/string";
+import { REGEX_MARKER, StringUtils } from "../../utils/string";
 import { IRuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
 import { IRule, RuleCategories } from "../common";
 import { NetworkRuleType } from "./common";
@@ -8,7 +8,6 @@ import { EMPTY } from "../../utils/constants";
 const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
 const NETWORK_RULE_SEPARATOR = "$";
-const REGEX_PATTERN_MARKER = "/";
 
 export interface INetworkRule extends IRule {
     category: RuleCategories.Network;
@@ -55,7 +54,7 @@ export class NetworkRuleParser {
         const separatorIndex = StringUtils.findLastUnescapedCharacterThatNotFollowedBy(
             rule,
             NETWORK_RULE_SEPARATOR,
-            REGEX_PATTERN_MARKER
+            REGEX_MARKER
         );
 
         // Get rule parts

@@ -50,7 +50,7 @@ export class PreProcessorParser {
     public static parse(raw: string): IPreProcessor | null {
         const trimmed = raw.trim();
 
-        if (!PreProcessorParser.isPreProcessor(raw)) {
+        if (!PreProcessorParser.isPreProcessor(trimmed)) {
             return null;
         }
 

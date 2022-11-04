@@ -1,3 +1,4 @@
+import { CommentRuleType } from "../../../src/parser/comment/common";
 import { IPreProcessor, PreProcessorParser } from "../../../src/parser/comment/preprocessor";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
@@ -19,7 +20,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#endif")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             name: "endif",
             params: undefined,
         });
@@ -27,7 +28,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#include ../sections/ads.txt")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             name: "include",
             params: "../sections/ads.txt",
         });
@@ -35,7 +36,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#include    ")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             name: "include",
             params: undefined,
         });
@@ -43,7 +44,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#if (conditions)")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             name: "if",
             params: "(conditions)",
         });
@@ -51,7 +52,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#if      (conditions)")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             name: "if",
             params: "(conditions)",
         });
@@ -59,7 +60,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#safari_cb_affinity(content_blockers)")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             // !#if is an operator, safari_cb_affinity is more of a "command" here
             name: "safari_cb_affinity(content_blockers)",
             params: undefined,
@@ -69,7 +70,7 @@ describe("PreProcessorParser", () => {
         expect(PreProcessorParser.parse("!#aaa(bbb ccc)")).toEqual(<IPreProcessor>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: "PreProcessor",
+            type: CommentRuleType.PreProcessor,
             name: "aaa(bbb ccc)",
             params: undefined,
         });

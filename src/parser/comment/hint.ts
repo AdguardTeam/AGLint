@@ -169,7 +169,9 @@ export class HintParser {
                 let subresult = name;
 
                 if (params && params.length > 0) {
-                    subresult += HINT_PARAMS_OPEN + params.join(HINT_PARAMS_SEPARATOR + SPACE) + HINT_PARAMS_CLOSE;
+                    subresult += HINT_PARAMS_OPEN;
+                    subresult += params.join(HINT_PARAMS_SEPARATOR + SPACE);
+                    subresult += HINT_PARAMS_CLOSE;
                 }
 
                 return subresult;

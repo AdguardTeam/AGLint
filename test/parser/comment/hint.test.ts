@@ -1,3 +1,4 @@
+import { CommentRuleType } from "../../../src/parser/comment/common";
 import { HintParser, IHint } from "../../../src/parser/comment/hint";
 import { RuleCategories } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
@@ -22,14 +23,14 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [],
         });
 
         expect(HintParser.parse("!+ ")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [],
         });
 
@@ -37,7 +38,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+NOT_OPTIMIZED")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "NOT_OPTIMIZED",
@@ -49,7 +50,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+ NOT_OPTIMIZED")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "NOT_OPTIMIZED",
@@ -62,7 +63,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+ HINT_NAME1 HINT_NAME2")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "HINT_NAME1",
@@ -79,7 +80,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+ HINT_NAME1()")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "HINT_NAME1",
@@ -91,7 +92,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+ HINT_NAME1(     )")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "HINT_NAME1",
@@ -103,7 +104,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+ HINT_NAME1() HINT_NAME2()")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "HINT_NAME1",
@@ -120,7 +121,7 @@ describe("HintParser", () => {
         expect(HintParser.parse("!+ HINT_NAME1(param0, param1) HINT_NAME2()")).toEqual(<IHint>{
             category: RuleCategories.Comment,
             syntax: AdblockSyntax.AdGuard,
-            type: "Hint",
+            type: CommentRuleType.Hint,
             hints: [
                 {
                     name: "HINT_NAME1",
@@ -138,7 +139,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME1",
@@ -158,7 +159,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME",
@@ -173,7 +174,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME",
@@ -188,7 +189,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME",
@@ -203,7 +204,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME",
@@ -219,7 +220,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME",
@@ -234,7 +235,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "HINT_NAME",
@@ -249,7 +250,7 @@ describe("HintParser", () => {
             <IHint>{
                 category: RuleCategories.Comment,
                 syntax: AdblockSyntax.AdGuard,
-                type: "Hint",
+                type: CommentRuleType.Hint,
                 hints: [
                     {
                         name: "hint_name",
