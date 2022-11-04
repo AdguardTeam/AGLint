@@ -31,8 +31,8 @@ export class NetworkRuleParser {
         let rule = raw.trim();
 
         const result: INetworkRule = {
-            type: NetworkRuleType.BasicNetworkRule,
             category: RuleCategories.Network,
+            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             regex: false,
             exception: false,

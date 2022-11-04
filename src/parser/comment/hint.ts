@@ -147,9 +147,9 @@ export class HintParser {
         }
 
         return {
-            syntax: AdblockSyntax.AdGuard,
             category: RuleCategories.Comment,
             type: CommentRuleType.Hint,
+            syntax: AdblockSyntax.AdGuard,
             hints: collectedMembers,
         };
     }

@@ -39,8 +39,8 @@ export class MetadataParser {
                     if (headerLower === METADATA_HEADERS[i].toLocaleLowerCase()) {
                         return {
                             category: RuleCategories.Comment,
-                            syntax: AdblockSyntax.Unknown,
                             type: CommentRuleType.Metadata,
+                            syntax: AdblockSyntax.Unknown,
                             marker: trimmed[0],
                             header,
                             value: commentText.substring(separatorIndex + 1).trim(),

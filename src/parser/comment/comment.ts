@@ -81,9 +81,9 @@ export class CommentParser {
             PreProcessorParser.parse(trimmed) ||
             MetadataParser.parse(trimmed) ||
             <IComment>{
-                syntax: AdblockSyntax.Unknown,
                 category: RuleCategories.Comment,
                 type: CommentRuleType.Comment,
+                syntax: AdblockSyntax.Unknown,
                 marker: trimmed[0],
                 text: trimmed.substring(1),
             }

@@ -55,8 +55,8 @@ export class PreProcessorParser {
 
         const result: IPreProcessor = {
             category: RuleCategories.Comment,
-            syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.PreProcessor,
+            syntax: AdblockSyntax.Unknown,
             name: EMPTY,
         };
 

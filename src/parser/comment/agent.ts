@@ -120,9 +120,9 @@ export class AgentParser {
             }
 
             return {
-                syntax: AdblockSyntax.Unknown,
                 category: RuleCategories.Comment,
                 type: CommentRuleType.Agent,
+                syntax: AdblockSyntax.Unknown,
                 agents: collectedAgents,
             };
         }
