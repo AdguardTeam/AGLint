@@ -31,7 +31,72 @@ Table of Contents:
 - Filter out syntax errors
 - Serialize rules (AST &#8594; string)
 
-Example:
+#### Parser example
+
+This code:
+
+```typescript
+import { RuleParser } from "aglint/parser";
+
+const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
+```
+
+will gives you this AST:
+
+```json
+{
+    "category": "Cosmetic",
+    "type": "ScriptletRule",
+    "syntax": "AdGuard",
+    "exception": false,
+    "modifiers": [],
+    "domains": [
+        {
+            "domain": "example.com",
+            "exception": false
+        },
+        {
+            "domain": "example.net",
+            "exception": true
+        }
+    ],
+    "separator": "#%#//scriptlet",
+    "body": {
+        "scriptlets": [
+            {
+                "scriptlet": {
+                    "type": "SingleQuoted",
+                    "value": "prevent-setInterval"
+                },
+                "parameters": [
+                    {
+                        "type": "SingleQuoted",
+                        "value": "check"
+                    },
+                    {
+                        "type": "SingleQuoted",
+                        "value": "!300"
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
+
+Then, you can serialize this AST:
+```typescript
+RuleParser.generate(ast);
+```
+
+Which returns the rule as string:
+```
+example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
+```
+
+#### Another parser example
+
+> *Please note that unnecessary spaces will disappear and CSS selectors will be regenerated according to uniform formatting*
 
 ```typescript
 import { RuleParser } from "aglint/parser";
@@ -54,6 +119,7 @@ console.log(RuleParser.generate(RuleParser.parse(`@@||example.org^$replace=/(<VA
 console.log(RuleParser.generate(RuleParser.parse("example.com,~example.net##:matches-path(/path) .ad")));
 console.log(RuleParser.generate(RuleParser.parse("example.com,~example.net#@#:matches-path(/path) body:style(padding: 0;)")));
 console.log(RuleParser.generate(RuleParser.parse("example.com##^script:has-text(something)")));
+console.log(RuleParser.generate(RuleParser.parse("example.com##+js(scriptlet0, , arg0)")));
 
 // Adblock Plus specific rules:
 console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0 arg1")));
