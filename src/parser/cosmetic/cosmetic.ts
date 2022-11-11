@@ -82,7 +82,7 @@ export class CosmeticRuleParser {
      * Parsed cosmetic rule AST or null if it failed to parse based on the known cosmetic rules
      * @throws If the input matches the cosmetic rule pattern but syntactically invalid
      */
-    public static parse(rawRule: string) {
+    public static parse(rawRule: string): IElementHidingRule | ICssRule | IScriptletRule | IHtmlRule | IJsRule | null {
         // Skip regular comments
         if (CommentParser.isRegularComment(rawRule)) {
             return null;
