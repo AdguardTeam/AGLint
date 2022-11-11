@@ -8,7 +8,18 @@ import { IPreProcessor, PreProcessorParser } from "./preprocessor";
 import { RuleCategories } from "../common";
 import { AdblockSyntax } from "../../utils/adblockers";
 
-/** Represents a simple comment. */
+/**
+ * Represents a simple comment.
+ *
+ * Example rules:
+ *   - ```adblock
+ *     ! This is just a comment
+ *     ```
+ *   - ```adblock
+ *     # This is just a comment
+ *     ```
+ *   - etc.
+ */
 export interface ISimpleComment extends IComment {
     type: CommentRuleType.Comment;
 
@@ -20,7 +31,7 @@ export interface ISimpleComment extends IComment {
 /**
  * CommentParser is responsible for parsing any comment-like adblock rules.
  *
- * For example:
+ * Example rules:
  *  - Agent comments:
  *      - ```adblock
  *        [AdGuard]

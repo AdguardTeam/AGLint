@@ -9,7 +9,21 @@ const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
 const NETWORK_RULE_SEPARATOR = "$";
 
-/** Represents a network filtering rule. Also known as "basic rule". */
+/**
+ * Represents a network filtering rule. Also known as "basic rule".
+ *
+ * Example rules:
+ *   - ```adblock
+ *     /ads.js^$script
+ *     ```
+ *   - ```adblock
+ *     ||example.com^$third-party
+ *     ```
+ *   - ```adblock
+ *     -banner-350px-
+ *     ```
+ *   - etc.
+ */
 export interface INetworkRule extends IRule {
     category: RuleCategories.Network;
     type: NetworkRuleType;

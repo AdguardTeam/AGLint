@@ -22,6 +22,17 @@ export interface IAgentMember {
  *
  * There can be several agents in a rule. For example, if the rule is `[Adblock Plus 2.0; AdGuard]`,
  * then there are two agent members: `Adblock Plus 2.0` and `AdGuard` (without version).
+ *
+ * Example rules:
+ *  - ```adblock
+ *    [AdGuard]
+ *    ```
+ *  - ```adblock
+ *    [Adblock Plus 2.0]
+ *    ```
+ *  - ```adblock
+ *    [uBlock Origin]
+ *    ```
  */
 export interface IAgent extends IComment {
     type: CommentRuleType.Agent;
