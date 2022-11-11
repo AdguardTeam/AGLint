@@ -18,6 +18,16 @@ export interface IAgent extends IComment {
     agents: IAgentMember[];
 }
 
+/**
+ * AgentParser is responsible for parsing an Adblock agent comment.
+ * Adblock agent comment marks that the filter list is supposed to be used by the specified
+ * ad blockers.
+ *
+ * Examples:
+ *    [AdGuard]
+ *    [Adblock Plus 2.0]
+ *    [uBlock Origin]
+ */
 export class AgentParser {
     /**
      * Determines whether a rule is an adblock agent.
