@@ -28,6 +28,7 @@ export type DomainListSeparator = typeof CLASSIC_DOMAIN_SEPARATOR | typeof MODIF
 
 /** Represents a list of domains, e.g. `example.com,~example.net`. */
 export interface IDomainList {
+    // Basically, the idea is that each main AST part should have a type
     type: typeof DOMAIN_LIST_TYPE;
     separator: DomainListSeparator;
     domains: IDomain[];

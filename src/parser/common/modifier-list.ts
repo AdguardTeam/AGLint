@@ -8,6 +8,7 @@ export const MODIFIER_LIST_TYPE = "ModifierList";
 
 /** Represents a modifier list, eg `script,domain=example.com`. */
 export interface IModifierList {
+    // Basically, the idea is that each main AST part should have a type
     type: typeof MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
 }

@@ -7,6 +7,7 @@ export const UBO_MODIFIER_LIST_TYPE = "uBlockModifierList";
 
 /** Represents uBlock's cosmetic rule modifiers. */
 export interface IuBlockModifierList {
+    // Basically, the idea is that each main AST part should have a type
     type: typeof UBO_MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
     rest: string;

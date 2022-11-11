@@ -10,6 +10,7 @@ export const ADG_MODIFIER_LIST_TYPE = "AdGuardModifierList";
 
 /** Represents AdGuard's cosmetic rule modifiers. */
 export interface IAdGuardModifierList {
+    // Basically, the idea is that each main AST part should have a type
     type: typeof ADG_MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
     rest: string;
