@@ -91,8 +91,7 @@ export class AgentParser {
 
         for (let i = 0; i < splitted.length; i++) {
             // Part contains dot or number
-            // Since this function rarely runs, it's okay to use regex here
-            if (splitted[i].indexOf(".") > -1 || /\d/.test(splitted[i])) {
+            if (splitted[i].indexOf(".") > -1 || (splitted[i] >= "0" && splitted[i] <= "9")) {
                 // Missing adblock name
                 if (i == 0) {
                     break;
