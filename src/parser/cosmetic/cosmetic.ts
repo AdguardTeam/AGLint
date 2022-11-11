@@ -268,10 +268,6 @@ export class CosmeticRuleParser {
 
                 const body = CssInjectionBodyParser.parseUblockCssInjection(rawBody);
 
-                // if (!body) {
-                //     throw new SyntaxError(`Invalid uBlock CSS injection: "${rawBody}"`);
-                // }
-
                 return <ICssRule>{
                     category: RuleCategories.Cosmetic,
                     type: CosmeticRuleType.CssRule,
@@ -303,10 +299,6 @@ export class CosmeticRuleParser {
         else if (CosmeticRuleSeparatorUtils.isAdGuardCss(separator)) {
             if (CssInjectionBodyParser.isAdGuardCssInjection(rawBody)) {
                 const body = CssInjectionBodyParser.parseAdGuardCssInjection(rawBody);
-
-                // if (!body) {
-                //     throw new SyntaxError(`Invalid AdGuard CSS injection: "${rawBody}"`);
-                // }
 
                 return <ICssRule>{
                     category: RuleCategories.Cosmetic,
