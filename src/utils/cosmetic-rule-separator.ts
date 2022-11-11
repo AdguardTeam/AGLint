@@ -252,7 +252,7 @@ export class CosmeticRuleSeparatorUtils {
         !noHashMark && (h = rule.indexOf("#", hashMarkPos + 1));
 
         if (h > -1) {
-            // Filter out comments, tink 127.0.0.1 localhost ## comment
+            // Filter out comments, think 127.0.0.1 localhost ## comment
             // ##
             if (rule[h + 1] == "#" && (h == 0 || rule[h - 1] != SPACE)) {
                 // ##+js
