@@ -61,8 +61,9 @@ export class NetworkRuleParser {
         // Handle these issues:
         //  /ad.js$m1=/v1/
         //  example.com$m1,m2=/^regex$/
-        const separatorIndex = StringUtils.findLastUnescapedCharacterThatNotFollowedBy(
+        const separatorIndex = StringUtils.findNextUnescapedCharacterThatNotFollowedBy(
             rule,
+            0,
             NETWORK_RULE_SEPARATOR,
             REGEX_MARKER
         );

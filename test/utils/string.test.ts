@@ -15,6 +15,12 @@ describe("String utils", () => {
         expect(StringUtils.findLastUnescapedCharacter(EMPTY, "a")).toEqual(-1);
     });
 
+    test("findNextUnescapedCharacterThatNotFollowedBy", () => {
+        expect(StringUtils.findNextUnescapedCharacterThatNotFollowedBy("$\\$\\$$f$ok", 0, "$", "f")).toEqual(0);
+        expect(StringUtils.findNextUnescapedCharacterThatNotFollowedBy("/^regexp$/$m=v", 0, "$", "/")).toEqual(10);
+        expect(StringUtils.findNextUnescapedCharacterThatNotFollowedBy(EMPTY, 0, "$", "/")).toEqual(-1);
+    });
+
     test("findLastUnescapedCharacterThatNotFollowedBy", () => {
         expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy("$\\$\\$$f$ok", "$", "f")).toEqual(7);
         expect(StringUtils.findLastUnescapedCharacterThatNotFollowedBy(EMPTY, "$", "/")).toEqual(-1);

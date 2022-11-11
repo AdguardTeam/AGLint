@@ -58,6 +58,38 @@ export class StringUtils {
     }
 
     /**
+     * Finds the next occurrence of a character that:
+     * - isn't preceded by an escape character
+     * - isn't followed by the specified character
+     *
+     * @param {string} pattern - Source pattern
+     * @param {number} start - Start index
+     * @param {string} searchedCharacter - Searched character
+     * @param {string} notFollowedBy - Searched character not followed by this character
+     * @param {string} escapeCharacter - Escape character, \ by default
+     * @returns {number} Index or -1 if the character not found
+     */
+    public static findNextUnescapedCharacterThatNotFollowedBy(
+        pattern: string,
+        start: number,
+        searchedCharacter: string,
+        notFollowedBy: string,
+        escapeCharacter: string = ESCAPE_CHARACTER
+    ): number {
+        for (let i = start; i < pattern.length; i++) {
+            // The searched character cannot be preceded by an escape
+            if (
+                pattern[i] == searchedCharacter &&
+                pattern[i + 1] != notFollowedBy &&
+                pattern[i - 1] != escapeCharacter
+            ) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
      * Finds the last occurrence of a character that:
      * - isn't preceded by an escape character
      * - isn't followed by the specified character

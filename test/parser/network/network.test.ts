@@ -145,10 +145,10 @@ describe("NetworkRuleParser", () => {
             syntax: AdblockSyntax.Unknown,
             regex: false,
             exception: false,
-            pattern: "example.com$m1$m2$m3$m4",
+            pattern: "example.com",
             modifiers: [
                 {
-                    modifier: "m5",
+                    modifier: "m1$m2$m3$m4$m5",
                 },
             ],
         });
@@ -159,11 +159,11 @@ describe("NetworkRuleParser", () => {
             syntax: AdblockSyntax.Unknown,
             regex: false,
             exception: false,
-            pattern: "example.com$m1=v1$m2$m3=v3$m4",
+            pattern: "example.com",
             modifiers: [
                 {
-                    modifier: "m5",
-                    value: "v5",
+                    modifier: "m1",
+                    value: "v1$m2$m3=v3$m4$m5=v5",
                 },
             ],
         });
