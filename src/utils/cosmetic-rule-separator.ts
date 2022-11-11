@@ -1,5 +1,6 @@
 import { SPACE } from "./constants";
 
+/** Represents possible cosmetic rule separators */
 export enum CosmeticRuleSeparator {
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
     AbpCSSElemhide = "##",
@@ -62,8 +63,10 @@ export enum CosmeticRuleSeparator {
     AdgHTMLException = "$@$",
 }
 
+/** In all cases, this means that the separator marks an exception. */
 export const EXCEPTION_MARKER = "@";
 
+/** Represents the result of the separator finder */
 export type CosmeticRuleSeparatorResult = [
     /**
      * Separator start position
@@ -86,6 +89,11 @@ export type CosmeticRuleSeparatorResult = [
     boolean | null
 ];
 
+/**
+ * CosmeticRuleSeparatorUtils is responsible for solving tasks related to cosmetic rule separators:
+ *  - finding
+ *  - categorization
+ */
 export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is an element hiding separator.

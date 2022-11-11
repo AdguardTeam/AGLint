@@ -15,6 +15,18 @@ const PREPROCESSOR_MARKER = "!#";
 const PREPROCESSOR_MARKER_LEN = 2;
 const PREPROCESSOR_SEPARATOR = " ";
 
+/**
+ * Represents a preprocessor comment.
+ *
+ * For example, if the comment is
+ * ```adblock
+ * !#if (adguard)
+ * ```
+ * then the directive's name is `if` and its value is `(adguard)`.
+ *
+ * In such a case, the parameters must be submitted for further parsing and validation, as this parser only handles
+ * the general syntax.
+ */
 export interface IPreProcessor extends IComment {
     category: RuleCategories.Comment;
     type: CommentRuleType.PreProcessor;
@@ -26,6 +38,20 @@ export interface IPreProcessor extends IComment {
     params?: string;
 }
 
+/**
+ * PreProcessorParser is responsible for parsing preprocessor rules.
+ *
+ * Please note that this parser only handles general syntax for now. So, for example,
+ * if your rule is
+ * ```adblock
+ * !#if (adguard)
+ * ```
+ * then the directive's name is `if` and its value is `(adguard)`, but the parameter list
+ * is not parsed / validated further.
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#pre-processor-directives}
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives}
+ */
 export class PreProcessorParser {
     /**
      * Determines whether the rule is a pre-processor rule.

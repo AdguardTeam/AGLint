@@ -12,27 +12,63 @@ const ADG_UBO_PARAM_SEPARATOR = ",";
 const ABP_SNIPPETS_SEPARATOR = ";";
 const ABP_PARAM_SEPARATOR = " ";
 
+/**
+ * Represents the body of an scriptlet injection rule.
+ *
+ * Adblock Plus supports multiple scriptlets within a rule, so the data structure represents the
+ * scriptlets as an array. AdGuard and uBlock Origin ONLY support one scriptlet per rule.
+ */
+export interface IScriptletRuleBody {
+    scriptlets: IScriptlet[];
+}
+
+/** Represents a specific scriptlet and its parameters. */
 export interface IScriptlet {
     scriptlet: IScriptletParameter;
     parameters?: IScriptletParameter[];
 }
 
-export enum ScriptletParameterType {
-    Unquoted = "Unquoted",
-    SingleQuoted = "SingleQuoted",
-    DoubleQuoted = "DoubleQuoted",
-    RegExp = "RegExp",
-}
-
+/** Represents a scriptlet parameter. */
 export interface IScriptletParameter {
     type: ScriptletParameterType;
     value: string;
 }
 
-export interface IScriptletRuleBody {
-    scriptlets: IScriptlet[];
+/**
+ * Represents a scriptlet parameter type.
+ *
+ * For example, let's have the following rule: `example.com#%#//scriptlet('scriptlet0', 'arg0')`
+ * Then the value of `'arg0'` is `arg0` and its type is `SingleQuoted`.
+ */
+export enum ScriptletParameterType {
+    /** Example: `value` */
+    Unquoted = "Unquoted",
+
+    /** Example: `'value'` */
+    SingleQuoted = "SingleQuoted",
+
+    /** Example: `"value"` */
+    DoubleQuoted = "DoubleQuoted",
+
+    /** Example: `/value/` */
+    RegExp = "RegExp",
 }
 
+/**
+ * ScriptletBodyParser is responsible for parsing the body of a scriptlet rule.
+ *
+ * Please note that the parser will parse any scriptlet rule if it is syntactically correct.
+ * For example, it will parse this:
+ * ```adblock
+ * example.com#%#//scriptlet('scriptlet0', 'arg0')
+ * ```
+ *
+ * Scriptlet compatibility is not checked at this level.
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#scriptlets}
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection}
+ * @see {@link https://help.eyeo.com/adblockplus/snippet-filters-tutorial}
+ */
 export class ScriptletBodyParser {
     /**
      * Parses a raw ADG/uBO scriptlet call body.

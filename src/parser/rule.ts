@@ -12,6 +12,11 @@ import {
 } from "./cosmetic/cosmetic";
 import { INetworkRule, NetworkRuleParser } from "./network/network";
 
+/**
+ * RuleParser is responsible for parsing the rules.
+ *
+ * It automatically determines the category and syntax of the rule, so you can pass any kind of rule to it.
+ */
 export class RuleParser {
     /**
      * Parse an adblock rule. The type and syntax of the rule is determined automatically if possible.

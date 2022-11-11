@@ -39,14 +39,51 @@ const UBO_REMOVE_MARKER = CSS_PSEUDO_MARKER + UBO_REMOVE + CSS_PSEUDO_OPEN;
 
 export const REMOVE_BLOCK_TYPE = "remove";
 
+/**
+ * Represents the CSS rule body, which can be:
+ *  - CSS declaration block
+ *  - remove
+ */
 export type CssInjectionBlock = Block | typeof REMOVE_BLOCK_TYPE;
 
+/** Represents a CSS injection body. */
 export interface ICssRuleBody {
     mediaQueryList?: MediaQueryList;
     selectors: Selector[];
     block?: CssInjectionBlock;
 }
 
+/**
+ * CssInjectionBodyParser is responsible for parsing a CSS injection body.
+ *
+ * Please note that not all adblockers support CSS injection in the same way, e.g. uBO does not support media queries.
+ *
+ * Example rules (AdGuard):
+ *  - ```adblock
+ *    example.com#$#body { padding-top: 0 !important; }
+ *    ```
+ *  - ```adblock
+ *    example.com#$#@media (min-width: 1024px) { body { padding-top: 0 !important; } }
+ *    ```
+ *  - ```adblock
+ *    example.com#$?#@media (min-width: 1024px) { .something:has(.ads) { padding-top: 0 !important; } }
+ *    ```
+ *  - ```adblock
+ *    example.com#$#.ads { remove: true; }
+ *    ```
+ *
+ * Example rules (uBlock Origin):
+ *  - ```adblock
+ *    example.com##body:style(padding-top: 0 !important;)
+ *    ```
+ *  - ```adblock
+ *    example.com##.ads:remove()
+ *    ```
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules}
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#subjectstylearg}
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#subjectremove}
+ */
 export class CssInjectionBodyParser {
     /**
      * Checks if a selector is a uBlock CSS injection.

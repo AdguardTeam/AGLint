@@ -1,3 +1,8 @@
+/**
+ * Constant values used by all parts of the library
+ */
+
+// Generic
 export const EMPTY = "";
 export const SPACE = " ";
 export const COMMA = ",";

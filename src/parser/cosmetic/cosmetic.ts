@@ -17,6 +17,12 @@ import { UBlockModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo
 import { CosmeticRuleType } from "./common";
 import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
 
+/**
+ * A generic representation of a cosmetic rule.
+ *
+ * Regarding the categories, there is only a difference in the body,
+ * all other properties can be defined at this level.
+ */
 export interface ICosmeticRule extends IRule {
     category: RuleCategories.Cosmetic;
     type: CosmeticRuleType;
@@ -27,31 +33,147 @@ export interface ICosmeticRule extends IRule {
     body: unknown;
 }
 
+/**
+ * Representation of an element hiding rule.
+ *
+ * Example rules:
+ * - ```adblock
+ *   example.com##.ads
+ *   ```
+ * - ```adblock
+ *   example.com#@#.ads
+ *   ```
+ * - ```adblock
+ *   example.com#?#.ads:has(> .something)
+ *   ```
+ * - ```adblock
+ *   example.com#@?#.ads:has(> .something)
+ *   ```
+ */
 export interface IElementHidingRule extends ICosmeticRule {
     type: CosmeticRuleType.ElementHidingRule;
     body: IElementHidingRuleBody;
 }
 
+/**
+ * Representation of a CSS injection rule.
+ *
+ * Example rules (AdGuard):
+ *  - ```adblock
+ *    example.com#$#body { padding-top: 0 !important; }
+ *    ```
+ *  - ```adblock
+ *    example.com#$#@media (min-width: 1024px) { body { padding-top: 0 !important; } }
+ *    ```
+ *  - ```adblock
+ *    example.com#$?#@media (min-width: 1024px) { .something:has(.ads) { padding-top: 0 !important; } }
+ *    ```
+ *  - ```adblock
+ *    example.com#$#.ads { remove: true; }
+ *    ```
+ *
+ * Example rules (uBlock Origin):
+ *  - ```adblock
+ *    example.com##body:style(padding-top: 0 !important;)
+ *    ```
+ *  - ```adblock
+ *    example.com##.ads:remove()
+ *    ```
+ */
 export interface ICssRule extends ICosmeticRule {
     type: CosmeticRuleType.CssRule;
     body: ICssRuleBody;
 }
 
+/**
+ * Representation of a scriptlet injection rule.
+ *
+ * Example rules (AdGuard):
+ *  - ```adblock
+ *    example.com#%#//scriptlet('scriptlet-name', 'arg0', 'arg1')
+ *    ```
+ *  - ```adblock
+ *    example.com#@%#//scriptlet('scriptlet-name', 'arg0', 'arg1')
+ *    ```
+ *
+ * Example rules (uBlock Origin):
+ *  - ```adblock
+ *    example.com##+js(scriptlet-name, arg0, arg1)
+ *    ```
+ *  - ```adblock
+ *    example.com#@#+js(scriptlet-name, arg0, arg1)
+ *    ```
+ *
+ * Example rules (Adblock Plus):
+ *  - ```adblock
+ *    example.com#$#scriptlet-name arg0 arg1
+ *    ```
+ *  - ```adblock
+ *    example.com#@$#scriptlet-name arg0 arg1
+ *    ```
+ *  - ```adblock
+ *    example.com#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11
+ *    ```
+ */
 export interface IScriptletRule extends ICosmeticRule {
     type: CosmeticRuleType.ScriptletRule;
     body: IScriptletRuleBody;
 }
 
+/**
+ * Representation of a HTML filtering rule.
+ *
+ * Example rules (AdGuard):
+ *  - ```adblock
+ *    example.com$$script[tag-content="detect"]
+ *    ```
+ *  - ```adblock
+ *    example.com$@$script[tag-content="detect"]
+ *    ```
+ *
+ * Example rules (uBlock Origin):
+ *  - ```adblock
+ *    example.com##^script:has-text(detect)
+ *    ```
+ *  - ```adblock
+ *    example.com#@#^script:has-text(detect)
+ *    ```
+ */
 export interface IHtmlRule extends ICosmeticRule {
     type: CosmeticRuleType.HtmlRule;
     body: IHtmlRuleBody;
 }
 
+/**
+ * Representation of a JS injection rule.
+ *
+ * Example rules (AdGuard):
+ *  - ```adblock
+ *    example.com#%#let a = 2;
+ *    ```
+ *  - ```adblock
+ *    example.com#@%#let a = 2;
+ *    ```
+ */
 export interface IJsRule extends ICosmeticRule {
     type: CosmeticRuleType.JsRule;
     body: string;
 }
 
+/**
+ * CosmeticRuleParser is responsible for parsing cosmetic rules.
+ *
+ * Where possible, it automatically detects the difference between supported syntaxes:
+ *  - AdGuard
+ *  - uBlock Origin
+ *  - Adblock Plus
+ *
+ * If the syntax is common / cannot be determined, the parser gives `Unknown` syntax.
+ *
+ * Please note that syntactically correct rules are parsed even if they are not actually
+ * compatible with the given adblocker. This is a completely natural behavior, meaningful
+ * checking of compatibility is not done at the parser level.
+ */
 export class CosmeticRuleParser {
     /**
      * Determines whether a rule is a cosmetic rule.
@@ -73,7 +195,7 @@ export class CosmeticRuleParser {
 
     /**
      * Parses a cosmetic rule. The structure of the cosmetic rules:
-     *  - pattern
+     *  - pattern (modifiers + domains in the case of AdGuard)
      *  - separator
      *  - body
      *

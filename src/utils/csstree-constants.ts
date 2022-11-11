@@ -1,3 +1,11 @@
+/**
+ * Helper file for CSSTree to provide better compatibility with TypeScript.
+ *
+ * CSSTree's typedef is outdated in some places:
+ *
+ * @see {@link https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62536}
+ */
+
 /* eslint-disable max-len */
 
 /** @see {@link https://github.com/csstree/csstree/blob/master/docs/ast.md#node-types} */

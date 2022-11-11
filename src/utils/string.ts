@@ -1,5 +1,5 @@
 /**
- * String helpers
+ * String helpers.
  */
 
 import { EMPTY, ESCAPE_CHARACTER, SPACE, TAB } from "./constants";

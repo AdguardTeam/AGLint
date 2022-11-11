@@ -9,6 +9,7 @@ const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
 const NETWORK_RULE_SEPARATOR = "$";
 
+/** Represents a network filtering rule. Also known as "basic rule". */
 export interface INetworkRule extends IRule {
     category: RuleCategories.Network;
     type: NetworkRuleType;
@@ -19,6 +20,15 @@ export interface INetworkRule extends IRule {
     modifiers: IRuleModifier[];
 }
 
+/**
+ * NetworkRuleParser is responsible for parsing network rules.
+ *
+ * Please note that this will parse all syntactically correct network rules.
+ * Modifier compatibility is not checked at the parser level.
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#basic-rules}
+ * @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#basic}
+ */
 export class NetworkRuleParser {
     /**
      * Parses a network rule (also known as basic rule). Make sure you parse the cosmetic rules first!

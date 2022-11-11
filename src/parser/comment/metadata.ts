@@ -10,6 +10,16 @@ import { CommentMarker, CommentRuleType, IComment } from "./common";
 
 const METADATA_SEPARATOR = ":";
 
+/**
+ * Represents a metadata comment rule. This is a special comment that specifies
+ * the name and value of the metadata header.
+ *
+ * For example, in the case of
+ * ```adblock
+ * ! Title: My List
+ * ```
+ * the name of the header is `Title`, and the value is `My List`.
+ */
 export interface IMetadata extends IComment {
     category: RuleCategories.Comment;
     type: CommentRuleType.Metadata;
@@ -18,6 +28,11 @@ export interface IMetadata extends IComment {
     value: string;
 }
 
+/**
+ * Metadata Parser is responsible for parsing metadata comments.
+ *
+ * @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#special-comments}
+ */
 export class MetadataParser {
     /**
      * Parses a raw rule as a metadata comment.

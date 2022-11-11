@@ -8,12 +8,23 @@ const MODIFIERS_MARKER = "$";
 
 export const ADG_MODIFIER_LIST_TYPE = "AdGuardModifierList";
 
+/** Represents AdGuard's cosmetic rule modifiers. */
 export interface IAdGuardModifierList {
     type: typeof ADG_MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
     rest: string;
 }
 
+/**
+ * AdGuardModifierListParser is responsible for parsing AdGuard cosmetic rule modifiers.
+ *
+ * For example:
+ * ```adblock
+ * [$path=/path]example.com##.ads
+ * ```
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#non-basic-rules-modifiers}
+ */
 export class AdGuardModifierListParser {
     /**
      * Parses an AdGuard modifier (option) list.

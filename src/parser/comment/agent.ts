@@ -8,11 +8,21 @@ const AGENT_LIST_OPEN = "[";
 const AGENT_LIST_CLOSE = "]";
 const AGENT_SEPARATOR = ";";
 
+/**
+ * Represents an agent (eg `Adblock Plus 2.0`, where adblock is `Adblock Plus` and version is `2.0`).
+ * Specifying the version is optional.
+ */
 export interface IAgentMember {
     adblock: string;
     version?: string;
 }
 
+/**
+ * Represents an agent comment.
+ *
+ * There can be several agents in a rule. For example, if the rule is `[Adblock Plus 2.0; AdGuard]`,
+ * then there are two agent members: `Adblock Plus 2.0` and `AdGuard` (without version).
+ */
 export interface IAgent extends IComment {
     type: CommentRuleType.Agent;
     agents: IAgentMember[];
@@ -24,9 +34,15 @@ export interface IAgent extends IComment {
  * ad blockers.
  *
  * Examples:
+ *  - ```adblock
  *    [AdGuard]
+ *    ```
+ *  - ```adblock
  *    [Adblock Plus 2.0]
+ *    ```
+ *  - ```adblock
  *    [uBlock Origin]
+ *    ```
  */
 export class AgentParser {
     /**
@@ -60,12 +76,11 @@ export class AgentParser {
      */
     private static parseAgent(raw: string): IAgentMember {
         const trimmed = raw.trim();
-
-        // Since this function rarely runs, it's okay to use regex here
         const splitted = trimmed.split(SPACE);
 
         for (let i = 0; i < splitted.length; i++) {
             // Part contains dot or number
+            // Since this function rarely runs, it's okay to use regex here
             if (splitted[i].indexOf(".") > -1 || /\d/.test(splitted[i])) {
                 // Missing adblock name
                 if (i == 0) {

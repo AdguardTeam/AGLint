@@ -16,11 +16,27 @@ const HINT_PARAMS_OPEN = "(";
 const HINT_PARAMS_CLOSE = ")";
 const HINT_PARAMS_SEPARATOR = ",";
 
+/**
+ * Represents a hint member. For example, for
+ * ```adblock
+ * !+ PLATFORM(windows, mac)
+ * ```
+ * the name would be `PLATFORM` and the params would be `["windows", "mac"]`.
+ */
 export interface IHintMember {
     name: string;
     params: string[];
 }
 
+/**
+ * Represents a hint comment rule.
+ *
+ * There can be several hints in a hint rule. For example, if the rule is
+ * ```adblock
+ * !+ NOT_OPTIMIZED PLATFORM(windows)
+ * ```
+ * then there are two hint members: `NOT_OPTIMIZED` and `PLATFORM`.
+ */
 export interface IHint extends IComment {
     category: RuleCategories.Comment;
     type: CommentRuleType.Hint;
@@ -28,6 +44,11 @@ export interface IHint extends IComment {
     hints: IHintMember[];
 }
 
+/**
+ * HintParser is responsible for parsing AdGuard hints.
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints}
+ */
 export class HintParser {
     /**
      * Determines whether the rule is a hint rule.

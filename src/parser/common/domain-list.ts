@@ -2,7 +2,23 @@ import { EMPTY } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 
 const DOMAIN_EXCEPTION_MARKER = "~";
+
+/**
+ * Example rule:
+ * ```adblock
+ * ! Domains are separated by ",":
+ * example.com,~example.org##.ads
+ * ```
+ */
 const CLASSIC_DOMAIN_SEPARATOR = ",";
+
+/**
+ * Example rule:
+ * ```adblock
+ * ! Domains are separated by "|":
+ * ads.js^$script,domains=example.com|~example.org
+ * ```
+ */
 const MODIFIER_DOMAIN_SEPARATOR = "|";
 
 export const DOMAIN_LIST_TYPE = "DomainList";
@@ -10,23 +26,30 @@ export const DOMAIN_LIST_TYPE = "DomainList";
 /** "," for the classic domain list, and "|" for the "domain" modifier parameter  */
 export type DomainListSeparator = typeof CLASSIC_DOMAIN_SEPARATOR | typeof MODIFIER_DOMAIN_SEPARATOR;
 
+/** Represents a list of domains, e.g. `example.com,~example.net`. */
 export interface IDomainList {
     type: typeof DOMAIN_LIST_TYPE;
     separator: DomainListSeparator;
     domains: IDomain[];
 }
 
+/** Represents an element of the domain list (a domain). */
 export interface IDomain {
     /** Domain name */
     domain: string;
 
-    /** Is exception? */
+    /** Is exception (~ applied)? */
     exception: boolean;
 }
 
+/**
+ * DomainListParser is responsible for parsing a domain list, e.g. `example.com,~example.net`.
+ *
+ * @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_domains}
+ */
 export class DomainListParser {
     /**
-     * Parses a domain list, eg. `example.com,example.org`
+     * Parses a domain list, eg. `example.com,example.org,~example.org`
      *
      * @param {string} raw - Raw domain list
      * @param {DomainListSeparator} separator - Separator character

@@ -6,11 +6,21 @@ const MODIFIER_ASSIGN_OPERATOR = "=";
 
 export const MODIFIER_LIST_TYPE = "ModifierList";
 
+/** Represents a modifier list, eg `script,domain=example.com`. */
 export interface IModifierList {
     type: typeof MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
 }
 
+/**
+ * Represents a modifier.
+ *
+ * For example, if the modifier is `third-party`, the value of the modifier property
+ * will be `third-party`, but the value will remain undefined.
+ *
+ * But if the modifier is `domain=example.com`, then the modifier property will be
+ * `domain` and the value property will be `example.com`.
+ */
 export interface IRuleModifier {
     /** Modifier name */
     modifier: string;
@@ -19,6 +29,14 @@ export interface IRuleModifier {
     value?: string;
 }
 
+/**
+ * ModifierListParser is responsible for parsing modifiers. Please note that the name is not uniform,
+ * "modifiers" are also known as "options".
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#basic-rules-modifiers}
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#non-basic-rules-modifiers}
+ * @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#options}
+ */
 export class ModifierListParser {
     /**
      * Parses the cosmetic rule modifiers, eg. `script,key=value`

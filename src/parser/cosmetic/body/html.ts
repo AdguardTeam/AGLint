@@ -11,18 +11,30 @@ import { DOUBLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
 
 const CSS_SELECTORS_SEPARATOR = ",";
 
+/**Represents an HTML filtering rule body. */
 export interface IHtmlRuleBody {
     selectors: Selector[];
 }
 
+/**
+ * HtmlBodyParser is responsible for parsing the body of HTML filtering rules.
+ *
+ * Please note that this parser will read ANY selector if it is syntactically correct.
+ * Checking whether this selector is actually compatible with a given adblocker is not
+ * done at this level.
+ *
+ * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#html-filtering-rules}
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters}
+ */
 export class HtmlBodyParser {
     /**
-     * Convert "" to \" within strings. The CSS parser does not recognize "".
+     * Convert "" to \" within strings, because CSSTree does not recognize "".
      *
      * @param {string} selector - CSS selector string
      * @returns {string} Escaped CSS selector
      * @throws
      *   - If the selector is invalid according to the CSS syntax
+     * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content}
      */
     public static escapeDoubleQuotes(selector: string): string {
         let withinString = false;
@@ -51,6 +63,7 @@ export class HtmlBodyParser {
      *
      * @param {string} selector - CSS selector string
      * @returns {string} Unescaped CSS selector
+     * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content}
      */
     public static unescapeDoubleQuotes(selector: string): string {
         let withinString = false;

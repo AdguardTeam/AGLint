@@ -1,17 +1,28 @@
+import { UBO_COSMETIC_MODIFIERS } from "../../../converter/cosmetic-modifiers";
 import { CSS_PSEUDO_CLOSE, CSS_PSEUDO_MARKER, CSS_PSEUDO_OPEN, EMPTY, SPACE } from "../../../utils/constants";
 import { StringUtils } from "../../../utils/string";
 import { IRuleModifier } from "../../common/modifier-list";
 
-const UBO_COSMETIC_MODIFIERS = ["matches-path"];
-
 export const UBO_MODIFIER_LIST_TYPE = "uBlockModifierList";
 
+/** Represents uBlock's cosmetic rule modifiers. */
 export interface IuBlockModifierList {
     type: typeof UBO_MODIFIER_LIST_TYPE;
     modifiers: IRuleModifier[];
     rest: string;
 }
 
+/**
+ * UBlockModifierListParser is responsible for parsing uBlock cosmetic rule modifiers.
+ *
+ * They follow the syntax of pseudo classes, but they are actually part of the targeting,
+ * not the selector.
+ *
+ * For example:
+ * ```adblock
+ * example.com##:matches-path(/path) .ads
+ * ```
+ */
 export class UBlockModifierListParser {
     /**
      * Parses a uBO modifier (option) list.

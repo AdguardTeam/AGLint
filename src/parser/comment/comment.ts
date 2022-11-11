@@ -8,12 +8,60 @@ import { IPreProcessor, PreProcessorParser } from "./preprocessor";
 import { RuleCategories } from "../common";
 import { AdblockSyntax } from "../../utils/adblockers";
 
+/** Represents a simple comment. */
 export interface ISimpleComment extends IComment {
     type: CommentRuleType.Comment;
+
+    /** Comment marker: `!` or `#` */
     marker: CommentMarker;
     text: string;
 }
 
+/**
+ * CommentParser is responsible for parsing any comment-like adblock rules.
+ *
+ * For example:
+ *  - Agent comments:
+ *      - ```adblock
+ *        [AdGuard]
+ *        ```
+ *      - ```adblock
+ *        [Adblock Plus 2.0]
+ *        ```
+ *      - etc.
+ *  - AdGuard hints:
+ *      - ```adblock
+ *        !+ NOT_OPTIMIZED
+ *        ```
+ *      - ```adblock
+ *        !+ NOT_OPTIMIZED PLATFORM(windows)
+ *        ```
+ *      - etc.
+ *  - Pre-processor comments:
+ *      - ```adblock
+ *        !#if (adguard)
+ *        ```
+ *      - ```adblock
+ *        !#endif
+ *        ```
+ *      - etc.
+ *  - Metadata headers:
+ *      - ```adblock
+ *        ! Title: My List
+ *        ```
+ *      - ```adblock
+ *        ! Version: 2.0.150
+ *        ```
+ *      - etc.
+ *  - Simple comments:
+ *      - ```adblock
+ *        ! This is just a comment
+ *        ```
+ *      - ```adblock
+ *        # This is just a comment
+ *        ```
+ *      - etc.
+ */
 export class CommentParser {
     /**
      * Determines whether a rule is a regular comment.

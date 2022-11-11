@@ -1,5 +1,5 @@
 /**
- * Additional / helper functions for CSSTree
+ * Additional / helper functions for CSSTree.
  */
 
 import {
