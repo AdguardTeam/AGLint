@@ -134,6 +134,14 @@ console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0\
 - Validate rules
 - Check redundancies, conflicts
 
+## Development
+
+Commands:
+- `yarn lint`: Run ESLint
+- `yarn test`: Run all tests
+- `yarn coverage`: Get test coverage report
+- `yarn build`: Build package (to `dist` folder)
+
 ## References
 
 - Basic docs:
