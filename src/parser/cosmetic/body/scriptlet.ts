@@ -3,7 +3,7 @@
  */
 
 import { AdblockSyntax } from "../../../utils/adblockers";
-import { EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
+import { EMPTY, SPACE } from "../../../utils/constants";
 import { DOUBLE_QUOTE_MARKER, REGEX_MARKER, SINGLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
 
 const ADG_UBO_CALL_OPEN = "(";
@@ -120,70 +120,6 @@ export class ScriptletBodyParser {
     }
 
     /**
-     * Splits the parameters of an ABP snippet call.
-     *
-     * @param {string} raw - Raw snippet call
-     * @returns {string[]} Splitted parameter list
-     */
-    private static splitAbpSnippetParameters(raw: string): string[] {
-        const result: string[] = [];
-        const trimmed = raw.trim();
-
-        let openedQuote: string | null = null;
-        let quotedArgStartIndex = -1;
-        let unquotedArgStartIndex = -1;
-        let collectedWhitespaces = EMPTY;
-
-        for (let i = 0; i < trimmed.length; i++) {
-            if (
-                (trimmed[i] == SINGLE_QUOTE_MARKER || trimmed[i] == DOUBLE_QUOTE_MARKER) &&
-                trimmed[i - 1] != ESCAPE_CHARACTER
-            ) {
-                if (!openedQuote) {
-                    if (unquotedArgStartIndex != -1) {
-                        result.push(collectedWhitespaces + trimmed.substring(unquotedArgStartIndex, i));
-                        unquotedArgStartIndex = -1;
-                        collectedWhitespaces = EMPTY;
-                    }
-                    openedQuote = trimmed[i];
-                    quotedArgStartIndex = i;
-                } else if (trimmed[i] == openedQuote) {
-                    result.push(collectedWhitespaces + trimmed.substring(quotedArgStartIndex, i + 1));
-                    openedQuote = null;
-                    quotedArgStartIndex = -1;
-                    collectedWhitespaces = EMPTY;
-                }
-            } else if (StringUtils.isWhitespace(trimmed[i]) && trimmed[i - 1] != ESCAPE_CHARACTER) {
-                // Whitespaces are only relevant if we are not in a string
-                if (!openedQuote) {
-                    // If this space follows an unquoted argument, the argument must be stored
-                    if (unquotedArgStartIndex != -1) {
-                        result.push(collectedWhitespaces + trimmed.substring(unquotedArgStartIndex, i));
-                        unquotedArgStartIndex = -1;
-                        collectedWhitespaces = trimmed[i];
-                    } else {
-                        collectedWhitespaces += trimmed[i];
-                    }
-                }
-            } else {
-                if (!openedQuote) {
-                    if (unquotedArgStartIndex == -1) {
-                        unquotedArgStartIndex = i;
-                    }
-                }
-            }
-        }
-
-        if (unquotedArgStartIndex != -1) {
-            result.push(collectedWhitespaces + trimmed.substring(unquotedArgStartIndex, trimmed.length));
-        } else if (quotedArgStartIndex != -1) {
-            result.push(collectedWhitespaces + trimmed.substring(quotedArgStartIndex, trimmed.length));
-        }
-
-        return result;
-    }
-
-    /**
      * Parses a raw ABP snippet call body.
      *
      * @param {string} raw - Raw body
@@ -207,9 +143,10 @@ export class ScriptletBodyParser {
         );
 
         for (const rawScriptletCall of rawScriptletCalls) {
-            const splittedRawParameterList = ScriptletBodyParser.splitAbpSnippetParameters(rawScriptletCall).map(
-                (param) => param.trim()
-            );
+            const splittedRawParameterList = StringUtils.splitStringByUnescapedNonStringNonRegexChar(
+                rawScriptletCall.trim(),
+                ABP_PARAM_SEPARATOR
+            ).map((param) => param.trim());
 
             // The scriptlet must be specified (parameters are optional)
             if (!splittedRawParameterList[0] || splittedRawParameterList[0] == EMPTY) {

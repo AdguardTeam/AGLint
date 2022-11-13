@@ -141,7 +141,7 @@ export class StringUtils {
             ) {
                 if (open === pattern[i]) {
                     open = null;
-                } else {
+                } else if (open === null) {
                     open = pattern[i];
                 }
             } else if (open === null && pattern[i] == searchedCharacter && pattern[i - 1] != ESCAPE_CHARACTER) {

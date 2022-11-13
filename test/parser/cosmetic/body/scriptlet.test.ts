@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ScriptletBodyParser, ScriptletParameterType } from "../../../../src/parser/cosmetic/body/scriptlet";
 import { AdblockSyntax } from "../../../../src/utils/adblockers";
 import { EMPTY } from "../../../../src/utils/constants";
@@ -353,11 +354,7 @@ describe("ScriptletBodyParser", () => {
                     parameters: [
                         {
                             type: "Unquoted",
-                            value: "some",
-                        },
-                        {
-                            type: "Unquoted",
-                            value: "'thing",
+                            value: "some'thing",
                         },
                     ],
                 },
@@ -415,6 +412,159 @@ describe("ScriptletBodyParser", () => {
                         {
                             type: "Unquoted",
                             value: "arg1\\ something",
+                        },
+                    ],
+                },
+            ],
+        });
+
+        // Another complicated case
+        expect(
+            ScriptletBodyParser.parseAbpSnippetCall(
+                `hide-if-matches-xpath './/*[@class="test-xpath-class"]'; hide-if-matches-xpath './/div[@id="aaa"]//div[starts-with(@id,"aaa")][.//h1//span/text()="aaa"]'; hide-if-matches-xpath './/div[@id="bbb"]//div[starts-with(@id,"bbb")][.//h1//span/text()="bbb"]'`
+            )
+        ).toEqual({
+            scriptlets: [
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-matches-xpath",
+                    },
+                    parameters: [
+                        {
+                            type: "SingleQuoted",
+                            value: './/*[@class="test-xpath-class"]',
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-matches-xpath",
+                    },
+                    parameters: [
+                        {
+                            type: "SingleQuoted",
+                            value: './/div[@id="aaa"]//div[starts-with(@id,"aaa")][.//h1//span/text()="aaa"]',
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-matches-xpath",
+                    },
+                    parameters: [
+                        {
+                            type: "SingleQuoted",
+                            value: './/div[@id="bbb"]//div[starts-with(@id,"bbb")][.//h1//span/text()="bbb"]',
+                        },
+                    ],
+                },
+            ],
+        });
+
+        // Complicated "real world" example
+        // Source: https://github.com/abp-filters/abp-filters-anti-cv/blob/4474f3aafcdb87bb7dd4053f1950068f7e3906ef/fb_non-graph.txt#L2
+        expect(
+            ScriptletBodyParser.parseAbpSnippetCall(
+                `race start; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href^="?__cft__"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]>span>span>b; hide-if-matches-xpath './/div[@role="feed"]//div[@role="article"]//a[@aria-label[.="Patrocinado" or .="Sponsa" or .="Bersponsor" or .="Commandité" or .="Ditaja" or .="Gesponsert" or .="Gesponsord" or .="Sponsrad" or .="Publicidad" or .="Sponsoreret" or .="Sponset" or .="Sponsored" or .="Sponsorisé" or .="Sponsorizat" or .="Sponsorizzato" or .="Sponsorlu" or .="Sponsorowane" or .="Реклама" or .="ממומן" or .="تمويل شوي" or .="دارای پشتیبانی مالی" or .="سپانسرڈ" or .="مُموَّل" or .="प्रायोजित" or .="সৌজন্যে" or .="ได้รับการสนับสนุน" or .="内容" or .="贊助" or .="Sponsoroitu" or .="May Sponsor" or .="Được tài trợ"]]/ancestor::div[@role="article"]'; race stop;`
+            )
+        ).toEqual({
+            scriptlets: [
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "race",
+                    },
+                    parameters: [
+                        {
+                            type: "Unquoted",
+                            value: "start",
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-contains-visible-text",
+                    },
+                    parameters: [
+                        {
+                            type: "RegExp",
+                            value: "[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}",
+                        },
+                        {
+                            type: "SingleQuoted",
+                            value: "div[role=feed] div[role=article]",
+                        },
+                        {
+                            type: "Unquoted",
+                            value: 'a[href="#"][role="link"]',
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-contains-visible-text",
+                    },
+                    parameters: [
+                        {
+                            type: "RegExp",
+                            value: "[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}",
+                        },
+                        {
+                            type: "SingleQuoted",
+                            value: "div[role=feed] div[role=article]",
+                        },
+                        {
+                            type: "Unquoted",
+                            value: 'a[href^="?__cft__"]',
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-contains-visible-text",
+                    },
+                    parameters: [
+                        {
+                            type: "RegExp",
+                            value: "[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}",
+                        },
+                        {
+                            type: "SingleQuoted",
+                            value: "div[role=feed] div[role=article]",
+                        },
+                        {
+                            type: "Unquoted",
+                            value: 'a[href="#"][role="link"]>span>span>b',
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "hide-if-matches-xpath",
+                    },
+                    parameters: [
+                        {
+                            type: "SingleQuoted",
+                            value: `.//div[@role="feed"]//div[@role="article"]//a[@aria-label[.="Patrocinado" or .="Sponsa" or .="Bersponsor" or .="Commandité" or .="Ditaja" or .="Gesponsert" or .="Gesponsord" or .="Sponsrad" or .="Publicidad" or .="Sponsoreret" or .="Sponset" or .="Sponsored" or .="Sponsorisé" or .="Sponsorizat" or .="Sponsorizzato" or .="Sponsorlu" or .="Sponsorowane" or .="Реклама" or .="ממומן" or .="تمويل شوي" or .="دارای پشتیبانی مالی" or .="سپانسرڈ" or .="مُموَّل" or .="प्रायोजित" or .="সৌজন্যে" or .="ได้รับการสนับสนุน" or .="内容" or .="贊助" or .="Sponsoroitu" or .="May Sponsor" or .="Được tài trợ"]]/ancestor::div[@role="article"]`,
+                        },
+                    ],
+                },
+                {
+                    scriptlet: {
+                        type: "Unquoted",
+                        value: "race",
+                    },
+                    parameters: [
+                        {
+                            type: "Unquoted",
+                            value: "stop",
                         },
                     ],
                 },
@@ -559,5 +709,21 @@ describe("ScriptletBodyParser", () => {
         expect(
             parseAndGenerate("scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0", AdblockSyntax.AdblockPlus)
         ).toEqual(["scriptlet0 arg0 arg1", "scriptlet1", "scriptlet2 arg0"]);
+
+        // Complicated "real world" example
+        // Source: https://github.com/abp-filters/abp-filters-anti-cv/blob/4474f3aafcdb87bb7dd4053f1950068f7e3906ef/fb_non-graph.txt#L2
+        expect(
+            parseAndGenerate(
+                `race start; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href^="?__cft__"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]>span>span>b; hide-if-matches-xpath './/div[@role="feed"]//div[@role="article"]//a[@aria-label[.="Patrocinado" or .="Sponsa" or .="Bersponsor" or .="Commandité" or .="Ditaja" or .="Gesponsert" or .="Gesponsord" or .="Sponsrad" or .="Publicidad" or .="Sponsoreret" or .="Sponset" or .="Sponsored" or .="Sponsorisé" or .="Sponsorizat" or .="Sponsorizzato" or .="Sponsorlu" or .="Sponsorowane" or .="Реклама" or .="ממומן" or .="تمويل شوي" or .="دارای پشتیبانی مالی" or .="سپانسرڈ" or .="مُموَّل" or .="प्रायोजित" or .="সৌজন্যে" or .="ได้รับการสนับสนุน" or .="内容" or .="贊助" or .="Sponsoroitu" or .="May Sponsor" or .="Được tài trợ"]]/ancestor::div[@role="article"]'; race stop;`,
+                AdblockSyntax.AdblockPlus
+            )
+        ).toEqual([
+            "race start",
+            `hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]`,
+            `hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href^="?__cft__"]`,
+            `hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]>span>span>b`,
+            `hide-if-matches-xpath './/div[@role="feed"]//div[@role="article"]//a[@aria-label[.="Patrocinado" or .="Sponsa" or .="Bersponsor" or .="Commandité" or .="Ditaja" or .="Gesponsert" or .="Gesponsord" or .="Sponsrad" or .="Publicidad" or .="Sponsoreret" or .="Sponset" or .="Sponsored" or .="Sponsorisé" or .="Sponsorizat" or .="Sponsorizzato" or .="Sponsorlu" or .="Sponsorowane" or .="Реклама" or .="ממומן" or .="تمويل شوي" or .="دارای پشتیبانی مالی" or .="سپانسرڈ" or .="مُموَّل" or .="प्रायोजित" or .="সৌজন্যে" or .="ได้รับการสนับสนุน" or .="内容" or .="贊助" or .="Sponsoroitu" or .="May Sponsor" or .="Được tài trợ"]]/ancestor::div[@role="article"]'`,
+            `race stop`,
+        ]);
     });
 });

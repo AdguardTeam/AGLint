@@ -32,6 +32,7 @@ describe("String utils", () => {
         expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ \\a   a`, "a")).toEqual(24);
 
         expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "aaa" /aaa/ /a/`, "a")).toEqual(-1);
+        expect(StringUtils.findUnescapedNonStringNonRegexChar(`'aa\\a' "a'aa" /a'a'a/ /a/`, "a")).toEqual(-1);
         expect(StringUtils.findUnescapedNonStringNonRegexChar(EMPTY, "a")).toEqual(-1);
     });
 
