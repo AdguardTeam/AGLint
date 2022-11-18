@@ -1,0 +1,77 @@
+name: Release
+on:
+  # Run manually
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out to repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+    
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Run ESLint
+        run: yarn lint
+  
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out to repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+    
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Run tests
+        run: yarn test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out to repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+    
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Run build script
+        run: yarn build
+
+      # TODO: Artifact / Create release:
+
+      # - name: Create release artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: release_artifact
+      #     path: |
+      #       .
+      #       !./node_modules
