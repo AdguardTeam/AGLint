@@ -16,8 +16,7 @@ import { IRuleModifier } from "../common/modifier-list";
 import { UblockModifier, UBlockModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-options";
 import { CosmeticRuleType } from "./common";
 import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
-
-const UBO_RESPONSEHEADER_MARKER = "responseheader(";
+import { UBO_RESPONSEHEADER_INDICATOR } from "../network/network";
 
 /**
  * A generic representation of a cosmetic rule.
@@ -354,9 +353,11 @@ export class CosmeticRuleParser {
             CosmeticRuleSeparatorUtils.isUblockHtml(separator) ||
             CosmeticRuleSeparatorUtils.isAdGuardHtml(separator)
         ) {
-            // TODO: https://github.com/AdguardTeam/AGLint/pull/1#issuecomment-1303440085
             // Special case: uBO's network rule
-            if (CosmeticRuleSeparatorUtils.isUblockHtml(separator) && rawBody.startsWith(UBO_RESPONSEHEADER_MARKER)) {
+            if (
+                CosmeticRuleSeparatorUtils.isUblockHtml(separator) &&
+                rawBody.startsWith(UBO_RESPONSEHEADER_INDICATOR)
+            ) {
                 return null;
             }
 

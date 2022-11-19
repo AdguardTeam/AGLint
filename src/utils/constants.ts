@@ -14,6 +14,13 @@ export const TAB = "\t";
 export const NEWLINE = "\n";
 export const ESCAPE_CHARACTER = "\\";
 
+// Brackets
+export const OPEN_PARENTHESIS = "(";
+export const CLOSE_PARENTHESIS = ")";
+
+// Operators
+export const ASSIGN_OPERATOR = "=";
+
 // CSS
 export const CSS_CLASS_MARKER = ".";
 export const CSS_ID_MARKER = "#";

@@ -3,11 +3,27 @@ import { REGEX_MARKER, StringUtils } from "../../utils/string";
 import { IRuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
 import { IRule, RuleCategories } from "../common";
 import { NetworkRuleType } from "./common";
-import { EMPTY } from "../../utils/constants";
+import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
+import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
 
 const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
 const NETWORK_RULE_SEPARATOR = "$";
+
+export const UBO_RESPONSEHEADER_INDICATOR = "responseheader" + OPEN_PARENTHESIS;
+const UBO_RESPONSEHEADER_INDICATOR_LEN = 15;
+const ADG_REMOVEHEADER = "removeheader";
+
+/**
+ * Represents the common properties of network rules
+ */
+export interface INetworkRule extends IRule {
+    category: RuleCategories.Network;
+    type: NetworkRuleType;
+    syntax: AdblockSyntax;
+    exception: boolean;
+    pattern: string;
+}
 
 /**
  * Represents a network filtering rule. Also known as "basic rule".
@@ -24,14 +40,26 @@ const NETWORK_RULE_SEPARATOR = "$";
  *     ```
  *   - etc.
  */
-export interface INetworkRule extends IRule {
-    category: RuleCategories.Network;
-    type: NetworkRuleType;
-    syntax: AdblockSyntax;
-    regex: boolean;
-    exception: boolean;
-    pattern: string;
+export interface IBasicNetworkRule extends INetworkRule {
+    type: NetworkRuleType.BasicNetworkRule;
     modifiers: IRuleModifier[];
+}
+
+/**
+ * Represents a header remover network filtering rule.
+ *
+ * Example rules:
+ *   - ```adblock
+ *     ||example.org^$removeheader=header-name
+ *     ```
+ *   - ```adblock
+ *     example.org##^responseheader(header-name)
+ *     ```
+ */
+export interface IRemoveHeaderNetworkRule extends INetworkRule {
+    type: NetworkRuleType.RemoveHeaderNetworkRule;
+    syntax: AdblockSyntax;
+    header: string;
 }
 
 /**
@@ -50,25 +78,29 @@ export class NetworkRuleParser {
      * @param {string} raw - Raw rule
      * @returns {INetworkRule} Network rule AST
      */
-    public static parse(raw: string): INetworkRule {
+    public static parse(raw: string): IBasicNetworkRule | IRemoveHeaderNetworkRule {
         let rule = raw.trim();
 
-        const result: INetworkRule = {
+        // Special case
+        const uboRemoveHeader = NetworkRuleParser.parseUboResponseHeader(raw);
+        if (uboRemoveHeader) {
+            return uboRemoveHeader;
+        }
+
+        const common: INetworkRule = {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             // Initially, the entire rule is considered a pattern
             pattern: rule,
-            modifiers: [],
         };
 
         // Rule starts with exception marker, eg @@||example.com
         if (rule.indexOf(NETWORK_RULE_EXCEPTION_MARKER) == 0) {
-            result.exception = true;
+            common.exception = true;
             rule = rule.substring(NETWORK_RULE_EXCEPTION_MARKER_LEN);
-            result.pattern = rule;
+            common.pattern = rule;
         }
 
         // Find corresponding (last) separator
@@ -83,16 +115,103 @@ export class NetworkRuleParser {
         );
 
         // Get rule parts
+        const modifiers: IRuleModifier[] = [];
+
         if (separatorIndex != -1) {
-            result.pattern = rule.substring(0, separatorIndex);
+            common.pattern = rule.substring(0, separatorIndex);
 
-            result.modifiers = ModifierListParser.parse(rule.substring(separatorIndex + 1)).modifiers;
+            modifiers.push(...ModifierListParser.parse(rule.substring(separatorIndex + 1)).modifiers);
+
+            // Special network rules
+            if (modifiers.length == 1 && modifiers[0].modifier == ADG_REMOVEHEADER) {
+                const header = modifiers[0].value;
+
+                if (!header || header.length == 0) {
+                    throw new SyntaxError(`No header name specified in rule "${raw}"`);
+                }
+
+                common.type = NetworkRuleType.RemoveHeaderNetworkRule;
+                common.syntax = AdblockSyntax.AdGuard;
+
+                return <IRemoveHeaderNetworkRule>{
+                    ...common,
+                    header: modifiers[0].value,
+                };
+            }
         }
 
-        // Pattern starts with / and ends with /
-        if (StringUtils.isRegexPattern(result.pattern)) {
-            result.regex = true;
+        return <IBasicNetworkRule>{
+            ...common,
+            modifiers,
+        };
+    }
+
+    /**
+     * Parses a uBlock header removal rule.
+     *
+     * @param {string} raw - Raw network rule
+     * @returns {IRemoveHeaderNetworkRule | null} Parsed rule
+     */
+    private static parseUboResponseHeader(raw: string): IRemoveHeaderNetworkRule | null {
+        const trimmed = raw.trim();
+
+        // In order to operate quickly, we only check the presence of the indicator at first
+        if (trimmed.indexOf(UBO_RESPONSEHEADER_INDICATOR) == -1) {
+            return null;
         }
+
+        // Although this is a network rule, it follows the syntax of cosmetic rules, so it is an exotic case
+        const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(trimmed);
+
+        if (
+            start == -1 ||
+            !(separator == CosmeticRuleSeparator.uBoHTML || separator == CosmeticRuleSeparator.uBoHTMLException)
+        ) {
+            throw new SyntaxError(`uBO responseheader filtering requires a valid uBO HTML rule separator`);
+        }
+
+        const body = trimmed.substring(end).trim();
+
+        if (!body.startsWith(UBO_RESPONSEHEADER_INDICATOR)) {
+            throw new SyntaxError(
+                `uBO responseheader filtering rule body must be starts with "${UBO_RESPONSEHEADER_INDICATOR}"`
+            );
+        }
+
+        if (!body.endsWith(CLOSE_PARENTHESIS)) {
+            throw new SyntaxError(`uBO responseheader filtering rule body must be ends with "${CLOSE_PARENTHESIS}"`);
+        }
+
+        const header = body.slice(UBO_RESPONSEHEADER_INDICATOR_LEN, -1).trim();
+
+        if (header.length == 0) {
+            throw new SyntaxError(`No header name specified in rule "${trimmed}"`);
+        }
+
+        return {
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.uBlockOrigin,
+            exception: !!exception,
+            pattern: trimmed.substring(0, start).trim(),
+            header,
+        };
+    }
+
+    /**
+     * Converts the AST of a header removal network rule to a string.
+     *
+     * @param {IRemoveHeaderNetworkRule} ast - Header remover rule AST
+     * @returns {string} Raw string
+     */
+    private static generateUboResponseHeader(ast: IRemoveHeaderNetworkRule): string {
+        let result = EMPTY;
+
+        result += ast.pattern;
+        result += ast.exception ? CosmeticRuleSeparator.uBoHTMLException : CosmeticRuleSeparator.uBoHTML;
+        result += UBO_RESPONSEHEADER_INDICATOR;
+        result += ast.header;
+        result += CLOSE_PARENTHESIS;
 
         return result;
     }
@@ -103,22 +222,41 @@ export class NetworkRuleParser {
      * @param {INetworkRule} ast - Network rule AST
      * @returns {string} Raw string
      */
-    public static generate(ast: INetworkRule): string {
+    public static generate(ast: IBasicNetworkRule | IRemoveHeaderNetworkRule): string {
         let result = EMPTY;
 
+        // Special case
+        if (ast.type == NetworkRuleType.RemoveHeaderNetworkRule && ast.syntax == AdblockSyntax.uBlockOrigin) {
+            return NetworkRuleParser.generateUboResponseHeader(<IRemoveHeaderNetworkRule>ast);
+        }
+
+        // Common parts
         if (ast.exception) {
             result += NETWORK_RULE_EXCEPTION_MARKER;
         }
 
         result += ast.pattern;
 
-        if (ast.modifiers.length > 0) {
-            result += NETWORK_RULE_SEPARATOR;
+        // Type-dependent parts
+        switch (ast.type) {
+            case NetworkRuleType.RemoveHeaderNetworkRule: {
+                result += NETWORK_RULE_SEPARATOR;
+                result += ADG_REMOVEHEADER;
+                result += ASSIGN_OPERATOR;
+                result += ast.header;
+                break;
+            }
+            case NetworkRuleType.BasicNetworkRule: {
+                if (ast.modifiers.length > 0) {
+                    result += NETWORK_RULE_SEPARATOR;
 
-            result += ModifierListParser.generate({
-                type: MODIFIER_LIST_TYPE,
-                modifiers: ast.modifiers,
-            });
+                    result += ModifierListParser.generate({
+                        type: MODIFIER_LIST_TYPE,
+                        modifiers: ast.modifiers,
+                    });
+                }
+                break;
+            }
         }
 
         return result;
