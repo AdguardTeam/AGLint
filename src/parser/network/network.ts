@@ -154,7 +154,8 @@ export class NetworkRuleParser {
      *
      * @param {string} raw - Raw uBO response header filtering rule
      * @returns {IRemoveHeaderNetworkRule | null}
-     * Parsed rule AST or null if it cannot be parsed as uBO response header filtering rule
+     * AST of the parsed rule, or null if there is no response header filtering indicator in the raw input
+     * @throws If the response header indicator is present, but the rule is syntactically invalid
      * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#response-header-filtering}
      */
     private static parseUboResponseHeader(raw: string): IRemoveHeaderNetworkRule | null {
