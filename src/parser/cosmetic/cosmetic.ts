@@ -353,7 +353,12 @@ export class CosmeticRuleParser {
             CosmeticRuleSeparatorUtils.isUblockHtml(separator) ||
             CosmeticRuleSeparatorUtils.isAdGuardHtml(separator)
         ) {
-            // Special case: uBO's network rule
+            /**
+             * Special case: uBO's responseheader rule. This rule follows the syntax of cosmetic rules,
+             * but is only parsed at the network level.
+             *
+             * @see {@link NetworkRuleParser.parse}
+             */
             if (
                 CosmeticRuleSeparatorUtils.isUblockHtml(separator) &&
                 rawBody.startsWith(UBO_RESPONSEHEADER_INDICATOR)
