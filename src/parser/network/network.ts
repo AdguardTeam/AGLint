@@ -147,7 +147,7 @@ export class NetworkRuleParser {
     }
 
     /**
-     * Parses a uBlock header removal rule.
+     * Parses a uBlock Origin header removal rule.
      *
      * @param {string} raw - Raw network rule
      * @returns {IRemoveHeaderNetworkRule | null} Parsed rule
