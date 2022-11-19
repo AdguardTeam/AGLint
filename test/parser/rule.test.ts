@@ -64,6 +64,22 @@ describe("RuleParser", () => {
             type: CommentRuleType.PreProcessor,
         });
 
+        // Inline linter configurations
+        expect(RuleParser.parse("! aglint-enable")).toMatchObject({
+            category: RuleCategories.Comment,
+            type: CommentRuleType.ConfigComment,
+        });
+
+        expect(RuleParser.parse("! aglint-disable")).toMatchObject({
+            category: RuleCategories.Comment,
+            type: CommentRuleType.ConfigComment,
+        });
+
+        expect(RuleParser.parse('! aglint rule1: "off"')).toMatchObject({
+            category: RuleCategories.Comment,
+            type: CommentRuleType.ConfigComment,
+        });
+
         // Metadata comments
         expect(RuleParser.parse("! Title: My List")).toMatchObject({
             category: RuleCategories.Comment,

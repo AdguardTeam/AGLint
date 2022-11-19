@@ -13,6 +13,7 @@ export enum CommentRuleType {
     Agent = "Agent",
     Hint = "Hint",
     PreProcessor = "PreProcessor",
+    ConfigComment = "ConfigComment",
 }
 
 /**
@@ -49,6 +50,14 @@ export enum CommentRuleType {
  *        ```
  *      - ```adblock
  *        ! Version: 2.0.150
+ *        ```
+ *      - etc.
+ *  - AGLint inline config comments:
+ *      - ```adblock
+ *        ! aglint-enable some-rule
+ *        ```
+ *      - ```adblock
+ *        ! aglint-disable some-rule
  *        ```
  *      - etc.
  *  - Simple comments:
