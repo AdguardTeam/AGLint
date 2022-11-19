@@ -147,10 +147,15 @@ export class NetworkRuleParser {
     }
 
     /**
-     * Parses a uBlock Origin header removal rule.
+     * Parses a uBlock Origin response header filtering rule.
      *
-     * @param {string} raw - Raw network rule
-     * @returns {IRemoveHeaderNetworkRule | null} Parsed rule
+     * uBO calls this rule a "special case of HTML filtering", so this follows uBO's HTML filtering
+     * syntax, which is a cosmetic pattern. However, we only parse this rule in the network parser.
+     *
+     * @param {string} raw - Raw uBO response header filtering rule
+     * @returns {IRemoveHeaderNetworkRule | null}
+     * Parsed rule AST or null if it cannot be parsed as uBO response header filtering rule
+     * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#response-header-filtering}
      */
     private static parseUboResponseHeader(raw: string): IRemoveHeaderNetworkRule | null {
         const trimmed = raw.trim();
