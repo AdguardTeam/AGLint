@@ -21,16 +21,16 @@ export enum CosmeticRuleSeparator {
     AbpSnippetException = "#@$#",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection} */
-    uBoScriptlet = "##+js",
+    UboScriptlet = "##+js",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection} */
-    uBoScriptletException = "#@#+js",
+    UboScriptletException = "#@#+js",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    uBoHTML = "##^",
+    UboHTML = "##^",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    uBoHTMLException = "#@#^",
+    UboHTMLException = "#@#^",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
     AdgCSSInject = "#$#",
@@ -143,7 +143,7 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isUblockScriptlet(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.uBoScriptlet || separator == CosmeticRuleSeparator.uBoScriptletException
+            separator == CosmeticRuleSeparator.UboScriptlet || separator == CosmeticRuleSeparator.UboScriptletException
         );
     }
 
@@ -178,7 +178,7 @@ export class CosmeticRuleSeparatorUtils {
      * @returns {boolean} true/false
      */
     public static isUblockHtml(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.uBoHTML || separator == CosmeticRuleSeparator.uBoHTMLException;
+        return separator == CosmeticRuleSeparator.UboHTML || separator == CosmeticRuleSeparator.UboHTMLException;
     }
 
     /**
@@ -265,11 +265,11 @@ export class CosmeticRuleSeparatorUtils {
             if (rule[h + 1] == "#" && (h == 0 || rule[h - 1] != SPACE)) {
                 // ##+js
                 if (rule[h + 2] == "+" && rule[h + 3] == "j" && rule[h + 4] == "s") {
-                    return [h, h + 5, CosmeticRuleSeparator.uBoScriptlet, false];
+                    return [h, h + 5, CosmeticRuleSeparator.UboScriptlet, false];
                 }
                 // ##^
                 else if (rule[h + 2] == "^") {
-                    return [h, h + 3, CosmeticRuleSeparator.uBoHTML, false];
+                    return [h, h + 3, CosmeticRuleSeparator.UboHTML, false];
                 }
                 // ##
                 return [h, h + 2, CosmeticRuleSeparator.AbpCSSElemhide, false];
@@ -310,11 +310,11 @@ export class CosmeticRuleSeparatorUtils {
                 if (rule[h + 2] == "#") {
                     // #@#+js
                     if (rule[h + 3] == "+" && rule[h + 4] == "j" && rule[h + 5] == "s") {
-                        return [h, h + 6, CosmeticRuleSeparator.uBoScriptletException, true];
+                        return [h, h + 6, CosmeticRuleSeparator.UboScriptletException, true];
                     }
                     // #@#^
                     else if (rule[h + 3] == "^") {
-                        return [h, h + 4, CosmeticRuleSeparator.uBoHTMLException, true];
+                        return [h, h + 4, CosmeticRuleSeparator.UboHTMLException, true];
                     }
                     return [h, h + 3, CosmeticRuleSeparator.AbpCSSElemhideException, true];
                 }

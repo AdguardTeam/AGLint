@@ -171,7 +171,7 @@ export class NetworkRuleParser {
 
         if (
             start == -1 ||
-            !(separator == CosmeticRuleSeparator.uBoHTML || separator == CosmeticRuleSeparator.uBoHTMLException)
+            !(separator == CosmeticRuleSeparator.UboHTML || separator == CosmeticRuleSeparator.UboHTMLException)
         ) {
             throw new SyntaxError(`uBO responseheader filtering requires a valid uBO HTML rule separator`);
         }
@@ -214,7 +214,7 @@ export class NetworkRuleParser {
         let result = EMPTY;
 
         result += ast.pattern;
-        result += ast.exception ? CosmeticRuleSeparator.uBoHTMLException : CosmeticRuleSeparator.uBoHTML;
+        result += ast.exception ? CosmeticRuleSeparator.UboHTMLException : CosmeticRuleSeparator.UboHTML;
         result += UBO_RESPONSEHEADER_INDICATOR;
         result += ast.header;
         result += CLOSE_PARENTHESIS;
