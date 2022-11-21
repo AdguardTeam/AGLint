@@ -135,7 +135,7 @@ export class NetworkRuleParser {
 
                 return <IRemoveHeaderNetworkRule>{
                     ...common,
-                    header: modifiers[0].value,
+                    header,
                 };
             }
         }
@@ -180,12 +180,12 @@ export class NetworkRuleParser {
 
         if (!body.startsWith(UBO_RESPONSEHEADER_INDICATOR)) {
             throw new SyntaxError(
-                `uBO responseheader filtering rule body must be starts with "${UBO_RESPONSEHEADER_INDICATOR}"`
+                `uBO responseheader filtering rule body must be start with "${UBO_RESPONSEHEADER_INDICATOR}"`
             );
         }
 
         if (!body.endsWith(CLOSE_PARENTHESIS)) {
-            throw new SyntaxError(`uBO responseheader filtering rule body must be ends with "${CLOSE_PARENTHESIS}"`);
+            throw new SyntaxError(`uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`);
         }
 
         const header = body.slice(UBO_RESPONSEHEADER_INDICATOR_LEN, -1).trim();

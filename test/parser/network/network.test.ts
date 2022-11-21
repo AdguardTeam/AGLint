@@ -343,15 +343,15 @@ describe("NetworkRuleParser", () => {
         );
 
         expect(() => NetworkRuleParser.parse(`example.org#@#^responseheader(`)).toThrowError(
-            `uBO responseheader filtering rule body must be ends with "${CLOSE_PARENTHESIS}"`
+            `uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`
         );
 
         expect(() => NetworkRuleParser.parse(`example.org#@#^responseheader(header-name`)).toThrowError(
-            `uBO responseheader filtering rule body must be ends with "${CLOSE_PARENTHESIS}"`
+            `uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`
         );
 
         expect(() => NetworkRuleParser.parse(`example.org#@#^div + responseheader(header-name)`)).toThrowError(
-            `uBO responseheader filtering rule body must be starts with "${UBO_RESPONSEHEADER_INDICATOR}"`
+            `uBO responseheader filtering rule body must be start with "${UBO_RESPONSEHEADER_INDICATOR}"`
         );
     });
 
