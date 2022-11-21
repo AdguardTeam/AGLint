@@ -7,11 +7,11 @@ import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
 
 const NETWORK_RULE_EXCEPTION_MARKER = "@@";
-const NETWORK_RULE_EXCEPTION_MARKER_LEN = 2;
+const NETWORK_RULE_EXCEPTION_MARKER_LEN = NETWORK_RULE_EXCEPTION_MARKER.length;
 const NETWORK_RULE_SEPARATOR = "$";
 
 export const UBO_RESPONSEHEADER_INDICATOR = "responseheader" + OPEN_PARENTHESIS;
-const UBO_RESPONSEHEADER_INDICATOR_LEN = 15;
+const UBO_RESPONSEHEADER_INDICATOR_LEN = UBO_RESPONSEHEADER_INDICATOR.length;
 const ADG_REMOVEHEADER = "removeheader";
 
 /**
