@@ -305,6 +305,28 @@ describe("NetworkRuleParser", () => {
             header: "header-name",
         });
 
+        expect(NetworkRuleParser.parse(`||example.org^$removeheader=request:header-name`)).toEqual(<
+            IRemoveHeaderNetworkRule
+        >{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: false,
+            pattern: "||example.org^",
+            header: "request:header-name",
+        });
+
+        expect(NetworkRuleParser.parse(`@@||example.org^$removeheader=request:header-name`)).toEqual(<
+            IRemoveHeaderNetworkRule
+        >{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: true,
+            pattern: "||example.org^",
+            header: "request:header-name",
+        });
+
         expect(() => NetworkRuleParser.parse(`||example.org^$removeheader=`)).toThrowError(
             /^No header name specified in rule/
         );
@@ -386,6 +408,14 @@ describe("NetworkRuleParser", () => {
 
         expect(parseAndGenerate(`@@||example.org^$removeheader=header-name`)).toEqual(
             `@@||example.org^$removeheader=header-name`
+        );
+
+        expect(parseAndGenerate(`||example.org^$removeheader=request:header-name`)).toEqual(
+            `||example.org^$removeheader=request:header-name`
+        );
+
+        expect(parseAndGenerate(`@@||example.org^$removeheader=request:header-name`)).toEqual(
+            `@@||example.org^$removeheader=request:header-name`
         );
 
         // uBO responseheader
