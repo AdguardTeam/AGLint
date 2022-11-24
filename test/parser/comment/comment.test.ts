@@ -188,6 +188,69 @@ describe("CommentParser", () => {
             value: "https://github.com/AdguardTeam/some-repo/wiki",
         });
 
+        // Config comments
+        expect(CommentParser.parse("! aglint-disable rule1, rule2")).toEqual({
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: CommentRuleType.ConfigComment,
+            marker: "!",
+            command: "aglint-disable",
+            params: ["rule1", "rule2"],
+        });
+
+        expect(CommentParser.parse("! aglint-enable rule1, rule2")).toEqual({
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: CommentRuleType.ConfigComment,
+            marker: "!",
+            command: "aglint-enable",
+            params: ["rule1", "rule2"],
+        });
+
+        expect(CommentParser.parse("# aglint-disable rule1, rule2")).toEqual({
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: CommentRuleType.ConfigComment,
+            marker: "#",
+            command: "aglint-disable",
+            params: ["rule1", "rule2"],
+        });
+
+        expect(CommentParser.parse("# aglint-enable rule1, rule2")).toEqual({
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: CommentRuleType.ConfigComment,
+            marker: "#",
+            command: "aglint-enable",
+            params: ["rule1", "rule2"],
+        });
+
+        expect(CommentParser.parse('! aglint rule1: "off", rule2: ["a", "b"] -- this is a comment')).toEqual({
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: CommentRuleType.ConfigComment,
+            marker: "!",
+            command: "aglint",
+            params: {
+                rule1: "off",
+                rule2: ["a", "b"],
+            },
+            comment: "this is a comment",
+        });
+
+        expect(CommentParser.parse('# aglint rule1: "off", rule2: ["a", "b"] -- this is a comment')).toEqual({
+            category: RuleCategories.Comment,
+            syntax: AdblockSyntax.Unknown,
+            type: CommentRuleType.ConfigComment,
+            marker: "#",
+            command: "aglint",
+            params: {
+                rule1: "off",
+                rule2: ["a", "b"],
+            },
+            comment: "this is a comment",
+        });
+
         // Comments
         expect(CommentParser.parse("! This is just a comment")).toEqual({
             category: RuleCategories.Comment,
@@ -249,6 +312,14 @@ describe("CommentParser", () => {
 
         expect(parseAndGenerate("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(
             "! Homepage: https://github.com/AdguardTeam/some-repo/wiki"
+        );
+
+        expect(parseAndGenerate("! aglint-enable rule1, rule2 -- comment")).toEqual(
+            "! aglint-enable rule1, rule2 -- comment"
+        );
+
+        expect(parseAndGenerate("# aglint-enable rule1, rule2 -- comment")).toEqual(
+            "# aglint-enable rule1, rule2 -- comment"
         );
 
         expect(parseAndGenerate("! This is just a comment")).toEqual("! This is just a comment");

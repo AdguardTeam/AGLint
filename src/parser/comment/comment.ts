@@ -7,6 +7,7 @@ import { IMetadata, MetadataParser } from "./metadata";
 import { IPreProcessor, PreProcessorParser } from "./preprocessor";
 import { RuleCategories } from "../common";
 import { AdblockSyntax } from "../../utils/adblockers";
+import { ConfigCommentParser, IConfigComment } from "./inline-config";
 
 /**
  * Represents a simple comment.
@@ -62,6 +63,14 @@ export interface ISimpleComment extends IComment {
  *        ```
  *      - ```adblock
  *        ! Version: 2.0.150
+ *        ```
+ *      - etc.
+ *  - AGLint inline config comments:
+ *      - ```adblock
+ *        ! aglint-enable some-rule
+ *        ```
+ *      - ```adblock
+ *        ! aglint-disable some-rule
  *        ```
  *      - etc.
  *  - Simple comments:
@@ -139,6 +148,7 @@ export class CommentParser {
             HintParser.parse(trimmed) ||
             PreProcessorParser.parse(trimmed) ||
             MetadataParser.parse(trimmed) ||
+            ConfigCommentParser.parse(trimmed) ||
             <IComment>{
                 category: RuleCategories.Comment,
                 type: CommentRuleType.Comment,
@@ -165,6 +175,8 @@ export class CommentParser {
                 return PreProcessorParser.generate(<IPreProcessor>ast);
             case CommentRuleType.Metadata:
                 return MetadataParser.generate(<IMetadata>ast);
+            case CommentRuleType.ConfigComment:
+                return ConfigCommentParser.generate(<IConfigComment>ast);
             case CommentRuleType.Comment:
                 return (<ISimpleComment>ast).marker + (<ISimpleComment>ast).text;
         }
