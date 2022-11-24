@@ -10,7 +10,7 @@ import {
     IJsRule,
     IScriptletRule,
 } from "./cosmetic/cosmetic";
-import { INetworkRule, NetworkRuleParser } from "./network/network";
+import { IBasicNetworkRule, IRemoveHeaderNetworkRule, INetworkRule, NetworkRuleParser } from "./network/network";
 
 /**
  * RuleParser is responsible for parsing the rules.
@@ -28,7 +28,15 @@ export class RuleParser {
      */
     public static parse(
         raw: string
-    ): IComment | ICssRule | IElementHidingRule | IScriptletRule | IHtmlRule | IJsRule | INetworkRule {
+    ):
+        | IComment
+        | ICssRule
+        | IElementHidingRule
+        | IScriptletRule
+        | IHtmlRule
+        | IJsRule
+        | IBasicNetworkRule
+        | IRemoveHeaderNetworkRule {
         const trimmed = raw.trim();
 
         // Comments (agent / metadata / hint / pre-processor / comment)
@@ -55,7 +63,7 @@ export class RuleParser {
      * @param {INetworkRule} ast - Adblock rule AST
      * @returns {string} Raw string
      */
-    public static generate(ast: IComment | ICosmeticRule | INetworkRule): string {
+    public static generate(ast: IComment | ICosmeticRule | IBasicNetworkRule | IRemoveHeaderNetworkRule): string {
         switch (ast.category) {
             case RuleCategories.Comment:
                 return CommentParser.generate(ast);

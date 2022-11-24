@@ -1,7 +1,12 @@
 import { RuleCategories } from "../../../src/parser/common";
 import { NetworkRuleType } from "../../../src/parser/network/common";
-import { NetworkRuleParser } from "../../../src/parser/network/network";
+import {
+    IRemoveHeaderNetworkRule,
+    NetworkRuleParser,
+    UBO_RESPONSEHEADER_INDICATOR,
+} from "../../../src/parser/network/network";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
+import { CLOSE_PARENTHESIS } from "../../../src/utils/constants";
 
 describe("NetworkRuleParser", () => {
     test("parse", () => {
@@ -9,7 +14,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "||example.com",
             modifiers: [],
@@ -19,7 +23,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: true,
             pattern: "||example.com",
             modifiers: [],
@@ -29,7 +32,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: true,
             pattern: "||example.com",
             modifiers: [
@@ -47,7 +49,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: true,
             exception: false,
             pattern: "/example/",
             modifiers: [],
@@ -57,7 +58,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: true,
             exception: true,
             pattern: "/example/",
             modifiers: [],
@@ -67,7 +67,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: true,
             exception: true,
             pattern: "/example/",
             modifiers: [
@@ -86,7 +85,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: true,
             exception: true,
             pattern: "/example/",
             modifiers: [
@@ -109,7 +107,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: true,
             exception: true,
             pattern: "/example/",
             modifiers: [
@@ -132,7 +129,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "example.com\\$m1",
             modifiers: [],
@@ -143,7 +139,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "example.com",
             modifiers: [
@@ -157,7 +152,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "example.com",
             modifiers: [
@@ -173,7 +167,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "/ad.js",
             modifiers: [
@@ -189,7 +182,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "/ad.js^",
             modifiers: [
@@ -204,7 +196,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "/ad.js^",
             modifiers: [
@@ -220,7 +211,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "example.com/a/b/c",
             modifiers: [
@@ -235,7 +225,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: false,
             pattern: "example.com",
             modifiers: [
@@ -256,7 +245,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: true,
             pattern: "/example/scripts/ad.js",
             modifiers: [
@@ -288,7 +276,6 @@ describe("NetworkRuleParser", () => {
             category: RuleCategories.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
-            regex: false,
             exception: true,
             pattern: "||example.org^",
             modifiers: [
@@ -298,6 +285,96 @@ describe("NetworkRuleParser", () => {
                 },
             ],
         });
+
+        // ADG removeheader
+        expect(NetworkRuleParser.parse(`||example.org^$removeheader=header-name`)).toEqual(<IRemoveHeaderNetworkRule>{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: false,
+            pattern: "||example.org^",
+            header: "header-name",
+        });
+
+        expect(NetworkRuleParser.parse(`@@||example.org^$removeheader=header-name`)).toEqual(<IRemoveHeaderNetworkRule>{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: true,
+            pattern: "||example.org^",
+            header: "header-name",
+        });
+
+        expect(NetworkRuleParser.parse(`||example.org^$removeheader=request:header-name`)).toEqual(<
+            IRemoveHeaderNetworkRule
+        >{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: false,
+            pattern: "||example.org^",
+            header: "request:header-name",
+        });
+
+        expect(NetworkRuleParser.parse(`@@||example.org^$removeheader=request:header-name`)).toEqual(<
+            IRemoveHeaderNetworkRule
+        >{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.AdGuard,
+            exception: true,
+            pattern: "||example.org^",
+            header: "request:header-name",
+        });
+
+        expect(() => NetworkRuleParser.parse(`||example.org^$removeheader=`)).toThrowError(
+            /^No header name specified in rule/
+        );
+
+        // uBO responseheader
+        expect(NetworkRuleParser.parse(`example.org##^responseheader(header-name)`)).toEqual(<IRemoveHeaderNetworkRule>{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.uBlockOrigin,
+            exception: false,
+            pattern: "example.org",
+            header: "header-name",
+        });
+
+        expect(NetworkRuleParser.parse(`example.org#@#^responseheader(header-name)`)).toEqual(<
+            IRemoveHeaderNetworkRule
+        >{
+            category: RuleCategories.Network,
+            type: NetworkRuleType.RemoveHeaderNetworkRule,
+            syntax: AdblockSyntax.uBlockOrigin,
+            exception: true,
+            pattern: "example.org",
+            header: "header-name",
+        });
+
+        expect(() => NetworkRuleParser.parse(`responseheader()`)).toThrowError(
+            "uBO responseheader filtering requires a valid uBO HTML rule separator"
+        );
+
+        expect(() => NetworkRuleParser.parse(`example.org#@#^responseheader()`)).toThrowError(
+            /^No header name specified in rule/
+        );
+
+        expect(() => NetworkRuleParser.parse(`example.org#@#^responseheader(  )`)).toThrowError(
+            /^No header name specified in rule/
+        );
+
+        expect(() => NetworkRuleParser.parse(`example.org#@#^responseheader(`)).toThrowError(
+            `uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`
+        );
+
+        expect(() => NetworkRuleParser.parse(`example.org#@#^responseheader(header-name`)).toThrowError(
+            `uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`
+        );
+
+        expect(() => NetworkRuleParser.parse(`example.org#@#^div + responseheader(header-name)`)).toThrowError(
+            `uBO responseheader filtering rule body must be start with "${UBO_RESPONSEHEADER_INDICATOR}"`
+        );
     });
 
     test("generate", () => {
@@ -322,6 +399,36 @@ describe("NetworkRuleParser", () => {
 
         expect(parseAndGenerate("@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/")).toEqual(
             "@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/"
+        );
+
+        // ADG removeheader
+        expect(parseAndGenerate(`||example.org^$removeheader=header-name`)).toEqual(
+            `||example.org^$removeheader=header-name`
+        );
+
+        expect(parseAndGenerate(`@@||example.org^$removeheader=header-name`)).toEqual(
+            `@@||example.org^$removeheader=header-name`
+        );
+
+        expect(parseAndGenerate(`||example.org^$removeheader=request:header-name`)).toEqual(
+            `||example.org^$removeheader=request:header-name`
+        );
+
+        expect(parseAndGenerate(`@@||example.org^$removeheader=request:header-name`)).toEqual(
+            `@@||example.org^$removeheader=request:header-name`
+        );
+
+        // uBO responseheader
+        expect(parseAndGenerate(`example.org##^responseheader(header-name)`)).toEqual(
+            `example.org##^responseheader(header-name)`
+        );
+
+        expect(parseAndGenerate(`example.org##^responseheader( header-name )`)).toEqual(
+            `example.org##^responseheader(header-name)`
+        );
+
+        expect(parseAndGenerate(`example.org#@#^responseheader(header-name)`)).toEqual(
+            `example.org#@#^responseheader(header-name)`
         );
     });
 });
