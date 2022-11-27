@@ -27,10 +27,10 @@ export enum CosmeticRuleSeparator {
     UboScriptletException = "#@#+js",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    UboHTML = "##^",
+    UboHtml = "##^",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    UboHTMLException = "#@#^",
+    UboHtmlException = "#@#^",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
     AdgCSSInject = "#$#",
@@ -178,7 +178,7 @@ export class CosmeticRuleSeparatorUtils {
      * @returns {boolean} true/false
      */
     public static isUblockHtml(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.UboHTML || separator == CosmeticRuleSeparator.UboHTMLException;
+        return separator == CosmeticRuleSeparator.UboHtml || separator == CosmeticRuleSeparator.UboHtmlException;
     }
 
     /**
@@ -269,7 +269,7 @@ export class CosmeticRuleSeparatorUtils {
                 }
                 // ##^
                 else if (rule[h + 2] == "^") {
-                    return [h, h + 3, CosmeticRuleSeparator.UboHTML, false];
+                    return [h, h + 3, CosmeticRuleSeparator.UboHtml, false];
                 }
                 // ##
                 return [h, h + 2, CosmeticRuleSeparator.AbpCSSElemhide, false];
@@ -314,7 +314,7 @@ export class CosmeticRuleSeparatorUtils {
                     }
                     // #@#^
                     else if (rule[h + 3] == "^") {
-                        return [h, h + 4, CosmeticRuleSeparator.UboHTMLException, true];
+                        return [h, h + 4, CosmeticRuleSeparator.UboHtmlException, true];
                     }
                     return [h, h + 3, CosmeticRuleSeparator.AbpCSSElemhideException, true];
                 }
