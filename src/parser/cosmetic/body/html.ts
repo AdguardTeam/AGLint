@@ -4,12 +4,10 @@
 
 import { Selector, SelectorList } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
-import { EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
+import { CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 import { DOUBLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
-
-const CSS_SELECTORS_SEPARATOR = ",";
 
 /**Represents an HTML filtering rule body. */
 export interface IHtmlRuleBody {

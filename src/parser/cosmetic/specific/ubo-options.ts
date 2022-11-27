@@ -7,12 +7,18 @@ import {
     PseudoClassSelector,
 } from "css-tree";
 import { UBO_COSMETIC_MODIFIERS } from "../../../converter/cosmetic-modifiers";
-import { CSS_PSEUDO_CLOSE, CSS_PSEUDO_MARKER, CSS_PSEUDO_OPEN, EMPTY, SPACE } from "../../../utils/constants";
+import {
+    CSS_NOT_PSEUDO,
+    CSS_PSEUDO_CLOSE,
+    CSS_PSEUDO_MARKER,
+    CSS_PSEUDO_OPEN,
+    EMPTY,
+    SPACE,
+} from "../../../utils/constants";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 import { IRuleModifier } from "../../common/modifier-list";
 
 export const UBO_MODIFIER_LIST_TYPE = "uBlockModifierList";
-const CSS_NOT_PSEUDO = "not";
 
 /** Represents uBlock's cosmetic rule modifiers. */
 export interface IuBlockModifierList {
@@ -112,7 +118,7 @@ export class UBlockModifierListParser {
             return <IuBlockModifierList>{
                 type: UBO_MODIFIER_LIST_TYPE,
                 modifiers: [],
-                rest: "",
+                rest: EMPTY,
             };
         }
 
@@ -139,7 +145,7 @@ export class UBlockModifierListParser {
                             // TODO: Fix CSSTree typedefs (first is getter now, not method)
                             // See: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62536
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            value: node && node.children ? generateCss(<any>node.children.first) : "",
+                            value: node && node.children ? generateCss(<any>node.children.first) : EMPTY,
                         };
 
                         if (prevPseudo && prevPseudo.name == CSS_NOT_PSEUDO) {

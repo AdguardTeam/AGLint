@@ -5,10 +5,13 @@
 import { Selector, SelectorList, MediaQueryList, Block, Rule, generate as generateCss } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
 import {
+    CSS_BLOCK_CLOSE,
+    CSS_BLOCK_OPEN,
     CSS_MEDIA_MARKER,
     CSS_PSEUDO_CLOSE,
     CSS_PSEUDO_MARKER,
     CSS_PSEUDO_OPEN,
+    CSS_SELECTORS_SEPARATOR,
     EMPTY,
     SPACE,
 } from "../../../utils/constants";
@@ -29,9 +32,6 @@ const UBO_CSS_INJECTION_PATTERN =
 const ADG_CSS_INJECTION_PATTERN = /^(?:.+){(?:.+)}$/;
 
 const REMOVE_BLOCK = "{ remove: true; }";
-const CSS_SELECTORS_SEPARATOR = ",";
-const CSS_BLOCK_OPEN = "{";
-const CSS_BLOCK_CLOSE = "}";
 const UBO_STYLE = "style";
 const UBO_REMOVE = "remove";
 const UBO_STYLE_MARKER = CSS_PSEUDO_MARKER + UBO_STYLE + CSS_PSEUDO_OPEN;

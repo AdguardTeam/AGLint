@@ -3,12 +3,10 @@
  */
 
 import { Selector, SelectorList } from "css-tree";
-import { SPACE } from "../../../utils/constants";
+import { CSS_SELECTORS_SEPARATOR, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 import { StringUtils } from "../../../utils/string";
-
-const CSS_SELECTORS_SEPARATOR = ",";
 
 /**
  * Represents an element hiding rule body. There can even be several selectors in a rule,

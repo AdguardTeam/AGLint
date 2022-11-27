@@ -25,11 +25,18 @@ export const ASSIGN_OPERATOR = "=";
 export const CSS_CLASS_MARKER = ".";
 export const CSS_ID_MARKER = "#";
 
+export const CSS_SELECTORS_SEPARATOR = ",";
+
 export const CSS_MEDIA_MARKER = "@media";
 
 export const CSS_PSEUDO_MARKER = ":";
 export const CSS_PSEUDO_OPEN = "(";
 export const CSS_PSEUDO_CLOSE = ")";
+
+export const CSS_NOT_PSEUDO = "not";
+
+export const CSS_BLOCK_OPEN = "{";
+export const CSS_BLOCK_CLOSE = "}";
 
 export const CSS_ATTRIBUTE_SELECTOR_OPEN = "[";
 export const CSS_ATTRIBUTE_SELECTOR_CLOSE = "]";
