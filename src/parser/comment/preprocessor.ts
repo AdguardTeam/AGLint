@@ -12,7 +12,7 @@ import { RuleCategories } from "../common";
 import { CommentRuleType, IComment } from "./common";
 
 const PREPROCESSOR_MARKER = "!#";
-const PREPROCESSOR_MARKER_LEN = 2;
+const PREPROCESSOR_MARKER_LEN = PREPROCESSOR_MARKER.length;
 const PREPROCESSOR_SEPARATOR = " ";
 
 /**

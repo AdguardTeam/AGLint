@@ -11,7 +11,7 @@ import { RuleCategories } from "../common";
 import { CommentRuleType, IComment } from "./common";
 
 const HINT_MARKER = "!+";
-const HINT_MARKER_LEN = 2;
+const HINT_MARKER_LEN = HINT_MARKER.length;
 const HINT_PARAMS_OPEN = "(";
 const HINT_PARAMS_CLOSE = ")";
 const HINT_PARAMS_SEPARATOR = ",";
