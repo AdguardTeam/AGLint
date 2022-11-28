@@ -11,9 +11,9 @@ import { ElementHidingBodyParser, ElementHidingRuleBody } from "./body/elementhi
 import { ScriptletBodyParser, ScriptletRuleBody } from "./body/scriptlet";
 import { HtmlBodyParser, HtmlRuleBody } from "./body/html";
 import { DomainListParser, DOMAIN_LIST_TYPE, Domain } from "../common/domain-list";
-import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "./specific/adg-options";
+import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "./specific/adg-modifiers";
 import { RuleModifier } from "../common/modifier-list";
-import { UboModifier, UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-options";
+import { UboModifier, UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-modifiers";
 import { CosmeticRuleType } from "./common";
 import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
 import { UBO_RESPONSEHEADER_INDICATOR } from "../network/network";
@@ -252,7 +252,7 @@ export class CosmeticRuleParser {
 
                 if (uboModifiers.length > 0) {
                     if (syntax == AdblockSyntax.Adg) {
-                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO options`);
+                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO modifiers`);
                     }
 
                     modifiers.push(...uboModifiers);
@@ -372,11 +372,11 @@ export class CosmeticRuleParser {
 
                 if (uboModifiers.length > 0) {
                     if (CosmeticRuleSeparatorUtils.isAdgHtml(separator)) {
-                        throw new SyntaxError(`Cannot use uBO options with ADG HTML filtering`);
+                        throw new SyntaxError(`Cannot use uBO modifiers with ADG HTML filtering`);
                     }
 
                     if (syntax == AdblockSyntax.Adg || adgModifiers.length > 0) {
-                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO options`);
+                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO modifiers`);
                     }
 
                     modifiers.push(...uboModifiers);

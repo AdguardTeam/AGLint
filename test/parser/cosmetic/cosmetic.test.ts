@@ -6,8 +6,8 @@ import { HtmlBodyParser } from "../../../src/parser/cosmetic/body/html";
 import { ScriptletBodyParser } from "../../../src/parser/cosmetic/body/scriptlet";
 import { CosmeticRuleType } from "../../../src/parser/cosmetic/common";
 import { CosmeticRuleParser } from "../../../src/parser/cosmetic/cosmetic";
-import { AdgModifierListParser } from "../../../src/parser/cosmetic/specific/adg-options";
-import { UboModifierListParser } from "../../../src/parser/cosmetic/specific/ubo-options";
+import { AdgModifierListParser } from "../../../src/parser/cosmetic/specific/adg-modifiers";
+import { UboModifierListParser } from "../../../src/parser/cosmetic/specific/ubo-modifiers";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -808,15 +808,15 @@ describe("CosmeticRuleParser", () => {
         expect(CosmeticRuleParser.parse("example.com,~example.net##^responseheader(a)")).toBeNull();
 
         expect(() => CosmeticRuleParser.parse("[$a=b]##:matches-path(/c) .ad")).toThrowError(
-            "Cannot use AdGuard modifier list with uBO options"
+            "Cannot use AdGuard modifier list with uBO modifiers"
         );
 
         expect(() => CosmeticRuleParser.parse("$$:matches-path(/c).ad")).toThrowError(
-            "Cannot use uBO options with ADG HTML filtering"
+            "Cannot use uBO modifiers with ADG HTML filtering"
         );
 
         expect(() => CosmeticRuleParser.parse("[$a=b]##^:matches-path(/c) .ad")).toThrowError(
-            "Cannot use AdGuard modifier list with uBO options"
+            "Cannot use AdGuard modifier list with uBO modifiers"
         );
 
         expect(() => CosmeticRuleParser.parse("[$a=b]##body:style(padding:0)")).toThrowError(

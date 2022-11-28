@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/ubo-options";
+import { UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/ubo-modifiers";
 import { EMPTY } from "../../../../src/utils/constants";
 
 describe("UboModifierListParser", () => {

@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/adg-options";
+import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/adg-modifiers";
 import { EMPTY } from "../../../../src/utils/constants";
 
 describe("AdgModifierListParser", () => {
