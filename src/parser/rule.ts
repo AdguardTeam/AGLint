@@ -21,9 +21,8 @@ export class RuleParser {
     /**
      * Parse an adblock rule. The type and syntax of the rule is determined automatically if possible.
      *
-     * @param raw - Raw rule
-     * @returns
-     * Network rule AST
+     * @param raw - Raw adblock rule
+     * @returns Adblock rule AST
      * @throws If the input matches a pattern but syntactically invalid
      */
     public static parse(
