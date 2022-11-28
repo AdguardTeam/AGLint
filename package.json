@@ -23,31 +23,21 @@
     },
     "homepage": "https://github.com/AdguardTeam/AGLint#readme",
     "type": "module",
-    "main": "dist/index.cjs",
-    "module": "dist/index.mjs",
-    "exports": {
-        ".": {
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs"
-        },
-        "./parser": {
-            "import": "./dist/parser/index.mjs",
-            "require": "./dist/parser/index.cjs"
-        }
-    },
-    "typings": "dist/types",
+    "main": "dist/aglint.cjs",
+    "module": "dist/aglint.mjs",
+    "types": "dist/aglint.d.ts",
     "files": [
         "dist",
         "src"
     ],
     "engines": {
-        "node": ">=12"
+        "node": ">=14"
     },
     "scripts": {
         "lint": "eslint . --ext .ts",
         "test": "jest --runInBand .",
         "coverage": "jest --coverage",
-        "build": "yarn rimraf dist && yarn rollup --config rollup.config.ts --configPlugin typescript && tsc --declaration --emitDeclarationOnly --outdir dist/types"
+        "build": "yarn rimraf dist && tsc --declaration --emitDeclarationOnly --outdir dist/types && yarn rollup --config rollup.config.ts --configPlugin typescript && yarn rimraf dist/types"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^23.0.2",

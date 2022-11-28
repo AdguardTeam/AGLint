@@ -99,7 +99,7 @@ example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 > *Please note that unnecessary spaces will disappear and CSS selectors will be regenerated according to uniform formatting*
 
 ```typescript
-import { RuleParser } from "aglint/parser";
+import { RuleParser } from "aglint";
 
 // General rules (ADG/uBO/ABP)
 console.log(RuleParser.generate(RuleParser.parse("##.ad")));
