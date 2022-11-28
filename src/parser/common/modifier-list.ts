@@ -42,16 +42,16 @@ export class ModifierListParser {
     /**
      * Parses the cosmetic rule modifiers, eg. `script,key=value`
      *
-     * @param rawModifiers - Raw modifiers
+     * @param raw - Raw modifiers
      * @returns Parsed modifiers interface
      */
-    public static parse(rawModifiers: string): ModifierList {
+    public static parse(raw: string): ModifierList {
         const result: ModifierList = {
             type: MODIFIER_LIST_TYPE,
             modifiers: [],
         };
 
-        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(rawModifiers, MODIFIERS_SEPARATOR);
+        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
         if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == EMPTY) {

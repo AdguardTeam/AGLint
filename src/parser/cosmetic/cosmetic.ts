@@ -200,27 +200,27 @@ export class CosmeticRuleParser {
      *  - separator
      *  - body
      *
-     * @param rawRule - Raw cosmetic rule
+     * @param raw - Raw cosmetic rule
      * @returns
      * Parsed cosmetic rule AST or null if it failed to parse based on the known cosmetic rules
      * @throws If the input matches the cosmetic rule pattern but syntactically invalid
      */
-    public static parse(rawRule: string): ElementHidingRule | CssRule | ScriptletRule | HtmlRule | JsRule | null {
+    public static parse(raw: string): ElementHidingRule | CssRule | ScriptletRule | HtmlRule | JsRule | null {
         // Skip regular comments
-        if (CommentParser.isRegularComment(rawRule)) {
+        if (CommentParser.isRegularComment(raw)) {
             return null;
         }
 
         // Find separator (every cosmetic rule has a separator)
-        const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(rawRule);
+        const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(raw);
 
         if (!separator) {
             return null;
         }
 
         // Find main structural elements
-        let rawPattern = rawRule.substring(0, start).trim();
-        let rawBody = rawRule.substring(end).trim();
+        let rawPattern = raw.substring(0, start).trim();
+        let rawBody = raw.substring(end).trim();
 
         // The syntax is initially unknown
         let syntax = AdblockSyntax.Unknown;
