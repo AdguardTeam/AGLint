@@ -1,7 +1,7 @@
 import { CommentParser } from "../../../src/parser/comment/comment";
 import { CommentRuleType } from "../../../src/parser/comment/common";
-import { IMetadata } from "../../../src/parser/comment/metadata";
-import { RuleCategories } from "../../../src/parser/common";
+import { Metadata } from "../../../src/parser/comment/metadata";
+import { RuleCategory } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -61,14 +61,14 @@ describe("CommentParser", () => {
 
         // Agents
         expect(CommentParser.parse("[]")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
         expect(CommentParser.parse("[Adblock Plus 2.0]")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -80,7 +80,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("[AdGuard]")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -92,8 +92,8 @@ describe("CommentParser", () => {
 
         // Hints
         expect(CommentParser.parse("!+ NOT_OPTIMIZED")).toEqual({
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -104,8 +104,8 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("!+NOT_OPTIMIZED")).toEqual({
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -116,8 +116,8 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("!+ NOT_OPTIMIZED PLATFORM(windows, mac) NOT_PLATFORM(android, ios)")).toEqual({
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -137,7 +137,7 @@ describe("CommentParser", () => {
 
         // Pre processors
         expect(CommentParser.parse("!#if (adguard)")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.PreProcessor,
             name: "if",
@@ -145,7 +145,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("!#if (adguard && !adguard_ext_safari)")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.PreProcessor,
             name: "if",
@@ -153,7 +153,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("!#include https://example.org/path/includedfile.txt")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.PreProcessor,
             name: "include",
@@ -161,8 +161,8 @@ describe("CommentParser", () => {
         });
 
         // Metadata
-        expect(CommentParser.parse("! Title: Filter")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(CommentParser.parse("! Title: Filter")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "!",
@@ -170,8 +170,8 @@ describe("CommentParser", () => {
             value: "Filter",
         });
 
-        expect(CommentParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(CommentParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "!",
@@ -179,8 +179,8 @@ describe("CommentParser", () => {
             value: "https://github.com/AdguardTeam/some-repo/wiki",
         });
 
-        expect(CommentParser.parse("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(CommentParser.parse("# Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "#",
@@ -190,7 +190,7 @@ describe("CommentParser", () => {
 
         // Config comments
         expect(CommentParser.parse("! aglint-disable rule1, rule2")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.ConfigComment,
             marker: "!",
@@ -199,7 +199,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("! aglint-enable rule1, rule2")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.ConfigComment,
             marker: "!",
@@ -208,7 +208,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("# aglint-disable rule1, rule2")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.ConfigComment,
             marker: "#",
@@ -217,7 +217,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("# aglint-enable rule1, rule2")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.ConfigComment,
             marker: "#",
@@ -226,7 +226,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse('! aglint rule1: "off", rule2: ["a", "b"] -- this is a comment')).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.ConfigComment,
             marker: "!",
@@ -239,7 +239,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse('# aglint rule1: "off", rule2: ["a", "b"] -- this is a comment')).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.ConfigComment,
             marker: "#",
@@ -253,7 +253,7 @@ describe("CommentParser", () => {
 
         // Comments
         expect(CommentParser.parse("! This is just a comment")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Comment,
             marker: "!",
@@ -261,7 +261,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("# This is just a comment")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Comment,
             marker: "#",
@@ -269,7 +269,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("!#########################")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Comment,
             marker: "!",
@@ -277,7 +277,7 @@ describe("CommentParser", () => {
         });
 
         expect(CommentParser.parse("##########################")).toEqual({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Comment,
             marker: "#",

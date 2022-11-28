@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 
 import { CommentRuleType } from "../../src/parser/comment/common";
-import { RuleCategories } from "../../src/parser/common";
+import { RuleCategory } from "../../src/parser/common";
 import { CosmeticRuleType } from "../../src/parser/cosmetic/common";
 import { NetworkRuleType } from "../../src/parser/network/common";
 import { RuleParser } from "../../src/parser/rule";
@@ -13,198 +13,198 @@ describe("RuleParser", () => {
 
         // Agents
         expect(RuleParser.parse("[Adblock Plus 2.0]")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Agent,
         });
 
         expect(RuleParser.parse("[Adblock Plus]")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Agent,
         });
 
         expect(RuleParser.parse("[AdGuard]")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Agent,
         });
 
         // Hints
         expect(RuleParser.parse("!+NOT_OPTIMIZED")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Hint,
         });
 
         expect(RuleParser.parse("!+ NOT_OPTIMIZED")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Hint,
         });
 
         expect(RuleParser.parse("!+ NOT_OPTIMIZED PLATFORM(windows, mac) NOT_PLATFORM(android, ios)")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Hint,
         });
 
         // Pre-processors
         expect(RuleParser.parse("!#if (adguard)")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.PreProcessor,
         });
 
         expect(RuleParser.parse("!#if (adguard && !adguard_ext_safari)")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.PreProcessor,
         });
 
         expect(RuleParser.parse("!#safari_cb_affinity")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.PreProcessor,
         });
 
         expect(RuleParser.parse("!#safari_cb_affinity(content_blockers)")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.PreProcessor,
         });
 
         // Inline linter configurations
         expect(RuleParser.parse("! aglint-enable")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
         });
 
         expect(RuleParser.parse("! aglint-disable")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
         });
 
         expect(RuleParser.parse('! aglint rule1: "off"')).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
         });
 
         // Metadata comments
         expect(RuleParser.parse("! Title: My List")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Metadata,
         });
 
         expect(RuleParser.parse("! Version: 2.0.150")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Metadata,
         });
 
         // Simple comments
         expect(RuleParser.parse("! This is just a comment")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Comment,
         });
 
         expect(RuleParser.parse("# This is just a comment")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Comment,
         });
 
         expect(RuleParser.parse("! https://github.com/AdguardTeam/AdguardFilters/issues/134623")).toMatchObject({
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Comment,
         });
 
         // Element hiding rules
         expect(RuleParser.parse("##.ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##.ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#.ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#.ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: true,
         });
 
         expect(RuleParser.parse("##.ad:-abp-has(.ad)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##.ad:-abp-has(.ad)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#.ad:-abp-has(.ad)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#.ad:-abp-has(.ad)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
             exception: true,
         });
 
         // CSS injections (AdGuard)
         expect(RuleParser.parse("#$#body { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net#$#body { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("#$#.ads { remove: true; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("#@$#body { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@$#body { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("#@$#.ads { remove: true; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(
             RuleParser.parse("#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
@@ -213,18 +213,18 @@ describe("RuleParser", () => {
                 "example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(
             RuleParser.parse("#@$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
@@ -233,37 +233,37 @@ describe("RuleParser", () => {
                 "example.com,~example.net#@$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("#$?#body:has(.ads) { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net#$?#body:has(.ads) { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("#@$?#body:has(.ads) { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@$?#body:has(.ads) { padding: 0; }")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
@@ -272,9 +272,9 @@ describe("RuleParser", () => {
                 "#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
@@ -283,9 +283,9 @@ describe("RuleParser", () => {
                 "example.com,~example.net#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
@@ -294,9 +294,9 @@ describe("RuleParser", () => {
                 "#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
@@ -305,502 +305,502 @@ describe("RuleParser", () => {
                 "example.com,~example.net#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         // CSS injections (uBlock)
         expect(RuleParser.parse("##body:style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##body:style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("##.ads:remove()")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#body:style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#body:style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("#@#.ads:remove()")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("##body:has(.ads):style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##body:has(.ads):style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#body:has(.ads):style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#body:has(.ads):style(padding: 0;)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         // Scriptlets (AdGuard)
         expect(RuleParser.parse("#%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net#%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject(
             {
-                category: RuleCategories.Cosmetic,
+                category: RuleCategory.Cosmetic,
                 type: CosmeticRuleType.ScriptletRule,
-                syntax: AdblockSyntax.AdGuard,
+                syntax: AdblockSyntax.Adg,
                 exception: true,
             }
         );
 
         // Scriptlets (uBlock)
         expect(RuleParser.parse("##+js(scriptlet0, arg0, arg1)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##+js(scriptlet0, arg0, arg1)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#+js(scriptlet0, arg0, arg1)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#+js(scriptlet0, arg0, arg1)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         // Snippets (Adblock Plus)
         expect(RuleParser.parse("#$#scriptlet0 arg0 arg1")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net#$#scriptlet0 arg0 arg1")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(RuleParser.parse("#@$#scriptlet0 arg0 arg1")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@$#scriptlet0 arg0 arg1")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         // ; at end
         expect(RuleParser.parse("#$#scriptlet0 arg0 arg1;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net#$#scriptlet0 arg0 arg1;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(RuleParser.parse("#@$#scriptlet0 arg0 arg1;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@$#scriptlet0 arg0 arg1;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         // Multiple snippets (Adblock Plus)
         expect(RuleParser.parse("#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(
             RuleParser.parse("example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(RuleParser.parse("#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         expect(
             RuleParser.parse("example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         // ; at end
         expect(RuleParser.parse("#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
         });
 
         expect(
             RuleParser.parse("example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
         });
 
         expect(RuleParser.parse("#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         expect(
             RuleParser.parse("example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
         });
 
         // HTML filters (AdGuard)
         expect(RuleParser.parse('$$script[tag-content="adblock"]')).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse('example.com,~example.net$$script[tag-content="adblock"]')).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse('$@$script[tag-content="adblock"]')).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse('example.com,~example.net$@$script[tag-content="adblock"]')).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         // HTML filters (uBlock)
         expect(RuleParser.parse("##^script:has-text(adblock)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##^script:has-text(adblock)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#^script:has-text(adblock)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#^script:has-text(adblock)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("##^script:has-text(adblock), script:has-text(detector)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(
             RuleParser.parse("example.com,~example.net##^script:has-text(adblock), script:has-text(detector)")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#^script:has-text(adblock), script:has-text(detector)")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(
             RuleParser.parse("example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)")
         ).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         // JS inject (AdGuard)
         expect(RuleParser.parse("#%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net#%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("#@%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         // AdGuard modifiers/options
         expect(RuleParser.parse("[$app=com.something]#%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("[$app=com.something]example.com,~example.net#%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
         });
 
         expect(RuleParser.parse("[$app=com.something]#@%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         expect(RuleParser.parse("[$app=com.something]example.com,~example.net#@%#const a = 2;")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
         });
 
         // uBlock modifiers/options
         expect(RuleParser.parse("##:matches-path(/path) .ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("example.com,~example.net##:matches-path(/path) .ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
         });
 
         expect(RuleParser.parse("#@#:matches-path(/path) .ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         expect(RuleParser.parse("example.com,~example.net#@#:matches-path(/path) .ad")).toMatchObject({
-            category: RuleCategories.Cosmetic,
+            category: RuleCategory.Cosmetic,
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
         });
 
         // Network rules
         expect(RuleParser.parse("||example.com")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: false,
         });
 
         expect(RuleParser.parse("@@||example.com")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: true,
         });
 
         expect(RuleParser.parse("/regex/")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: false,
         });
 
         expect(RuleParser.parse("@@/regex/")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: true,
         });
 
         expect(RuleParser.parse("/regex/$m1,m2=v2")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: false,
         });
 
         expect(RuleParser.parse("@@/regex/$m1,m2=v2")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: true,
         });
 
         expect(RuleParser.parse("/example/$m1,m2=v2,m3=/^r3$/")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: false,
         });
 
         expect(RuleParser.parse("@@/example/$m1,m2=v2,m3=/^r3$/")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: true,
         });
 
         expect(RuleParser.parse("/ad.js^$m1=/^v1$/")).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: false,
@@ -809,7 +809,7 @@ describe("RuleParser", () => {
         expect(
             RuleParser.parse("@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/")
         ).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: true,
@@ -818,7 +818,7 @@ describe("RuleParser", () => {
         expect(
             RuleParser.parse("@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i")
         ).toMatchObject({
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: true,

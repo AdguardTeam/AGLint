@@ -1,6 +1,6 @@
 import { CommentRuleType } from "../../../src/parser/comment/common";
-import { HintParser, IHint } from "../../../src/parser/comment/hint";
-import { RuleCategories } from "../../../src/parser/common";
+import { HintParser, Hint } from "../../../src/parser/comment/hint";
+import { RuleCategory } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -20,24 +20,24 @@ describe("HintParser", () => {
 
     test("parse", () => {
         // Empty
-        expect(HintParser.parse("!+")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [],
         });
 
-        expect(HintParser.parse("!+ ")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ ")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [],
         });
 
         // Without parameters
-        expect(HintParser.parse("!+NOT_OPTIMIZED")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+NOT_OPTIMIZED")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -47,9 +47,9 @@ describe("HintParser", () => {
             ],
         });
 
-        expect(HintParser.parse("!+ NOT_OPTIMIZED")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ NOT_OPTIMIZED")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -60,9 +60,9 @@ describe("HintParser", () => {
         });
 
         // Multiple, without parameters
-        expect(HintParser.parse("!+ HINT_NAME1 HINT_NAME2")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ HINT_NAME1 HINT_NAME2")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -77,9 +77,9 @@ describe("HintParser", () => {
         });
 
         // Without parameters, but with empty parameter list ()
-        expect(HintParser.parse("!+ HINT_NAME1()")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ HINT_NAME1()")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -89,9 +89,9 @@ describe("HintParser", () => {
             ],
         });
 
-        expect(HintParser.parse("!+ HINT_NAME1(     )")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ HINT_NAME1(     )")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -101,9 +101,9 @@ describe("HintParser", () => {
             ],
         });
 
-        expect(HintParser.parse("!+ HINT_NAME1() HINT_NAME2()")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ HINT_NAME1() HINT_NAME2()")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -118,9 +118,9 @@ describe("HintParser", () => {
         });
 
         // Variadic
-        expect(HintParser.parse("!+ HINT_NAME1(param0, param1) HINT_NAME2()")).toEqual(<IHint>{
-            category: RuleCategories.Comment,
-            syntax: AdblockSyntax.AdGuard,
+        expect(HintParser.parse("!+ HINT_NAME1(param0, param1) HINT_NAME2()")).toEqual(<Hint>{
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Adg,
             type: CommentRuleType.Hint,
             hints: [
                 {
@@ -136,9 +136,9 @@ describe("HintParser", () => {
 
         expect(HintParser.parse("!+ HINT_NAME1(param0, param1) HINT_NAME2(param0)")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -156,9 +156,9 @@ describe("HintParser", () => {
         // Skipped parameters
         expect(HintParser.parse("!+ HINT_NAME(param0, , param1)")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -171,9 +171,9 @@ describe("HintParser", () => {
 
         expect(HintParser.parse("!+ HINT_NAME(param0, , , )")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -186,9 +186,9 @@ describe("HintParser", () => {
 
         expect(HintParser.parse("!+ HINT_NAME( , , , )")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -201,9 +201,9 @@ describe("HintParser", () => {
 
         expect(HintParser.parse("!+ HINT_NAME(,,,)")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -217,9 +217,9 @@ describe("HintParser", () => {
         // Spaces
         expect(HintParser.parse("!+ HINT_NAME(    p0  ,   p1 ,   p2 ,     p3)")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -232,9 +232,9 @@ describe("HintParser", () => {
 
         expect(HintParser.parse("!+ HINT_NAME(hello world, hello   world)")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {
@@ -247,9 +247,9 @@ describe("HintParser", () => {
 
         expect(HintParser.parse("!+ hint_name(hello world, hello   world)")).toEqual(
             // eslint-disable-next-line prettier/prettier
-            <IHint>{
-                category: RuleCategories.Comment,
-                syntax: AdblockSyntax.AdGuard,
+            <Hint>{
+                category: RuleCategory.Comment,
+                syntax: AdblockSyntax.Adg,
                 type: CommentRuleType.Hint,
                 hints: [
                     {

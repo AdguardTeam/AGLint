@@ -1,21 +1,21 @@
 /* eslint-disable max-len */
-import { UBlockModifierListParser, UBO_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/ubo-options";
+import { UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/ubo-options";
 import { EMPTY } from "../../../../src/utils/constants";
 
-describe("UBlockModifierListParser", () => {
-    test("hasUblockModifierIndicators", async () => {
-        expect(UBlockModifierListParser.hasUblockModifierIndicators(":matches-path(/path).ad")).toBe(true);
-        expect(
-            UBlockModifierListParser.hasUblockModifierIndicators(":matches-path(/path).ad:matches-path(/path)")
-        ).toBe(true);
+describe("UboModifierListParser", () => {
+    test("hasUboModifierIndicators", async () => {
+        expect(UboModifierListParser.hasUboModifierIndicators(":matches-path(/path).ad")).toBe(true);
+        expect(UboModifierListParser.hasUboModifierIndicators(":matches-path(/path).ad:matches-path(/path)")).toBe(
+            true
+        );
 
-        expect(UBlockModifierListParser.hasUblockModifierIndicators(":matches-path2(/path).ad")).toBe(false);
+        expect(UboModifierListParser.hasUboModifierIndicators(":matches-path2(/path).ad")).toBe(false);
 
-        expect(UBlockModifierListParser.hasUblockModifierIndicators(".ad")).toBe(false);
+        expect(UboModifierListParser.hasUboModifierIndicators(".ad")).toBe(false);
     });
 
     test("parse", async () => {
-        expect(UBlockModifierListParser.parse(":matches-path(/path).ad")).toEqual({
+        expect(UboModifierListParser.parse(":matches-path(/path).ad")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -28,7 +28,7 @@ describe("UBlockModifierListParser", () => {
         });
 
         // trim
-        expect(UBlockModifierListParser.parse(":matches-path(/path) .ad")).toEqual({
+        expect(UboModifierListParser.parse(":matches-path(/path) .ad")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -40,7 +40,7 @@ describe("UBlockModifierListParser", () => {
             rest: ".ad",
         });
 
-        expect(UBlockModifierListParser.parse(":matches-path() .ad")).toEqual({
+        expect(UboModifierListParser.parse(":matches-path() .ad")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -52,7 +52,7 @@ describe("UBlockModifierListParser", () => {
             rest: ".ad",
         });
 
-        expect(UBlockModifierListParser.parse(":matches-path() .ad")).toEqual({
+        expect(UboModifierListParser.parse(":matches-path() .ad")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -65,7 +65,7 @@ describe("UBlockModifierListParser", () => {
         });
 
         expect(
-            UBlockModifierListParser.parse(
+            UboModifierListParser.parse(
                 ":matches-path(a) .ad:matches-path(b):matches-path(c) > .something:matches-path(d) > .advert"
             )
         ).toEqual({
@@ -96,7 +96,7 @@ describe("UBlockModifierListParser", () => {
         });
 
         // not
-        expect(UBlockModifierListParser.parse(":not(:matches-path(/path)) .ad")).toEqual({
+        expect(UboModifierListParser.parse(":not(:matches-path(/path)) .ad")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -109,7 +109,7 @@ describe("UBlockModifierListParser", () => {
         });
 
         expect(
-            UBlockModifierListParser.parse(
+            UboModifierListParser.parse(
                 ":not(:matches-path(a)) .ad:matches-path(b):not(:matches-path(c)) > .something:matches-path(d) > .advert"
             )
         ).toEqual({
@@ -140,20 +140,20 @@ describe("UBlockModifierListParser", () => {
         });
 
         // No uBO modifier
-        expect(UBlockModifierListParser.parse(".ad:-abp-has(.something)")).toEqual({
+        expect(UboModifierListParser.parse(".ad:-abp-has(.something)")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [],
             rest: ".ad:-abp-has(.something)",
         });
 
-        expect(UBlockModifierListParser.parse(EMPTY)).toEqual({
+        expect(UboModifierListParser.parse(EMPTY)).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [],
             rest: EMPTY,
         });
 
         // trim
-        expect(UBlockModifierListParser.parse("  ")).toEqual({
+        expect(UboModifierListParser.parse("  ")).toEqual({
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers: [],
             rest: EMPTY,
@@ -162,10 +162,10 @@ describe("UBlockModifierListParser", () => {
 
     test("generate", async () => {
         const parseAndGenerate = (raw: string) => {
-            const ast = UBlockModifierListParser.parse(raw);
+            const ast = UboModifierListParser.parse(raw);
 
             if (ast) {
-                return UBlockModifierListParser.generate(ast);
+                return UboModifierListParser.generate(ast);
             }
 
             return null;

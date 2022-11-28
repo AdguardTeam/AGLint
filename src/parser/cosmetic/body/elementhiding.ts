@@ -12,7 +12,7 @@ import { StringUtils } from "../../../utils/string";
  * Represents an element hiding rule body. There can even be several selectors in a rule,
  * but the best practice is to place the selectors in separate rules.
  */
-export interface IElementHidingRuleBody {
+export interface ElementHidingRuleBody {
     selectors: Selector[];
 }
 
@@ -36,12 +36,12 @@ export class ElementHidingBodyParser {
     /**
      * Parses a raw cosmetic rule body as an element hiding rule body.
      *
-     * @param {string} raw - Raw body
-     * @returns {IElementHidingRuleBody | null} Element hiding rule body AST
+     * @param raw - Raw body
+     * @returns Element hiding rule body AST
      * @throws
      *   - If the selector is invalid according to the CSS syntax
      */
-    public static parse(raw: string): IElementHidingRuleBody {
+    public static parse(raw: string): ElementHidingRuleBody {
         const trimmed = raw.trim();
 
         const selectors: Selector[] = [];
@@ -69,10 +69,10 @@ export class ElementHidingBodyParser {
     /**
      * Converts an element hiding rule body AST to a string.
      *
-     * @param {IElementHidingRuleBody} ast - Element hiding rule body AST
-     * @returns {string} Raw string
+     * @param ast - Element hiding rule body AST
+     * @returns Raw string
      */
-    public static generate(ast: IElementHidingRuleBody): string {
+    public static generate(ast: ElementHidingRuleBody): string {
         return ast.selectors
             .map((selector) => CssTree.generateSelector(selector))
             .join(CSS_SELECTORS_SEPARATOR + SPACE);

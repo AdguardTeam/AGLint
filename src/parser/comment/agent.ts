@@ -1,8 +1,8 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { SPACE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
-import { RuleCategories } from "../common";
-import { CommentMarker, CommentRuleType, IComment } from "./common";
+import { RuleCategory } from "../common";
+import { CommentMarker, CommentRuleType, Comment } from "./common";
 
 const AGENT_LIST_OPEN = "[";
 const AGENT_LIST_CLOSE = "]";
@@ -12,7 +12,7 @@ const AGENT_SEPARATOR = ";";
  * Represents an agent (eg `Adblock Plus 2.0`, where adblock is `Adblock Plus` and version is `2.0`).
  * Specifying the version is optional.
  */
-export interface IAgentMember {
+export interface AgentMember {
     adblock: string;
     version?: string;
 }
@@ -34,9 +34,9 @@ export interface IAgentMember {
  *    [uBlock Origin]
  *    ```
  */
-export interface IAgent extends IComment {
+export interface Agent extends Comment {
     type: CommentRuleType.Agent;
-    agents: IAgentMember[];
+    agents: AgentMember[];
 }
 
 /**
@@ -59,8 +59,8 @@ export class AgentParser {
     /**
      * Determines whether a rule is an adblock agent.
      *
-     * @param {string} raw - Raw rule
-     * @returns {boolean} true/false
+     * @param raw - Raw rule
+     * @returns true/false
      */
     public static isAgent(raw: string): boolean {
         const trimmed = raw.trim();
@@ -77,15 +77,15 @@ export class AgentParser {
     /**
      * Parses an adblock agent member.
      *
-     * @param {string} raw - Raw agent member, eg `Adblock Plus 2.0`
-     * @returns {IAgentMember} - Agent member AST
+     * @param raw - Raw agent member, eg `Adblock Plus 2.0`
+     * @returns - Agent member AST
      * @example
      * ```js
      * AgentParser.parseAgent('Adblock Plus 2.0');
      * AgentParser.parseAgent('uBlock Origin 1.40.1');
      * ```
      */
-    private static parseAgent(raw: string): IAgentMember {
+    private static parseAgent(raw: string): AgentMember {
         const trimmed = raw.trim();
         const splitted = trimmed.split(SPACE);
 
@@ -112,10 +112,10 @@ export class AgentParser {
     /**
      * Parses a raw rule as an adblock agent comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IAgent | null} Adblock agent AST or null (if the raw rule cannot be parsed as an adblock agent comment)
+     * @param raw - Raw rule
+     * @returns Adblock agent AST or null (if the raw rule cannot be parsed as an adblock agent comment)
      */
-    public static parse(raw: string): IAgent | null {
+    public static parse(raw: string): Agent | null {
         const trimmed = raw.trim();
 
         // Check basic adblock agents pattern: [...], ![...], ! [...], #[...], etc.
@@ -141,7 +141,7 @@ export class AgentParser {
 
         // Parse content between brackets
         if (openingBracketIndex != -1) {
-            const collectedAgents: IAgentMember[] = [];
+            const collectedAgents: AgentMember[] = [];
             const rawAgents = trimmed.slice(openingBracketIndex + 1, -1);
             const agents = rawAgents.split(AGENT_SEPARATOR);
             for (const agent of agents) {
@@ -155,7 +155,7 @@ export class AgentParser {
             }
 
             return {
-                category: RuleCategories.Comment,
+                category: RuleCategory.Comment,
                 type: CommentRuleType.Agent,
                 syntax: AdblockSyntax.Unknown,
                 agents: collectedAgents,
@@ -168,10 +168,10 @@ export class AgentParser {
     /**
      * Converts an adblock agent AST to a string.
      *
-     * @param {IAgent} ast - Agent AST
-     * @returns {string} Raw string
+     * @param ast - Agent AST
+     * @returns Raw string
      */
-    public static generate(ast: IAgent): string {
+    public static generate(ast: Agent): string {
         let result = AGENT_LIST_OPEN;
 
         result += ast.agents

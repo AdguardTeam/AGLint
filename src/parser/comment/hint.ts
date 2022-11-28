@@ -7,8 +7,8 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { EMPTY, SPACE, UNDERSCORE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
-import { RuleCategories } from "../common";
-import { CommentRuleType, IComment } from "./common";
+import { RuleCategory } from "../common";
+import { CommentRuleType, Comment } from "./common";
 
 const HINT_MARKER = "!+";
 const HINT_MARKER_LEN = HINT_MARKER.length;
@@ -23,7 +23,7 @@ const HINT_PARAMS_SEPARATOR = ",";
  * ```
  * the name would be `PLATFORM` and the params would be `["windows", "mac"]`.
  */
-export interface IHintMember {
+export interface HintMember {
     name: string;
     params: string[];
 }
@@ -37,11 +37,11 @@ export interface IHintMember {
  * ```
  * then there are two hint members: `NOT_OPTIMIZED` and `PLATFORM`.
  */
-export interface IHint extends IComment {
-    category: RuleCategories.Comment;
+export interface Hint extends Comment {
+    category: RuleCategory.Comment;
     type: CommentRuleType.Hint;
-    syntax: AdblockSyntax.AdGuard;
-    hints: IHintMember[];
+    syntax: AdblockSyntax.Adg;
+    hints: HintMember[];
 }
 
 /**
@@ -53,8 +53,8 @@ export class HintParser {
     /**
      * Determines whether the rule is a hint rule.
      *
-     * @param {string} raw - Raw rule
-     * @returns {boolean} true/false
+     * @param raw - Raw rule
+     * @returns true/false
      */
     public static isHint(raw: string): boolean {
         return raw.trim().startsWith(HINT_MARKER);
@@ -63,19 +63,19 @@ export class HintParser {
     /**
      * Parses a raw rule as a hint comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IHint | null} Hint AST or null (if the raw rule cannot be parsed as a hint comment)
+     * @param raw - Raw rule
+     * @returns Hint AST or null (if the raw rule cannot be parsed as a hint comment)
      * @throws If the input matches the HINT pattern but syntactically invalid
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints-1}
      */
-    public static parse(raw: string): IHint | null {
+    public static parse(raw: string): Hint | null {
         const trimmed = raw.trim();
 
         if (!HintParser.isHint(trimmed)) {
             return null;
         }
 
-        const collectedMembers: IHintMember[] = [];
+        const collectedMembers: HintMember[] = [];
 
         let openingBracketIndex = -1;
         let collectedHintName = EMPTY;
@@ -169,9 +169,9 @@ export class HintParser {
         }
 
         return {
-            category: RuleCategories.Comment,
+            category: RuleCategory.Comment,
             type: CommentRuleType.Hint,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             hints: collectedMembers,
         };
     }
@@ -179,10 +179,10 @@ export class HintParser {
     /**
      * Converts a hint AST to a string.
      *
-     * @param {IHint} ast - Hint AST
-     * @returns {string} Raw string
+     * @param ast - Hint AST
+     * @returns Raw string
      */
-    public static generate(ast: IHint): string {
+    public static generate(ast: Hint): string {
         let result = HINT_MARKER + SPACE;
 
         result += ast.hints

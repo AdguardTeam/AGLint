@@ -1,13 +1,13 @@
 import { StringUtils } from "../../utils/string";
 import { CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
-import { CommentMarker, CommentRuleType, IComment } from "./common";
-import { AgentParser, IAgent } from "./agent";
-import { HintParser, IHint } from "./hint";
-import { IMetadata, MetadataParser } from "./metadata";
-import { IPreProcessor, PreProcessorParser } from "./preprocessor";
-import { RuleCategories } from "../common";
+import { CommentMarker, CommentRuleType, Comment } from "./common";
+import { AgentParser, Agent } from "./agent";
+import { HintParser, Hint } from "./hint";
+import { Metadata, MetadataParser } from "./metadata";
+import { PreProcessor, PreProcessorParser } from "./preprocessor";
+import { RuleCategory } from "../common";
 import { AdblockSyntax } from "../../utils/adblockers";
-import { ConfigCommentParser, IConfigComment } from "./inline-config";
+import { ConfigCommentParser, ConfigComment } from "./inline-config";
 
 /**
  * Represents a simple comment.
@@ -21,7 +21,7 @@ import { ConfigCommentParser, IConfigComment } from "./inline-config";
  *     ```
  *   - etc.
  */
-export interface ISimpleComment extends IComment {
+export interface SimpleComment extends Comment {
     type: CommentRuleType.Comment;
 
     /** Comment marker: `!` or `#` */
@@ -86,8 +86,8 @@ export class CommentParser {
     /**
      * Determines whether a rule is a regular comment.
      *
-     * @param {string} raw - Raw data
-     * @returns {boolean} true/false
+     * @param raw - Raw data
+     * @returns true/false
      */
     public static isRegularComment(raw: string): boolean {
         return raw.trim()[0] == CommentMarker.Regular;
@@ -96,8 +96,8 @@ export class CommentParser {
     /**
      * Determines whether a rule is a comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {boolean} true/false
+     * @param raw - Raw rule
+     * @returns true/false
      */
     public static isComment(raw: string): boolean {
         const trimmed = raw.trim();
@@ -133,10 +133,10 @@ export class CommentParser {
     /**
      * Parses a raw rule as comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IComment | null} Comment AST or null (if the raw rule cannot be parsed as comment)
+     * @param raw - Raw rule
+     * @returns Comment AST or null (if the raw rule cannot be parsed as comment)
      */
-    public static parse(raw: string): IComment | null {
+    public static parse(raw: string): Comment | null {
         const trimmed = raw.trim();
 
         if (!CommentParser.isComment(trimmed)) {
@@ -149,8 +149,8 @@ export class CommentParser {
             PreProcessorParser.parse(trimmed) ||
             MetadataParser.parse(trimmed) ||
             ConfigCommentParser.parse(trimmed) ||
-            <IComment>{
-                category: RuleCategories.Comment,
+            <Comment>{
+                category: RuleCategory.Comment,
                 type: CommentRuleType.Comment,
                 syntax: AdblockSyntax.Unknown,
                 marker: trimmed[0],
@@ -162,23 +162,23 @@ export class CommentParser {
     /**
      * Converts a comment AST to a string.
      *
-     * @param {IComment} ast - Comment AST
-     * @returns {string} Raw string
+     * @param ast - Comment AST
+     * @returns Raw string
      */
-    public static generate(ast: IComment): string {
+    public static generate(ast: Comment): string {
         switch (ast.type) {
             case CommentRuleType.Agent:
-                return AgentParser.generate(<IAgent>ast);
+                return AgentParser.generate(<Agent>ast);
             case CommentRuleType.Hint:
-                return HintParser.generate(<IHint>ast);
+                return HintParser.generate(<Hint>ast);
             case CommentRuleType.PreProcessor:
-                return PreProcessorParser.generate(<IPreProcessor>ast);
+                return PreProcessorParser.generate(<PreProcessor>ast);
             case CommentRuleType.Metadata:
-                return MetadataParser.generate(<IMetadata>ast);
+                return MetadataParser.generate(<Metadata>ast);
             case CommentRuleType.ConfigComment:
-                return ConfigCommentParser.generate(<IConfigComment>ast);
+                return ConfigCommentParser.generate(<ConfigComment>ast);
             case CommentRuleType.Comment:
-                return (<ISimpleComment>ast).marker + (<ISimpleComment>ast).text;
+                return (<SimpleComment>ast).marker + (<SimpleComment>ast).text;
         }
     }
 }

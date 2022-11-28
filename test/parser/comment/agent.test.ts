@@ -1,6 +1,6 @@
-import { AgentParser, IAgent } from "../../../src/parser/comment/agent";
+import { AgentParser, Agent } from "../../../src/parser/comment/agent";
 import { CommentRuleType } from "../../../src/parser/comment/common";
-import { RuleCategories } from "../../../src/parser/common";
+import { RuleCategory } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -32,64 +32,64 @@ describe("AgentParser", () => {
         expect(AgentParser.parse(SPACE)).toBeNull();
 
         // Valid agents
-        expect(AgentParser.parse("[]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[ ]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[ ]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[  ]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[  ]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[;]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[;]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[ ; ]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[ ; ]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[  ;  ]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[  ;  ]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[;;;]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[;;;]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[ ; ; ; ]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[ ; ; ; ]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [],
         });
 
-        expect(AgentParser.parse("[AdBlock]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[AdBlock]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -99,8 +99,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[AdGuard]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[AdGuard]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -110,8 +110,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[uBlock]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[uBlock]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -121,8 +121,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[uBlock Origin]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[uBlock Origin]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -132,8 +132,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[Adblock Plus 2.0]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[Adblock Plus 2.0]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -144,8 +144,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[uBlock Origin 1.0.0]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[uBlock Origin 1.0.0]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -156,8 +156,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[Adblock Plus 2.0; AdGuard]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[Adblock Plus 2.0; AdGuard]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -171,8 +171,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[Adblock Plus 2.0; AdGuard 1.0.1.10]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[Adblock Plus 2.0; AdGuard 1.0.1.10]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -187,8 +187,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("[Adblock Plus 3.1; AdGuard 1.4; uBlock Origin 1.0.15.0]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[Adblock Plus 3.1; AdGuard 1.4; uBlock Origin 1.0.15.0]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -207,8 +207,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("![Adblock Plus 3.1]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("![Adblock Plus 3.1]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -219,8 +219,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("! [Adblock Plus 3.1]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("! [Adblock Plus 3.1]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -231,8 +231,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("#[Adblock Plus 3.1]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("#[Adblock Plus 3.1]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -243,8 +243,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("# [Adblock Plus 3.1]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("# [Adblock Plus 3.1]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -255,8 +255,8 @@ describe("AgentParser", () => {
             ],
         });
 
-        expect(AgentParser.parse("# [Adblock Plus 3.1 beta]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("# [Adblock Plus 3.1 beta]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [
@@ -268,8 +268,8 @@ describe("AgentParser", () => {
         });
 
         // Syntactically this is fine:
-        expect(AgentParser.parse("[2.0]")).toEqual(<IAgent>{
-            category: RuleCategories.Comment,
+        expect(AgentParser.parse("[2.0]")).toEqual(<Agent>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Agent,
             agents: [

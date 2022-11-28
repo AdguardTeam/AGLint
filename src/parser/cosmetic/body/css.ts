@@ -47,7 +47,7 @@ export const REMOVE_BLOCK_TYPE = "remove";
 export type CssInjectionBlock = Block | typeof REMOVE_BLOCK_TYPE;
 
 /** Represents a CSS injection body. */
-export interface ICssRuleBody {
+export interface CssRuleBody {
     mediaQueryList?: MediaQueryList;
     selectors: Selector[];
     block?: CssInjectionBlock;
@@ -88,10 +88,10 @@ export class CssInjectionBodyParser {
     /**
      * Checks if a selector is a uBlock CSS injection.
      *
-     * @param {string} raw - Raw selector body
-     * @returns {boolean} true/false
+     * @param raw - Raw selector body
+     * @returns true/false
      */
-    public static isUblockCssInjection(raw: string): boolean {
+    public static isUboCssInjection(raw: string): boolean {
         const trimmed = raw.trim();
 
         // Since it has to run for every elementhide rule, the regex would be slow,
@@ -106,18 +106,18 @@ export class CssInjectionBodyParser {
     /**
      * Checks if a selector is an AdGuard CSS injection.
      *
-     * @param {string} raw - Raw selector body
-     * @returns {boolean} true/false
+     * @param raw - Raw selector body
+     * @returns true/false
      */
-    public static isAdGuardCssInjection(raw: string) {
+    public static isAdgCssInjection(raw: string) {
         return ADG_CSS_INJECTION_PATTERN.test(raw.trim());
     }
 
     /**
      * Parses a raw selector as an AdGuard CSS injection.
      *
-     * @param {string} raw - Raw rule
-     * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
+     * @param raw - Raw rule
+     * @returns CSS injection AST or null (if the raw rule cannot be parsed
      * as AdGuard CSS injection)
      * @throws
      *   - If the selector is invalid according to the CSS syntax
@@ -125,11 +125,11 @@ export class CssInjectionBodyParser {
      *   - If several remove properties have been declared
      *   - If there are other declarations in addition to the remove property
      */
-    public static parseAdGuardCssInjection(raw: string): ICssRuleBody | null {
+    public static parseAdgCssInjection(raw: string): CssRuleBody | null {
         const trimmed = raw.trim();
 
         // Check pattern first
-        if (!CssInjectionBodyParser.isAdGuardCssInjection(trimmed)) {
+        if (!CssInjectionBodyParser.isAdgCssInjection(trimmed)) {
             return null;
         }
 
@@ -202,22 +202,22 @@ export class CssInjectionBodyParser {
     /**
      * Parses a raw selector as a uBlock CSS injection.
      *
-     * @param {string} raw - Raw rule
-     * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
+     * @param raw - Raw rule
+     * @returns CSS injection AST or null (if the raw rule cannot be parsed
      * as uBlock CSS injection)
      */
-    public static parseUblockCssInjection(raw: string): ICssRuleBody | null {
+    public static parseUboCssInjection(raw: string): CssRuleBody | null {
         const trimmed = raw.trim();
 
         // Check pattern first
-        const uBlockCssInjection = trimmed.match(UBO_CSS_INJECTION_PATTERN);
-        if (!(uBlockCssInjection && uBlockCssInjection.groups)) {
+        const uboCssInjection = trimmed.match(UBO_CSS_INJECTION_PATTERN);
+        if (!(uboCssInjection && uboCssInjection.groups)) {
             return null;
         }
 
         const selectors: Selector[] = [];
 
-        const rawSelectorList = uBlockCssInjection.groups.selectors.trim();
+        const rawSelectorList = uboCssInjection.groups.selectors.trim();
         const selectorListAst = <SelectorList>CssTree.parse(rawSelectorList, CssTreeParserContext.selectorList);
 
         selectorListAst.children.forEach((node) => {
@@ -233,8 +233,8 @@ export class CssInjectionBodyParser {
 
         let block: CssInjectionBlock = REMOVE_BLOCK_TYPE;
 
-        if (uBlockCssInjection.groups.declarations) {
-            const rawDeclarations = uBlockCssInjection.groups.declarations.trim();
+        if (uboCssInjection.groups.declarations) {
+            const rawDeclarations = uboCssInjection.groups.declarations.trim();
 
             // Hack: CSS parser waits for `{declarations}` pattern, so we need { and } chars:
             block = <Block>CssTree.parse(`{${rawDeclarations}}`, CssTreeParserContext.block);
@@ -249,38 +249,38 @@ export class CssInjectionBodyParser {
     /**
      * Parses a raw selector as a CSS injection. It determines the syntax automatically.
      *
-     * @param {string} raw - Raw rule
-     * @returns {ICssRuleBody | null} CSS injection AST or null (if the raw rule cannot be parsed
+     * @param raw - Raw rule
+     * @returns CSS injection AST or null (if the raw rule cannot be parsed
      * as CSS injection)
      */
-    public static parse(raw: string): ICssRuleBody | null {
+    public static parse(raw: string): CssRuleBody | null {
         const trimmed = raw.trim();
 
         // AdGuard CSS injection
-        const result = CssInjectionBodyParser.parseAdGuardCssInjection(trimmed);
+        const result = CssInjectionBodyParser.parseAdgCssInjection(trimmed);
         if (result) {
             return result;
         }
 
         // uBlock CSS injection
-        return CssInjectionBodyParser.parseUblockCssInjection(trimmed);
+        return CssInjectionBodyParser.parseUboCssInjection(trimmed);
     }
 
     /**
      * Converts a CSS injection AST to a string.
      *
-     * @param {ICssRuleBody} ast - CSS injection rule body AST
-     * @param {AdblockSyntax} syntax - Desired syntax of the generated result
-     * @returns {string} Raw string
+     * @param ast - CSS injection rule body AST
+     * @param syntax - Desired syntax of the generated result
+     * @returns Raw string
      * @throws
      *   - If you generate a media query with uBlock syntax
      *   - If you enter unsupported syntax
      */
-    public static generate(ast: ICssRuleBody, syntax: AdblockSyntax): string {
+    public static generate(ast: CssRuleBody, syntax: AdblockSyntax): string {
         let result = EMPTY;
 
         switch (syntax) {
-            case AdblockSyntax.AdGuard: {
+            case AdblockSyntax.Adg: {
                 if (ast.mediaQueryList) {
                     result += CSS_MEDIA_MARKER;
                     result += SPACE;
@@ -317,7 +317,7 @@ export class CssInjectionBodyParser {
                 break;
             }
 
-            case AdblockSyntax.uBlockOrigin: {
+            case AdblockSyntax.Ubo: {
                 if (ast.mediaQueryList !== undefined) {
                     throw new SyntaxError("uBlock doesn't support media queries");
                 }

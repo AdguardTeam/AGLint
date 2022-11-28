@@ -16,15 +16,15 @@ import {
     SPACE,
 } from "../../../utils/constants";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
-import { IRuleModifier } from "../../common/modifier-list";
+import { RuleModifier } from "../../common/modifier-list";
 
-export const UBO_MODIFIER_LIST_TYPE = "uBlockModifierList";
+export const UBO_MODIFIER_LIST_TYPE = "UboModifierList";
 
 /** Represents uBlock's cosmetic rule modifiers. */
-export interface IuBlockModifierList {
+export interface UboModifierList {
     // Basically, the idea is that each main AST part should have a type
     type: typeof UBO_MODIFIER_LIST_TYPE;
-    modifiers: UblockModifier[];
+    modifiers: UboModifier[];
     rest: string;
 }
 
@@ -36,12 +36,12 @@ export interface IuBlockModifierList {
  * example.com##:not(:matches-path(/path)) .ad
  * ```
  */
-export interface UblockModifier extends IRuleModifier {
+export interface UboModifier extends RuleModifier {
     not?: boolean;
 }
 
 /**
- * UBlockModifierListParser is responsible for parsing uBlock cosmetic rule modifiers.
+ * UboModifierListParser is responsible for parsing uBlock cosmetic rule modifiers.
  *
  * They follow the syntax of pseudo classes, but they are actually part of the targeting,
  * not the selector.
@@ -51,15 +51,15 @@ export interface UblockModifier extends IRuleModifier {
  * example.com##:matches-path(/path) .ads
  * ```
  */
-export class UBlockModifierListParser {
+export class UboModifierListParser {
     /**
      * Checks if there is a uBO modifier indicator in the selector.
      * The motivation is to have a lightweight check before expensive parsing.
      *
-     * @param {string} raw - Raw selector
-     * @returns {boolean} true/false
+     * @param raw - Raw selector
+     * @returns true/false
      */
-    public static hasUblockModifierIndicators(raw: string): boolean {
+    public static hasUboModifierIndicators(raw: string): boolean {
         return (
             UBO_COSMETIC_MODIFIERS.find(
                 // eslint-disable-next-line @typescript-eslint/no-loop-func
@@ -107,15 +107,15 @@ export class UBlockModifierListParser {
      *
      * @see {@link https://github.com/gorhill/uBlock/wiki/Procedural-cosmetic-filters#subjectmatches-patharg}
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#non-basic-rules-modifiers-path}
-     * @param {string} raw - Raw selector
-     * @returns {IuBlockModifierList} Parsed uBO modifiers and rest of the selector
+     * @param raw - Raw selector
+     * @returns Parsed uBO modifiers and rest of the selector
      */
-    public static parse(raw: string): IuBlockModifierList {
+    public static parse(raw: string): UboModifierList {
         const trimmed = raw.trim();
 
         // Handle empty case (otherwise CSSTree throws error for the empty selector)
         if (trimmed.length == 0) {
-            return <IuBlockModifierList>{
+            return <UboModifierList>{
                 type: UBO_MODIFIER_LIST_TYPE,
                 modifiers: [],
                 rest: EMPTY,
@@ -129,7 +129,7 @@ export class UBlockModifierListParser {
         });
 
         let prevPseudo: PseudoClassSelector | null = null;
-        const modifiers: UblockModifier[] = [];
+        const modifiers: UboModifier[] = [];
 
         // Initially, we keep the entire selector
         const keep = Array(trimmed.length).fill(true);
@@ -140,7 +140,7 @@ export class UBlockModifierListParser {
                     if (UBO_COSMETIC_MODIFIERS.includes(node.name)) {
                         // If the previous pseudo selector was :not(), then the
                         // entire :not(:ubo-modifier(...)) must be omitted
-                        const common: IRuleModifier = {
+                        const common: RuleModifier = {
                             modifier: node.name,
                             // TODO: Fix CSSTree typedefs (first is getter now, not method)
                             // See: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62536
@@ -190,7 +190,7 @@ export class UBlockModifierListParser {
             }
         }
 
-        return <IuBlockModifierList>{
+        return <UboModifierList>{
             type: UBO_MODIFIER_LIST_TYPE,
             modifiers,
             rest: rest.trim(),
@@ -200,10 +200,10 @@ export class UBlockModifierListParser {
     /**
      * Converts a uBO modifier (option) list AST to a string.
      *
-     * @param {IuBlockModifierList} ast - Modifier list AST
-     * @returns {string} Raw string
+     * @param ast - Modifier list AST
+     * @returns Raw string
      */
-    public static generate(ast: IuBlockModifierList): string {
+    public static generate(ast: UboModifierList): string {
         let result = EMPTY;
 
         result += ast.modifiers

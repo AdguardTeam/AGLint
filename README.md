@@ -47,7 +47,7 @@ will gives you this AST:
 {
     "category": "Cosmetic",
     "type": "ScriptletRule",
-    "syntax": "AdGuard",
+    "syntax": "Adg",
     "exception": false,
     "modifiers": [],
     "domains": [

@@ -1,74 +1,74 @@
 /* eslint-disable max-len */
 import { Selector } from "css-tree";
-import { CssInjectionBodyParser, ICssRuleBody, REMOVE_BLOCK_TYPE } from "../../../../src/parser/cosmetic/body/css";
+import { CssInjectionBodyParser, CssRuleBody, REMOVE_BLOCK_TYPE } from "../../../../src/parser/cosmetic/body/css";
 import { AdblockSyntax } from "../../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../../src/utils/constants";
 import { CssTree } from "../../../../src/utils/csstree";
 import { CssTreeParserContext } from "../../../../src/utils/csstree-constants";
 
 describe("CssInjectionBodyParser", () => {
-    test("isUblockCssInjection", () => {
-        expect(CssInjectionBodyParser.isUblockCssInjection(EMPTY)).toBe(false);
-        expect(CssInjectionBodyParser.isUblockCssInjection(SPACE)).toBe(false);
+    test("isUboCssInjection", () => {
+        expect(CssInjectionBodyParser.isUboCssInjection(EMPTY)).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection(SPACE)).toBe(false);
 
-        expect(CssInjectionBodyParser.isUblockCssInjection(".ad")).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection(".ad")).toBe(false);
 
-        expect(CssInjectionBodyParser.isUblockCssInjection("body {}")).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection("body {}")).toBe(false);
 
-        expect(CssInjectionBodyParser.isUblockCssInjection("body { padding-top: 0 !important; }")).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection("body { padding-top: 0 !important; }")).toBe(false);
 
         expect(
-            CssInjectionBodyParser.isUblockCssInjection(
+            CssInjectionBodyParser.isUboCssInjection(
                 "@media (min-width: 1024px) { body { padding-top: 0 !important; } }"
             )
         ).toBe(false);
 
         // Empty
-        expect(CssInjectionBodyParser.isUblockCssInjection("body:style()")).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection("body:style()")).toBe(false);
 
-        expect(CssInjectionBodyParser.isUblockCssInjection("body:style(padding-top: 0 !important;)")).toBe(true);
+        expect(CssInjectionBodyParser.isUboCssInjection("body:style(padding-top: 0 !important;)")).toBe(true);
 
-        expect(CssInjectionBodyParser.isUblockCssInjection("body:ad-component:remove()")).toBe(true);
+        expect(CssInjectionBodyParser.isUboCssInjection("body:ad-component:remove()")).toBe(true);
     });
 
-    test("isAdGuardCssInjection", () => {
-        expect(CssInjectionBodyParser.isAdGuardCssInjection(EMPTY)).toBe(false);
-        expect(CssInjectionBodyParser.isAdGuardCssInjection(SPACE)).toBe(false);
+    test("isAdgCssInjection", () => {
+        expect(CssInjectionBodyParser.isAdgCssInjection(EMPTY)).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection(SPACE)).toBe(false);
 
-        expect(CssInjectionBodyParser.isAdGuardCssInjection(".ad")).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection(".ad")).toBe(false);
 
         // Empty
-        expect(CssInjectionBodyParser.isAdGuardCssInjection("body {}")).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection("body {}")).toBe(false);
 
-        expect(CssInjectionBodyParser.isAdGuardCssInjection("body { padding-top: 0 !important; }")).toBe(true);
+        expect(CssInjectionBodyParser.isAdgCssInjection("body { padding-top: 0 !important; }")).toBe(true);
 
         expect(
-            CssInjectionBodyParser.isAdGuardCssInjection(
+            CssInjectionBodyParser.isAdgCssInjection(
                 "@media (min-width: 1024px) { body { padding-top: 0 !important; } }"
             )
         ).toBe(true);
 
-        expect(CssInjectionBodyParser.isAdGuardCssInjection("body:style()")).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection("body:style()")).toBe(false);
 
-        expect(CssInjectionBodyParser.isAdGuardCssInjection("body:style(padding-top: 0 !important;)")).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection("body:style(padding-top: 0 !important;)")).toBe(false);
 
-        expect(CssInjectionBodyParser.isAdGuardCssInjection("body:ad-component:remove()")).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection("body:ad-component:remove()")).toBe(false);
     });
 
-    test("parseAdGuardCssInjection", () => {
-        expect(CssInjectionBodyParser.parseAdGuardCssInjection("body { padding-top: 0 !important; }")).toEqual(<
-            ICssRuleBody
+    test("parseAdgCssInjection", () => {
+        expect(CssInjectionBodyParser.parseAdgCssInjection("body { padding-top: 0 !important; }")).toEqual(<
+            CssRuleBody
         >{
             selectors: [CssTree.parse("body", CssTreeParserContext.selector)],
             block: CssTree.parse("{ padding-top: 0 !important; }", CssTreeParserContext.block),
         });
 
         expect(
-            CssInjectionBodyParser.parseAdGuardCssInjection(
+            CssInjectionBodyParser.parseAdgCssInjection(
                 // eslint-disable-next-line max-len
                 "body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }"
             )
-        ).toEqual(<ICssRuleBody>{
+        ).toEqual(<CssRuleBody>{
             selectors: [
                 CssTree.parse("body", CssTreeParserContext.selector),
                 CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
@@ -81,11 +81,11 @@ describe("CssInjectionBodyParser", () => {
 
         // Complicated case: Media query, ExtCss selector
         expect(
-            CssInjectionBodyParser.parseAdGuardCssInjection(
+            CssInjectionBodyParser.parseAdgCssInjection(
                 // eslint-disable-next-line max-len
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; } }"
             )
-        ).toEqual(<ICssRuleBody>{
+        ).toEqual(<CssRuleBody>{
             mediaQueryList: CssTree.parse(
                 "(min-width: 1000px) and (max-width: 2000px)",
                 CssTreeParserContext.mediaQueryList
@@ -101,8 +101,8 @@ describe("CssInjectionBodyParser", () => {
         });
 
         // Remove
-        expect(CssInjectionBodyParser.parseAdGuardCssInjection("body > section[ad-source] { remove: true; }")).toEqual(<
-            ICssRuleBody
+        expect(CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { remove: true; }")).toEqual(<
+            CssRuleBody
         >{
             selectors: [CssTree.parse("body > section[ad-source]", CssTreeParserContext.selector)],
             block: REMOVE_BLOCK_TYPE,
@@ -110,48 +110,46 @@ describe("CssInjectionBodyParser", () => {
 
         // Invalid cases
         expect(() =>
-            CssInjectionBodyParser.parseAdGuardCssInjection("body > section[ad-source] { remove: true; remove: true; }")
+            CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { remove: true; remove: true; }")
         ).toThrowError(/^Multiple remove property found in the following CSS injection body:/);
 
         expect(() =>
-            CssInjectionBodyParser.parseAdGuardCssInjection("body > section[ad-source] { remove: true; padding: 0; }")
+            CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { remove: true; padding: 0; }")
         ).toThrowError(
             /^In addition to the remove property, the following CSS injection body also uses other properties:/
         );
 
         expect(() =>
-            CssInjectionBodyParser.parseAdGuardCssInjection("body > section[ad-source] { padding: 0; remove: true; }")
+            CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { padding: 0; remove: true; }")
         ).toThrowError(
             /^In addition to the remove property, the following CSS injection body also uses other properties:/
         );
 
         expect(() =>
-            CssInjectionBodyParser.parseAdGuardCssInjection(
+            CssInjectionBodyParser.parseAdgCssInjection(
                 "body > section[ad-source] { margin: 0; remove: true; padding: 0; }"
             )
         ).toThrowError(
             /^In addition to the remove property, the following CSS injection body also uses other properties:/
         );
 
-        expect(() =>
-            CssInjectionBodyParser.parseAdGuardCssInjection("body > section[ad-source] { asd }")
-        ).toThrowError();
+        expect(() => CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { asd }")).toThrowError();
     });
 
-    test("parseUblockCssInjection", () => {
-        expect(CssInjectionBodyParser.parseUblockCssInjection("body:style(padding-top: 0 !important;)")).toEqual(<
-            ICssRuleBody
+    test("parseUboCssInjection", () => {
+        expect(CssInjectionBodyParser.parseUboCssInjection("body:style(padding-top: 0 !important;)")).toEqual(<
+            CssRuleBody
         >{
             selectors: [CssTree.parse("body", CssTreeParserContext.selector)],
             block: CssTree.parse("{ padding-top: 0 !important; }", CssTreeParserContext.block),
         });
 
         expect(
-            CssInjectionBodyParser.parseUblockCssInjection(
+            CssInjectionBodyParser.parseUboCssInjection(
                 // eslint-disable-next-line max-len
                 "body, section:has(.something):style(padding-top: 0 !important; padding-bottom: 0 !important; color: red !important;)"
             )
-        ).toEqual(<ICssRuleBody>{
+        ).toEqual(<CssRuleBody>{
             selectors: [
                 CssTree.parse("body", CssTreeParserContext.selector),
                 CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
@@ -163,15 +161,13 @@ describe("CssInjectionBodyParser", () => {
         });
 
         // Remove
-        expect(CssInjectionBodyParser.parseUblockCssInjection("body > section[ad-source]:remove()")).toEqual(<
-            ICssRuleBody
-        >{
+        expect(CssInjectionBodyParser.parseUboCssInjection("body > section[ad-source]:remove()")).toEqual(<CssRuleBody>{
             selectors: [CssTree.parse("body > section[ad-source]", CssTreeParserContext.selector)],
             block: REMOVE_BLOCK_TYPE,
         });
 
         // Invalid
-        expect(CssInjectionBodyParser.parseUblockCssInjection("body { padding: 0; }")).toBe(null);
+        expect(CssInjectionBodyParser.parseUboCssInjection("body { padding: 0; }")).toBe(null);
     });
 
     test("parse", () => {
@@ -180,7 +176,7 @@ describe("CssInjectionBodyParser", () => {
                 // eslint-disable-next-line max-len
                 "body, section:has(.something):style(padding-top: 0 !important; padding-bottom: 0 !important; color: red !important;)"
             )
-        ).toEqual(<ICssRuleBody>{
+        ).toEqual(<CssRuleBody>{
             selectors: [
                 CssTree.parse("body", CssTreeParserContext.selector),
                 CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
@@ -191,7 +187,7 @@ describe("CssInjectionBodyParser", () => {
             ),
         });
 
-        expect(CssInjectionBodyParser.parse("body, section:has(.something):remove()")).toEqual(<ICssRuleBody>{
+        expect(CssInjectionBodyParser.parse("body, section:has(.something):remove()")).toEqual(<CssRuleBody>{
             selectors: [
                 CssTree.parse("body", CssTreeParserContext.selector),
                 CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
@@ -204,7 +200,7 @@ describe("CssInjectionBodyParser", () => {
                 // eslint-disable-next-line max-len
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; } }"
             )
-        ).toEqual(<ICssRuleBody>{
+        ).toEqual(<CssRuleBody>{
             mediaQueryList: CssTree.parse(
                 "(min-width: 1000px) and (max-width: 2000px)",
                 CssTreeParserContext.mediaQueryList
@@ -223,7 +219,7 @@ describe("CssInjectionBodyParser", () => {
             CssInjectionBodyParser.parse(
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { remove: true; } }"
             )
-        ).toEqual(<ICssRuleBody>{
+        ).toEqual(<CssRuleBody>{
             mediaQueryList: CssTree.parse(
                 "(min-width: 1000px) and (max-width: 2000px)",
                 CssTreeParserContext.mediaQueryList
@@ -247,17 +243,17 @@ describe("CssInjectionBodyParser", () => {
             return null;
         };
 
-        expect(parseAndGenerate("body { padding: 0!important; }", AdblockSyntax.AdGuard)).toEqual(
+        expect(parseAndGenerate("body { padding: 0!important; }", AdblockSyntax.Adg)).toEqual(
             "body { padding: 0 !important; }"
         );
 
-        expect(parseAndGenerate("body > .ad:remove()", AdblockSyntax.uBlockOrigin)).toEqual("body > .ad:remove()");
+        expect(parseAndGenerate("body > .ad:remove()", AdblockSyntax.Ubo)).toEqual("body > .ad:remove()");
 
         expect(
             parseAndGenerate(
                 // eslint-disable-next-line max-len
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { remove: true; } }",
-                AdblockSyntax.AdGuard
+                AdblockSyntax.Adg
             )
         ).toEqual(
             "@media (min-width:1000px) and (max-width:2000px) { body, section:has(.something) { remove: true; } }"
@@ -268,7 +264,7 @@ describe("CssInjectionBodyParser", () => {
                 {
                     selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
                 },
-                AdblockSyntax.AdGuard
+                AdblockSyntax.Adg
             )
         ).toEqual(".test { }");
 
@@ -277,7 +273,7 @@ describe("CssInjectionBodyParser", () => {
                 {
                     selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
                 },
-                AdblockSyntax.uBlockOrigin
+                AdblockSyntax.Ubo
             )
         ).toEqual(".test:style()");
 
@@ -286,14 +282,14 @@ describe("CssInjectionBodyParser", () => {
                 {
                     selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
                 },
-                AdblockSyntax.AdblockPlus
+                AdblockSyntax.Abp
             )
         ).toThrowError(/^Unsupported syntax:/);
 
         expect(() =>
             parseAndGenerate(
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { remove: true; } }",
-                AdblockSyntax.uBlockOrigin
+                AdblockSyntax.Ubo
             )
         ).toThrowError("uBlock doesn't support media queries");
     });

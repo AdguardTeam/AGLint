@@ -6,8 +6,8 @@ import { HtmlBodyParser } from "../../../src/parser/cosmetic/body/html";
 import { ScriptletBodyParser } from "../../../src/parser/cosmetic/body/scriptlet";
 import { CosmeticRuleType } from "../../../src/parser/cosmetic/common";
 import { CosmeticRuleParser } from "../../../src/parser/cosmetic/cosmetic";
-import { AdGuardModifierListParser } from "../../../src/parser/cosmetic/specific/adg-options";
-import { UBlockModifierListParser } from "../../../src/parser/cosmetic/specific/ubo-options";
+import { AdgModifierListParser } from "../../../src/parser/cosmetic/specific/adg-options";
+import { UboModifierListParser } from "../../../src/parser/cosmetic/specific/ubo-options";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -124,7 +124,7 @@ describe("CosmeticRuleParser", () => {
         // Valid CSS inject (AdGuard)
         expect(CosmeticRuleParser.parse("#$#body { padding: 0; }")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -134,7 +134,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#$#body { padding: 0; }")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -144,7 +144,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@$#body { padding: 0; }")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: [],
@@ -154,7 +154,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@$#body { padding: 0; }")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -167,7 +167,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }")
         ).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -181,7 +181,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("#$#@media(min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }")
         ).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -197,7 +197,7 @@ describe("CosmeticRuleParser", () => {
             )
         ).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -210,7 +210,7 @@ describe("CosmeticRuleParser", () => {
         // Valid ExtendedCSS inject (AdGuard)
         expect(CosmeticRuleParser.parse("#$?#body:-abp-has(.ad) { padding: 0; }")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -222,7 +222,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#$?#body:-abp-has(.ad) { padding: 0; }")
         ).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -232,7 +232,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@$?#body:-abp-has(.ad) { padding: 0; }")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: [],
@@ -244,7 +244,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#@$?#body:-abp-has(.ad) { padding: 0; }")
         ).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -255,7 +255,7 @@ describe("CosmeticRuleParser", () => {
         // Valid CSS inject (uBlock)
         expect(CosmeticRuleParser.parse("##body:style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: [],
@@ -265,7 +265,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net##body:style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -275,7 +275,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@#body:style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: [],
@@ -285,7 +285,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@#body:style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -296,7 +296,7 @@ describe("CosmeticRuleParser", () => {
         // Valid ExtendedCSS inject (uBlock)
         expect(CosmeticRuleParser.parse("##body:has(.ad):style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: [],
@@ -306,7 +306,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net##body:has(.ad):style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -316,7 +316,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@#body:has(.ad):style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: [],
@@ -326,7 +326,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@#body:has(.ad):style(padding: 0;)")).toMatchObject({
             type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -337,7 +337,7 @@ describe("CosmeticRuleParser", () => {
         // Valid scriptlet inject (AdGuard)
         expect(CosmeticRuleParser.parse("#%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -349,7 +349,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#%#//scriptlet('scriptlet0', 'arg0', 'arg1')")
         ).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -359,7 +359,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: [],
@@ -371,7 +371,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')")
         ).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -382,7 +382,7 @@ describe("CosmeticRuleParser", () => {
         // Valid scriptlet inject (uBlock)
         expect(CosmeticRuleParser.parse("##+js(scriptlet0, arg0, arg1)")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: [],
@@ -392,7 +392,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net##+js(scriptlet0, arg0, arg1)")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -402,7 +402,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@#+js(scriptlet0, arg0, arg1)")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: [],
@@ -412,7 +412,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@#+js(scriptlet0, arg0, arg1)")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -423,7 +423,7 @@ describe("CosmeticRuleParser", () => {
         // Valid scriptlet inject (ABP)
         expect(CosmeticRuleParser.parse("#$#scriptlet0 arg0 arg1")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
             modifiers: [],
             domains: [],
@@ -433,7 +433,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#$#scriptlet0 arg0 arg1")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -443,7 +443,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@$#scriptlet0 arg0 arg1")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
             modifiers: [],
             domains: [],
@@ -453,7 +453,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@$#scriptlet0 arg0 arg1")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -463,7 +463,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
             modifiers: [],
             domains: [],
@@ -475,7 +475,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")
         ).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -485,7 +485,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
             modifiers: [],
             domains: [],
@@ -497,7 +497,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")
         ).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -507,7 +507,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
             modifiers: [],
             domains: [],
@@ -519,7 +519,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")
         ).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -529,7 +529,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
             modifiers: [],
             domains: [],
@@ -541,7 +541,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;")
         ).toMatchObject({
             type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.AdblockPlus,
+            syntax: AdblockSyntax.Abp,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -552,7 +552,7 @@ describe("CosmeticRuleParser", () => {
         // Valid HTML filters (AdGuard)
         expect(CosmeticRuleParser.parse('$$script[tag-content="adblock"]')).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -562,7 +562,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse('example.com,~example.net$$script[tag-content="adblock"]')).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -572,7 +572,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse('$@$script[tag-content="adblock"]')).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: [],
@@ -582,7 +582,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse('example.com,~example.net$@$script[tag-content="adblock"]')).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -593,7 +593,7 @@ describe("CosmeticRuleParser", () => {
         // Valid HTML filters (uBlock)
         expect(CosmeticRuleParser.parse("##^script:has-text(adblock)")).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: [],
@@ -603,7 +603,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net##^script:has-text(adblock)")).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -613,7 +613,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@#^script:has-text(adblock)")).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: [],
@@ -623,7 +623,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@#^script:has-text(adblock)")).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -633,7 +633,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("##^script:has-text(adblock), script:has-text(detector)")).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: [],
@@ -645,7 +645,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net##^script:has-text(adblock), script:has-text(detector)")
         ).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -655,7 +655,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@#^script:has-text(adblock), script:has-text(detector)")).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: [],
@@ -667,7 +667,7 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)")
         ).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -678,7 +678,7 @@ describe("CosmeticRuleParser", () => {
         // Valid JS injections (AdGuard)
         expect(CosmeticRuleParser.parse("#%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: [],
@@ -688,7 +688,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -698,7 +698,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: [],
@@ -708,7 +708,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -720,9 +720,9 @@ describe("CosmeticRuleParser", () => {
         // ! At this point, we aren't yet testing the conflict between the domain modifier and the classic domain list
         expect(CosmeticRuleParser.parse("[$app=com.something]#%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
-            modifiers: AdGuardModifierListParser.parse("[$app=com.something]").modifiers,
+            modifiers: AdgModifierListParser.parse("[$app=com.something]").modifiers,
             domains: [],
             separator: "#%#",
             body: "const a = 2;",
@@ -730,9 +730,9 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("[$app=com.something,anything=123]#%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
-            modifiers: AdGuardModifierListParser.parse("[$app=com.something,anything=123]").modifiers,
+            modifiers: AdgModifierListParser.parse("[$app=com.something,anything=123]").modifiers,
             domains: [],
             separator: "#%#",
             body: "const a = 2;",
@@ -740,9 +740,9 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("[$app=com.something]example.com,~example.net#%#const a = 2;")).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
-            modifiers: AdGuardModifierListParser.parse("[$app=com.something]").modifiers,
+            modifiers: AdgModifierListParser.parse("[$app=com.something]").modifiers,
             domains: DomainListParser.parse("example.com,~example.net").domains,
             separator: "#%#",
             body: "const a = 2;",
@@ -752,9 +752,9 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("[$app=com.something,anything=123]example.com,~example.net#%#const a = 2;")
         ).toMatchObject({
             type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.AdGuard,
+            syntax: AdblockSyntax.Adg,
             exception: false,
-            modifiers: AdGuardModifierListParser.parse("[$app=com.something,anything=123]").modifiers,
+            modifiers: AdgModifierListParser.parse("[$app=com.something,anything=123]").modifiers,
             domains: DomainListParser.parse("example.com,~example.net").domains,
             separator: "#%#",
             body: "const a = 2;",
@@ -763,9 +763,9 @@ describe("CosmeticRuleParser", () => {
         // uBlock modifiers/options
         expect(CosmeticRuleParser.parse("##:matches-path(/path) .ad")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
-            modifiers: UBlockModifierListParser.parse(":matches-path(/path)").modifiers,
+            modifiers: UboModifierListParser.parse(":matches-path(/path)").modifiers,
             domains: [],
             separator: "##",
             body: ElementHidingBodyParser.parse(".ad"),
@@ -773,9 +773,9 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net##:matches-path(/path) .ad")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
-            modifiers: UBlockModifierListParser.parse(":matches-path(/path)").modifiers,
+            modifiers: UboModifierListParser.parse(":matches-path(/path)").modifiers,
             domains: DomainListParser.parse("example.com,~example.net").domains,
             separator: "##",
             body: ElementHidingBodyParser.parse(".ad"),
@@ -785,9 +785,9 @@ describe("CosmeticRuleParser", () => {
             CosmeticRuleParser.parse("example.com,~example.net##^:matches-path(/path) script:has-text(detect)")
         ).toMatchObject({
             type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: false,
-            modifiers: UBlockModifierListParser.parse(":matches-path(/path)").modifiers,
+            modifiers: UboModifierListParser.parse(":matches-path(/path)").modifiers,
             domains: DomainListParser.parse("example.com,~example.net").domains,
             separator: "##^",
             body: HtmlBodyParser.parse("script:has-text(detect)"),
