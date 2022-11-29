@@ -4,15 +4,13 @@
 
 import { Selector, SelectorList } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
-import { EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
+import { CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 import { DOUBLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
 
-const CSS_SELECTORS_SEPARATOR = ",";
-
 /**Represents an HTML filtering rule body. */
-export interface IHtmlRuleBody {
+export interface HtmlRuleBody {
     selectors: Selector[];
 }
 
@@ -30,8 +28,8 @@ export class HtmlBodyParser {
     /**
      * Convert "" to \" within strings, because CSSTree does not recognize "".
      *
-     * @param {string} selector - CSS selector string
-     * @returns {string} Escaped CSS selector
+     * @param selector - CSS selector string
+     * @returns Escaped CSS selector
      * @throws
      *   - If the selector is invalid according to the CSS syntax
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content}
@@ -61,8 +59,8 @@ export class HtmlBodyParser {
     /**
      * Convert \" to "" within strings.
      *
-     * @param {string} selector - CSS selector string
-     * @returns {string} Unescaped CSS selector
+     * @param selector - CSS selector string
+     * @returns Unescaped CSS selector
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content}
      */
     public static unescapeDoubleQuotes(selector: string): string {
@@ -87,10 +85,10 @@ export class HtmlBodyParser {
      * Parses a raw cosmetic rule body as an HTML filtering rule body.
      * Please note that compatibility is not yet checked at this point.
      *
-     * @param {string} raw - Raw body
-     * @returns {IHtmlRuleBody | null} HTML filtering rule body AST
+     * @param raw - Raw body
+     * @returns HTML filtering rule body AST
      */
-    public static parse(raw: string): IHtmlRuleBody {
+    public static parse(raw: string): HtmlRuleBody {
         const trimmed = raw.trim();
 
         const selectors: Selector[] = [];
@@ -121,17 +119,17 @@ export class HtmlBodyParser {
     /**
      * Converts an HTML filtering rule body AST to a string.
      *
-     * @param {IHtmlRuleBody} ast - HTML filtering rule body AST
-     * @param {AdblockSyntax} syntax - Desired syntax of the generated result
-     * @returns {string} Raw string
+     * @param ast - HTML filtering rule body AST
+     * @param syntax - Desired syntax of the generated result
+     * @returns Raw string
      */
-    public static generate(ast: IHtmlRuleBody, syntax: AdblockSyntax): string {
+    public static generate(ast: HtmlRuleBody, syntax: AdblockSyntax): string {
         let result = ast.selectors
             .map((selector) => CssTree.generateSelector(selector))
             .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
         // In the case of AdGuard syntax, the "" case must be handled
-        if (syntax == AdblockSyntax.AdGuard) {
+        if (syntax == AdblockSyntax.Adg) {
             result = HtmlBodyParser.unescapeDoubleQuotes(result);
         }
 

@@ -2,32 +2,32 @@ import {
     DomainListParser,
     DomainListSeparator,
     DOMAIN_LIST_TYPE,
-    IDomainList,
+    DomainList,
 } from "../../../src/parser/common/domain-list";
-import { EMPTY } from "../../../src/utils/constants";
+import { COMMA, EMPTY } from "../../../src/utils/constants";
 
 describe("DomainListParser", () => {
     test("parse", () => {
         // Single domain
-        expect(DomainListParser.parse("example.com")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("example.com")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [{ domain: "example.com", exception: false }],
         });
 
         // Multiple domains
-        expect(DomainListParser.parse("example.com,example.net")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("example.com,example.net")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [
                 { domain: "example.com", exception: false },
                 { domain: "example.net", exception: false },
             ],
         });
 
-        expect(DomainListParser.parse("example.com,example.net,example.org")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("example.com,example.net,example.org")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [
                 { domain: "example.com", exception: false },
                 { domain: "example.net", exception: false },
@@ -36,25 +36,25 @@ describe("DomainListParser", () => {
         });
 
         // Exception - single domain
-        expect(DomainListParser.parse("~example.com")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("~example.com")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [{ domain: "example.com", exception: true }],
         });
 
         // Exception - multiple domains
-        expect(DomainListParser.parse("~example.com,~example.net")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("~example.com,~example.net")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [
                 { domain: "example.com", exception: true },
                 { domain: "example.net", exception: true },
             ],
         });
 
-        expect(DomainListParser.parse("~example.com,~example.net,~example.org")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("~example.com,~example.net,~example.org")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [
                 { domain: "example.com", exception: true },
                 { domain: "example.net", exception: true },
@@ -63,9 +63,9 @@ describe("DomainListParser", () => {
         });
 
         // Mixed - multiple domains
-        expect(DomainListParser.parse("~example.com,~example.net,example.eu,~example.org")).toEqual(<IDomainList>{
+        expect(DomainListParser.parse("~example.com,~example.net,example.eu,~example.org")).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [
                 { domain: "example.com", exception: true },
                 { domain: "example.net", exception: true },
@@ -76,10 +76,10 @@ describe("DomainListParser", () => {
 
         // Mixed - spaces (trim)
         expect(DomainListParser.parse("~example.com,  example.net    ,   example.eu ,        ~example.org")).toEqual(<
-            IDomainList
+            DomainList
         >{
             type: DOMAIN_LIST_TYPE,
-            separator: ",",
+            separator: COMMA,
             domains: [
                 { domain: "example.com", exception: true },
                 { domain: "example.net", exception: false },
@@ -90,7 +90,7 @@ describe("DomainListParser", () => {
 
         expect(
             DomainListParser.parse("~example.com|  example.net    |   example.eu |        ~example.org", "|")
-        ).toEqual(<IDomainList>{
+        ).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: "|",
             domains: [
@@ -122,7 +122,7 @@ describe("DomainListParser", () => {
     });
 
     test("generate", () => {
-        const parseAndGenerate = (raw: string, separator: DomainListSeparator = ",") => {
+        const parseAndGenerate = (raw: string, separator: DomainListSeparator = COMMA) => {
             const ast = DomainListParser.parse(raw, separator);
 
             if (ast) {

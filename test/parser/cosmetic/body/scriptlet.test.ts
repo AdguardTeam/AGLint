@@ -677,7 +677,7 @@ describe("ScriptletBodyParser", () => {
             return null;
         };
 
-        expect(parseAndGenerate("()", AdblockSyntax.AdGuard)).toEqual([]);
+        expect(parseAndGenerate("()", AdblockSyntax.Adg)).toEqual([]);
 
         expect(
             ScriptletBodyParser.generate(
@@ -691,31 +691,33 @@ describe("ScriptletBodyParser", () => {
                         },
                     ],
                 },
-                AdblockSyntax.AdGuard
+                AdblockSyntax.Adg
             )
         ).toEqual(["(scriptlet1)"]);
 
-        expect(parseAndGenerate("(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")", AdblockSyntax.AdGuard)).toEqual([
+        expect(parseAndGenerate("(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")", AdblockSyntax.Adg)).toEqual([
             "(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")",
         ]);
 
         expect(
             parseAndGenerate(
                 "scriptlet0 arg0 /a;b/ 'a;b' \"a;b\"; scriptlet-1; scriptlet2 'arg0' arg1\\ something;",
-                AdblockSyntax.AdblockPlus
+                AdblockSyntax.Abp
             )
         ).toEqual(["scriptlet0 arg0 /a;b/ 'a;b' \"a;b\"", "scriptlet-1", "scriptlet2 'arg0' arg1\\ something"]);
 
-        expect(
-            parseAndGenerate("scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0", AdblockSyntax.AdblockPlus)
-        ).toEqual(["scriptlet0 arg0 arg1", "scriptlet1", "scriptlet2 arg0"]);
+        expect(parseAndGenerate("scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0", AdblockSyntax.Abp)).toEqual([
+            "scriptlet0 arg0 arg1",
+            "scriptlet1",
+            "scriptlet2 arg0",
+        ]);
 
         // Complicated "real world" example
         // Source: https://github.com/abp-filters/abp-filters-anti-cv/blob/4474f3aafcdb87bb7dd4053f1950068f7e3906ef/fb_non-graph.txt#L2
         expect(
             parseAndGenerate(
                 `race start; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href^="?__cft__"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ 'div[role=feed] div[role=article]' a[href="#"][role="link"]>span>span>b; hide-if-matches-xpath './/div[@role="feed"]//div[@role="article"]//a[@aria-label[.="Patrocinado" or .="Sponsa" or .="Bersponsor" or .="Commandité" or .="Ditaja" or .="Gesponsert" or .="Gesponsord" or .="Sponsrad" or .="Publicidad" or .="Sponsoreret" or .="Sponset" or .="Sponsored" or .="Sponsorisé" or .="Sponsorizat" or .="Sponsorizzato" or .="Sponsorlu" or .="Sponsorowane" or .="Реклама" or .="ממומן" or .="تمويل شوي" or .="دارای پشتیبانی مالی" or .="سپانسرڈ" or .="مُموَّل" or .="प्रायोजित" or .="সৌজন্যে" or .="ได้รับการสนับสนุน" or .="内容" or .="贊助" or .="Sponsoroitu" or .="May Sponsor" or .="Được tài trợ"]]/ancestor::div[@role="article"]'; race stop;`,
-                AdblockSyntax.AdblockPlus
+                AdblockSyntax.Abp
             )
         ).toEqual([
             "race start",

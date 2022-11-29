@@ -8,11 +8,11 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { EMPTY, HASHMARK } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
-import { RuleCategories } from "../common";
-import { CommentRuleType, IComment } from "./common";
+import { RuleCategory } from "../common";
+import { CommentRuleType, Comment } from "./common";
 
 const PREPROCESSOR_MARKER = "!#";
-const PREPROCESSOR_MARKER_LEN = 2;
+const PREPROCESSOR_MARKER_LEN = PREPROCESSOR_MARKER.length;
 const PREPROCESSOR_SEPARATOR = " ";
 
 /**
@@ -27,8 +27,8 @@ const PREPROCESSOR_SEPARATOR = " ";
  * In such a case, the parameters must be submitted for further parsing and validation, as this parser only handles
  * the general syntax.
  */
-export interface IPreProcessor extends IComment {
-    category: RuleCategories.Comment;
+export interface PreProcessor extends Comment {
+    category: RuleCategory.Comment;
     type: CommentRuleType.PreProcessor;
 
     /** Name of the directive */
@@ -56,8 +56,8 @@ export class PreProcessorParser {
     /**
      * Determines whether the rule is a pre-processor rule.
      *
-     * @param {string} raw - Raw rule
-     * @returns {boolean} true/false
+     * @param raw - Raw rule
+     * @returns true/false
      */
     public static isPreProcessor(raw: string): boolean {
         const trimmed = raw.trim();
@@ -69,19 +69,19 @@ export class PreProcessorParser {
     /**
      * Parses a raw rule as a pre-processor comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IPreProcessor | null}
+     * @param raw - Raw rule
+     * @returns
      * Pre-processor comment AST or null (if the raw rule cannot be parsed as a pre-processor comment)
      */
-    public static parse(raw: string): IPreProcessor | null {
+    public static parse(raw: string): PreProcessor | null {
         const trimmed = raw.trim();
 
         if (!PreProcessorParser.isPreProcessor(trimmed)) {
             return null;
         }
 
-        const result: IPreProcessor = {
-            category: RuleCategories.Comment,
+        const result: PreProcessor = {
+            category: RuleCategory.Comment,
             type: CommentRuleType.PreProcessor,
             syntax: AdblockSyntax.Unknown,
             name: EMPTY,
@@ -106,10 +106,10 @@ export class PreProcessorParser {
     /**
      * Converts a pre-processor comment AST to a string.
      *
-     * @param {IPreProcessor} ast - Pre-processor comment AST
-     * @returns {string} Raw string
+     * @param ast - Pre-processor comment AST
+     * @returns Raw string
      */
-    public static generate(ast: IPreProcessor): string {
+    public static generate(ast: PreProcessor): string {
         let result = PREPROCESSOR_MARKER;
 
         result += ast.name;

@@ -31,7 +31,7 @@ import {
 } from "./constants";
 import { CssTreeNodeType, CssTreeParserContext } from "./csstree-constants";
 
-export interface IExtendedCssNodes {
+export interface ExtendedCssNodes {
     pseudos: PseudoClassSelector[];
     attributes: AttributeSelector[];
 }
@@ -40,9 +40,9 @@ export class CssTree {
     /**
      * Helper function for parsing CSS parts.
      *
-     * @param {string} raw - Raw CSS input
-     * @param {string} context - CSSTree context
-     * @returns {CssNode} - CSSTree node (AST)
+     * @param raw - Raw CSS input
+     * @param context - CSSTree context
+     * @returns CSSTree node (AST)
      */
     public static parse(raw: string, context: CssTreeParserContext): CssNode {
         return parse(raw, {
@@ -60,9 +60,9 @@ export class CssTree {
     /**
      * Helper function for creating attribute selectors.
      *
-     * @param {string} attribute - Attribute name
-     * @param {string} value - Attribute value
-     * @returns {AttributeSelector} - Attribute selector AST
+     * @param attribute - Attribute name
+     * @param value - Attribute value
+     * @returns Attribute selector AST
      */
     public static createAttributeSelector(attribute: string, value: string): AttributeSelector {
         return {
@@ -82,10 +82,10 @@ export class CssTree {
 
     /**
      *
-     * @param {Selector} selectorAst - CSSTree Selector AST
-     * @returns {IExtendedCssNodes} Extended CSS Nodes
+     * @param selectorAst - CSSTree Selector AST
+     * @returns Extended CSS Nodes
      */
-    public static getSelectorExtendedCssNodes(selectorAst: Selector): IExtendedCssNodes {
+    public static getSelectorExtendedCssNodes(selectorAst: Selector): ExtendedCssNodes {
         const pseudos: PseudoClassSelector[] = [];
         const attributes: AttributeSelector[] = [];
 
@@ -115,8 +115,8 @@ export class CssTree {
      * Selector generation based on CSSTree's AST. This is necessary because CSSTree
      * only adds spaces in some edge cases.
      *
-     * @param {CssNode} ast - CSS Tree AST
-     * @returns {string} CSS selector as string
+     * @param ast - CSS Tree AST
+     * @returns CSS selector as string
      */
     public static generateSelector(ast: Selector): string {
         let result = EMPTY;
@@ -298,8 +298,8 @@ export class CssTree {
     /**
      * Block generation based on CSSTree's AST. This is necessary because CSSTree only adds spaces in some edge cases.
      *
-     * @param {CssNode} ast - CSS Tree AST
-     * @returns {string} CSS selector as string
+     * @param ast - CSS Tree AST
+     * @returns CSS selector as string
      */
     public static generateBlock(ast: Block): string {
         let result = EMPTY;

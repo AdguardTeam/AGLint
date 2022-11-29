@@ -1,21 +1,18 @@
 /* eslint-disable max-len */
-import {
-    AdGuardModifierListParser,
-    ADG_MODIFIER_LIST_TYPE,
-} from "../../../../src/parser/cosmetic/specific/adg-options";
+import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/adg-modifiers";
 import { EMPTY } from "../../../../src/utils/constants";
 
-describe("AdGuardModifierListParser", () => {
+describe("AdgModifierListParser", () => {
     test("parse", async () => {
         // Empty
-        expect(AdGuardModifierListParser.parse(EMPTY)).toEqual({
+        expect(AdgModifierListParser.parse(EMPTY)).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [],
             rest: EMPTY,
         });
 
         // Valid cases (please note that modifier parser are tested in another test file)
-        expect(AdGuardModifierListParser.parse("[$m1]example.com")).toEqual({
+        expect(AdgModifierListParser.parse("[$m1]example.com")).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -25,7 +22,7 @@ describe("AdGuardModifierListParser", () => {
             rest: "example.com",
         });
 
-        expect(AdGuardModifierListParser.parse("[$m1,m2=v2]example.com")).toEqual({
+        expect(AdgModifierListParser.parse("[$m1,m2=v2]example.com")).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -39,7 +36,7 @@ describe("AdGuardModifierListParser", () => {
             rest: "example.com",
         });
 
-        expect(AdGuardModifierListParser.parse("[$m1,m2=v2]")).toEqual({
+        expect(AdgModifierListParser.parse("[$m1,m2=v2]")).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -54,7 +51,7 @@ describe("AdGuardModifierListParser", () => {
         });
 
         // Spaces
-        expect(AdGuardModifierListParser.parse("[$   path  =   /test  ]")).toEqual({
+        expect(AdgModifierListParser.parse("[$   path  =   /test  ]")).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
@@ -67,7 +64,7 @@ describe("AdGuardModifierListParser", () => {
 
         // Complicated case
         expect(
-            AdGuardModifierListParser.parse(
+            AdgModifierListParser.parse(
                 `[$path=/test,domain=/(^|.+\\.)example\\.(com|org)\\$/,modifier1]example.com,example.org`
             )
         ).toEqual({
@@ -89,32 +86,30 @@ describe("AdGuardModifierListParser", () => {
         });
 
         // Invalid cases
-        expect(() => AdGuardModifierListParser.parse("[")).toThrowError(/^Missing modifier marker "\$" at pattern/);
+        expect(() => AdgModifierListParser.parse("[")).toThrowError(/^Missing modifier marker "\$" at pattern/);
 
-        expect(() => AdGuardModifierListParser.parse("[ ")).toThrowError(/^Missing modifier marker "\$" at pattern/);
+        expect(() => AdgModifierListParser.parse("[ ")).toThrowError(/^Missing modifier marker "\$" at pattern/);
 
-        expect(() => AdGuardModifierListParser.parse("[m1]example.com")).toThrowError(
+        expect(() => AdgModifierListParser.parse("[m1]example.com")).toThrowError(
             /^Missing modifier marker "\$" at pattern/
         );
 
-        expect(() => AdGuardModifierListParser.parse("[$m1example.com")).toThrowError(
+        expect(() => AdgModifierListParser.parse("[$m1example.com")).toThrowError(
             /^Missing closing bracket "]" at pattern/
         );
 
-        expect(() => AdGuardModifierListParser.parse("[$]example.com")).toThrowError(
-            /^No modifiers specified at pattern/
-        );
-        expect(() => AdGuardModifierListParser.parse("[$  ]example.com")).toThrowError(
+        expect(() => AdgModifierListParser.parse("[$]example.com")).toThrowError(/^No modifiers specified at pattern/);
+        expect(() => AdgModifierListParser.parse("[$  ]example.com")).toThrowError(
             /^No modifiers specified at pattern/
         );
     });
 
     test("generate", async () => {
         const parseAndGenerate = (raw: string) => {
-            const ast = AdGuardModifierListParser.parse(raw);
+            const ast = AdgModifierListParser.parse(raw);
 
             if (ast) {
-                return AdGuardModifierListParser.generate(ast);
+                return AdgModifierListParser.generate(ast);
             }
 
             return null;

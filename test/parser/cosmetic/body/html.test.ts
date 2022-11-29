@@ -48,13 +48,11 @@ describe("HtmlBodyParser", () => {
             return null;
         };
 
-        expect(parseAndGenerate('[tag-content="""a"""]', AdblockSyntax.AdGuard)).toEqual('[tag-content="""a"""]');
+        expect(parseAndGenerate('[tag-content="""a"""]', AdblockSyntax.Adg)).toEqual('[tag-content="""a"""]');
 
-        expect(parseAndGenerate('[tag-content="""""a"""""]', AdblockSyntax.AdGuard)).toEqual(
-            '[tag-content="""""a"""""]'
-        );
+        expect(parseAndGenerate('[tag-content="""""a"""""]', AdblockSyntax.Adg)).toEqual('[tag-content="""""a"""""]');
 
-        expect(parseAndGenerate("script:has-text(a), script:has-text(b)", AdblockSyntax.AdGuard)).toEqual(
+        expect(parseAndGenerate("script:has-text(a), script:has-text(b)", AdblockSyntax.Adg)).toEqual(
             "script:has-text(a), script:has-text(b)"
         );
     });

@@ -27,15 +27,15 @@ export const DOMAIN_LIST_TYPE = "DomainList";
 export type DomainListSeparator = typeof CLASSIC_DOMAIN_SEPARATOR | typeof MODIFIER_DOMAIN_SEPARATOR;
 
 /** Represents a list of domains, e.g. `example.com,~example.net`. */
-export interface IDomainList {
+export interface DomainList {
     // Basically, the idea is that each main AST part should have a type
     type: typeof DOMAIN_LIST_TYPE;
     separator: DomainListSeparator;
-    domains: IDomain[];
+    domains: Domain[];
 }
 
 /** Represents an element of the domain list (a domain). */
-export interface IDomain {
+export interface Domain {
     /** Domain name */
     domain: string;
 
@@ -52,13 +52,13 @@ export class DomainListParser {
     /**
      * Parses a domain list, eg. `example.com,example.org,~example.org`
      *
-     * @param {string} raw - Raw domain list
-     * @param {DomainListSeparator} separator - Separator character
-     * @returns {IDomainList} Domain list AST
+     * @param raw - Raw domain list
+     * @param separator - Separator character
+     * @returns Domain list AST
      * @throws If the domain list is syntactically invalid
      */
-    public static parse(raw: string, separator: DomainListSeparator = CLASSIC_DOMAIN_SEPARATOR): IDomainList {
-        const domains: IDomain[] = [];
+    public static parse(raw: string, separator: DomainListSeparator = CLASSIC_DOMAIN_SEPARATOR): DomainList {
+        const domains: Domain[] = [];
         const rawDomains = raw.trim().split(separator);
 
         for (const rawDomain of rawDomains) {
@@ -94,10 +94,10 @@ export class DomainListParser {
     /**
      * Converts a domain list AST to a string.
      *
-     * @param {IDomainList} ast - Domain list AST
-     * @returns {string} Raw string
+     * @param ast - Domain list AST
+     * @returns Raw string
      */
-    public static generate(ast: IDomainList): string {
+    public static generate(ast: DomainList): string {
         const result = ast.domains
             .map(({ domain, exception }) => {
                 let subresult = EMPTY;

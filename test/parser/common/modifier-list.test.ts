@@ -1,55 +1,55 @@
-import { IModifierList, ModifierListParser, MODIFIER_LIST_TYPE } from "../../../src/parser/common/modifier-list";
+import { ModifierList, ModifierListParser, MODIFIER_LIST_TYPE } from "../../../src/parser/common/modifier-list";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
 describe("ModifierListParser", () => {
     test("parse", () => {
         // Empty modifiers
-        expect(ModifierListParser.parse(EMPTY)).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse(EMPTY)).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [],
         });
-        expect(ModifierListParser.parse(SPACE)).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse(SPACE)).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [],
         });
 
         // Valid modifiers
-        expect(ModifierListParser.parse("modifier1")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1" }],
         });
 
-        expect(ModifierListParser.parse("modifier1,modifier2")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1,modifier2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2" }],
         });
 
-        expect(ModifierListParser.parse("modifier1, modifier2")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1, modifier2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2" }],
         });
 
-        expect(ModifierListParser.parse("modifier1=value1")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1=value1")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1", value: "value1" }],
         });
 
-        expect(ModifierListParser.parse("modifier1 = value1")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1 = value1")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1", value: "value1" }],
         });
 
-        expect(ModifierListParser.parse("   modifier1   =    value1       ")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("   modifier1   =    value1       ")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1", value: "value1" }],
         });
 
-        expect(ModifierListParser.parse("modifier1,modifier2=value2")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2", value: "value2" }],
         });
 
-        expect(ModifierListParser.parse("modifier1=value1,modifier2=value2")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1=value1,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [
                 { modifier: "modifier1", value: "value1" },
@@ -59,7 +59,7 @@ describe("ModifierListParser", () => {
 
         // Escaped separator comma
         // eslint-disable-next-line prettier/prettier
-        expect(ModifierListParser.parse("modifier1=a\\,b\\,c,modifier2=value2")).toEqual(<IModifierList>{
+        expect(ModifierListParser.parse("modifier1=a\\,b\\,c,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [
                 { modifier: "modifier1", value: "a\\,b\\,c" },
@@ -71,7 +71,7 @@ describe("ModifierListParser", () => {
             ModifierListParser.parse(
                 "path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i"
             )
-        ).toEqual(<IModifierList>{
+        ).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [
                 {

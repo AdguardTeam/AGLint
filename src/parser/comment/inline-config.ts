@@ -6,8 +6,8 @@
 
 import { AdblockSyntax } from "../../utils/adblockers";
 import { COMMA, EMPTY, SPACE } from "../../utils/constants";
-import { RuleCategories } from "../common";
-import { CommentMarker, CommentRuleType, IComment } from "./common";
+import { RuleCategory } from "../common";
+import { CommentMarker, CommentRuleType, Comment } from "./common";
 import JSON5 from "json5";
 
 const AGLINT_COMMAND_PREFIX = "aglint";
@@ -23,8 +23,8 @@ const CONFIG_COMMENT_MARKER = "--";
  * ```
  * then the command is `aglint-disable` and its params is `["some-rule", "another-rule"]`.
  */
-export interface IConfigComment extends IComment {
-    category: RuleCategories.Comment;
+export interface ConfigComment extends Comment {
+    category: RuleCategory.Comment;
     type: CommentRuleType.ConfigComment;
 
     /** Comment marker: `!` or `#` */
@@ -51,8 +51,8 @@ export class ConfigCommentParser {
     /**
      * Determines whether the rule is an inline configuration comment rule.
      *
-     * @param {string} raw - Raw rule
-     * @returns {boolean} true/false
+     * @param raw - Raw rule
+     * @returns true/false
      */
     public static isConfigComment(raw: string): boolean {
         const trimmed = raw.trim();
@@ -79,11 +79,11 @@ export class ConfigCommentParser {
     /**
      * Parses a raw rule as an inline configuration comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IConfigComment | null}
+     * @param raw - Raw rule
+     * @returns
      * Inline configuration comment AST or null (if the raw rule cannot be parsed as configuration comment)
      */
-    public static parse(raw: string): IConfigComment | null {
+    public static parse(raw: string): ConfigComment | null {
         const trimmed = raw.trim();
 
         if (!ConfigCommentParser.isConfigComment(trimmed)) {
@@ -102,8 +102,8 @@ export class ConfigCommentParser {
         }
 
         // Prepare result
-        const result: IConfigComment = {
-            category: RuleCategories.Comment,
+        const result: ConfigComment = {
+            category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
             syntax: AdblockSyntax.Unknown,
             marker: raw[0] as CommentMarker,
@@ -144,10 +144,10 @@ export class ConfigCommentParser {
     /**
      * Converts an inline configuration comment AST to a string.
      *
-     * @param {IConfigComment} ast - Inline configuration comment AST
-     * @returns {string} Raw string
+     * @param ast - Inline configuration comment AST
+     * @returns Raw string
      */
-    public static generate(ast: IConfigComment): string {
+    public static generate(ast: ConfigComment): string {
         let result = EMPTY;
 
         result += ast.marker;

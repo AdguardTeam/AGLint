@@ -18,18 +18,18 @@ const ABP_PARAM_SEPARATOR = " ";
  * Adblock Plus supports multiple scriptlets within a rule, so the data structure represents the
  * scriptlets as an array. AdGuard and uBlock Origin ONLY support one scriptlet per rule.
  */
-export interface IScriptletRuleBody {
-    scriptlets: IScriptlet[];
+export interface ScriptletRuleBody {
+    scriptlets: Scriptlet[];
 }
 
 /** Represents a specific scriptlet and its parameters. */
-export interface IScriptlet {
-    scriptlet: IScriptletParameter;
-    parameters?: IScriptletParameter[];
+export interface Scriptlet {
+    scriptlet: ScriptletParameter;
+    parameters?: ScriptletParameter[];
 }
 
 /** Represents a scriptlet parameter. */
-export interface IScriptletParameter {
+export interface ScriptletParameter {
     type: ScriptletParameterType;
     value: string;
 }
@@ -73,11 +73,11 @@ export class ScriptletBodyParser {
     /**
      * Parses a raw ADG/uBO scriptlet call body.
      *
-     * @param {string} raw - Raw body
-     * @returns {IScriptletRuleBody} Scriptlet rule body AST
+     * @param raw - Raw body
+     * @returns Scriptlet rule body AST
      * @throws If there is no opening/closing parenthesis
      */
-    public static parseAdgAndUboScriptletCall(raw: string): IScriptletRuleBody {
+    public static parseAdgAndUboScriptletCall(raw: string): ScriptletRuleBody {
         const trimmed = raw.trim();
 
         // Call should contain: (arg0, arg1,...)
@@ -122,12 +122,12 @@ export class ScriptletBodyParser {
     /**
      * Parses a raw ABP snippet call body.
      *
-     * @param {string} raw - Raw body
-     * @returns {IScriptletRuleBody | null} Scriptlet rule body AST
+     * @param raw - Raw body
+     * @returns Scriptlet rule body AST
      * @throws If no scriptlet is specified
      */
-    public static parseAbpSnippetCall(raw: string): IScriptletRuleBody {
-        const scriptlets: IScriptlet[] = [];
+    public static parseAbpSnippetCall(raw: string): ScriptletRuleBody {
+        const scriptlets: Scriptlet[] = [];
 
         let trimmed = raw.trim();
 
@@ -169,10 +169,10 @@ export class ScriptletBodyParser {
     /**
      * Converts an array of strings into an array of parameter interfaces.
      *
-     * @param {string[]} params - Parameter list as array of strings
-     * @returns {IScriptletParameter[]} Parameter list as array of parameter interfaces
+     * @param params - Parameter list as array of strings
+     * @returns Parameter list as array of parameter interfaces
      */
-    private static decodeParameters(params: string[]): IScriptletParameter[] {
+    private static decodeParameters(params: string[]): ScriptletParameter[] {
         return params.map((param) => {
             let type: ScriptletParameterType = ScriptletParameterType.Unquoted;
 
@@ -196,10 +196,10 @@ export class ScriptletBodyParser {
     /**
      * Converts an array of parameter interfaces into an array of strings.
      *
-     * @param {IScriptletParameter[]} params - Parameter list as array of parameter interfaces
-     * @returns {string[]} Parameter list as array of strings
+     * @param params - Parameter list as array of parameter interfaces
+     * @returns Parameter list as array of strings
      */
-    private static encodeParameters(params: IScriptletParameter[]): string[] {
+    private static encodeParameters(params: ScriptletParameter[]): string[] {
         return params.map(({ value, type }) => {
             switch (type) {
                 case ScriptletParameterType.SingleQuoted:
@@ -227,10 +227,10 @@ export class ScriptletBodyParser {
     /**
      * Parses a raw cosmetic rule body as a scriptlet injection rule body.
      *
-     * @param {string} raw - Raw body
-     * @returns {IScriptletRuleBody | null} Scriptlet injection rule body AST
+     * @param raw - Raw body
+     * @returns Scriptlet injection rule body AST
      */
-    public static parse(raw: string): IScriptletRuleBody {
+    public static parse(raw: string): ScriptletRuleBody {
         const trimmed = raw.trim();
 
         // ADG and uBO calls always begins with parenthesis
@@ -244,16 +244,16 @@ export class ScriptletBodyParser {
     /**
      * Converts a scriptlet injection rule body AST to a string.
      *
-     * @param {IScriptletRuleBody} ast - Scriptlet injection rule body AST
-     * @param {AdblockSyntax} syntax - Desired syntax of the generated result
-     * @returns {string} Raw string
+     * @param ast - Scriptlet injection rule body AST
+     * @param syntax - Desired syntax of the generated result
+     * @returns Raw string
      */
-    public static generate(ast: IScriptletRuleBody, syntax: AdblockSyntax): string[] {
+    public static generate(ast: ScriptletRuleBody, syntax: AdblockSyntax): string[] {
         const scriptlets = ast.scriptlets.map(({ scriptlet, parameters }) => {
             return ScriptletBodyParser.encodeParameters([scriptlet, ...(parameters || [])]);
         });
 
-        if (syntax == AdblockSyntax.AdGuard || syntax == AdblockSyntax.uBlockOrigin) {
+        if (syntax == AdblockSyntax.Adg || syntax == AdblockSyntax.Ubo) {
             return scriptlets.map((scriptlet) => `(${scriptlet.join(ADG_UBO_PARAM_SEPARATOR + SPACE)})`);
         }
 

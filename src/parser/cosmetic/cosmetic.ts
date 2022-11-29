@@ -1,4 +1,4 @@
-import { IRule, RuleCategories } from "../common";
+import { Rule, RuleCategory } from "../common";
 
 // Utils
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
@@ -6,14 +6,14 @@ import { AdblockSyntax } from "../../utils/adblockers";
 
 // Parsers
 import { CommentParser } from "../comment/comment";
-import { CssInjectionBodyParser, ICssRuleBody } from "./body/css";
-import { ElementHidingBodyParser, IElementHidingRuleBody } from "./body/elementhiding";
-import { ScriptletBodyParser, IScriptletRuleBody } from "./body/scriptlet";
-import { HtmlBodyParser, IHtmlRuleBody } from "./body/html";
-import { DomainListParser, DOMAIN_LIST_TYPE, IDomain } from "../common/domain-list";
-import { AdGuardModifierListParser, ADG_MODIFIER_LIST_TYPE } from "./specific/adg-options";
-import { IRuleModifier } from "../common/modifier-list";
-import { UblockModifier, UBlockModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-options";
+import { CssInjectionBodyParser, CssRuleBody } from "./body/css";
+import { ElementHidingBodyParser, ElementHidingRuleBody } from "./body/elementhiding";
+import { ScriptletBodyParser, ScriptletRuleBody } from "./body/scriptlet";
+import { HtmlBodyParser, HtmlRuleBody } from "./body/html";
+import { DomainListParser, DOMAIN_LIST_TYPE, Domain } from "../common/domain-list";
+import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "./specific/adg-modifiers";
+import { RuleModifier } from "../common/modifier-list";
+import { UboModifier, UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-modifiers";
 import { CosmeticRuleType } from "./common";
 import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
 import { UBO_RESPONSEHEADER_INDICATOR } from "../network/network";
@@ -24,11 +24,11 @@ import { UBO_RESPONSEHEADER_INDICATOR } from "../network/network";
  * Regarding the categories, there is only a difference in the body,
  * all other properties can be defined at this level.
  */
-export interface ICosmeticRule extends IRule {
-    category: RuleCategories.Cosmetic;
+export interface CosmeticRule extends Rule {
+    category: RuleCategory.Cosmetic;
     type: CosmeticRuleType;
-    modifiers: IRuleModifier[] | UblockModifier[];
-    domains: IDomain[];
+    modifiers: RuleModifier[] | UboModifier[];
+    domains: Domain[];
     separator: CosmeticRuleSeparator;
     exception: boolean;
     body: unknown;
@@ -51,9 +51,9 @@ export interface ICosmeticRule extends IRule {
  *   example.com#@?#.ads:has(> .something)
  *   ```
  */
-export interface IElementHidingRule extends ICosmeticRule {
+export interface ElementHidingRule extends CosmeticRule {
     type: CosmeticRuleType.ElementHidingRule;
-    body: IElementHidingRuleBody;
+    body: ElementHidingRuleBody;
 }
 
 /**
@@ -81,9 +81,9 @@ export interface IElementHidingRule extends ICosmeticRule {
  *    example.com##.ads:remove()
  *    ```
  */
-export interface ICssRule extends ICosmeticRule {
+export interface CssRule extends CosmeticRule {
     type: CosmeticRuleType.CssRule;
-    body: ICssRuleBody;
+    body: CssRuleBody;
 }
 
 /**
@@ -116,9 +116,9 @@ export interface ICssRule extends ICosmeticRule {
  *    example.com#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11
  *    ```
  */
-export interface IScriptletRule extends ICosmeticRule {
+export interface ScriptletRule extends CosmeticRule {
     type: CosmeticRuleType.ScriptletRule;
-    body: IScriptletRuleBody;
+    body: ScriptletRuleBody;
 }
 
 /**
@@ -140,9 +140,9 @@ export interface IScriptletRule extends ICosmeticRule {
  *    example.com#@#^script:has-text(detect)
  *    ```
  */
-export interface IHtmlRule extends ICosmeticRule {
+export interface HtmlRule extends CosmeticRule {
     type: CosmeticRuleType.HtmlRule;
-    body: IHtmlRuleBody;
+    body: HtmlRuleBody;
 }
 
 /**
@@ -156,7 +156,7 @@ export interface IHtmlRule extends ICosmeticRule {
  *    example.com#@%#let a = 2;
  *    ```
  */
-export interface IJsRule extends ICosmeticRule {
+export interface JsRule extends CosmeticRule {
     type: CosmeticRuleType.JsRule;
     body: string;
 }
@@ -179,8 +179,8 @@ export class CosmeticRuleParser {
     /**
      * Determines whether a rule is a cosmetic rule.
      *
-     * @param {string} raw - Raw rule
-     * @returns {boolean} true/false
+     * @param raw - Raw rule
+     * @returns true/false
      */
     public static isCosmetic(raw: string) {
         const trimmed = raw.trim();
@@ -200,44 +200,44 @@ export class CosmeticRuleParser {
      *  - separator
      *  - body
      *
-     * @param {string} rawRule - Raw cosmetic rule
-     * @returns {IElementHidingRule | ICssRule | IScriptletRule | IHtmlRule | IJsRule | null}
+     * @param raw - Raw cosmetic rule
+     * @returns
      * Parsed cosmetic rule AST or null if it failed to parse based on the known cosmetic rules
      * @throws If the input matches the cosmetic rule pattern but syntactically invalid
      */
-    public static parse(rawRule: string): IElementHidingRule | ICssRule | IScriptletRule | IHtmlRule | IJsRule | null {
+    public static parse(raw: string): ElementHidingRule | CssRule | ScriptletRule | HtmlRule | JsRule | null {
         // Skip regular comments
-        if (CommentParser.isRegularComment(rawRule)) {
+        if (CommentParser.isRegularComment(raw)) {
             return null;
         }
 
         // Find separator (every cosmetic rule has a separator)
-        const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(rawRule);
+        const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(raw);
 
         if (!separator) {
             return null;
         }
 
         // Find main structural elements
-        let rawPattern = rawRule.substring(0, start).trim();
-        let rawBody = rawRule.substring(end).trim();
+        let rawPattern = raw.substring(0, start).trim();
+        let rawBody = raw.substring(end).trim();
 
         // The syntax is initially unknown
         let syntax = AdblockSyntax.Unknown;
 
-        const modifiers: IRuleModifier[] = [];
+        const modifiers: RuleModifier[] = [];
 
         // Handle pattern
-        const { modifiers: adgModifiers, rest: adgRest } = AdGuardModifierListParser.parse(rawPattern);
+        const { modifiers: adgModifiers, rest: adgRest } = AdgModifierListParser.parse(rawPattern);
 
         if (adgModifiers.length > 0) {
             modifiers.push(...adgModifiers);
 
-            syntax = AdblockSyntax.AdGuard;
+            syntax = AdblockSyntax.Adg;
             rawPattern = adgRest;
         }
 
-        let domains: IDomain[] = [];
+        let domains: Domain[] = [];
 
         if (rawPattern.length > 0) {
             domains = DomainListParser.parse(rawPattern).domains;
@@ -247,32 +247,32 @@ export class CosmeticRuleParser {
 
         // Element hiding / uBO CSS inject
         if (CosmeticRuleSeparatorUtils.isElementHiding(separator)) {
-            if (UBlockModifierListParser.hasUblockModifierIndicators(rawBody)) {
-                const { modifiers: uboModifiers, rest: uboRest } = UBlockModifierListParser.parse(rawBody);
+            if (UboModifierListParser.hasUboModifierIndicators(rawBody)) {
+                const { modifiers: uboModifiers, rest: uboRest } = UboModifierListParser.parse(rawBody);
 
                 if (uboModifiers.length > 0) {
-                    if (syntax == AdblockSyntax.AdGuard) {
-                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO options`);
+                    if (syntax == AdblockSyntax.Adg) {
+                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO modifiers`);
                     }
 
                     modifiers.push(...uboModifiers);
 
-                    syntax = AdblockSyntax.uBlockOrigin;
+                    syntax = AdblockSyntax.Ubo;
                     rawBody = uboRest;
                 }
             }
 
-            if (CssInjectionBodyParser.isUblockCssInjection(rawBody)) {
-                if (syntax == AdblockSyntax.AdGuard) {
+            if (CssInjectionBodyParser.isUboCssInjection(rawBody)) {
+                if (syntax == AdblockSyntax.Adg) {
                     throw new SyntaxError(`Cannot use AdGuard modifier list with uBO's CSS injection`);
                 }
 
-                syntax = AdblockSyntax.uBlockOrigin;
+                syntax = AdblockSyntax.Ubo;
 
-                const body = CssInjectionBodyParser.parseUblockCssInjection(rawBody);
+                const body = CssInjectionBodyParser.parseUboCssInjection(rawBody);
 
-                return <ICssRule>{
-                    category: RuleCategories.Cosmetic,
+                return <CssRule>{
+                    category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.CssRule,
                     syntax,
                     exception,
@@ -284,8 +284,8 @@ export class CosmeticRuleParser {
             }
 
             // Regular elemhide rules
-            return <IElementHidingRule>{
-                category: RuleCategories.Cosmetic,
+            return <ElementHidingRule>{
+                category: RuleCategory.Cosmetic,
                 type: CosmeticRuleType.ElementHidingRule,
                 syntax,
                 exception,
@@ -297,14 +297,14 @@ export class CosmeticRuleParser {
         }
 
         // ADG CSS inject / ABP snippet inject
-        else if (CosmeticRuleSeparatorUtils.isAdGuardCss(separator)) {
-            if (CssInjectionBodyParser.isAdGuardCssInjection(rawBody)) {
-                const body = CssInjectionBodyParser.parseAdGuardCssInjection(rawBody);
+        else if (CosmeticRuleSeparatorUtils.isAdgCss(separator)) {
+            if (CssInjectionBodyParser.isAdgCssInjection(rawBody)) {
+                const body = CssInjectionBodyParser.parseAdgCssInjection(rawBody);
 
-                return <ICssRule>{
-                    category: RuleCategories.Cosmetic,
+                return <CssRule>{
+                    category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.CssRule,
-                    syntax: AdblockSyntax.AdGuard,
+                    syntax: AdblockSyntax.Adg,
                     exception,
                     modifiers,
                     domains,
@@ -313,10 +313,10 @@ export class CosmeticRuleParser {
                 };
             }
 
-            return <IScriptletRule>{
-                category: RuleCategories.Cosmetic,
+            return <ScriptletRule>{
+                category: RuleCategory.Cosmetic,
                 type: CosmeticRuleType.ScriptletRule,
-                syntax: AdblockSyntax.AdblockPlus,
+                syntax: AdblockSyntax.Abp,
                 exception,
                 modifiers,
                 domains,
@@ -327,17 +327,17 @@ export class CosmeticRuleParser {
 
         // ADG/uBO scriptlets
         else if (
-            CosmeticRuleSeparatorUtils.isAdGuardScriptlet(separator) ||
-            CosmeticRuleSeparatorUtils.isUblockScriptlet(separator)
+            CosmeticRuleSeparatorUtils.isAdgScriptlet(separator) ||
+            CosmeticRuleSeparatorUtils.isUboScriptlet(separator)
         ) {
             // Set syntax
-            syntax = AdblockSyntax.AdGuard;
-            if (CosmeticRuleSeparatorUtils.isUblockScriptlet(separator)) {
-                syntax = AdblockSyntax.uBlockOrigin;
+            syntax = AdblockSyntax.Adg;
+            if (CosmeticRuleSeparatorUtils.isUboScriptlet(separator)) {
+                syntax = AdblockSyntax.Ubo;
             }
 
-            return <IScriptletRule>{
-                category: RuleCategories.Cosmetic,
+            return <ScriptletRule>{
+                category: RuleCategory.Cosmetic,
                 type: CosmeticRuleType.ScriptletRule,
                 syntax,
                 exception,
@@ -349,51 +349,45 @@ export class CosmeticRuleParser {
         }
 
         // ADG/uBO HTML filters
-        else if (
-            CosmeticRuleSeparatorUtils.isUblockHtml(separator) ||
-            CosmeticRuleSeparatorUtils.isAdGuardHtml(separator)
-        ) {
+        else if (CosmeticRuleSeparatorUtils.isUboHtml(separator) || CosmeticRuleSeparatorUtils.isAdgHtml(separator)) {
             /**
              * Special case: uBO's responseheader rule. This rule follows the syntax of cosmetic rules,
              * but is only parsed at the network level.
              *
              * @see {@link NetworkRuleParser.parse}
              */
-            if (
-                CosmeticRuleSeparatorUtils.isUblockHtml(separator) &&
-                rawBody.startsWith(UBO_RESPONSEHEADER_INDICATOR)
-            ) {
+            if (CosmeticRuleSeparatorUtils.isUboHtml(separator) && rawBody.startsWith(UBO_RESPONSEHEADER_INDICATOR)) {
                 return null;
             }
 
             // Set syntax
-            if (CosmeticRuleSeparatorUtils.isUblockHtml(separator)) {
-                syntax = AdblockSyntax.uBlockOrigin;
+            if (CosmeticRuleSeparatorUtils.isUboHtml(separator)) {
+                syntax = AdblockSyntax.Ubo;
             } else {
-                syntax = AdblockSyntax.AdGuard;
+                syntax = AdblockSyntax.Adg;
             }
 
-            if (UBlockModifierListParser.hasUblockModifierIndicators(rawBody)) {
-                const { modifiers: uboModifiers, rest: uboRest } = UBlockModifierListParser.parse(rawBody);
+            if (UboModifierListParser.hasUboModifierIndicators(rawBody)) {
+                const { modifiers: uboModifiers, rest: uboRest } = UboModifierListParser.parse(rawBody);
 
                 if (uboModifiers.length > 0) {
-                    if (CosmeticRuleSeparatorUtils.isAdGuardHtml(separator)) {
-                        throw new SyntaxError(`Cannot use uBO options with ADG HTML filtering`);
+                    if (CosmeticRuleSeparatorUtils.isAdgHtml(separator)) {
+                        throw new SyntaxError(`Cannot use uBO modifiers with ADG HTML filtering`);
                     }
 
-                    if (syntax == AdblockSyntax.AdGuard || adgModifiers.length > 0) {
-                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO options`);
+                    if (syntax == AdblockSyntax.Adg || adgModifiers.length > 0) {
+                        throw new SyntaxError(`Cannot use AdGuard modifier list with uBO modifiers`);
                     }
 
                     modifiers.push(...uboModifiers);
 
-                    syntax = AdblockSyntax.uBlockOrigin;
+                    syntax = AdblockSyntax.Ubo;
                     rawBody = uboRest;
                 }
             }
 
-            return <IHtmlRule>{
-                category: RuleCategories.Cosmetic,
+            return <HtmlRule>{
+                category: RuleCategory.Cosmetic,
                 type: CosmeticRuleType.HtmlRule,
                 syntax,
                 exception,
@@ -405,11 +399,11 @@ export class CosmeticRuleParser {
         }
 
         // ADG JS inject
-        else if (CosmeticRuleSeparatorUtils.isAdGuardJs(separator)) {
-            return <IJsRule>{
-                category: RuleCategories.Cosmetic,
+        else if (CosmeticRuleSeparatorUtils.isAdgJs(separator)) {
+            return <JsRule>{
+                category: RuleCategory.Cosmetic,
                 type: CosmeticRuleType.JsRule,
-                syntax: AdblockSyntax.AdGuard,
+                syntax: AdblockSyntax.Adg,
                 exception,
                 modifiers,
                 domains,
@@ -424,15 +418,15 @@ export class CosmeticRuleParser {
     /**
      * Converts a cosmetic rule AST into a string.
      *
-     * @param {ICosmeticRule} ast - Cosmetic rule AST
-     * @returns {string} Raw string
+     * @param ast - Cosmetic rule AST
+     * @returns Raw string
      */
-    public static generate(ast: ICosmeticRule): string {
+    public static generate(ast: CosmeticRule): string {
         let result = EMPTY;
 
         // AdGuard modifiers
-        if (ast.syntax == AdblockSyntax.AdGuard && ast.modifiers.length > 0) {
-            result += AdGuardModifierListParser.generate({
+        if (ast.syntax == AdblockSyntax.Adg && ast.modifiers.length > 0) {
+            result += AdgModifierListParser.generate({
                 type: ADG_MODIFIER_LIST_TYPE,
                 modifiers: ast.modifiers,
                 rest: EMPTY,
@@ -450,42 +444,42 @@ export class CosmeticRuleParser {
             case CosmeticRuleType.ElementHidingRule:
                 result += ast.separator;
 
-                if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
-                    result += UBlockModifierListParser.generate({
+                if (ast.syntax == AdblockSyntax.Ubo && ast.modifiers.length > 0) {
+                    result += UboModifierListParser.generate({
                         type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
-                        rest: ElementHidingBodyParser.generate(<IElementHidingRuleBody>ast.body),
+                        rest: ElementHidingBodyParser.generate(<ElementHidingRuleBody>ast.body),
                     });
                 } else {
-                    result += ElementHidingBodyParser.generate(<IElementHidingRuleBody>ast.body);
+                    result += ElementHidingBodyParser.generate(<ElementHidingRuleBody>ast.body);
                 }
                 break;
 
             case CosmeticRuleType.CssRule:
                 result += ast.separator;
 
-                if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
-                    result += UBlockModifierListParser.generate({
+                if (ast.syntax == AdblockSyntax.Ubo && ast.modifiers.length > 0) {
+                    result += UboModifierListParser.generate({
                         type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
-                        rest: CssInjectionBodyParser.generate(<ICssRuleBody>ast.body, ast.syntax),
+                        rest: CssInjectionBodyParser.generate(<CssRuleBody>ast.body, ast.syntax),
                     });
                 } else {
-                    result += CssInjectionBodyParser.generate(<ICssRuleBody>ast.body, ast.syntax);
+                    result += CssInjectionBodyParser.generate(<CssRuleBody>ast.body, ast.syntax);
                 }
                 break;
 
             case CosmeticRuleType.HtmlRule:
                 result += ast.separator;
 
-                if (ast.syntax == AdblockSyntax.uBlockOrigin && ast.modifiers.length > 0) {
-                    result += UBlockModifierListParser.generate({
+                if (ast.syntax == AdblockSyntax.Ubo && ast.modifiers.length > 0) {
+                    result += UboModifierListParser.generate({
                         type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
-                        rest: HtmlBodyParser.generate(<IHtmlRuleBody>ast.body, ast.syntax),
+                        rest: HtmlBodyParser.generate(<HtmlRuleBody>ast.body, ast.syntax),
                     });
                 } else {
-                    result += HtmlBodyParser.generate(<IHtmlRuleBody>ast.body, ast.syntax);
+                    result += HtmlBodyParser.generate(<HtmlRuleBody>ast.body, ast.syntax);
                 }
                 break;
 
@@ -500,9 +494,9 @@ export class CosmeticRuleParser {
                 result += ast.separator;
 
                 // eslint-disable-next-line no-case-declarations
-                const scriptlets = ScriptletBodyParser.generate(<IScriptletRuleBody>ast.body, ast.syntax);
+                const scriptlets = ScriptletBodyParser.generate(<ScriptletRuleBody>ast.body, ast.syntax);
 
-                if (ast.syntax == AdblockSyntax.AdblockPlus) {
+                if (ast.syntax == AdblockSyntax.Abp) {
                     result += scriptlets.join(SEMICOLON + SPACE);
                     return result;
                 } else {

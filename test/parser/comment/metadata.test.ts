@@ -1,6 +1,6 @@
 import { CommentRuleType } from "../../../src/parser/comment/common";
-import { IMetadata, MetadataParser } from "../../../src/parser/comment/metadata";
-import { RuleCategories } from "../../../src/parser/common";
+import { Metadata, MetadataParser } from "../../../src/parser/comment/metadata";
+import { RuleCategory } from "../../../src/parser/common";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -19,8 +19,8 @@ describe("MetadataParser", () => {
         expect(MetadataParser.parse("!:::")).toBe(null);
         expect(MetadataParser.parse("! : : :")).toBe(null);
 
-        expect(MetadataParser.parse("! Title: Filter")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(MetadataParser.parse("! Title: Filter")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "!",
@@ -28,8 +28,8 @@ describe("MetadataParser", () => {
             value: "Filter",
         });
 
-        expect(MetadataParser.parse("# Title: Filter")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(MetadataParser.parse("# Title: Filter")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "#",
@@ -37,8 +37,8 @@ describe("MetadataParser", () => {
             value: "Filter",
         });
 
-        expect(MetadataParser.parse("! title: Filter")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(MetadataParser.parse("! title: Filter")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "!",
@@ -46,8 +46,8 @@ describe("MetadataParser", () => {
             value: "Filter",
         });
 
-        expect(MetadataParser.parse("!    title:    Filter   ")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(MetadataParser.parse("!    title:    Filter   ")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "!",
@@ -55,8 +55,8 @@ describe("MetadataParser", () => {
             value: "Filter",
         });
 
-        expect(MetadataParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<IMetadata>{
-            category: RuleCategories.Comment,
+        expect(MetadataParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<Metadata>{
+            category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
             type: CommentRuleType.Metadata,
             marker: "!",

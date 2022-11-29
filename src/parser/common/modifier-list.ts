@@ -7,10 +7,10 @@ const MODIFIER_ASSIGN_OPERATOR = "=";
 export const MODIFIER_LIST_TYPE = "ModifierList";
 
 /** Represents a modifier list, eg `script,domain=example.com`. */
-export interface IModifierList {
+export interface ModifierList {
     // Basically, the idea is that each main AST part should have a type
     type: typeof MODIFIER_LIST_TYPE;
-    modifiers: IRuleModifier[];
+    modifiers: RuleModifier[];
 }
 
 /**
@@ -22,7 +22,7 @@ export interface IModifierList {
  * But if the modifier is `domain=example.com`, then the modifier property will be
  * `domain` and the value property will be `example.com`.
  */
-export interface IRuleModifier {
+export interface RuleModifier {
     /** Modifier name */
     modifier: string;
 
@@ -42,16 +42,16 @@ export class ModifierListParser {
     /**
      * Parses the cosmetic rule modifiers, eg. `script,key=value`
      *
-     * @param {string} rawModifiers - Raw modifiers
-     * @returns {IRuleModifier} Parsed modifiers interface
+     * @param raw - Raw modifiers
+     * @returns Parsed modifiers interface
      */
-    public static parse(rawModifiers: string): IModifierList {
-        const result: IModifierList = {
+    public static parse(raw: string): ModifierList {
+        const result: ModifierList = {
             type: MODIFIER_LIST_TYPE,
             modifiers: [],
         };
 
-        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(rawModifiers, MODIFIERS_SEPARATOR);
+        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
         if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == EMPTY) {
@@ -84,10 +84,10 @@ export class ModifierListParser {
     /**
      * Converts a modifier list AST to a string.
      *
-     * @param {IModifierList} ast - Modifier list AST
-     * @returns {string} Raw string
+     * @param ast - Modifier list AST
+     * @returns Raw string
      */
-    public static generate(ast: IModifierList): string {
+    public static generate(ast: ModifierList): string {
         const result = ast.modifiers
             .map(({ modifier, value }) => {
                 let subresult = modifier.trim();

@@ -27,10 +27,10 @@ export enum CosmeticRuleSeparator {
     UboScriptletException = "#@#+js",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    UboHTML = "##^",
+    UboHtml = "##^",
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    UboHTMLException = "#@#^",
+    UboHtmlException = "#@#^",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
     AdgCSSInject = "#$#",
@@ -98,8 +98,8 @@ export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is an element hiding separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
     public static isElementHiding(separator: string): boolean {
         return (
@@ -113,10 +113,10 @@ export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is an AdGuard CSS injection separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isAdGuardCss(separator: string): boolean {
+    public static isAdgCss(separator: string): boolean {
         return (
             separator == CosmeticRuleSeparator.AdgCSSInject ||
             separator == CosmeticRuleSeparator.AdgCSSInjectException ||
@@ -128,20 +128,20 @@ export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is an Adblock Plus snippet separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isAdblockPlusSnippet(separator: string): boolean {
+    public static isAbpSnippet(separator: string): boolean {
         return separator == CosmeticRuleSeparator.AbpSnippet || separator == CosmeticRuleSeparator.AbpSnippetException;
     }
 
     /**
      * Returns whether the specified separator is a uBlock scriptlet separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isUblockScriptlet(separator: string): boolean {
+    public static isUboScriptlet(separator: string): boolean {
         return (
             separator == CosmeticRuleSeparator.UboScriptlet || separator == CosmeticRuleSeparator.UboScriptletException
         );
@@ -150,10 +150,10 @@ export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is an AdGuard scriptlet separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isAdGuardScriptlet(separator: string): boolean {
+    public static isAdgScriptlet(separator: string): boolean {
         return (
             separator == CosmeticRuleSeparator.AdgScriptlet || separator == CosmeticRuleSeparator.AdgScriptletException
         );
@@ -162,10 +162,10 @@ export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is an AdGuard JS separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isAdGuardJs(separator: string): boolean {
+    public static isAdgJs(separator: string): boolean {
         return (
             separator == CosmeticRuleSeparator.AdgJsInject || separator == CosmeticRuleSeparator.AdgJsInjectException
         );
@@ -174,42 +174,42 @@ export class CosmeticRuleSeparatorUtils {
     /**
      * Returns whether the specified separator is a uBlock HTML separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isUblockHtml(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.UboHTML || separator == CosmeticRuleSeparator.UboHTMLException;
+    public static isUboHtml(separator: string): boolean {
+        return separator == CosmeticRuleSeparator.UboHtml || separator == CosmeticRuleSeparator.UboHtmlException;
     }
 
     /**
      * Returns whether the specified separator is an AdGuard HTML separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
-    public static isAdGuardHtml(separator: string): boolean {
+    public static isAdgHtml(separator: string): boolean {
         return separator == CosmeticRuleSeparator.AdgHTML || separator == CosmeticRuleSeparator.AdgHTMLException;
     }
 
     /**
      * Returns whether the specified separator is a scriptlet separator.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
     public static isScriptlet(separator: string): boolean {
         return (
-            CosmeticRuleSeparatorUtils.isAdblockPlusSnippet(separator) ||
-            CosmeticRuleSeparatorUtils.isUblockScriptlet(separator) ||
-            CosmeticRuleSeparatorUtils.isAdGuardScriptlet(separator)
+            CosmeticRuleSeparatorUtils.isAbpSnippet(separator) ||
+            CosmeticRuleSeparatorUtils.isUboScriptlet(separator) ||
+            CosmeticRuleSeparatorUtils.isAdgScriptlet(separator)
         );
     }
 
     /**
      * Returns whether the specified separator is an exception.
      *
-     * @param {string} separator - Separator as string
-     * @returns {boolean} true/false
+     * @param separator - Separator as string
+     * @returns true/false
      */
     public static isException(separator?: string): boolean {
         if (!separator) {
@@ -224,8 +224,8 @@ export class CosmeticRuleSeparatorUtils {
      * Looks for the cosmetic rule separator in the rule. This is a simplified version that
      * masks the recursive function.
      *
-     * @param {string} rule - Raw rule
-     * @returns {CosmeticRuleSeparatorResult} Separator data
+     * @param rule - Raw rule
+     * @returns Separator data
      */
     public static find(rule: string): CosmeticRuleSeparatorResult {
         return CosmeticRuleSeparatorUtils.findRecursively(rule);
@@ -235,14 +235,14 @@ export class CosmeticRuleSeparatorUtils {
      * Recursively looks for the cosmetic rule separator in the rule. The basic idea is from TSUrlFilter, this is
      * a further optimized version. The method is very low level, but it is necessary for speed.
      *
-     * @param {string} rule - Raw rule.
-     * @param {number} hashMarkPos - Latest hashmark character (#) position (if none, then -1).
-     * @param {number} dollarSignPos - Latest dollar sign character ($) position (if none, then -1).
-     * @param {boolean} noHashMark - Once we have established that there is no hashmark character (#), it is
+     * @param rule - Raw rule.
+     * @param hashMarkPos - Latest hashmark character (#) position (if none, then -1).
+     * @param dollarSignPos - Latest dollar sign character ($) position (if none, then -1).
+     * @param noHashMark - Once we have established that there is no hashmark character (#), it is
      * unnecessary to search for it again in the next step of the recursion.
-     * @param {boolean} noDollarSign - once we have established that there is no dollar sign character ($), it is
+     * @param noDollarSign - once we have established that there is no dollar sign character ($), it is
      * unnecessary to search for it again in the next step of the recursion.
-     * @returns {CosmeticRuleSeparatorResult} Separator data
+     * @returns Separator data
      */
     private static findRecursively(
         rule: string,
@@ -269,7 +269,7 @@ export class CosmeticRuleSeparatorUtils {
                 }
                 // ##^
                 else if (rule[h + 2] == "^") {
-                    return [h, h + 3, CosmeticRuleSeparator.UboHTML, false];
+                    return [h, h + 3, CosmeticRuleSeparator.UboHtml, false];
                 }
                 // ##
                 return [h, h + 2, CosmeticRuleSeparator.AbpCSSElemhide, false];
@@ -314,7 +314,7 @@ export class CosmeticRuleSeparatorUtils {
                     }
                     // #@#^
                     else if (rule[h + 3] == "^") {
-                        return [h, h + 4, CosmeticRuleSeparator.UboHTMLException, true];
+                        return [h, h + 4, CosmeticRuleSeparator.UboHtmlException, true];
                     }
                     return [h, h + 3, CosmeticRuleSeparator.AbpCSSElemhideException, true];
                 }

@@ -1,7 +1,7 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { REGEX_MARKER, StringUtils } from "../../utils/string";
-import { IRuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
-import { IRule, RuleCategories } from "../common";
+import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
+import { Rule, RuleCategory } from "../common";
 import { NetworkRuleType } from "./common";
 import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
@@ -17,8 +17,8 @@ const ADG_REMOVEHEADER = "removeheader";
 /**
  * Represents the common properties of network rules
  */
-export interface INetworkRule extends IRule {
-    category: RuleCategories.Network;
+export interface NetworkRule extends Rule {
+    category: RuleCategory.Network;
     type: NetworkRuleType;
     syntax: AdblockSyntax;
     exception: boolean;
@@ -40,9 +40,9 @@ export interface INetworkRule extends IRule {
  *     ```
  *   - etc.
  */
-export interface IBasicNetworkRule extends INetworkRule {
+export interface BasicNetworkRule extends NetworkRule {
     type: NetworkRuleType.BasicNetworkRule;
-    modifiers: IRuleModifier[];
+    modifiers: RuleModifier[];
 }
 
 /**
@@ -56,7 +56,7 @@ export interface IBasicNetworkRule extends INetworkRule {
  *     example.org##^responseheader(header-name)
  *     ```
  */
-export interface IRemoveHeaderNetworkRule extends INetworkRule {
+export interface RemoveHeaderNetworkRule extends NetworkRule {
     type: NetworkRuleType.RemoveHeaderNetworkRule;
     syntax: AdblockSyntax;
     header: string;
@@ -75,10 +75,10 @@ export class NetworkRuleParser {
     /**
      * Parses a network rule (also known as basic rule). Make sure you parse the cosmetic rules first!
      *
-     * @param {string} raw - Raw rule
-     * @returns {INetworkRule} Network rule AST
+     * @param raw - Raw rule
+     * @returns Network rule AST
      */
-    public static parse(raw: string): IBasicNetworkRule | IRemoveHeaderNetworkRule {
+    public static parse(raw: string): BasicNetworkRule | RemoveHeaderNetworkRule {
         let rule = raw.trim();
 
         // Special case
@@ -87,8 +87,8 @@ export class NetworkRuleParser {
             return uboRemoveHeader;
         }
 
-        const common: INetworkRule = {
-            category: RuleCategories.Network,
+        const common: NetworkRule = {
+            category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Unknown,
             exception: false,
@@ -115,7 +115,7 @@ export class NetworkRuleParser {
         );
 
         // Get rule parts
-        const modifiers: IRuleModifier[] = [];
+        const modifiers: RuleModifier[] = [];
 
         if (separatorIndex != -1) {
             common.pattern = rule.substring(0, separatorIndex);
@@ -131,16 +131,16 @@ export class NetworkRuleParser {
                 }
 
                 common.type = NetworkRuleType.RemoveHeaderNetworkRule;
-                common.syntax = AdblockSyntax.AdGuard;
+                common.syntax = AdblockSyntax.Adg;
 
-                return <IRemoveHeaderNetworkRule>{
+                return <RemoveHeaderNetworkRule>{
                     ...common,
                     header,
                 };
             }
         }
 
-        return <IBasicNetworkRule>{
+        return <BasicNetworkRule>{
             ...common,
             modifiers,
         };
@@ -152,13 +152,13 @@ export class NetworkRuleParser {
      * uBO calls this rule a "special case of HTML filtering", so this follows uBO's HTML filtering
      * syntax, which is a cosmetic pattern. However, we only parse this rule in the network parser.
      *
-     * @param {string} raw - Raw uBO response header filtering rule
-     * @returns {IRemoveHeaderNetworkRule | null}
+     * @param raw - Raw uBO response header filtering rule
+     * @returns
      * AST of the parsed rule, or null if there is no response header filtering indicator in the raw input
      * @throws If the response header indicator is present, but the rule is syntactically invalid
      * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#response-header-filtering}
      */
-    private static parseUboResponseHeader(raw: string): IRemoveHeaderNetworkRule | null {
+    private static parseUboResponseHeader(raw: string): RemoveHeaderNetworkRule | null {
         const trimmed = raw.trim();
 
         // In order to operate quickly, we only check the presence of the indicator at first
@@ -171,7 +171,7 @@ export class NetworkRuleParser {
 
         if (
             start == -1 ||
-            !(separator == CosmeticRuleSeparator.UboHTML || separator == CosmeticRuleSeparator.UboHTMLException)
+            !(separator == CosmeticRuleSeparator.UboHtml || separator == CosmeticRuleSeparator.UboHtmlException)
         ) {
             throw new SyntaxError(`uBO responseheader filtering requires a valid uBO HTML rule separator`);
         }
@@ -195,9 +195,9 @@ export class NetworkRuleParser {
         }
 
         return {
-            category: RuleCategories.Network,
+            category: RuleCategory.Network,
             type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.uBlockOrigin,
+            syntax: AdblockSyntax.Ubo,
             exception: !!exception,
             pattern: trimmed.substring(0, start).trim(),
             header,
@@ -207,14 +207,14 @@ export class NetworkRuleParser {
     /**
      * Converts the AST of a header removal network rule to a string.
      *
-     * @param {IRemoveHeaderNetworkRule} ast - Header remover rule AST
-     * @returns {string} Raw string
+     * @param ast - Header remover rule AST
+     * @returns Raw string
      */
-    private static generateUboResponseHeader(ast: IRemoveHeaderNetworkRule): string {
+    private static generateUboResponseHeader(ast: RemoveHeaderNetworkRule): string {
         let result = EMPTY;
 
         result += ast.pattern;
-        result += ast.exception ? CosmeticRuleSeparator.UboHTMLException : CosmeticRuleSeparator.UboHTML;
+        result += ast.exception ? CosmeticRuleSeparator.UboHtmlException : CosmeticRuleSeparator.UboHtml;
         result += UBO_RESPONSEHEADER_INDICATOR;
         result += ast.header;
         result += CLOSE_PARENTHESIS;
@@ -225,15 +225,15 @@ export class NetworkRuleParser {
     /**
      * Converts a network rule (basic rule) AST to a string.
      *
-     * @param {INetworkRule} ast - Network rule AST
-     * @returns {string} Raw string
+     * @param ast - Network rule AST
+     * @returns Raw string
      */
-    public static generate(ast: IBasicNetworkRule | IRemoveHeaderNetworkRule): string {
+    public static generate(ast: BasicNetworkRule | RemoveHeaderNetworkRule): string {
         let result = EMPTY;
 
         // Special case
-        if (ast.type == NetworkRuleType.RemoveHeaderNetworkRule && ast.syntax == AdblockSyntax.uBlockOrigin) {
-            return NetworkRuleParser.generateUboResponseHeader(<IRemoveHeaderNetworkRule>ast);
+        if (ast.type == NetworkRuleType.RemoveHeaderNetworkRule && ast.syntax == AdblockSyntax.Ubo) {
+            return NetworkRuleParser.generateUboResponseHeader(<RemoveHeaderNetworkRule>ast);
         }
 
         // Common parts

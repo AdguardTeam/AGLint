@@ -5,8 +5,8 @@
 import { METADATA_HEADERS } from "../../converter/metadata";
 import { AdblockSyntax } from "../../utils/adblockers";
 import { SPACE } from "../../utils/constants";
-import { RuleCategories } from "../common";
-import { CommentMarker, CommentRuleType, IComment } from "./common";
+import { RuleCategory } from "../common";
+import { CommentMarker, CommentRuleType, Comment } from "./common";
 
 const METADATA_SEPARATOR = ":";
 
@@ -20,8 +20,8 @@ const METADATA_SEPARATOR = ":";
  * ```
  * the name of the header is `Title`, and the value is `My List`.
  */
-export interface IMetadata extends IComment {
-    category: RuleCategories.Comment;
+export interface Metadata extends Comment {
+    category: RuleCategory.Comment;
     type: CommentRuleType.Metadata;
     marker: string;
     header: string;
@@ -37,10 +37,10 @@ export class MetadataParser {
     /**
      * Parses a raw rule as a metadata comment.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IMetadata | null} Metadata comment AST or null (if the raw rule cannot be parsed as a metadata comment)
+     * @param raw - Raw rule
+     * @returns Metadata comment AST or null (if the raw rule cannot be parsed as a metadata comment)
      */
-    public static parse(raw: string): IMetadata | null {
+    public static parse(raw: string): Metadata | null {
         const trimmed = raw.trim();
 
         if (trimmed[0] == CommentMarker.Regular || trimmed[0] == CommentMarker.Hashmark) {
@@ -53,7 +53,7 @@ export class MetadataParser {
                 for (let i = 0; i < METADATA_HEADERS.length; i++) {
                     if (headerLower === METADATA_HEADERS[i].toLocaleLowerCase()) {
                         return {
-                            category: RuleCategories.Comment,
+                            category: RuleCategory.Comment,
                             type: CommentRuleType.Metadata,
                             syntax: AdblockSyntax.Unknown,
                             marker: trimmed[0],
@@ -71,10 +71,10 @@ export class MetadataParser {
     /**
      * Converts a metadata comment AST to a string.
      *
-     * @param {IMetadata} ast - Metadata comment AST
-     * @returns {string} Raw string
+     * @param ast - Metadata comment AST
+     * @returns Raw string
      */
-    public static generate(ast: IMetadata): string {
+    public static generate(ast: Metadata): string {
         let result = ast.marker + SPACE;
 
         result += ast.header;

@@ -1,16 +1,16 @@
 import { CommentParser } from "./comment/comment";
-import { IComment } from "./comment/common";
-import { RuleCategories } from "./common";
+import { Comment } from "./comment/common";
+import { RuleCategory } from "./common";
 import {
     CosmeticRuleParser,
-    ICosmeticRule,
-    ICssRule,
-    IElementHidingRule,
-    IHtmlRule,
-    IJsRule,
-    IScriptletRule,
+    CosmeticRule,
+    CssRule,
+    ElementHidingRule,
+    HtmlRule,
+    JsRule,
+    ScriptletRule,
 } from "./cosmetic/cosmetic";
-import { IBasicNetworkRule, IRemoveHeaderNetworkRule, INetworkRule, NetworkRuleParser } from "./network/network";
+import { BasicNetworkRule, RemoveHeaderNetworkRule, NetworkRuleParser } from "./network/network";
 
 /**
  * RuleParser is responsible for parsing the rules.
@@ -21,22 +21,21 @@ export class RuleParser {
     /**
      * Parse an adblock rule. The type and syntax of the rule is determined automatically if possible.
      *
-     * @param {string} raw - Raw rule
-     * @returns {IComment | ICssRule | IElementHidingRule | IScriptletRule | IHtmlRule | IJsRule | INetworkRule}
-     * Network rule AST
+     * @param raw - Raw adblock rule
+     * @returns Adblock rule AST
      * @throws If the input matches a pattern but syntactically invalid
      */
     public static parse(
         raw: string
     ):
-        | IComment
-        | ICssRule
-        | IElementHidingRule
-        | IScriptletRule
-        | IHtmlRule
-        | IJsRule
-        | IBasicNetworkRule
-        | IRemoveHeaderNetworkRule {
+        | Comment
+        | CssRule
+        | ElementHidingRule
+        | ScriptletRule
+        | HtmlRule
+        | JsRule
+        | BasicNetworkRule
+        | RemoveHeaderNetworkRule {
         const trimmed = raw.trim();
 
         // Comments (agent / metadata / hint / pre-processor / comment)
@@ -60,16 +59,16 @@ export class RuleParser {
     /**
      * Converts a rule AST to a string.
      *
-     * @param {INetworkRule} ast - Adblock rule AST
-     * @returns {string} Raw string
+     * @param ast - Adblock rule AST
+     * @returns Raw string
      */
-    public static generate(ast: IComment | ICosmeticRule | IBasicNetworkRule | IRemoveHeaderNetworkRule): string {
+    public static generate(ast: Comment | CosmeticRule | BasicNetworkRule | RemoveHeaderNetworkRule): string {
         switch (ast.category) {
-            case RuleCategories.Comment:
+            case RuleCategory.Comment:
                 return CommentParser.generate(ast);
-            case RuleCategories.Cosmetic:
+            case RuleCategory.Cosmetic:
                 return CosmeticRuleParser.generate(ast);
-            case RuleCategories.Network:
+            case RuleCategory.Network:
                 return NetworkRuleParser.generate(ast);
         }
     }
