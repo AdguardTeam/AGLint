@@ -2,7 +2,7 @@
  * Elementhiding rule body parser
  */
 
-import { Selector, SelectorList } from "css-tree";
+import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "css-tree";
 import { CSS_SELECTORS_SEPARATOR, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
@@ -13,7 +13,7 @@ import { StringUtils } from "../../../utils/string";
  * but the best practice is to place the selectors in separate rules.
  */
 export interface ElementHidingRuleBody {
-    selectors: Selector[];
+    selectors: SelectorPlain[];
 }
 
 /**
@@ -44,11 +44,11 @@ export class ElementHidingBodyParser {
     public static parse(raw: string): ElementHidingRuleBody {
         const trimmed = raw.trim();
 
-        const selectors: Selector[] = [];
+        const selectors: SelectorPlain[] = [];
 
         // Selector
         if (StringUtils.findNextUnescapedCharacter(trimmed, CSS_SELECTORS_SEPARATOR) == -1) {
-            selectors.push(<Selector>CssTree.parse(trimmed, CssTreeParserContext.selector));
+            selectors.push(<SelectorPlain>CssTree.parsePlain(trimmed, CssTreeParserContext.selector));
         }
 
         // SelectorList
@@ -56,7 +56,7 @@ export class ElementHidingBodyParser {
             const selectorListAst = <SelectorList>CssTree.parse(trimmed, CssTreeParserContext.selectorList);
             selectorListAst.children.forEach((child) => {
                 if (child.type === CssTreeNodeType.Selector) {
-                    selectors.push(child);
+                    selectors.push(<SelectorPlain>toPlainObject(child));
                 }
             });
         }
@@ -74,7 +74,7 @@ export class ElementHidingBodyParser {
      */
     public static generate(ast: ElementHidingRuleBody): string {
         return ast.selectors
-            .map((selector) => CssTree.generateSelector(selector))
+            .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
             .join(CSS_SELECTORS_SEPARATOR + SPACE);
     }
 }

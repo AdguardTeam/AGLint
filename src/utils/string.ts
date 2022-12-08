@@ -388,4 +388,14 @@ export class StringUtils {
 
         return result;
     }
+
+    /**
+     * Splits a string along newline characters.
+     *
+     * @param input - Input string
+     * @returns Splitted string
+     */
+    public static splitStringByNewLines(input: string): string[] {
+        return input.split(/\r?\n/);
+    }
 }

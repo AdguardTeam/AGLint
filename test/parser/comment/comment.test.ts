@@ -1,7 +1,7 @@
-import { CommentParser } from "../../../src/parser/comment/comment";
-import { CommentRuleType } from "../../../src/parser/comment/common";
+import { CommentParser } from "../../../src/parser/comment";
+import { CommentRuleType } from "../../../src/parser/comment/types";
 import { Metadata } from "../../../src/parser/comment/metadata";
-import { RuleCategory } from "../../../src/parser/common";
+import { RuleCategory } from "../../../src/parser/categories";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 
@@ -255,7 +255,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("! This is just a comment")).toEqual({
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
             marker: "!",
             text: " This is just a comment",
         });
@@ -263,7 +263,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("# This is just a comment")).toEqual({
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
             marker: "#",
             text: " This is just a comment",
         });
@@ -271,7 +271,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("!#########################")).toEqual({
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
             marker: "!",
             text: "#########################",
         });
@@ -279,7 +279,7 @@ describe("CommentParser", () => {
         expect(CommentParser.parse("##########################")).toEqual({
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Unknown,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
             marker: "#",
             text: "#########################",
         });

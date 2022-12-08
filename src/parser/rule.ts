@@ -1,16 +1,28 @@
-import { CommentParser } from "./comment/comment";
-import { Comment } from "./comment/common";
-import { RuleCategory } from "./common";
-import {
-    CosmeticRuleParser,
-    CosmeticRule,
-    CssRule,
-    ElementHidingRule,
-    HtmlRule,
-    JsRule,
-    ScriptletRule,
-} from "./cosmetic/cosmetic";
-import { BasicNetworkRule, RemoveHeaderNetworkRule, NetworkRuleParser } from "./network/network";
+import { AdblockSyntax } from "../utils/adblockers";
+import { RuleCategory } from "./categories";
+import { AnyCommentRule, CommentParser } from "./comment";
+import { AnyCosmeticRule, CosmeticRuleParser } from "./cosmetic";
+import { AnyNetworkRule, NetworkRuleParser } from "./network";
+import { EMPTY } from "../utils/constants";
+
+const EMPTY_RULE_TYPE = "EmptyRule";
+
+export type AnyRule = EmptyRule | AnyCommentRule | AnyCosmeticRule | AnyNetworkRule;
+
+/**
+ * Specifies the general structure of a rule. This information must
+ * be included in all rules, regardless of category.
+ */
+export interface Rule {
+    syntax: AdblockSyntax;
+    category: RuleCategory;
+    type: string;
+}
+
+/** Represents an "empty rule" (practically an empty line) */
+export interface EmptyRule extends Rule {
+    type: typeof EMPTY_RULE_TYPE;
+}
 
 /**
  * RuleParser is responsible for parsing the rules.
@@ -25,18 +37,17 @@ export class RuleParser {
      * @returns Adblock rule AST
      * @throws If the input matches a pattern but syntactically invalid
      */
-    public static parse(
-        raw: string
-    ):
-        | Comment
-        | CssRule
-        | ElementHidingRule
-        | ScriptletRule
-        | HtmlRule
-        | JsRule
-        | BasicNetworkRule
-        | RemoveHeaderNetworkRule {
+    public static parse(raw: string): AnyRule {
         const trimmed = raw.trim();
+
+        // Empty lines
+        if (trimmed.length == 0) {
+            return {
+                syntax: AdblockSyntax.Unknown,
+                category: RuleCategory.Empty,
+                type: EMPTY_RULE_TYPE,
+            };
+        }
 
         // Comments (agent / metadata / hint / pre-processor / comment)
         const comment = CommentParser.parse(trimmed);
@@ -62,14 +73,16 @@ export class RuleParser {
      * @param ast - Adblock rule AST
      * @returns Raw string
      */
-    public static generate(ast: Comment | CosmeticRule | BasicNetworkRule | RemoveHeaderNetworkRule): string {
+    public static generate(ast: AnyRule): string {
         switch (ast.category) {
+            case RuleCategory.Empty:
+                return EMPTY;
             case RuleCategory.Comment:
-                return CommentParser.generate(ast);
+                return CommentParser.generate(<AnyCommentRule>ast);
             case RuleCategory.Cosmetic:
-                return CosmeticRuleParser.generate(ast);
+                return CosmeticRuleParser.generate(<AnyCosmeticRule>ast);
             case RuleCategory.Network:
-                return NetworkRuleParser.generate(ast);
+                return NetworkRuleParser.generate(<AnyNetworkRule>ast);
         }
     }
 }

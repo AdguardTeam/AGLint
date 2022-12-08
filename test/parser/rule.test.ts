@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 
-import { CommentRuleType } from "../../src/parser/comment/common";
-import { RuleCategory } from "../../src/parser/common";
-import { CosmeticRuleType } from "../../src/parser/cosmetic/common";
-import { NetworkRuleType } from "../../src/parser/network/common";
+import { CommentRuleType } from "../../src/parser/comment/types";
+import { RuleCategory } from "../../src/parser/categories";
+import { CosmeticRuleType } from "../../src/parser/cosmetic/types";
+import { NetworkRuleType } from "../../src/parser/network/types";
 import { RuleParser } from "../../src/parser/rule";
 import { AdblockSyntax } from "../../src/utils/adblockers";
 
@@ -94,17 +94,17 @@ describe("RuleParser", () => {
         // Simple comments
         expect(RuleParser.parse("! This is just a comment")).toMatchObject({
             category: RuleCategory.Comment,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
         });
 
         expect(RuleParser.parse("# This is just a comment")).toMatchObject({
             category: RuleCategory.Comment,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
         });
 
         expect(RuleParser.parse("! https://github.com/AdguardTeam/AdguardFilters/issues/134623")).toMatchObject({
             category: RuleCategory.Comment,
-            type: CommentRuleType.Comment,
+            type: CommentRuleType.SimpleComment,
         });
 
         // Element hiding rules

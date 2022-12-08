@@ -1,18 +1,22 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { REGEX_MARKER, StringUtils } from "../../utils/string";
 import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
-import { Rule, RuleCategory } from "../common";
-import { NetworkRuleType } from "./common";
+import { RuleCategory } from "../categories";
+import { NetworkRuleType } from "./types";
 import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
+import { Rule } from "../rule";
 
 const NETWORK_RULE_EXCEPTION_MARKER = "@@";
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = NETWORK_RULE_EXCEPTION_MARKER.length;
 const NETWORK_RULE_SEPARATOR = "$";
 
-export const UBO_RESPONSEHEADER_INDICATOR = "responseheader" + OPEN_PARENTHESIS;
-const UBO_RESPONSEHEADER_INDICATOR_LEN = UBO_RESPONSEHEADER_INDICATOR.length;
+const UBO_RESPONSEHEADER = "responseheader";
 const ADG_REMOVEHEADER = "removeheader";
+export const UBO_RESPONSEHEADER_INDICATOR = UBO_RESPONSEHEADER + OPEN_PARENTHESIS;
+const UBO_RESPONSEHEADER_INDICATOR_LEN = UBO_RESPONSEHEADER_INDICATOR.length;
+
+export type AnyNetworkRule = BasicNetworkRule | RemoveHeaderNetworkRule;
 
 /**
  * Represents the common properties of network rules
@@ -78,7 +82,7 @@ export class NetworkRuleParser {
      * @param raw - Raw rule
      * @returns Network rule AST
      */
-    public static parse(raw: string): BasicNetworkRule | RemoveHeaderNetworkRule {
+    public static parse(raw: string): AnyNetworkRule {
         let rule = raw.trim();
 
         // Special case
@@ -228,7 +232,7 @@ export class NetworkRuleParser {
      * @param ast - Network rule AST
      * @returns Raw string
      */
-    public static generate(ast: BasicNetworkRule | RemoveHeaderNetworkRule): string {
+    public static generate(ast: AnyNetworkRule): string {
         let result = EMPTY;
 
         // Special case

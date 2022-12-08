@@ -1,8 +1,10 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { SPACE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
-import { RuleCategory } from "../common";
-import { CommentMarker, CommentRuleType, Comment } from "./common";
+import { RuleCategory } from "../categories";
+import { CommentRuleType } from "./types";
+import { CommentMarker } from "./marker";
+import { Comment } from ".";
 
 const AGENT_LIST_OPEN = "[";
 const AGENT_LIST_CLOSE = "]";

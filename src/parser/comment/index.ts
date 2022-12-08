@@ -1,13 +1,23 @@
 import { StringUtils } from "../../utils/string";
 import { CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
-import { CommentMarker, CommentRuleType, Comment } from "./common";
+import { CommentRuleType } from "./types";
+import { CommentMarker } from "./marker";
 import { AgentParser, Agent } from "./agent";
 import { HintParser, Hint } from "./hint";
 import { Metadata, MetadataParser } from "./metadata";
 import { PreProcessor, PreProcessorParser } from "./preprocessor";
-import { RuleCategory } from "../common";
 import { AdblockSyntax } from "../../utils/adblockers";
 import { ConfigCommentParser, ConfigComment } from "./inline-config";
+import { RuleCategory } from "../categories";
+import { Rule } from "../rule";
+
+export type AnyCommentRule = Agent | Hint | ConfigComment | Metadata | PreProcessor | SimpleComment;
+
+/** Represents the basic comment rule interface. */
+export interface Comment extends Rule {
+    category: RuleCategory.Comment;
+    type: CommentRuleType;
+}
 
 /**
  * Represents a simple comment.
@@ -22,7 +32,7 @@ import { ConfigCommentParser, ConfigComment } from "./inline-config";
  *   - etc.
  */
 export interface SimpleComment extends Comment {
-    type: CommentRuleType.Comment;
+    type: CommentRuleType.SimpleComment;
 
     /** Comment marker: `!` or `#` */
     marker: CommentMarker;
@@ -136,7 +146,7 @@ export class CommentParser {
      * @param raw - Raw rule
      * @returns Comment AST or null (if the raw rule cannot be parsed as comment)
      */
-    public static parse(raw: string): Comment | null {
+    public static parse(raw: string): AnyCommentRule | null {
         const trimmed = raw.trim();
 
         if (!CommentParser.isComment(trimmed)) {
@@ -149,9 +159,9 @@ export class CommentParser {
             PreProcessorParser.parse(trimmed) ||
             MetadataParser.parse(trimmed) ||
             ConfigCommentParser.parse(trimmed) ||
-            <Comment>{
+            <SimpleComment>{
                 category: RuleCategory.Comment,
-                type: CommentRuleType.Comment,
+                type: CommentRuleType.SimpleComment,
                 syntax: AdblockSyntax.Unknown,
                 marker: trimmed[0],
                 text: trimmed.substring(1),
@@ -165,7 +175,7 @@ export class CommentParser {
      * @param ast - Comment AST
      * @returns Raw string
      */
-    public static generate(ast: Comment): string {
+    public static generate(ast: AnyCommentRule): string {
         switch (ast.type) {
             case CommentRuleType.Agent:
                 return AgentParser.generate(<Agent>ast);
@@ -177,7 +187,7 @@ export class CommentParser {
                 return MetadataParser.generate(<Metadata>ast);
             case CommentRuleType.ConfigComment:
                 return ConfigCommentParser.generate(<ConfigComment>ast);
-            case CommentRuleType.Comment:
+            case CommentRuleType.SimpleComment:
                 return (<SimpleComment>ast).marker + (<SimpleComment>ast).text;
         }
     }

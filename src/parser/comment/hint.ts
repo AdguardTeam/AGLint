@@ -7,8 +7,9 @@
 import { AdblockSyntax } from "../../utils/adblockers";
 import { EMPTY, SPACE, UNDERSCORE } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
-import { RuleCategory } from "../common";
-import { CommentRuleType, Comment } from "./common";
+import { RuleCategory } from "../categories";
+import { CommentRuleType } from "./types";
+import { Comment } from ".";
 
 const HINT_MARKER = "!+";
 const HINT_MARKER_LEN = HINT_MARKER.length;
