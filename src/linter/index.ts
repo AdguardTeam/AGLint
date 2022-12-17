@@ -1,402 +1,646 @@
-/** Linter core */
+/**
+ * AGLint core
+ */
 
-// External
-import ignore, { Ignore } from "ignore";
+// Linter stuff
+import { LinterRule, LinterRuleSeverity } from "./rule";
+import { LinterConfig, defaultLinterConfig } from "./config";
+import { defaultLinterRules } from "./rules";
+import { ConfigCommentType } from "./inline-config";
 
-// Parser
-import { Rules } from "./rules";
-import { ConfigComment } from "../parser/comment/inline-config";
-import { FilterListEntryType, FilterListParser, ValidFilterListEntry } from "../parser/filterlist";
+// Parser stuff
 import { RuleCategory } from "../parser/categories";
 import { CommentRuleType } from "../parser/comment/types";
-import { LinterRule, LinterRuleConfig, LinterRuleEvents, LinterRuleSeverity } from "./rule";
+import { AnyRule, RuleParser } from "../parser";
+import { NEWLINE } from "../utils/constants";
 
-const defaultOptions: LinterOptions = {
-    allowInlineConfig: true,
-};
+import { StringUtils } from "../utils/string";
+import { ArrayUtils } from "../utils/array";
 
-export interface LinterOptions {
-    allowInlineConfig?: boolean;
-    rules?: { [key: string]: LinterRuleConfig };
-}
-
-/** Represents currently supported config comments */
-export enum ConfigCommentType {
-    /** Main config comment with configuration object */
-    Main = "aglint",
-
-    /** Disables AGLint until the next enable comment */
-    Disable = "aglint-disable",
-
-    /** Enables AGLint */
-    Enable = "aglint-enable",
-
-    /** Disables AGLint for next line */
-    DisableNextLine = "aglint-disable-next-line",
-
-    /** Enables AGLint for next line */
-    EnableNextLine = "aglint-enable-next-line",
-}
-
-/** Represents the location of a problem detected by the linter */
+/**
+ * Represents the location of a problem that detected by the linter
+ */
 export interface LinterPosition {
-    /** Start line number */
+    /**
+     * Start line number
+     */
     startLine: number;
 
-    /** Start column position */
+    /**
+     * Start column position
+     */
     startColumn?: number;
 
-    /** End line number */
+    /**
+     * End line number
+     */
     endLine: number;
 
-    /** End column position */
+    /**
+     * End column position
+     */
     endColumn?: number;
 }
 
-/** Represents a problem report (this must be passed to context.report from the rules) */
+/**
+ * Represents a problem report (this must be passed to context.report from the rules)
+ */
 export interface LinterProblemReport {
-    /** Text description of the problem */
+    /**
+     * Text description of the problem
+     */
     message: string;
 
+    /**
+     * The location of the problem
+     */
     position: LinterPosition;
 
-    // TODO
-    fix?: unknown;
+    /**
+     * Suggested fix for the problem
+     */
+    fix?: AnyRule | AnyRule[];
 }
 
+/**
+ * Represents a linter result that is returned by the `lint` method
+ */
 export interface LinterResult {
-    messages: LinterProblem[];
+    /**
+     * Array of problems detected by the linter
+     */
+    problems: LinterProblem[];
+
+    /**
+     * Count of warnings (just for convenience, can be calculated from problems array)
+     */
     warningCount: number;
+
+    /**
+     * Count of errors (just for convenience, can be calculated from problems array)
+     */
     errorCount: number;
+
+    /**
+     * Count of fatal errors (just for convenience, can be calculated from problems array)
+     */
     fatalErrorCount: number;
+
+    /**
+     * The fixed filter list content. This is only available if the `fix` option is set to `true`.
+     */
+    fixed?: string;
 }
 
-/** Represents a message given by the linter */
+/**
+ * Represents a problem given by the linter
+ */
 export interface LinterProblem {
-    /** Name of the linter rule that generated this problem */
+    /**
+     * Name of the linter rule that generated this problem
+     */
     rule?: string;
 
-    /** The severity of this problem (it practically inherits the rule severity) */
+    /**
+     * The severity of this problem (it practically inherits the rule severity)
+     */
     severity: LinterRuleSeverity;
 
-    /** Text description of the problem */
+    /**
+     * Text description of the problem
+     */
     message: string;
 
+    /**
+     * The location of the problem
+     */
     position: LinterPosition;
+
+    /**
+     * Suggested fix for the problem (if available)
+     */
+    fix?: AnyRule | AnyRule[];
 }
 
+/**
+ * Represents a linter context that is passed to the rules when their events are triggered
+ */
 export interface LinterContext {
-    /** Get shared linter configuration */
-    getLinterOptions: () => LinterOptions;
+    /**
+     * Get shared linter configuration
+     *
+     * @returns The shared linter configuration
+     */
+    getLinterConfig: () => LinterConfig;
 
-    /** Get raw adblock filter list content */
+    /**
+     * Get raw adblock filter list content
+     *
+     * @returns The raw adblock filter list content
+     */
     getFilterListContent: () => string;
 
-    /** Get actual adblock rule */
-    getActualAdblockRule: () => ValidFilterListEntry;
+    /**
+     * Get actual adblock rule as AST
+     *
+     * @returns The actual adblock rule as AST
+     */
+    getActualAdblockRuleAst: () => AnyRule | undefined;
 
-    /** Rule state storage */
-    storage: RuleStorage;
+    /**
+     * Get actual adblock rule as original string
+     *
+     * @returns The actual adblock rule as original string
+     */
+    getActualAdblockRuleRaw: () => string | undefined;
 
-    /** Report a problem to the linter */
+    /**
+     * Get the actual line number
+     *
+     * @returns The actual line number
+     */
+    getActualLine: () => number;
+
+    /**
+     * Is fix needed? This is an optimization for the linter, so it doesn't have to
+     * run the fixer if it's not needed.
+     *
+     * @returns `true` if fix is needed, `false` otherwise
+     */
+    fixingEnabled: () => boolean;
+
+    /**
+     * Storage for storing data between events. This storage is only visible to the rule.
+     */
+    storage: LinterRuleStorage;
+
+    /**
+     * Function for reporting problems to the linter
+     *
+     * @param problem - The problem to report
+     */
     report: (problem: LinterProblemReport) => void;
 }
 
-type RuleStorage = { [key: string]: unknown };
+/**
+ * Represents a linter rule storage object that is passed as reference to
+ * the rules when their events are triggered.
+ *
+ * Basically used internally by the linter, so no need to export this.
+ */
+type LinterRuleStorage = {
+    // The key is some string, the value is unknown at this point.
+    // The concrete value type is defined by the rule.
+    [key: string]: unknown;
+};
 
-interface RuleData {
+/**
+ * Represents a linter rule data object. Basically used internally by the linter,
+ * so no need to export this.
+ */
+interface LinterRuleData {
+    /**
+     * The rule itself.
+     */
     rule: LinterRule;
-    storage: RuleStorage;
+
+    /**
+     * Storage for storing data between events. This storage is only visible
+     * to the rule.
+     */
+    storage: LinterRuleStorage;
+
+    /**
+     * The severity of the rule.
+     */
     severity: LinterRuleSeverity;
+
+    /**
+     * The parameters of the rule. This is unknown at this point, but the concrete
+     * type is defined by the rule.
+     */
     parameters?: unknown[];
 }
 
 export class Linter {
-    /** The linter configuration */
-    private options: LinterOptions = defaultOptions;
+    /**
+     * A map of rule names to `LinterRule` objects
+     */
+    private readonly rules: Map<string, LinterRuleData> = new Map();
 
-    /** It stores the ignored paths (the ignore management is delegated to a well-tested external library) */
-    private ignore: Ignore = ignore();
+    /**
+     * A set of disabled rule names
+     */
+    private readonly disabledRules: Set<string> = new Set();
 
-    /** All rules are imported at the beginning, and this rule storage handles them */
-    private rules: Map<string, RuleData> = new Map(
-        Array.from(Rules).map(([name, rule]) => [
-            name,
-            {
-                rule,
-                storage: {},
-                severity: rule.meta.severity,
-            },
-        ])
-    );
+    /**
+     * Creates a new linter instance.
+     *
+     * @param config - The linter configuration
+     */
+    constructor(private readonly config: LinterConfig = defaultLinterConfig) {}
 
-    /** Actually processed filter list */
-    private filterListContent = "";
-
-    /** Actually processed adblock rule */
-    private actualAdblockRule!: ValidFilterListEntry;
-
-    /** Found problems */
-    private problems: LinterProblem[] = [];
-
-    /** Is linter currently disabled? */
-    private disabled = false;
-
-    /** Is linter disabled for the next line? */
-    private nextLineDisabled = false;
-
-    /** Some rules are disabled for the next line? */
-    private nextLineDisabledRules: string[] = [];
-
-    // private nextLineEnabledRules: string[] = [];
-
-    constructor(options: LinterOptions = defaultOptions) {
-        this.options = options;
-
-        // TODO Load options
-
-        // Invoke start
-        this.invokeRuleEvent("onStart");
+    /**
+     * Adds all default rules to the linter.
+     */
+    public addDefaultRules(): void {
+        for (const [name, rule] of defaultLinterRules) {
+            this.addRule(name, rule);
+        }
     }
 
     /**
-     * With this method, a custom linter rule can be added to the linter
+     * Adds a new rule to the linter. If a rule with the same name already exists,
+     * an error is thrown, because rule names must be unique.
      *
-     * @param name - Rule name
-     * @param rule - The rule itself
-     * @param severity -.Rule severity
-     * @param parameters - Additional parameters
+     * @param name - The name of the rule
+     * @param rule - The `LinterRule` object
+     * @throws If the rule name is already taken
      */
-    public defineRule(name: string, rule: LinterRule, severity: LinterRuleSeverity, parameters: unknown[] = []) {
+    public addRule(name: string, rule: LinterRule): void {
         if (this.rules.has(name)) {
-            throw new Error("Name already taken");
+            throw new Error(`Rule with name "${name}" already exists`);
         }
 
+        // Add rule to the repository
         this.rules.set(name, {
+            // Add rule itself
             rule,
+
+            // Create an empty storage for the rule
             storage: {},
-            severity,
-            parameters,
+
+            // Get rule severity
+            severity: rule.meta.severity,
         });
     }
 
     /**
-     * Adds new ignores to the linter (in addition to the existing ones)
+     * Returns the `LinterRule` object with the specified name.
      *
-     * @param ignores - Ignore list
+     * @param name - The name of the rule
+     * @returns The `LinterRule` object, or `undefined` if no such rule exists
      */
-    public addIgnores(ignores: string[]) {
-        this.ignore.add(ignores);
+    public getRule(name: string): LinterRule | undefined {
+        // Return the rule (if it exists)
+        return this.rules.get(name)?.rule;
     }
 
     /**
-     * Resets the list of ignores (older ones are lost)
+     * Returns the map of all rules in the repository.
      *
-     * @param ignores - Ignore list
+     * @returns The map of rule names to `LinterRule` objects
      */
-    public setIgnores(ignores: string[]) {
-        this.ignore = ignore().add(ignores);
+    public getRules(): Map<string, LinterRuleData> {
+        return this.rules;
     }
 
     /**
-     * Determines whether the specified path is ignored
+     * Returns whether a rule with the specified name exists in the repository.
      *
-     * @param filePath - Path for the file
-     * @returns true/false
+     * @param name - The name of the rule
+     * @returns `true` if the rule exists, `false` otherwise
      */
-    public isPathIgnored(filePath: string): boolean {
-        return this.ignore.ignores(filePath);
+    public hasRule(name: string): boolean {
+        return this.rules.has(name);
     }
 
     /**
-     * Determines if a liter rule is turned off
+     * Removes a rule from the repository.
      *
-     * @param name - Rule name
-     * @returns true/false
+     * @param name - The name of the rule
      */
-    private isRuleDisabled(name: string): boolean {
-        if (this.options.rules) {
-            if (this.nextLineDisabledRules.includes(name)) {
-                return true;
-            }
+    public removeRule(name: string): void {
+        this.rules.delete(name);
+    }
 
-            if (name in this.options.rules) {
-                return this.options.rules[name] === LinterRuleSeverity.Off;
-            }
+    /**
+     * Disables a rule by name.
+     *
+     * @param name - The name of the rule
+     * @throws If the rule does not exist
+     */
+    public disableRule(name: string): void {
+        // Check if the rule exists
+        if (!this.hasRule(name)) {
+            throw new Error(`Rule with name "${name}" does not exist`);
         }
 
-        return false;
+        // Add rule to the disabled rules set
+        this.disabledRules.add(name);
     }
 
     /**
-     * Stores a reported problem in the linter
+     * Enables a rule
      *
-     * @param problem - Problem informations
+     * @param name - The name of the rule
      */
-    private addProblem(problem: LinterProblem) {
-        this.problems.push(problem);
+    public enableRule(name: string): void {
+        this.disabledRules.delete(name);
     }
 
     /**
-     * Returns the problems detected by the linter
+     * Returns whether a rule is disabled.
      *
-     * @returns Deep copy of problems array
+     * @param name - The name of the rule
+     * @returns `true` if the rule is disabled, `false` otherwise
      */
-    public getProblems(): LinterProblem[] {
-        return [...this.problems];
+    public isRuleDisabled(name: string): boolean {
+        return this.disabledRules.has(name);
     }
 
     /**
-     * Calls the specified event in all enabled rules
-     *
-     * @param event - Event name
-     */
-    public invokeRuleEvent(event: string & keyof LinterRuleEvents) {
-        for (const [name, rule] of this.rules) {
-            // Skipping non-existent rules / events
-            if (this.isRuleDisabled(name) || !Object.prototype.hasOwnProperty.call(rule.rule.events, event)) {
-                continue;
-            }
-
-            // Create actual context, and protect it with freezing
-            const context: LinterContext = Object.freeze({
-                // Deep copy linter config
-                getLinterOptions: () => ({ ...this.options }),
-
-                // The whole filter list content
-                getFilterListContent: () => this.filterListContent,
-
-                // The currently iterated adblock rule
-                getActualAdblockRule: () => this.actualAdblockRule,
-
-                // Storage reference
-                storage: rule.storage,
-
-                // Reporter
-                report: (data: LinterProblemReport) => {
-                    this.addProblem({
-                        rule: name,
-                        severity: rule.severity,
-                        message: data.message,
-                        position: { ...data.position },
-                    });
-                },
-            });
-
-            // Invoke rule event with the context
-            rule.rule.events[event]?.(context);
-        }
-    }
-
-    /**
-     * Processes a config comment
-     *
-     * @param ast - Config comment AST
-     */
-    private processConfigComment(ast: ConfigComment) {
-        // If the processing of config comments is disabled in the config, then do nothing
-        if (!this.options.allowInlineConfig) {
-            return;
-        }
-
-        switch (ast.command) {
-            case ConfigCommentType.Main: {
-                // TODO: Modify linter config here
-                break;
-            }
-
-            case ConfigCommentType.Disable: {
-                this.disabled = true;
-                break;
-            }
-
-            case ConfigCommentType.Enable: {
-                this.disabled = false;
-                break;
-            }
-
-            case ConfigCommentType.DisableNextLine: {
-                if (ast.params && typeof ast.params === "string") {
-                    this.nextLineDisabledRules = ast.params;
-                } else {
-                    this.nextLineDisabled = true;
-                }
-
-                break;
-            }
-
-            // TODO: Enable next line
-        }
-    }
-
-    /**
-     * Lint a filter list
+     * Lints the list of rules (typically this is the content of a filter list).
      *
      * @param content - Filter list content
+     * @param fix - Include fixes in the result. Please note that if more than one fix
+     * is available for a single problem, then the line will be skipped.
+     * @returns Linter result
      */
-    public lintFilterList(content: string) {
-        this.filterListContent = content;
+    public lint(content: string, fix = false): LinterResult {
+        // Prepare linting result
+        const result: LinterResult = {
+            problems: [],
+            warningCount: 0,
+            errorCount: 0,
+            fatalErrorCount: 0,
+        };
 
-        // It must be indicated to the rules that processing of the filter list has begun
-        this.invokeRuleEvent("onStartFilterList");
+        let isDisabled = false;
 
-        // Parse filter list
-        const entries = FilterListParser.parse(content);
+        // A set of linter rule names that are disabled on the next line
+        const nextLineDisabled = new Set<string>();
+        let isDisabledForNextLine = false;
 
-        for (const entry of entries) {
-            // If an entry (line/rule) is valid, it means that it was successfully parsed
-            if (entry.type == FilterListEntryType.ValidEntry) {
-                // ALWAYS handle linter config comments (even if disable is in effect)
-                if (this.options.allowInlineConfig) {
-                    if (entry.ast.category == RuleCategory.Comment && entry.ast.type == CommentRuleType.ConfigComment) {
-                        this.processConfigComment(entry.ast);
+        // A set of linter rule names that are enabled on the next line
+        const nextLineEnabled = new Set<string>();
+        let isEnabledForNextLine = false;
+
+        // Store the actual line number here for the context object
+        let actualLine = 0;
+
+        // Store the actual rule here for the context object
+        let actualAdblockRuleAst: AnyRule | undefined = undefined;
+        let actualAdblockRuleRaw: string | undefined = undefined;
+
+        /**
+         * Invokes an event for all rules. This function is only used internally
+         * by the actual linting, so we define it here.
+         *
+         * The context is dependent on the actual linting environment, so we create
+         * a new context object for each event within this function.
+         *
+         * @param event - The event to invoke (e.g. `onRule`)
+         */
+        const invokeEvent = (event: keyof LinterRule["events"]): void => {
+            for (const [name, data] of this.rules) {
+                // If the rule is disabled, skip it
+                if (
+                    (this.isRuleDisabled(name) || // rule is disabled at config level
+                        nextLineDisabled.has(name)) && // or rule is disabled for the next line
+                    !nextLineEnabled.has(name) // and rule is not enabled for the next line
+                ) {
+                    continue;
+                }
+
+                // Get event handler for the rule
+                const eventHandler = data.rule.events[event];
+
+                // Invoke event handler if it exists
+                if (eventHandler) {
+                    // Create a context object and freeze it in order to prevent
+                    // accidental / unwanted modifications
+                    const context: LinterContext = Object.freeze({
+                        // Deep copy of the linter configuration
+                        getLinterConfig: () => ({ ...this.config }),
+
+                        // Currently linted filter list content
+                        getFilterListContent: () => content,
+
+                        // Currently iterated adblock rule
+                        // eslint-disable-next-line @typescript-eslint/no-loop-func
+                        getActualAdblockRuleAst: () => (actualAdblockRuleAst ? { ...actualAdblockRuleAst } : undefined),
+
+                        // Currently iterated adblock rule
+                        // eslint-disable-next-line @typescript-eslint/no-loop-func
+                        getActualAdblockRuleRaw: () => (actualAdblockRuleRaw ? actualAdblockRuleRaw : undefined),
+
+                        // eslint-disable-next-line @typescript-eslint/no-loop-func
+                        getActualLine: () => actualLine,
+
+                        fixingEnabled: () => fix,
+
+                        // Storage reference
+                        storage: data.storage,
+
+                        // Reporter function
+                        report: (problem: LinterProblemReport) => {
+                            result.problems.push({
+                                rule: name,
+                                severity: data.severity,
+                                message: problem.message,
+                                position: { ...problem.position },
+                                fix: problem.fix,
+                            });
+
+                            if (data.severity === LinterRuleSeverity.Warn) {
+                                result.warningCount++;
+                            } else if (data.severity === LinterRuleSeverity.Error) {
+                                result.errorCount++;
+                            } else if (data.severity === LinterRuleSeverity.Fatal) {
+                                result.fatalErrorCount++;
+                            }
+                        },
+                    });
+
+                    // Invoke event handler with the context object
+                    eventHandler(context);
+                }
+            }
+        };
+
+        // Invoke onStartFilterList event before parsing the filter list
+        invokeEvent("onStartFilterList");
+
+        // Get lines (rules) of the filter list
+        const rules = StringUtils.splitStringByNewLines(content);
+
+        // Iterate over all filter list adblock rules
+        rules.forEach((rule, index) => {
+            // Update actual line number for the context object
+            actualLine = index + 1;
+
+            // Process the line
+            const code = ((): number => {
+                try {
+                    // Parse the current adblock rule, but this throw an error if the rule is invalid.
+                    // We catch the error and report it as a problem.
+                    const ast = RuleParser.parse(rule);
+
+                    // Handle inline config comments
+                    if (ast.category == RuleCategory.Comment && ast.type == CommentRuleType.ConfigComment) {
+                        // If inline config is not allowed in the linter configuration,
+                        // simply skip the comment processing
+                        if (!this.config.allowInlineConfig) {
+                            return 0;
+                        }
+
+                        // Process the inline config comment
+                        switch (ast.command) {
+                            case ConfigCommentType.Main: {
+                                // TODO: Modify linter config here
+                                break;
+                            }
+
+                            case ConfigCommentType.Disable: {
+                                isDisabled = true;
+                                break;
+                            }
+
+                            case ConfigCommentType.Enable: {
+                                isDisabled = false;
+                                break;
+                            }
+
+                            case ConfigCommentType.DisableNextLine: {
+                                // Disable specific rules for the next line
+                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
+                                    for (const param of ast.params) {
+                                        nextLineDisabled.add(param);
+                                    }
+                                }
+                                // Disable all rules for the next line
+                                else {
+                                    isDisabledForNextLine = true;
+                                }
+
+                                break;
+                            }
+
+                            case ConfigCommentType.EnableNextLine: {
+                                // Enable specific rules for the next line
+                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
+                                    for (const param of ast.params) {
+                                        nextLineEnabled.add(param);
+                                    }
+                                }
+                                // Enable all rules for the next line
+                                else {
+                                    isEnabledForNextLine = true;
+                                }
+
+                                break;
+                            }
+                        }
 
                         // The config comment has been processed, there is nothing more to do with the line
-                        continue;
+                        // But we need to return 1, because we processed an inline config comment
+                        return 1;
+                    } else {
+                        // If the linter is actually disabled, skip the rule processing.
+                        // It is important to do this check here, because we need to
+                        // process the inline config comments even if the linter is disabled
+                        // (in this way we could detect the `enable` command, for example).
+                        if ((isDisabled || isDisabledForNextLine) && !isEnabledForNextLine) {
+                            return 0;
+                        }
+
+                        // Deep copy of the line data
+                        actualAdblockRuleAst = { ...ast };
+                        actualAdblockRuleRaw = rule;
+
+                        // Invoke onRule event for all rules (process actual adblock rule)
+                        invokeEvent("onRule");
                     }
+                } catch (error: unknown) {
+                    // If the linter is actually disabled, skip the error reporting
+                    if ((isDisabled || isDisabledForNextLine) && !isEnabledForNextLine) {
+                        return 0;
+                    }
+
+                    if (error instanceof Error) {
+                        // If an error occurs during parsing, it means that the rule is invalid,
+                        // that is, it could not be parsed for some reason. This is a fatal error,
+                        // since the linter rules can only accept AST.
+                        result.problems.push({
+                            severity: LinterRuleSeverity.Fatal,
+                            message: error.message,
+                            position: {
+                                startLine: index + 1,
+                                startColumn: 0,
+                                endLine: index + 1,
+                                endColumn: rule.length,
+                            },
+                        });
+
+                        // Don't forget to increase the fatal error count when parsing fails
+                        result.fatalErrorCount++;
+                    }
+                }
+
+                return 0;
+            })();
+
+            // Clear next line stuff if the line was processed with code 0
+            if (code === 0) {
+                nextLineDisabled.clear();
+                nextLineEnabled.clear();
+                isDisabledForNextLine = false;
+                isEnabledForNextLine = false;
+            }
+        });
+
+        // Invoke onEndFilterList event after parsing the filter list
+        invokeEvent("onEndFilterList");
+
+        // Build fixed content if fixing is enabled
+        if (fix) {
+            // Create a new array for the fixed content (later we will join it)
+            const fixes: string[] = [];
+
+            // Iterate over all lines in the original content (filter list content)
+            for (let i = 0; i < rules.length; i++) {
+                let conflict = false;
+                let foundFix: AnyRule | AnyRule[] | undefined = undefined;
+
+                // Iterate over all problems and check if the problem is on the current line
+                for (const problem of result.problems) {
+                    // TODO: Currently we only support fixes for single-line problems
+                    if (problem.position.startLine == i + 1 && i + 1 == problem.position.endLine) {
+                        // If the problem has a fix, check if there is a conflict.
+                        // We can't fix the line if there are multiple fixes for the same line.
+                        if (problem.fix) {
+                            if (foundFix && foundFix != problem.fix) {
+                                conflict = true;
+                                break;
+                            }
+
+                            foundFix = problem.fix;
+                        }
+                    }
+                }
+
+                // If there is a fix and there is no conflict, push the fix to the fixes array
+                if (foundFix && !conflict) {
+                    // If the fix is an array, we need to push all its elements
+                    if (Array.isArray(foundFix)) {
+                        fixes.push(...foundFix.map((ast) => RuleParser.generate(ast)));
+                    }
+                    // Otherwise, we can simply push the generated (fixed) rule
+                    else {
+                        fixes.push(RuleParser.generate(foundFix));
+                    }
+                } else {
+                    // Otherwise, push the original rule
+                    fixes.push(rules[i]);
                 }
             }
 
-            // Handle disables
-            if (this.disabled) {
-                continue;
-            }
-
-            if (this.nextLineDisabled) {
-                // Enable linter again, since it was just a temporary disable
-                this.nextLineDisabled = false;
-                continue;
-            }
-
-            if (entry.type == FilterListEntryType.ValidEntry) {
-                // Adblock rules processing - run all enabled linter rules
-                this.actualAdblockRule = entry;
-
-                this.invokeRuleEvent("onRule");
-            }
-            // If an entry (line/rule) is invalid, it means that it could not be parsed for some reason. This is a
-            // fatal error from the point of view of the linter, since the linter rules can only accept AST.
-            else if (entry.type == FilterListEntryType.InvalidEntry) {
-                this.addProblem({
-                    severity: LinterRuleSeverity.Fatal,
-                    message: entry.error.message,
-                    position: {
-                        startLine: entry.line,
-                        startColumn: 0,
-                        endLine: entry.line,
-                        endColumn: entry.raw.length,
-                    },
-                });
-
-                // Since the rule is wrong, there is nothing more to do with this line, so let's jump to the next line
-                continue;
-            }
-
-            // It is important that if there were linter rules turned off for this line, they must be enabled again
-            this.nextLineDisabledRules = [];
+            // Join the fixed rules by newlines
+            result.fixed = fixes.join(NEWLINE);
         }
 
-        // It must be indicated to the rules that the entire filter list has been processed
-        this.invokeRuleEvent("onEndFilterList");
+        // Return linting result
+        return result;
     }
 }

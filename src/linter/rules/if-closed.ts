@@ -1,42 +1,83 @@
+// Linter stuff
+import { LinterContext, LinterPosition } from "..";
+import { LinterRule, LinterRuleSeverity, LinterRuleType } from "../rule";
+
+// Parser stuff
+import { AnyRule } from "../../parser";
 import { RuleCategory } from "../../parser/categories";
 import { CommentRuleType } from "../../parser/comment/types";
-import { ValidFilterListEntry } from "../../parser/filterlist";
-import { LinterContext } from "..";
-import { LinterRule, LinterRuleSeverity, LinterRuleType } from "../rule";
+import { PreProcessor } from "../../parser/comment/preprocessor";
 
 const IF_DIRECTIVE = "if";
 const ENDIF_DIRECTIVE = "endif";
 
-/** Concreting the storage type definition (the linter only provides a general form where the value is unknown) */
+/**
+ * Concreting the storage type definition (the linter only provides a general
+ * form where the value type is unknown)
+ */
 interface RuleStorage {
-    openIfs: Array<ValidFilterListEntry>;
+    /**
+     * Array of all open if directives
+     */
+    openIfs: Array<StoredIf>;
 }
 
-/** Inserting the storage type definition into the context */
+/**
+ * Interface for storing the directive and its position
+ */
+interface StoredIf {
+    /**
+     * Position of the directive
+     */
+    position: LinterPosition;
+
+    /**
+     * Collected if directive
+     */
+    rule: PreProcessor;
+}
+
+/**
+ * Inserting the storage type definition into the context
+ */
 type RuleContext = LinterContext & {
     storage: RuleStorage;
 };
 
+/**
+ * Rule that checks if all if directives are closed
+ */
 export const IfClosed = <LinterRule>{
     meta: {
         type: LinterRuleType.Problem,
         severity: LinterRuleSeverity.Error,
-        fixable: false,
     },
     events: {
         onStartFilterList: (context: RuleContext): void => {
-            // Each rule ONLY sees its own storage
+            // Each rule ONLY sees its own storage. At the beginning of the filter list,
+            // we just initialize the storage.
             context.storage.openIfs = [];
         },
         onRule: (context: RuleContext): void => {
             // Get actually iterated adblock rule
-            const entry = context.getActualAdblockRule();
-            const { ast, line } = entry;
+            const ast = <AnyRule>context.getActualAdblockRuleAst();
+            const raw = <string>context.getActualAdblockRuleRaw();
+            const line = context.getActualLine();
 
+            // Check adblock rule category and type
             if (ast.category == RuleCategory.Comment && ast.type == CommentRuleType.PreProcessor) {
+                // Check for "if" and "endif" directives
                 if (ast.name == IF_DIRECTIVE) {
                     // Collect open "if"
-                    context.storage.openIfs.push(entry);
+                    context.storage.openIfs.push({
+                        position: {
+                            startLine: line,
+                            startColumn: 0,
+                            endLine: line,
+                            endColumn: raw.length,
+                        },
+                        rule: ast,
+                    });
                 } else if (ast.name == ENDIF_DIRECTIVE) {
                     if (context.storage.openIfs.length == 0) {
                         context.report({
@@ -46,7 +87,7 @@ export const IfClosed = <LinterRule>{
                                 startLine: line,
                                 startColumn: 0,
                                 endLine: line,
-                                endColumn: entry.raw.length,
+                                endColumn: raw.length,
                             },
                         });
                     } else {
@@ -58,15 +99,10 @@ export const IfClosed = <LinterRule>{
         },
         onEndFilterList: (context: RuleContext): void => {
             // If there are any collected "if"s, that means they aren't closed, so a problem must be reported for them
-            for (const entry of context.storage.openIfs) {
+            for (const openIf of context.storage.openIfs) {
                 context.report({
                     message: `Unclosed "${IF_DIRECTIVE}" directive`,
-                    position: {
-                        startLine: entry.line,
-                        startColumn: 0,
-                        endLine: entry.line,
-                        endColumn: entry.raw.length,
-                    },
+                    position: openIf.position,
                 });
             }
         },

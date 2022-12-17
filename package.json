@@ -58,7 +58,6 @@
         "@types/node": "^18.11.7",
         "@types/rimraf": "^3.0.2",
         "@types/semver": "^7.3.12",
-        "@types/yargs": "^17.0.15",
         "@typescript-eslint/eslint-plugin": "^5.27.0",
         "@typescript-eslint/parser": "^5.27.0",
         "eslint": "^8.24.0",
@@ -84,10 +83,10 @@
     },
     "dependencies": {
         "chalk": "^5.1.2",
+        "commander": "^9.4.1",
         "css-tree": "^2.2.1",
         "glob": "^8.0.3",
         "ignore": "^5.2.1",
-        "json5": "^2.2.1",
-        "yargs": "^17.6.2"
+        "json5": "^2.2.1"
     }
 }

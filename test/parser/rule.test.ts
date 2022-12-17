@@ -4,12 +4,23 @@ import { CommentRuleType } from "../../src/parser/comment/types";
 import { RuleCategory } from "../../src/parser/categories";
 import { CosmeticRuleType } from "../../src/parser/cosmetic/types";
 import { NetworkRuleType } from "../../src/parser/network/types";
-import { RuleParser } from "../../src/parser/rule";
+import { EMPTY_RULE_TYPE, RuleParser } from "../../src/parser/rule";
 import { AdblockSyntax } from "../../src/utils/adblockers";
 
 describe("RuleParser", () => {
     test("parse", () => {
         // ! It is enough just to look at the basics, each unit is tested in detail elsewhere
+
+        // Empty lines
+        expect(RuleParser.parse("")).toMatchObject({
+            category: RuleCategory.Empty,
+            type: EMPTY_RULE_TYPE,
+        });
+
+        expect(RuleParser.parse("  ")).toMatchObject({
+            category: RuleCategory.Empty,
+            type: EMPTY_RULE_TYPE,
+        });
 
         // Agents
         expect(RuleParser.parse("[Adblock Plus 2.0]")).toMatchObject({
@@ -835,6 +846,11 @@ describe("RuleParser", () => {
 
             return null;
         };
+
+        // Empty lines
+        expect(parseAndGenerate("")).toEqual("");
+        expect(parseAndGenerate(" ")).toEqual("");
+        expect(parseAndGenerate("  ")).toEqual("");
 
         // Agents
         expect(parseAndGenerate("[Adblock Plus 2.0]")).toEqual("[Adblock Plus 2.0]");

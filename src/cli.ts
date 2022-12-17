@@ -5,9 +5,7 @@
 
 import chalk from "chalk";
 
-// TODO: yargs
-// import yargs from "yargs";
-// import { hideBin } from "yargs/helpers";
+// TODO: commander
 
 // import globPkg from "glob";
 // const { glob } = globPkg;
@@ -34,11 +32,11 @@ import { Linter } from ".";
 
     // TODO: Read file list from args / process all txt files
 
-    linter.lintFilterList(readFileSync("src/a.txt").toString());
+    const problems = linter.lint(readFileSync("src/a.txt").toString(), true);
 
-    const problems = linter.getProblems();
+    console.log(problems.fixed);
 
-    for (const problem of problems) {
+    for (const problem of problems.problems) {
         let message = "";
 
         // Problem type

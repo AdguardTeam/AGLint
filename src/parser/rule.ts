@@ -1,31 +1,41 @@
-import { AdblockSyntax } from "../utils/adblockers";
 import { RuleCategory } from "./categories";
 import { AnyCommentRule, CommentParser } from "./comment";
 import { AnyCosmeticRule, CosmeticRuleParser } from "./cosmetic";
 import { AnyNetworkRule, NetworkRuleParser } from "./network";
+import { AdblockSyntax } from "../utils/adblockers";
 import { EMPTY } from "../utils/constants";
 
-const EMPTY_RULE_TYPE = "EmptyRule";
+export const EMPTY_RULE_TYPE = "EmptyRule";
 
+/**
+ * Represents any kind of adblock rule.
+ */
 export type AnyRule = EmptyRule | AnyCommentRule | AnyCosmeticRule | AnyNetworkRule;
 
 /**
- * Specifies the general structure of a rule. This information must
+ * Specifies the general structure of an adblock rule. This information must
  * be included in all rules, regardless of category.
  */
 export interface Rule {
+    /** Syntax of the adblock rule (if cannot be determined then the value is `Unknown`) */
     syntax: AdblockSyntax;
+
+    /** Category of the adblock rule (should be always present) */
     category: RuleCategory;
+
+    /** Type of the adblock rule (should be always present) */
     type: string;
 }
 
-/** Represents an "empty rule" (practically an empty line) */
+/**
+ * Represents an "empty rule" (practically an empty line)
+ */
 export interface EmptyRule extends Rule {
     type: typeof EMPTY_RULE_TYPE;
 }
 
 /**
- * RuleParser is responsible for parsing the rules.
+ * `RuleParser` is responsible for parsing the rules.
  *
  * It automatically determines the category and syntax of the rule, so you can pass any kind of rule to it.
  */
@@ -40,7 +50,7 @@ export class RuleParser {
     public static parse(raw: string): AnyRule {
         const trimmed = raw.trim();
 
-        // Empty lines
+        // Empty lines / rules
         if (trimmed.length == 0) {
             return {
                 syntax: AdblockSyntax.Unknown,
@@ -49,7 +59,7 @@ export class RuleParser {
             };
         }
 
-        // Comments (agent / metadata / hint / pre-processor / comment)
+        // Comment rules (agent / metadata / hint / pre-processor / comment)
         const comment = CommentParser.parse(trimmed);
         if (comment !== null) {
             return comment;
@@ -75,12 +85,19 @@ export class RuleParser {
      */
     public static generate(ast: AnyRule): string {
         switch (ast.category) {
+            // Empty lines
             case RuleCategory.Empty:
                 return EMPTY;
+
+            // Comment rules
             case RuleCategory.Comment:
                 return CommentParser.generate(<AnyCommentRule>ast);
+
+            // Cosmetic / non-basic rules
             case RuleCategory.Cosmetic:
                 return CosmeticRuleParser.generate(<AnyCosmeticRule>ast);
+
+            // Network / basic rules
             case RuleCategory.Network:
                 return NetworkRuleParser.generate(<AnyNetworkRule>ast);
         }
