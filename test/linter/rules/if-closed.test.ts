@@ -89,7 +89,15 @@ describe("if-closed", () => {
         linter.addRule("if-closed", IfClosed);
 
         expect(
-            linter.lint(["rule", "!#if (condition1)", "rule", "!#endif", "!#endif", "rule", "rule"].join(NEWLINE))
+            linter.lint([
+                "rule",
+                "!#if (condition1)",
+                "rule",
+                "!#endif",
+                "!#endif",
+                "rule",
+                "rule"
+            ].join(NEWLINE))
         ).toMatchObject({
             problems: [
                 {
