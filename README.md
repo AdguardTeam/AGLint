@@ -18,26 +18,29 @@
 Table of Contents:
 - [Project structure](#project-structure)
   - [Parser](#parser)
+    - [Parser example](#parser-example)
+    - [Another parser example](#another-parser-example)
   - [Converter (WIP)](#converter-wip)
   - [Linter (WIP)](#linter-wip)
+- [Development](#development)
 - [References](#references)
 
 ## Project structure
 
 ### Parser
 
-- Parsing ADG/UBO/ABP rules into AST (string &#8594; AST)
-- Tolerant
-- Filter out syntax errors
-- Serialize rules (AST &#8594; string)
+An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently in use. In other words, any filter list can be parsed with it. The parser API basically has two main parts:
+- Parser: parsing rules (string &#8594; AST)
+- Generator: serialization of ASTs (AST &#8594; string)
 
 #### Parser example
 
 This code:
 
 ```typescript
-import { RuleParser } from "aglint/parser";
+import { RuleParser } from "aglint";
 
+// RuleParser automatically determines the rule type
 const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
 ```
 
@@ -47,7 +50,7 @@ will gives you this AST:
 {
     "category": "Cosmetic",
     "type": "ScriptletRule",
-    "syntax": "Adg",
+    "syntax": "AdGuard",
     "exception": false,
     "modifiers": [],
     "domains": [
