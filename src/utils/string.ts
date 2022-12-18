@@ -312,13 +312,13 @@ export class StringUtils {
     }
 
     /**
-     *Checks if a character is whitespace.
+     * Determines whether the given character is a space or tab character.
      *
-     * @param character - Character to check
-     * @returns true/false
+     * @param char - The character to check.
+     * @returns true if the given character is a space or tab character, false otherwise.
      */
-    public static isWhitespace(character: string): boolean {
-        return character == SPACE || character == TAB;
+    public static isWhitespace(char: string): boolean {
+        return char == SPACE || char == TAB;
     }
 
     /**
@@ -387,5 +387,15 @@ export class StringUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Splits a string along newline characters.
+     *
+     * @param input - Input string
+     * @returns Splitted string
+     */
+    public static splitStringByNewLines(input: string): string[] {
+        return input.split(/\r?\n/);
     }
 }

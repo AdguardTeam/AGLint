@@ -3,29 +3,53 @@
  * It also allows unknown syntax
  */
 export enum AdblockSyntax {
-    /** Unknown / common */
+    /** Unknown / common syntax */
     Unknown = "Unknown",
 
-    /** Adblock Plus */
-    Abp = "Abp",
+    /**
+     * Adblock Plus
+     *
+     * @see {@link https://adblockplus.org/}
+     */
+    Abp = "AdblockPlus",
 
-    /** uBlock Origin */
-    Ubo = "Ubo",
+    /**
+     * uBlock Origin
+     *
+     * @see {@link https://github.com/gorhill/uBlock}
+     */
+    Ubo = "UblockOrigin",
 
-    /** AdGuard */
-    Adg = "Adg",
+    /**
+     * AdGuard
+     *
+     * @see {@link https://adguard.com/}
+     */
+    Adg = "AdGuard",
 }
 
 /**
  * Possible adblock syntaxes (supported by this library)
  */
 export enum StrictAdblockSyntax {
-    /** Adblock Plus */
-    Abp = "Abp",
+    /**
+     * Adblock Plus
+     *
+     * @see {@link https://adblockplus.org/}
+     */
+    Abp = "AdblockPlus",
 
-    /** uBlock Origin */
-    Ubo = "Ubo",
+    /**
+     * uBlock Origin
+     *
+     * @see {@link https://github.com/gorhill/uBlock}
+     */
+    Ubo = "UblockOrigin",
 
-    /** AdGuard */
-    Adg = "Adg",
+    /**
+     * AdGuard
+     *
+     * @see {@link https://adguard.com/}
+     */
+    Adg = "AdGuard",
 }

@@ -1,4 +1,4 @@
-/** AGLint root */
+/** AGLint package root */
 
-// TODO: Import all modules here
-export * from "./parser/index";
+export * from "./parser";
+export * from "./linter";

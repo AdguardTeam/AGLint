@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
-import { CommentMarker, CommentRuleType } from "../../../src/parser/comment/common";
+import { CommentRuleType } from "../../../src/parser/comment/types";
+import { CommentMarker } from "../../../src/parser/comment/marker";
 import { ConfigComment, ConfigCommentParser } from "../../../src/parser/comment/inline-config";
-import { RuleCategory } from "../../../src/parser/common";
+import { RuleCategory } from "../../../src/parser/categories";
 import { AdblockSyntax } from "../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../src/utils/constants";
 

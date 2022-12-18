@@ -2,7 +2,7 @@
  * HTML filtering rule body parser
  */
 
-import { Selector, SelectorList } from "css-tree";
+import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
 import { CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
@@ -11,7 +11,7 @@ import { DOUBLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
 
 /**Represents an HTML filtering rule body. */
 export interface HtmlRuleBody {
-    selectors: Selector[];
+    selectors: SelectorPlain[];
 }
 
 /**
@@ -91,14 +91,14 @@ export class HtmlBodyParser {
     public static parse(raw: string): HtmlRuleBody {
         const trimmed = raw.trim();
 
-        const selectors: Selector[] = [];
+        const selectors: SelectorPlain[] = [];
 
         // Convert "" to \\" (this theoretically does not affect the uBlock rules)
         const escapedRawBody = HtmlBodyParser.escapeDoubleQuotes(trimmed);
 
         // Selector
         if (StringUtils.findNextUnescapedCharacter(escapedRawBody, CSS_SELECTORS_SEPARATOR) == -1) {
-            selectors.push(<Selector>CssTree.parse(escapedRawBody, CssTreeParserContext.selector));
+            selectors.push(<SelectorPlain>CssTree.parsePlain(escapedRawBody, CssTreeParserContext.selector));
         }
 
         // SelectorList
@@ -106,7 +106,7 @@ export class HtmlBodyParser {
             const selectorListAst = <SelectorList>CssTree.parse(escapedRawBody, CssTreeParserContext.selectorList);
             selectorListAst.children.forEach((child) => {
                 if (child.type === CssTreeNodeType.Selector) {
-                    selectors.push(child);
+                    selectors.push(<SelectorPlain>toPlainObject(child));
                 }
             });
         }
@@ -125,7 +125,7 @@ export class HtmlBodyParser {
      */
     public static generate(ast: HtmlRuleBody, syntax: AdblockSyntax): string {
         let result = ast.selectors
-            .map((selector) => CssTree.generateSelector(selector))
+            .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
             .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
         // In the case of AdGuard syntax, the "" case must be handled

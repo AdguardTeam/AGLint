@@ -22,17 +22,17 @@ describe("HtmlBodyParser", () => {
 
     test("parse", () => {
         expect(HtmlBodyParser.parse('[tag-content="""a"""]')).toEqual({
-            selectors: [CssTree.parse('[tag-content="\\"a\\""]', CssTreeParserContext.selector)],
+            selectors: [CssTree.parsePlain('[tag-content="\\"a\\""]', CssTreeParserContext.selector)],
         });
 
         expect(HtmlBodyParser.parse('[tag-content="""""a"""""]')).toEqual({
-            selectors: [CssTree.parse('[tag-content="\\"\\"a\\"\\""]', CssTreeParserContext.selector)],
+            selectors: [CssTree.parsePlain('[tag-content="\\"\\"a\\"\\""]', CssTreeParserContext.selector)],
         });
 
         expect(HtmlBodyParser.parse("script:has-text(a), script:has-text(b)")).toEqual({
             selectors: [
-                CssTree.parse("script:has-text(a)", CssTreeParserContext.selector),
-                CssTree.parse("script:has-text(b)", CssTreeParserContext.selector),
+                CssTree.parsePlain("script:has-text(a)", CssTreeParserContext.selector),
+                CssTree.parsePlain("script:has-text(b)", CssTreeParserContext.selector),
             ],
         });
     });

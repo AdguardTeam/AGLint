@@ -2,7 +2,18 @@
  * CSS injection rule body parser
  */
 
-import { Selector, SelectorList, MediaQueryList, Block, Rule, generate as generateCss } from "css-tree";
+import {
+    Selector,
+    SelectorList,
+    Block,
+    Rule,
+    generate as generateCss,
+    SelectorPlain,
+    BlockPlain,
+    toPlainObject,
+    fromPlainObject,
+    MediaQueryListPlain,
+} from "css-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
 import {
     CSS_BLOCK_CLOSE,
@@ -44,12 +55,12 @@ export const REMOVE_BLOCK_TYPE = "remove";
  *  - CSS declaration block
  *  - remove
  */
-export type CssInjectionBlock = Block | typeof REMOVE_BLOCK_TYPE;
+export type CssInjectionBlock = BlockPlain | typeof REMOVE_BLOCK_TYPE;
 
 /** Represents a CSS injection body. */
 export interface CssRuleBody {
-    mediaQueryList?: MediaQueryList;
-    selectors: Selector[];
+    mediaQueryList?: MediaQueryListPlain;
+    selectors: SelectorPlain[];
     block?: CssInjectionBlock;
 }
 
@@ -133,15 +144,15 @@ export class CssInjectionBodyParser {
             return null;
         }
 
-        let mediaQueryList: MediaQueryList | undefined = undefined;
+        let mediaQueryList: MediaQueryListPlain | undefined = undefined;
         const selectors: Selector[] = [];
         let rawRule = trimmed;
 
         // Parse media queries (if any)
         const mediaQueryMatch = trimmed.match(MEDIA_QUERY_PATTERN);
         if (mediaQueryMatch && mediaQueryMatch.groups) {
-            mediaQueryList = <MediaQueryList>(
-                CssTree.parse(mediaQueryMatch.groups.mediaQueryList.trim(), CssTreeParserContext.mediaQueryList)
+            mediaQueryList = <MediaQueryListPlain>(
+                CssTree.parsePlain(mediaQueryMatch.groups.mediaQueryList.trim(), CssTreeParserContext.mediaQueryList)
             );
 
             rawRule = mediaQueryMatch.groups.rule.trim();
@@ -162,13 +173,13 @@ export class CssInjectionBodyParser {
             }
         });
 
-        let block: CssInjectionBlock = ruleAst.block;
+        let block: BlockPlain | typeof REMOVE_BLOCK_TYPE = <BlockPlain>toPlainObject(ruleAst.block);
 
         // Check for remove property
         let removeDeclFound = false;
         let nonRemoveDeclFound = false;
 
-        block.children.forEach((node) => {
+        ruleAst.block.children.forEach((node) => {
             if (node.type === CssTreeNodeType.Declaration) {
                 if (node.property == REMOVE_BLOCK_TYPE) {
                     if (removeDeclFound) {
@@ -194,7 +205,7 @@ export class CssInjectionBodyParser {
 
         return {
             mediaQueryList,
-            selectors,
+            selectors: <SelectorPlain[]>selectors.map((selector) => toPlainObject(selector)),
             block,
         };
     }
@@ -224,26 +235,21 @@ export class CssInjectionBodyParser {
             if (node.type == CssTreeNodeType.Selector) {
                 selectors.push(node);
             }
-            // else {
-            //     throw new Error(
-            //         `Invalid selector found in the following CSS injection body: "${raw}"`
-            //     );
-            // }
         });
 
-        let block: CssInjectionBlock = REMOVE_BLOCK_TYPE;
+        const result: CssRuleBody = {
+            selectors: <SelectorPlain[]>selectors.map((selector) => toPlainObject(selector)),
+            block: REMOVE_BLOCK_TYPE,
+        };
 
         if (uboCssInjection.groups.declarations) {
             const rawDeclarations = uboCssInjection.groups.declarations.trim();
 
             // Hack: CSS parser waits for `{declarations}` pattern, so we need { and } chars:
-            block = <Block>CssTree.parse(`{${rawDeclarations}}`, CssTreeParserContext.block);
+            result.block = <BlockPlain>toPlainObject(CssTree.parse(`{${rawDeclarations}}`, CssTreeParserContext.block));
         }
 
-        return {
-            selectors,
-            block,
-        };
+        return result;
     }
 
     /**
@@ -256,14 +262,9 @@ export class CssInjectionBodyParser {
     public static parse(raw: string): CssRuleBody | null {
         const trimmed = raw.trim();
 
-        // AdGuard CSS injection
-        const result = CssInjectionBodyParser.parseAdgCssInjection(trimmed);
-        if (result) {
-            return result;
-        }
-
-        // uBlock CSS injection
-        return CssInjectionBodyParser.parseUboCssInjection(trimmed);
+        return (
+            CssInjectionBodyParser.parseAdgCssInjection(trimmed) || CssInjectionBodyParser.parseUboCssInjection(trimmed)
+        );
     }
 
     /**
@@ -284,7 +285,7 @@ export class CssInjectionBodyParser {
                 if (ast.mediaQueryList) {
                     result += CSS_MEDIA_MARKER;
                     result += SPACE;
-                    result += generateCss(ast.mediaQueryList);
+                    result += generateCss(fromPlainObject(ast.mediaQueryList));
                     result += SPACE;
                     result += CSS_BLOCK_OPEN;
                     result += SPACE;
@@ -292,7 +293,7 @@ export class CssInjectionBodyParser {
 
                 // Selectors (comma separated)
                 result += ast.selectors
-                    .map((selector) => CssTree.generateSelector(selector))
+                    .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
                     .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
                 // Rule body (remove or another declarations)
@@ -305,7 +306,7 @@ export class CssInjectionBodyParser {
                 } else {
                     result += CSS_BLOCK_OPEN;
                     result += SPACE;
-                    result += CssTree.generateBlock(ast.block);
+                    result += CssTree.generateBlock(<Block>fromPlainObject(ast.block));
                     result += SPACE;
                     result += CSS_BLOCK_CLOSE;
                 }
@@ -324,7 +325,7 @@ export class CssInjectionBodyParser {
 
                 // Selectors (comma separated)
                 result += ast.selectors
-                    .map((selector) => CssTree.generateSelector(selector))
+                    .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
                     .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
                 // Add :remove() or :style() at the end of the injection
@@ -342,7 +343,7 @@ export class CssInjectionBodyParser {
                     result += CSS_PSEUDO_MARKER;
                     result += UBO_STYLE;
                     result += CSS_PSEUDO_OPEN;
-                    result += CssTree.generateBlock(ast.block);
+                    result += CssTree.generateBlock(<Block>fromPlainObject(ast.block));
                     result += CSS_PSEUDO_CLOSE;
                 }
 

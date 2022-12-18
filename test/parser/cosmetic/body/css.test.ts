@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Selector } from "css-tree";
+import { MediaQueryListPlain, SelectorPlain } from "css-tree";
 import { CssInjectionBodyParser, CssRuleBody, REMOVE_BLOCK_TYPE } from "../../../../src/parser/cosmetic/body/css";
 import { AdblockSyntax } from "../../../../src/utils/adblockers";
 import { EMPTY, SPACE } from "../../../../src/utils/constants";
@@ -59,8 +59,8 @@ describe("CssInjectionBodyParser", () => {
         expect(CssInjectionBodyParser.parseAdgCssInjection("body { padding-top: 0 !important; }")).toEqual(<
             CssRuleBody
         >{
-            selectors: [CssTree.parse("body", CssTreeParserContext.selector)],
-            block: CssTree.parse("{ padding-top: 0 !important; }", CssTreeParserContext.block),
+            selectors: [CssTree.parsePlain("body", CssTreeParserContext.selector)],
+            block: CssTree.parsePlain("{ padding-top: 0 !important; }", CssTreeParserContext.block),
         });
 
         expect(
@@ -70,10 +70,10 @@ describe("CssInjectionBodyParser", () => {
             )
         ).toEqual(<CssRuleBody>{
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
-            block: CssTree.parse(
+            block: CssTree.parsePlain(
                 "{ padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }",
                 CssTreeParserContext.block
             ),
@@ -86,15 +86,15 @@ describe("CssInjectionBodyParser", () => {
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; } }"
             )
         ).toEqual(<CssRuleBody>{
-            mediaQueryList: CssTree.parse(
+            mediaQueryList: CssTree.parsePlain(
                 "(min-width: 1000px) and (max-width: 2000px)",
                 CssTreeParserContext.mediaQueryList
             ),
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
-            block: CssTree.parse(
+            block: CssTree.parsePlain(
                 "{ padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }",
                 CssTreeParserContext.block
             ),
@@ -104,7 +104,7 @@ describe("CssInjectionBodyParser", () => {
         expect(CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { remove: true; }")).toEqual(<
             CssRuleBody
         >{
-            selectors: [CssTree.parse("body > section[ad-source]", CssTreeParserContext.selector)],
+            selectors: [CssTree.parsePlain("body > section[ad-source]", CssTreeParserContext.selector)],
             block: REMOVE_BLOCK_TYPE,
         });
 
@@ -140,8 +140,8 @@ describe("CssInjectionBodyParser", () => {
         expect(CssInjectionBodyParser.parseUboCssInjection("body:style(padding-top: 0 !important;)")).toEqual(<
             CssRuleBody
         >{
-            selectors: [CssTree.parse("body", CssTreeParserContext.selector)],
-            block: CssTree.parse("{ padding-top: 0 !important; }", CssTreeParserContext.block),
+            selectors: [CssTree.parsePlain("body", CssTreeParserContext.selector)],
+            block: CssTree.parsePlain("{ padding-top: 0 !important; }", CssTreeParserContext.block),
         });
 
         expect(
@@ -151,10 +151,10 @@ describe("CssInjectionBodyParser", () => {
             )
         ).toEqual(<CssRuleBody>{
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
-            block: CssTree.parse(
+            block: CssTree.parsePlain(
                 "{ padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }",
                 CssTreeParserContext.block
             ),
@@ -162,7 +162,7 @@ describe("CssInjectionBodyParser", () => {
 
         // Remove
         expect(CssInjectionBodyParser.parseUboCssInjection("body > section[ad-source]:remove()")).toEqual(<CssRuleBody>{
-            selectors: [CssTree.parse("body > section[ad-source]", CssTreeParserContext.selector)],
+            selectors: [CssTree.parsePlain("body > section[ad-source]", CssTreeParserContext.selector)],
             block: REMOVE_BLOCK_TYPE,
         });
 
@@ -178,10 +178,10 @@ describe("CssInjectionBodyParser", () => {
             )
         ).toEqual(<CssRuleBody>{
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
-            block: CssTree.parse(
+            block: CssTree.parsePlain(
                 "{ padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }",
                 CssTreeParserContext.block
             ),
@@ -189,8 +189,8 @@ describe("CssInjectionBodyParser", () => {
 
         expect(CssInjectionBodyParser.parse("body, section:has(.something):remove()")).toEqual(<CssRuleBody>{
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
             block: REMOVE_BLOCK_TYPE,
         });
@@ -201,15 +201,14 @@ describe("CssInjectionBodyParser", () => {
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; } }"
             )
         ).toEqual(<CssRuleBody>{
-            mediaQueryList: CssTree.parse(
-                "(min-width: 1000px) and (max-width: 2000px)",
-                CssTreeParserContext.mediaQueryList
+            mediaQueryList: <MediaQueryListPlain>(
+                CssTree.parsePlain("(min-width: 1000px) and (max-width: 2000px)", CssTreeParserContext.mediaQueryList)
             ),
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
-            block: CssTree.parse(
+            block: CssTree.parsePlain(
                 "{ padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }",
                 CssTreeParserContext.block
             ),
@@ -220,13 +219,12 @@ describe("CssInjectionBodyParser", () => {
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { remove: true; } }"
             )
         ).toEqual(<CssRuleBody>{
-            mediaQueryList: CssTree.parse(
-                "(min-width: 1000px) and (max-width: 2000px)",
-                CssTreeParserContext.mediaQueryList
+            mediaQueryList: <MediaQueryListPlain>(
+                CssTree.parsePlain("(min-width: 1000px) and (max-width: 2000px)", CssTreeParserContext.mediaQueryList)
             ),
             selectors: [
-                CssTree.parse("body", CssTreeParserContext.selector),
-                CssTree.parse("section:has(.something)", CssTreeParserContext.selector),
+                CssTree.parsePlain("body", CssTreeParserContext.selector),
+                CssTree.parsePlain("section:has(.something)", CssTreeParserContext.selector),
             ],
             block: REMOVE_BLOCK_TYPE,
         });
@@ -262,7 +260,7 @@ describe("CssInjectionBodyParser", () => {
         expect(
             CssInjectionBodyParser.generate(
                 {
-                    selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
+                    selectors: [<SelectorPlain>CssTree.parsePlain(".test", CssTreeParserContext.selector)],
                 },
                 AdblockSyntax.Adg
             )
@@ -271,7 +269,7 @@ describe("CssInjectionBodyParser", () => {
         expect(
             CssInjectionBodyParser.generate(
                 {
-                    selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
+                    selectors: [<SelectorPlain>CssTree.parsePlain(".test", CssTreeParserContext.selector)],
                 },
                 AdblockSyntax.Ubo
             )
@@ -280,7 +278,7 @@ describe("CssInjectionBodyParser", () => {
         expect(() =>
             CssInjectionBodyParser.generate(
                 {
-                    selectors: [<Selector>CssTree.parse(".test", CssTreeParserContext.selector)],
+                    selectors: [<SelectorPlain>CssTree.parsePlain(".test", CssTreeParserContext.selector)],
                 },
                 AdblockSyntax.Abp
             )

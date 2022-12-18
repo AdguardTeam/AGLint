@@ -6,8 +6,10 @@
 
 import { AdblockSyntax } from "../../utils/adblockers";
 import { COMMA, EMPTY, SPACE } from "../../utils/constants";
-import { RuleCategory } from "../common";
-import { CommentMarker, CommentRuleType, Comment } from "./common";
+import { RuleCategory } from "../categories";
+import { CommentRuleType } from "./types";
+import { CommentMarker } from "./marker";
+import { Comment } from ".";
 import JSON5 from "json5";
 
 const AGLINT_COMMAND_PREFIX = "aglint";
@@ -15,7 +17,7 @@ const PARAMS_SEPARATOR = COMMA;
 const CONFIG_COMMENT_MARKER = "--";
 
 /**
- * Represents an inline configuration comment.
+ * Represents an inline linter configuration comment.
  *
  * For example, if the comment is
  * ```adblock
@@ -159,10 +161,12 @@ export class ConfigCommentParser {
             if (Array.isArray(ast.params)) {
                 result += ast.params.join(PARAMS_SEPARATOR + SPACE);
             } else {
+                // Trim JSON boundaries
                 result += JSON.stringify(ast.params).slice(1, -1).trim();
             }
         }
 
+        // Add comment within the config comment
         if (ast.comment) {
             result += SPACE;
             result += CONFIG_COMMENT_MARKER;

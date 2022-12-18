@@ -1,11 +1,11 @@
-import { Rule, RuleCategory } from "../common";
+import { RuleCategory } from "../categories";
 
 // Utils
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
 import { AdblockSyntax } from "../../utils/adblockers";
 
 // Parsers
-import { CommentParser } from "../comment/comment";
+import { CommentParser } from "../comment";
 import { CssInjectionBodyParser, CssRuleBody } from "./body/css";
 import { ElementHidingBodyParser, ElementHidingRuleBody } from "./body/elementhiding";
 import { ScriptletBodyParser, ScriptletRuleBody } from "./body/scriptlet";
@@ -14,9 +14,12 @@ import { DomainListParser, DOMAIN_LIST_TYPE, Domain } from "../common/domain-lis
 import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "./specific/adg-modifiers";
 import { RuleModifier } from "../common/modifier-list";
 import { UboModifier, UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "./specific/ubo-modifiers";
-import { CosmeticRuleType } from "./common";
+import { CosmeticRuleType } from "./types";
 import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
-import { UBO_RESPONSEHEADER_INDICATOR } from "../network/network";
+import { UBO_RESPONSEHEADER_INDICATOR } from "../network";
+import { Rule } from "../rule";
+
+export type AnyCosmeticRule = CssRule | ElementHidingRule | ScriptletRule | HtmlRule | JsRule;
 
 /**
  * A generic representation of a cosmetic rule.
@@ -205,7 +208,7 @@ export class CosmeticRuleParser {
      * Parsed cosmetic rule AST or null if it failed to parse based on the known cosmetic rules
      * @throws If the input matches the cosmetic rule pattern but syntactically invalid
      */
-    public static parse(raw: string): ElementHidingRule | CssRule | ScriptletRule | HtmlRule | JsRule | null {
+    public static parse(raw: string): AnyCosmeticRule | null {
         // Skip regular comments
         if (CommentParser.isRegularComment(raw)) {
             return null;
@@ -421,7 +424,7 @@ export class CosmeticRuleParser {
      * @param ast - Cosmetic rule AST
      * @returns Raw string
      */
-    public static generate(ast: CosmeticRule): string {
+    public static generate(ast: AnyCosmeticRule): string {
         let result = EMPTY;
 
         // AdGuard modifiers
@@ -448,10 +451,10 @@ export class CosmeticRuleParser {
                     result += UboModifierListParser.generate({
                         type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
-                        rest: ElementHidingBodyParser.generate(<ElementHidingRuleBody>ast.body),
+                        rest: ElementHidingBodyParser.generate(ast.body),
                     });
                 } else {
-                    result += ElementHidingBodyParser.generate(<ElementHidingRuleBody>ast.body);
+                    result += ElementHidingBodyParser.generate(ast.body);
                 }
                 break;
 
@@ -462,10 +465,10 @@ export class CosmeticRuleParser {
                     result += UboModifierListParser.generate({
                         type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
-                        rest: CssInjectionBodyParser.generate(<CssRuleBody>ast.body, ast.syntax),
+                        rest: CssInjectionBodyParser.generate(ast.body, ast.syntax),
                     });
                 } else {
-                    result += CssInjectionBodyParser.generate(<CssRuleBody>ast.body, ast.syntax);
+                    result += CssInjectionBodyParser.generate(ast.body, ast.syntax);
                 }
                 break;
 
@@ -476,10 +479,10 @@ export class CosmeticRuleParser {
                     result += UboModifierListParser.generate({
                         type: UBO_MODIFIER_LIST_TYPE,
                         modifiers: ast.modifiers,
-                        rest: HtmlBodyParser.generate(<HtmlRuleBody>ast.body, ast.syntax),
+                        rest: HtmlBodyParser.generate(ast.body, ast.syntax),
                     });
                 } else {
-                    result += HtmlBodyParser.generate(<HtmlRuleBody>ast.body, ast.syntax);
+                    result += HtmlBodyParser.generate(ast.body, ast.syntax);
                 }
                 break;
 
@@ -494,7 +497,7 @@ export class CosmeticRuleParser {
                 result += ast.separator;
 
                 // eslint-disable-next-line no-case-declarations
-                const scriptlets = ScriptletBodyParser.generate(<ScriptletRuleBody>ast.body, ast.syntax);
+                const scriptlets = ScriptletBodyParser.generate(ast.body, ast.syntax);
 
                 if (ast.syntax == AdblockSyntax.Abp) {
                     result += scriptlets.join(SEMICOLON + SPACE);

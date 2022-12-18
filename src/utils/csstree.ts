@@ -12,6 +12,8 @@ import {
     Selector,
     generate,
     Block,
+    CssNodePlain,
+    toPlainObject,
 } from "css-tree";
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from "../converter/pseudo";
 import {
@@ -55,6 +57,28 @@ export class CssTree {
                 throw new SyntaxError(error.rawMessage);
             },
         });
+    }
+
+    /**
+     * Helper function for parsing CSS parts.
+     *
+     * @param raw - Raw CSS input
+     * @param context - CSSTree context
+     * @returns CSSTree node (AST)
+     */
+    public static parsePlain(raw: string, context: CssTreeParserContext): CssNodePlain {
+        return toPlainObject(
+            parse(raw, {
+                context,
+                parseAtrulePrelude: true,
+                parseRulePrelude: true,
+                parseValue: true,
+                parseCustomProperty: true,
+                onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
+                    throw new SyntaxError(error.rawMessage);
+                },
+            })
+        );
     }
 
     /**

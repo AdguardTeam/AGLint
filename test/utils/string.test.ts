@@ -158,4 +158,10 @@ describe("String utils", () => {
         expect(StringUtils.escapeCharacter(`b`, "b")).toBe(`\\b`);
         expect(StringUtils.escapeCharacter(`\\b`, "b")).toBe(`\\b`);
     });
+
+    test("splitStringByNewLines", () => {
+        expect(StringUtils.splitStringByNewLines(``)).toStrictEqual([""]);
+        expect(StringUtils.splitStringByNewLines(`a\nb\nc`)).toStrictEqual(["a", "b", "c"]);
+        expect(StringUtils.splitStringByNewLines(`a\r\nb\nc`)).toStrictEqual(["a", "b", "c"]);
+    });
 });
