@@ -1,8 +1,8 @@
 &nbsp;
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="assets/aglint_darkmode.svg">
-        <img alt="AGLint" src="assets/aglint_lightmode.svg" width="300px">
+        <source media="(prefers-color-scheme: dark)" srcset="https://cdn.adguard.com/website/github.com/AGLint/aglint_logo_darkmode.svg">
+        <img alt="AGLint" src="https://cdn.adguard.com/website/github.com/AGLint/aglint_logo_lightmode.svg" width="350px">
     </picture>
 </p>
 <h3 align="center">Universal adblock filter list parser, linter and converter.</h3>
@@ -10,9 +10,9 @@
     Supported syntaxes:
 </p>
 <p align="center">
-    <a href="https://adguard.com/"><img src="https://gist.githubusercontent.com/scripthunter7/6378a96b61b927357f39a33d3abc5af7/raw/e306604fd548ac1b2de70d2a5d8a43017496f221/adguard_logo.svg" width="14px"> AdGuard</a> |
-    <a href="https://github.com/gorhill/uBlock"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/UBlock_Origin.svg" width="14px"> uBlock Origin</a> |
-    <a href="https://adblockplus.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Adblock_Plus_2014_Logo.svg" width="14px"> Adblock Plus</a>
+    <a href="https://adguard.com/"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
+    <a href="https://github.com/gorhill/uBlock"><img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin</a> |
+    <a href="https://adblockplus.org/"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
 </p>
 
 Table of Contents:
@@ -26,18 +26,18 @@ Table of Contents:
 
 ### Parser
 
-An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently in use. In other words, any filter list can be parsed with it. The parser API basically has two main parts:
-- Parser: parsing rules (string &#8594; AST)
-- Generator: serialization of ASTs (AST &#8594; string)
+- Parsing ADG/UBO/ABP rules into AST (string &#8594; AST)
+- Tolerant
+- Filter out syntax errors
+- Serialize rules (AST &#8594; string)
 
 #### Parser example
 
 This code:
 
 ```typescript
-import { RuleParser } from "aglint";
+import { RuleParser } from "aglint/parser";
 
-// RuleParser automatically determines the rule type
 const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
 ```
 
@@ -47,7 +47,7 @@ will gives you this AST:
 {
     "category": "Cosmetic",
     "type": "ScriptletRule",
-    "syntax": "AdGuard",
+    "syntax": "Adg",
     "exception": false,
     "modifiers": [],
     "domains": [
