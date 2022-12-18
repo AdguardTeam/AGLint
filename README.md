@@ -1,8 +1,8 @@
 &nbsp;
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="assets/aglint_darkmode.svg">
-        <img alt="AGLint" src="assets/aglint_lightmode.svg" width="300px">
+        <source media="(prefers-color-scheme: dark)" srcset="https://cdn.adguard.com/website/github.com/AGLint/aglint_logo_darkmode.svg">
+        <img alt="AGLint" src="https://cdn.adguard.com/website/github.com/AGLint/aglint_logo_lightmode.svg" width="350px">
     </picture>
 </p>
 <h3 align="center">Universal adblock filter list parser, linter and converter.</h3>
@@ -10,16 +10,19 @@
     Supported syntaxes:
 </p>
 <p align="center">
-    <a href="https://adguard.com/"><img src="https://gist.githubusercontent.com/scripthunter7/6378a96b61b927357f39a33d3abc5af7/raw/e306604fd548ac1b2de70d2a5d8a43017496f221/adguard_logo.svg" width="14px"> AdGuard</a> |
-    <a href="https://github.com/gorhill/uBlock"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/UBlock_Origin.svg" width="14px"> uBlock Origin</a> |
-    <a href="https://adblockplus.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Adblock_Plus_2014_Logo.svg" width="14px"> Adblock Plus</a>
+    <a href="https://adguard.com/"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
+    <a href="https://github.com/gorhill/uBlock"><img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin</a> |
+    <a href="https://adblockplus.org/"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
 </p>
 
 Table of Contents:
 - [Project structure](#project-structure)
   - [Parser](#parser)
+    - [Parser example](#parser-example)
+    - [Another parser example](#another-parser-example)
   - [Converter (WIP)](#converter-wip)
   - [Linter (WIP)](#linter-wip)
+- [Development](#development)
 - [References](#references)
 
 ## Project structure
