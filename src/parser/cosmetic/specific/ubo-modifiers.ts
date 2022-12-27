@@ -20,11 +20,23 @@ import { RuleModifier } from "../../common/modifier-list";
 
 export const UBO_MODIFIER_LIST_TYPE = "UboModifierList";
 
-/** Represents uBlock's cosmetic rule modifiers. */
+/**
+ * Represents uBlock's cosmetic rule modifiers.
+ */
 export interface UboModifierList {
-    // Basically, the idea is that each main AST part should have a type
+    /**
+     * Type of the node. Basically, the idea is that each main AST part should have a type
+     */
     type: typeof UBO_MODIFIER_LIST_TYPE;
+
+    /**
+     * List of modifiers
+     */
     modifiers: UboModifier[];
+
+    /**
+     * Rest of the pattern
+     */
     rest: string;
 }
 
@@ -37,11 +49,14 @@ export interface UboModifierList {
  * ```
  */
 export interface UboModifier extends RuleModifier {
+    /**
+     * If the modifier is negated.
+     */
     not?: boolean;
 }
 
 /**
- * UboModifierListParser is responsible for parsing uBlock cosmetic rule modifiers.
+ * `UboModifierListParser` is responsible for parsing uBlock cosmetic rule modifiers.
  *
  * They follow the syntax of pseudo classes, but they are actually part of the targeting,
  * not the selector.
@@ -57,7 +72,7 @@ export class UboModifierListParser {
      * The motivation is to have a lightweight check before expensive parsing.
      *
      * @param raw - Raw selector
-     * @returns true/false
+     * @returns `true` if there is a uBO modifier indicator in the selector, `false` otherwise
      */
     public static hasUboModifierIndicators(raw: string): boolean {
         return (

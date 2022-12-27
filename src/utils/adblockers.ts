@@ -1,54 +1,47 @@
 /**
  * Possible adblock syntaxes (supported by this library)
- * It also allows unknown syntax
  */
 export enum AdblockSyntax {
-    /** Unknown / common syntax */
-    Unknown = "Unknown",
+    /**
+     * Common syntax, which is supported by more than one adblocker (or by all adblockers).
+     *
+     * We typically use this syntax when we cannot determine the concrete syntax of the rule,
+     * because the syntax is used by more than one adblocker natively.
+     *
+     * @example
+     * - `||example.org^$important` is a common syntax, since it is used by all adblockers natively, and
+     * we cannot determine at parsing level whether `important` is a valid option or not, and if it is valid,
+     * then which adblocker supports it.
+     */
+    Common = "Common",
 
     /**
-     * Adblock Plus
+     * Adblock Plus syntax.
      *
+     * @example
+     * - `example.org#$#abort-on-property-read alert` is an Adblock Plus syntax, since it is not used by any other
+     * adblockers directly (probably supported by some on-the-fly conversion, but this is not the native syntax).
      * @see {@link https://adblockplus.org/}
      */
     Abp = "AdblockPlus",
 
     /**
-     * uBlock Origin
+     * uBlock Origin syntax.
      *
+     * @example
+     * - `example.com##+js(set, atob, noopFunc)` is an uBlock Origin syntax, since it is not used by any other
+     * adblockers directly (probably supported by some on-the-fly conversion, but this is not the native syntax).
      * @see {@link https://github.com/gorhill/uBlock}
      */
     Ubo = "UblockOrigin",
 
     /**
-     * AdGuard
+     * AdGuard syntax.
      *
-     * @see {@link https://adguard.com/}
-     */
-    Adg = "AdGuard",
-}
-
-/**
- * Possible adblock syntaxes (supported by this library)
- */
-export enum StrictAdblockSyntax {
-    /**
-     * Adblock Plus
-     *
-     * @see {@link https://adblockplus.org/}
-     */
-    Abp = "AdblockPlus",
-
-    /**
-     * uBlock Origin
-     *
-     * @see {@link https://github.com/gorhill/uBlock}
-     */
-    Ubo = "UblockOrigin",
-
-    /**
-     * AdGuard
-     *
+     * @example
+     * - `example.org#%#//scriptlet("abort-on-property-read", "alert")` is an AdGuard syntax, since it is not used
+     * by any other adblockers directly (probably supported by some on-the-fly conversion, but this is not the native
+     * syntax).
      * @see {@link https://adguard.com/}
      */
     Adg = "AdGuard",

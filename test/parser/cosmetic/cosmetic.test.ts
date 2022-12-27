@@ -42,7 +42,7 @@ describe("CosmeticRuleParser", () => {
         // Valid elemhide
         expect(CosmeticRuleParser.parse("##.ad")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             modifiers: [],
             domains: [],
@@ -52,7 +52,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net##.ad")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -62,7 +62,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@#.ad")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             modifiers: [],
             domains: [],
@@ -72,7 +72,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@#.ad")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -83,7 +83,7 @@ describe("CosmeticRuleParser", () => {
         // Valid elemhide (extended)
         expect(CosmeticRuleParser.parse("#?#.ad:-abp-has(.ad)")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             modifiers: [],
             domains: [],
@@ -93,7 +93,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#?#.ad:-abp-has(.ad)")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,
@@ -103,7 +103,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("#@?#.ad:-abp-has(.ad)")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             modifiers: [],
             domains: [],
@@ -113,7 +113,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(CosmeticRuleParser.parse("example.com,~example.net#@?#.ad:-abp-has(.ad)")).toMatchObject({
             type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             modifiers: [],
             domains: DomainListParser.parse("example.com,~example.net").domains,

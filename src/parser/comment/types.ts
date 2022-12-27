@@ -1,4 +1,6 @@
-/** Represents possible comment categories. */
+/**
+ * Represents possible comment categories.
+ */
 export enum CommentRuleType {
     SimpleComment = "SimpleComment",
     Metadata = "Metadata",

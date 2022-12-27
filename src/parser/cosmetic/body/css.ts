@@ -57,15 +57,28 @@ export const REMOVE_BLOCK_TYPE = "remove";
  */
 export type CssInjectionBlock = BlockPlain | typeof REMOVE_BLOCK_TYPE;
 
-/** Represents a CSS injection body. */
+/**
+ * Represents a CSS injection body.
+ */
 export interface CssRuleBody {
+    /**
+     * List of media queries (if any)
+     */
     mediaQueryList?: MediaQueryListPlain;
+
+    /**
+     * List of selectors
+     */
     selectors: SelectorPlain[];
+
+    /**
+     * CSS declaration block or remove
+     */
     block?: CssInjectionBlock;
 }
 
 /**
- * CssInjectionBodyParser is responsible for parsing a CSS injection body.
+ * `CssInjectionBodyParser` is responsible for parsing a CSS injection body.
  *
  * Please note that not all adblockers support CSS injection in the same way, e.g. uBO does not support media queries.
  *
@@ -100,7 +113,7 @@ export class CssInjectionBodyParser {
      * Checks if a selector is a uBlock CSS injection.
      *
      * @param raw - Raw selector body
-     * @returns true/false
+     * @returns `true` if the selector is a uBlock CSS injection, `false` otherwise
      */
     public static isUboCssInjection(raw: string): boolean {
         const trimmed = raw.trim();
@@ -118,7 +131,7 @@ export class CssInjectionBodyParser {
      * Checks if a selector is an AdGuard CSS injection.
      *
      * @param raw - Raw selector body
-     * @returns true/false
+     * @returns `true` if the selector is an AdGuard CSS injection, `false` otherwise
      */
     public static isAdgCssInjection(raw: string) {
         return ADG_CSS_INJECTION_PATTERN.test(raw.trim());

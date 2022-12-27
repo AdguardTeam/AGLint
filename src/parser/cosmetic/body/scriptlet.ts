@@ -19,18 +19,39 @@ const ABP_PARAM_SEPARATOR = " ";
  * scriptlets as an array. AdGuard and uBlock Origin ONLY support one scriptlet per rule.
  */
 export interface ScriptletRuleBody {
+    /**
+     * Scriptlet(s) to inject.
+     */
     scriptlets: Scriptlet[];
 }
 
-/** Represents a specific scriptlet and its parameters. */
+/**
+ * Represents a specific scriptlet and its parameters.
+ */
 export interface Scriptlet {
+    /**
+     * Scriptlet name. For example, if the rule is `example.com#%#//scriptlet('scriptlet0', 'arg0')`,
+     * then the name is `scriptlet0`.
+     */
     scriptlet: ScriptletParameter;
+
+    /**
+     * Scriptlet parameters. For example, if the rule is `example.com#%#//scriptlet('scriptlet0', 'arg0')`,
+     * then the parameters are `[{type: 'SingleQuoted', value: 'arg0'}]`.
+     */
     parameters?: ScriptletParameter[];
 }
 
 /** Represents a scriptlet parameter. */
 export interface ScriptletParameter {
+    /**
+     * Parameter type. For example, if the parameter is `'arg0'`, then its type is `SingleQuoted`.
+     */
     type: ScriptletParameterType;
+
+    /**
+     * Parameter value. For example, if the parameter is `'arg0'`, then its value is `arg0`.
+     */
     value: string;
 }
 
@@ -41,21 +62,37 @@ export interface ScriptletParameter {
  * Then the value of `'arg0'` is `arg0` and its type is `SingleQuoted`.
  */
 export enum ScriptletParameterType {
-    /** Example: `value` */
+    /**
+     * Unquoted parameter.
+     *
+     * @example `value`
+     */
     Unquoted = "Unquoted",
 
-    /** Example: `'value'` */
+    /**
+     * Single-quoted parameter.
+     *
+     * @example `'value'`
+     */
     SingleQuoted = "SingleQuoted",
 
-    /** Example: `"value"` */
+    /**
+     * Double-quoted parameter.
+     *
+     * @example `"value"`
+     */
     DoubleQuoted = "DoubleQuoted",
 
-    /** Example: `/value/` */
+    /**
+     * Regular expression parameter.
+     *
+     * @example `/value/`
+     */
     RegExp = "RegExp",
 }
 
 /**
- * ScriptletBodyParser is responsible for parsing the body of a scriptlet rule.
+ * `ScriptletBodyParser` is responsible for parsing the body of a scriptlet rule.
  *
  * Please note that the parser will parse any scriptlet rule if it is syntactically correct.
  * For example, it will parse this:
@@ -63,7 +100,7 @@ export enum ScriptletParameterType {
  * example.com#%#//scriptlet('scriptlet0', 'arg0')
  * ```
  *
- * Scriptlet compatibility is not checked at this level.
+ * but it didn't check if the scriptlet `scriptlet0` actually supported by any adblocker.
  *
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#scriptlets}
  * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection}
@@ -109,6 +146,7 @@ export class ScriptletBodyParser {
 
         const parameterList = ScriptletBodyParser.decodeParameters(splittedRawParameterList);
 
+        // Only one scriptlet is supported in AdGuard/uBlock Origin
         return {
             scriptlets: [
                 {
@@ -161,6 +199,7 @@ export class ScriptletBodyParser {
             });
         }
 
+        // Adblock Plus snippet call can contain multiple scriptlets
         return {
             scriptlets,
         };

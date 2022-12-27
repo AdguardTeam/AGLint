@@ -11,9 +11,14 @@ import { ConfigCommentParser, ConfigComment } from "./inline-config";
 import { RuleCategory } from "../categories";
 import { Rule } from "../rule";
 
+/**
+ * Represents any comment-like adblock rule.
+ */
 export type AnyCommentRule = Agent | Hint | ConfigComment | Metadata | PreProcessor | SimpleComment;
 
-/** Represents the basic comment rule interface. */
+/**
+ * Represents the basic comment rule interface.
+ */
 export interface Comment extends Rule {
     category: RuleCategory.Comment;
     type: CommentRuleType;
@@ -22,6 +27,7 @@ export interface Comment extends Rule {
 /**
  * Represents a simple comment.
  *
+ * @example
  * Example rules:
  *   - ```adblock
  *     ! This is just a comment
@@ -34,14 +40,28 @@ export interface Comment extends Rule {
 export interface SimpleComment extends Comment {
     type: CommentRuleType.SimpleComment;
 
-    /** Comment marker: `!` or `#` */
+    /**
+     * Comment marker.
+     *
+     * @example
+     * - If the rule is `! This is just a comment`, then the marker will be `!`.
+     * - If the rule is `# This is just a comment`, then the marker will be `#`.
+     */
     marker: CommentMarker;
+
+    /**
+     * Comment text.
+     *
+     * @example
+     * If the rule is `! This is just a comment`, then the text will be `This is just a comment`.
+     */
     text: string;
 }
 
 /**
- * CommentParser is responsible for parsing any comment-like adblock rules.
+ * `CommentParser` is responsible for parsing any comment-like adblock rules.
  *
+ * @example
  * Example rules:
  *  - Agent comments:
  *      - ```adblock
@@ -97,7 +117,7 @@ export class CommentParser {
      * Determines whether a rule is a regular comment.
      *
      * @param raw - Raw data
-     * @returns true/false
+     * @returns `true` if the rule is a regular comment, `false` otherwise
      */
     public static isRegularComment(raw: string): boolean {
         return raw.trim()[0] == CommentMarker.Regular;
@@ -107,7 +127,7 @@ export class CommentParser {
      * Determines whether a rule is a comment.
      *
      * @param raw - Raw rule
-     * @returns true/false
+     * @returns `true` if the rule is a comment, `false` otherwise
      */
     public static isComment(raw: string): boolean {
         const trimmed = raw.trim();
@@ -162,7 +182,7 @@ export class CommentParser {
             <SimpleComment>{
                 category: RuleCategory.Comment,
                 type: CommentRuleType.SimpleComment,
-                syntax: AdblockSyntax.Unknown,
+                syntax: AdblockSyntax.Common,
                 marker: trimmed[0],
                 text: trimmed.substring(1),
             }

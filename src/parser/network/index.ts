@@ -16,6 +16,9 @@ const ADG_REMOVEHEADER = "removeheader";
 export const UBO_RESPONSEHEADER_INDICATOR = UBO_RESPONSEHEADER + OPEN_PARENTHESIS;
 const UBO_RESPONSEHEADER_INDICATOR_LEN = UBO_RESPONSEHEADER_INDICATOR.length;
 
+/**
+ * Represents any network rule
+ */
 export type AnyNetworkRule = BasicNetworkRule | RemoveHeaderNetworkRule;
 
 /**
@@ -25,13 +28,47 @@ export interface NetworkRule extends Rule {
     category: RuleCategory.Network;
     type: NetworkRuleType;
     syntax: AdblockSyntax;
+
+    /**
+     * If the rule is an exception rule. If the rule begins with `@@`, it means that it is an exception rule.
+     *
+     * @example
+     * The following rule is an exception rule:
+     * ```adblock
+     * @@||example.org^
+     * ```
+     * since it begins with `@@`, which is the exception marker.
+     *
+     * But the following rule is not an exception rule:
+     * ```adblock
+     * ||example.org^
+     * ```
+     * since it does not begins with `@@`.
+     */
     exception: boolean;
+
+    /**
+     * The rule pattern.
+     *
+     * @example
+     * - Let's say we have the following rule:
+     *   ```adblock
+     *   ||example.org^
+     *   ```
+     *   then the pattern of this rule is `||example.org^`.
+     * - But let's say we have the following rule:
+     *   ```adblock
+     *   ||example.org^$third-party,script
+     *   ```
+     *   then the pattern of this rule is also `||example.org^`.
+     */
     pattern: string;
 }
 
 /**
  * Represents a network filtering rule. Also known as "basic rule".
  *
+ * @example
  * Example rules:
  *   - ```adblock
  *     /ads.js^$script
@@ -46,12 +83,24 @@ export interface NetworkRule extends Rule {
  */
 export interface BasicNetworkRule extends NetworkRule {
     type: NetworkRuleType.BasicNetworkRule;
+
+    /**
+     * The rule modifiers.
+     *
+     * @example
+     * - Let's say we have the following rule:
+     *   ```adblock
+     *   ||example.org^$third-party
+     *   ```
+     *   then the modifiers of this rule are `["third-party"]`.
+     */
     modifiers: RuleModifier[];
 }
 
 /**
  * Represents a header remover network filtering rule.
  *
+ * @example
  * Example rules:
  *   - ```adblock
  *     ||example.org^$removeheader=header-name
@@ -63,11 +112,15 @@ export interface BasicNetworkRule extends NetworkRule {
 export interface RemoveHeaderNetworkRule extends NetworkRule {
     type: NetworkRuleType.RemoveHeaderNetworkRule;
     syntax: AdblockSyntax;
+
+    /**
+     * The name of the header to remove.
+     */
     header: string;
 }
 
 /**
- * NetworkRuleParser is responsible for parsing network rules.
+ * `NetworkRuleParser` is responsible for parsing network rules.
  *
  * Please note that this will parse all syntactically correct network rules.
  * Modifier compatibility is not checked at the parser level.
@@ -94,7 +147,7 @@ export class NetworkRuleParser {
         const common: NetworkRule = {
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             // Initially, the entire rule is considered a pattern
             pattern: rule,

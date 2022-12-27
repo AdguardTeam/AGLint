@@ -89,7 +89,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint-disable")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-disable",
         });
@@ -97,7 +97,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("!aglint-disable")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-disable",
         });
@@ -106,7 +106,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("# aglint-disable")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Hashmark,
             command: "aglint-disable",
         });
@@ -114,7 +114,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("#aglint-disable")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Hashmark,
             command: "aglint-disable",
         });
@@ -123,7 +123,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint-enable")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-enable",
         });
@@ -131,7 +131,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint-enable rule1")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-enable",
             params: ["rule1"],
@@ -140,7 +140,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint-enable rule1,rule2")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-enable",
             params: ["rule1", "rule2"],
@@ -149,7 +149,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint-enable rule1, rule2")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-enable",
             params: ["rule1", "rule2"],
@@ -159,7 +159,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint-enable rule1, rule2 -- comment")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint-enable",
             params: ["rule1", "rule2"],
@@ -169,7 +169,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse('! aglint rule1: "off"')).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint",
             params: {
@@ -180,7 +180,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse("! aglint rule1: 1")).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint",
             params: {
@@ -191,7 +191,7 @@ describe("PreProcessorParser", () => {
         expect(ConfigCommentParser.parse('! aglint rule1: ["error", "double"]')).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint",
             params: {
@@ -207,7 +207,7 @@ describe("PreProcessorParser", () => {
         ).toEqual(<ConfigComment>{
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: CommentMarker.Regular,
             command: "aglint",
             params: {

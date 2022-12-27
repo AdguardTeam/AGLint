@@ -9,7 +9,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("||example.com")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "||example.com",
             modifiers: [],
@@ -18,7 +18,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("@@||example.com")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "||example.com",
             modifiers: [],
@@ -27,7 +27,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("@@||example.com$m1,m2=v2")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "||example.com",
             modifiers: [
@@ -44,7 +44,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("/example/")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "/example/",
             modifiers: [],
@@ -53,7 +53,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("@@/example/")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "/example/",
             modifiers: [],
@@ -62,7 +62,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("@@/example/$m1,m2=v2")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "/example/",
             modifiers: [
@@ -80,7 +80,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("@@/example/$m1,m2=v2,m3=/^r3$/")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "/example/",
             modifiers: [
@@ -102,7 +102,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("@@/example/$m1,m2=v2,m3=/^r3\\$/")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "/example/",
             modifiers: [
@@ -124,7 +124,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("example.com\\$m1")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "example.com\\$m1",
             modifiers: [],
@@ -134,7 +134,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("example.com$m1$m2$m3$m4$m5")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "example.com",
             modifiers: [
@@ -147,7 +147,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("example.com$m1=v1$m2$m3=v3$m4$m5=v5")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "example.com",
             modifiers: [
@@ -162,7 +162,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("/ad.js$m1=v1")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "/ad.js",
             modifiers: [
@@ -177,7 +177,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("/ad.js^$m1=v1")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "/ad.js^",
             modifiers: [
@@ -191,7 +191,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("/ad.js^$m1=/^v1$/")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "/ad.js^",
             modifiers: [
@@ -206,7 +206,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("example.com/a/b/c$m1=v1")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "example.com/a/b/c",
             modifiers: [
@@ -220,7 +220,7 @@ describe("NetworkRuleParser", () => {
         expect(NetworkRuleParser.parse("example.com$m1,m2=/^regex$/")).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "example.com",
             modifiers: [
@@ -240,7 +240,7 @@ describe("NetworkRuleParser", () => {
         ).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "/example/scripts/ad.js",
             modifiers: [
@@ -271,7 +271,7 @@ describe("NetworkRuleParser", () => {
         ).toEqual({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
             pattern: "||example.org^",
             modifiers: [

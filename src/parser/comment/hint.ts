@@ -18,21 +18,39 @@ const HINT_PARAMS_CLOSE = ")";
 const HINT_PARAMS_SEPARATOR = ",";
 
 /**
- * Represents a hint member. For example, for
+ * Represents a hint member.
+ *
+ * @example
  * ```adblock
  * !+ PLATFORM(windows, mac)
  * ```
  * the name would be `PLATFORM` and the params would be `["windows", "mac"]`.
  */
 export interface HintMember {
+    /**
+     * Hint name.
+     *
+     * @example
+     * For `PLATFORM(windows, mac)` the name would be `PLATFORM`.
+     */
     name: string;
+
+    /**
+     * Hint parameters.
+     *
+     * @example
+     * For `PLATFORM(windows, mac)` the params would be `["windows", "mac"]`.
+     */
     params: string[];
 }
 
 /**
  * Represents a hint comment rule.
  *
- * There can be several hints in a hint rule. For example, if the rule is
+ * There can be several hints in a hint rule.
+ *
+ * @example
+ * If the rule is
  * ```adblock
  * !+ NOT_OPTIMIZED PLATFORM(windows)
  * ```
@@ -41,13 +59,27 @@ export interface HintMember {
 export interface Hint extends Comment {
     category: RuleCategory.Comment;
     type: CommentRuleType.Hint;
+
+    /**
+     * Currently only AdGuard supports hints.
+     */
     syntax: AdblockSyntax.Adg;
+
+    /**
+     * List of hints.
+     */
     hints: HintMember[];
 }
 
 /**
- * HintParser is responsible for parsing AdGuard hints.
+ * `HintParser` is responsible for parsing AdGuard hints.
  *
+ * @example
+ * ```adblock
+ * !+ NOT_OPTIMIZED PLATFORM(windows)
+ * ```
+ * the list will contain two hint members: `NOT_OPTIMIZED` and `PLATFORM`, and the params
+ * for `PLATFORM` would be `["windows"]`.
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints}
  */
 export class HintParser {
@@ -55,7 +87,7 @@ export class HintParser {
      * Determines whether the rule is a hint rule.
      *
      * @param raw - Raw rule
-     * @returns true/false
+     * @returns `true` if the rule is a hint rule, `false` otherwise
      */
     public static isHint(raw: string): boolean {
         return raw.trim().startsWith(HINT_MARKER);

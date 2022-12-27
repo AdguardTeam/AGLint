@@ -6,16 +6,25 @@ import { CommentRuleType } from "./types";
 import { CommentMarker } from "./marker";
 import { Comment } from ".";
 
+// Agent list is started with `[` and ended with `]`, and agents are separated by `;`.
+// For example, `[Adblock Plus 2.0; AdGuard]`.
 const AGENT_LIST_OPEN = "[";
 const AGENT_LIST_CLOSE = "]";
 const AGENT_SEPARATOR = ";";
 
 /**
  * Represents an agent (eg `Adblock Plus 2.0`, where adblock is `Adblock Plus` and version is `2.0`).
- * Specifying the version is optional.
+ * Specifying the version is optional, since `[Adblock Plus]` is also a valid agent.
  */
 export interface AgentMember {
+    /**
+     * Ad blocker name.
+     */
     adblock: string;
+
+    /**
+     * Ad blocker version (optional).
+     */
     version?: string;
 }
 
@@ -25,6 +34,7 @@ export interface AgentMember {
  * There can be several agents in a rule. For example, if the rule is `[Adblock Plus 2.0; AdGuard]`,
  * then there are two agent members: `Adblock Plus 2.0` and `AdGuard` (without version).
  *
+ * @example
  * Example rules:
  *  - ```adblock
  *    [AdGuard]
@@ -38,15 +48,24 @@ export interface AgentMember {
  */
 export interface Agent extends Comment {
     type: CommentRuleType.Agent;
+
+    /**
+     * List of agents.
+     *
+     * @example
+     * If the rule is `[Adblock Plus 2.0; AdGuard]`, then the list will contain two agent members:
+     * `Adblock Plus 2.0` and `AdGuard` (without version).
+     */
     agents: AgentMember[];
 }
 
 /**
- * AgentParser is responsible for parsing an Adblock agent comment.
+ * `AgentParser` is responsible for parsing an Adblock agent comment.
  * Adblock agent comment marks that the filter list is supposed to be used by the specified
  * ad blockers.
  *
- * Examples:
+ * @example
+ * Example agent comments:
  *  - ```adblock
  *    [AdGuard]
  *    ```
@@ -62,7 +81,7 @@ export class AgentParser {
      * Determines whether a rule is an adblock agent.
      *
      * @param raw - Raw rule
-     * @returns true/false
+     * @returns `true` if the rule is an adblock agent, `false` otherwise
      */
     public static isAgent(raw: string): boolean {
         const trimmed = raw.trim();
@@ -159,7 +178,7 @@ export class AgentParser {
             return {
                 category: RuleCategory.Comment,
                 type: CommentRuleType.Agent,
-                syntax: AdblockSyntax.Unknown,
+                syntax: AdblockSyntax.Common,
                 agents: collectedAgents,
             };
         }

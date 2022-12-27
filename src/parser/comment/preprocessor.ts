@@ -19,6 +19,7 @@ const PREPROCESSOR_SEPARATOR = " ";
 /**
  * Represents a preprocessor comment.
  *
+ * @example
  * For example, if the comment is
  * ```adblock
  * !#if (adguard)
@@ -32,24 +33,30 @@ export interface PreProcessor extends Comment {
     category: RuleCategory.Comment;
     type: CommentRuleType.PreProcessor;
 
-    /** Name of the directive */
+    /**
+     * Name of the directive
+     */
     name: string;
 
-    /** Params (optional) */
+    /**
+     * Params (optional)
+     */
     params?: string;
 }
 
 /**
- * PreProcessorParser is responsible for parsing preprocessor rules.
+ * `PreProcessorParser` is responsible for parsing preprocessor rules.
+ * Pre-processor comments are special comments that are used to control the behavior of the filter list processor.
+ * Please note that this parser only handles general syntax for now, and does not validate the parameters at
+ * the parsing stage.
  *
- * Please note that this parser only handles general syntax for now. So, for example,
- * if your rule is
+ * @example
+ * If your rule is
  * ```adblock
  * !#if (adguard)
  * ```
  * then the directive's name is `if` and its value is `(adguard)`, but the parameter list
  * is not parsed / validated further.
- *
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#pre-processor-directives}
  * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives}
  */
@@ -58,7 +65,7 @@ export class PreProcessorParser {
      * Determines whether the rule is a pre-processor rule.
      *
      * @param raw - Raw rule
-     * @returns true/false
+     * @returns `true` if the rule is a pre-processor rule, `false` otherwise
      */
     public static isPreProcessor(raw: string): boolean {
         const trimmed = raw.trim();
@@ -84,7 +91,7 @@ export class PreProcessorParser {
         const result: PreProcessor = {
             category: RuleCategory.Comment,
             type: CommentRuleType.PreProcessor,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             name: EMPTY,
         };
 
