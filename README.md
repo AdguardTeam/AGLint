@@ -46,8 +46,6 @@ Table of Contents:
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists, and we want to make it easy to use them in adblockers.
 
-We hope that this tool will help to improve the quality of filter lists and will be useful for filter list maintainers, adblocker developers and users who want to create or maintain their own filter lists.
-
 Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org/). If you are familiar with ESLint, you will find it easy to use `AGLint` as well.
 
 ## Features
