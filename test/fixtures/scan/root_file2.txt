@@ -1,1 +1,4 @@
-this file should appear as a lintable file
+!#endif
+!#if (adguard)
+rule
+
