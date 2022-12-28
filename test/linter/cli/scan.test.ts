@@ -3,7 +3,18 @@ import path from "path";
 import { scan } from "../../../src/linter/cli/scan";
 
 describe("scan", () => {
-    test("run on fixture", async () => {
+    test("run on bad fixture", async () => {
+        const base = "test/fixtures/scan_bad";
+
+        await expect(scan(base)).rejects.toThrowError(
+            `Multiple config files found in the same directory: "${path.join(
+                base,
+                "dir2/aglint.config.json"
+            )}" and "${path.join(base, "dir2/aglint.config.yaml")}"`
+        );
+    });
+
+    test("run on good fixture", async () => {
         const base = "test/fixtures/scan";
         const result = await scan(base);
 

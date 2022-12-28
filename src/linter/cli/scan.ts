@@ -74,7 +74,10 @@ export async function scan(dir: string, ignores: Ignore[] = []): Promise<Scanned
                 // If a config file is already found, throw an error
                 if (result.configFile !== null) {
                     throw new Error(
-                        `Multiple config files found in the same directory: ${result.configFile.base} and ${item}`
+                        `Multiple config files found in the same directory: "${path.join(
+                            result.configFile.dir,
+                            result.configFile.base
+                        )}" and "${itemPath}"`
                     );
                 }
 
