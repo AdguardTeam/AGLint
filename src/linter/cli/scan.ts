@@ -34,6 +34,7 @@ export interface ScannedDirectory {
  * @param dir Directory to search in
  * @param ignores File ignores
  * @returns Array of file paths
+ * @throws If multiple config files are found in the given directory
  */
 export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScannedDirectory> {
     // Initialize an empty result
