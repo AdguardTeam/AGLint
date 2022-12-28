@@ -200,7 +200,7 @@ example.com##.ad
 example.org##.something
 ```
 
-so the linter will give you the following warning:
+so the linter will give you the following errors:
 
 ```
     1:0     error   Using an "endif" directive without an opening "if" directive
