@@ -294,6 +294,8 @@ example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 
 Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule.
 
+You can pass any rule to the parser, it automatically determines the type and category of the rule.
+
 If the rule is syntactically incorrect, the parser will throw an error.
 
 ### Linter
@@ -324,6 +326,20 @@ const report = linter.lint("example.com##.ad, #ad");
 
 // Do something with the report :)
 ```
+
+The `LinterRule` interface has the following structure:
+
+- meta: Metadata for the rule
+  - `type`: problem, suggestion or layout
+  - `severity`: warning, error or fatal
+- events:
+  - `onStartFilterList`: called before analyzing a file
+  - `onRule`: Called to analyze a single rule
+  - `onEndFilterList`: called after analyzing a file
+
+Every event has a `context` parameter, which makes it possible to get the current filter list content, the current rule, report, etc.
+
+You can check the `src/linter/rules` directory for detailed examples.
 
 ### Converter (WIP)
 
