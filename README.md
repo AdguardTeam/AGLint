@@ -36,7 +36,7 @@ Table of Contents:
     - [Parser](#parser)
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
-- [Development](#development)
+- [Development \& Contribution](#development--contribution)
 - [Ideas](#ideas)
 - [License](#license)
 - [References](#references)
@@ -64,7 +64,7 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 
 ## Getting started
 
-Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is a very short instruction on how to use it as a CLI tool.
+Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is a very short instruction on how to use it as a CLI tool with the default configuration.
 
 ### Pre-requisites
 - Node.js 12 or higher: https://nodejs.org/en/download/
@@ -78,12 +78,13 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
    - Yarn:
      - Globally: `yarn global add @adguard/aglint`
      - Locally: `yarn add -D @adguard/aglint`
-2. If you want to customize the default configuration, create a file named `aglint.config.json` in the root of your repo and add your custom configuration there. See [Configuration](#configuration) for more info.
-3. Run AGlint **in your project folder**:
+2. Run AGlint **in your project folder**:
    - NPM: `aglint lint` (or `npx aglint lint` if you installed it locally)
    - Yarn: `yarn aglint lint`
 
-That's it! :hugs: If you want to customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).
+That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
+
+*If you want to customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
 
 ## VSCode extension
 
@@ -91,7 +92,7 @@ We have created a VSCode extension that fully covers adblock filter list syntax.
 
 This extension enables syntax highlighting, and it's compatible with `AGLint`. GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this extension to highlight adblock filter lists.
 
-We strongly recommend using this extension if you are working with adblock filter lists.
+**We strongly recommend using this extension if you are working with adblock filter lists.**
 
 ## Special comments
 
@@ -141,49 +142,50 @@ The configuration file should be a valid JSON or YAML file. The following option
     - `rule-severity`: a string with the severity of the rule. It can be `error`, `warn` or `off`.
     - `rule-options`: an object with options for the rule. For example, `{ "option-1": "value-1" }` (optional).
     - For example you can disable the `rule-1` rule by adding the following configuration:
-        ```json
-        {
-            "rules": {
-                "rule-1": ["off"]
-            }
-        }
-        ```
+      ```json
+      {
+          "rules": {
+              "rule-1": ["off"]
+          }
+      }
+      ```
+      or you can change the severity of the `rule-2` rule to `warn`:
 
-        or you can change the severity of the `rule-2` rule to `warn`:
+      ```json
+      {
+          "rules": {
+              "rule-2": ["warn"]
+          }
+      }
+      ```
+      or you can change the severity of the `rule-3` rule to `error` and add an option to it:
 
-        ```json
-        {
-            "rules": {
-                "rule-2": ["warn"]
-            }
-        }
-        ```
+      ```json
+      {
+          "rules": {
+              "rule-3": ["error", { "option-3": "value-3" }]
+          }
+      }
+      ```
+      Configuration file example:
 
-        or you can change the severity of the `rule-3` rule to `error` and add an option to it:
-
-        ```json
-        {
-            "rules": {
-                "rule-3": ["error", { "option-3": "value-3" }]
-            }
-        }
-        ```
-
-        Configuration file example:
-
-        ```json
-        {
-            "colors": true,
-            "fix": false,
-            "rules": {
-                "rule-1": ["error", { "option-1": "value-1" }],
-                "rule-2": ["warn", { "option-2": "value-2" }],
-                "rule-3": ["off"]
-            }
-        }
-        ```
+      ```json
+      {
+          "colors": true,
+          "fix": false,
+          "rules": {
+              "rule-1": ["error", { "option-1": "value-1" }],
+              "rule-2": ["warn", { "option-2": "value-2" }],
+              "rule-3": ["off"]
+          }
+      }
+      ```
 
 ## Linter rules
+
+The linter parses your filter list files with the built in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error for that rule and didn't run any other rules for that rule, since it is not possible to check it without AST.
+
+Currently, the following linter rules are available (we will add more rules in the future):
 
 ### `if-closed`
 
@@ -295,7 +297,7 @@ Which returns the rule as string (this is not the same as the original rule, it 
 example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 ```
 
-Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule.
+Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting is different, the rule itself is the same.
 
 You can pass any rule to the parser, it automatically determines the type and category of the rule.
 
@@ -357,7 +359,7 @@ A small summary of what to expect:
 - Rule converter (AST &#8594; AST)
   - The rule converter allows you to convert from any syntax to any syntax. If possible, of course, otherwise an error will be thrown. For example, you cannot convert a CSS injection to Adblock Plus, since ABP does not support CSS injections.
 
-## Development
+## Development & Contribution
 
 You can contribute to the project by opening a pull request. Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. You can do this by running `yarn lint` and `yarn test` commands.
 
