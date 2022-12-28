@@ -23,10 +23,10 @@ Table of Contents:
   - [Installation \& Usage](#installation--usage)
 - [VSCode extension](#vscode-extension)
 - [Special comments](#special-comments)
-  - [Ignore rules](#ignore-rules)
+  - [Ignore adblock rules](#ignore-adblock-rules)
     - [Ignore single rule](#ignore-single-rule)
-    - [Ignore multiple rules](#ignore-multiple-rules)
-    - [Disable some rules](#disable-some-rules)
+    - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
+    - [Disable some linter rules](#disable-some-linter-rules)
 - [Ignoring files or folders](#ignoring-files-or-folders)
 - [Configuration](#configuration)
 - [Linter rules](#linter-rules)
@@ -96,12 +96,12 @@ This extension enables syntax highlighting, and it's compatible with `AGLint`. G
 
 ## Special comments
 
-You may not want to lint some rules, so you can add special config / control comments to ignore / customize them. Generally these comments begins with the `! aglint-` prefix.
+You may not want to lint some adblock rules, so you can add special config / control comments to ignore / customize them. Generally these comments begins with the `! aglint-` prefix.
 
-### Ignore rules
+### Ignore adblock rules
 
 #### Ignore single rule
-You can completely disable linting for a rule by adding `! aglint-disable-next-line` comment before the rule. For example, `example.com##.ad` will be ignored in the following case:
+You can completely disable linting for an adblock rule by adding `! aglint-disable-next-line` comment before the adblock rule. For example, `example.com##.ad` will be ignored in the following case:
 
 ```adblock
 ! aglint-disable-next-line
@@ -109,8 +109,8 @@ example.com##.ad
 example.net##.ad
 ```
 
-#### Ignore multiple rules
-If you want to ignore multiple rules, you can add `! aglint-disable` comment before the first rule and `! aglint-enable` comment after the last rule. For example, `example.com##.ad` and `example.net##.ad` will be ignored in the following case:
+#### Ignore multiple adblock rules
+If you want to ignore multiple adblock rules, you can add `! aglint-disable` comment before the first adblock rule and `! aglint-enable` comment after the last adblock rule. For example, `example.com##.ad` and `example.net##.ad` will be ignored in the following case:
 
 ```adblock
 ! aglint-disable
@@ -120,9 +120,9 @@ example.net##.ad
 example.org##.ad
 ```
 
-#### Disable some rules
+#### Disable some linter rules
 
-You can disable some rules by adding `! aglint-disable-next-line rule1, rule2` comment before the rule.
+You can disable some linter rules by adding `! aglint-disable-next-line rule1, rule2` comment before the adblock rule.
 
 ## Ignoring files or folders
 
