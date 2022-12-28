@@ -7,12 +7,12 @@
 import { program } from "commander";
 import chalk from "chalk";
 import { readFileSync } from "fs";
+import path, { ParsedPath } from "path";
+import { readFile, writeFile } from "fs/promises";
+import { walkScannedDirectory } from "./linter/cli/walk";
 import { mergeConfigs, defaultLinterCliConfig, LinterCliConfig } from "./linter/cli/config";
 import { scan } from "./linter/cli/scan";
-import { walkScannedDirectory } from "./linter/cli/walk";
-import path, { ParsedPath } from "path";
-import { Linter } from ".";
-import { readFile, writeFile } from "fs/promises";
+import { Linter } from "@aglint";
 
 // Based on https://github.com/rollup/plugins/tree/master/packages/json#usage
 const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));

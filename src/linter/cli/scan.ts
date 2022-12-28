@@ -1,7 +1,12 @@
 import { readFile, readdir, stat } from "fs/promises";
-import ignore, { Ignore } from "ignore";
 import path, { ParsedPath } from "path";
+import ignore, { Ignore } from "ignore";
 import { CONFIG_FILE_NAMES, IGNORE_FILE_NAME, SUPPORTED_EXTENSIONS } from "./constants";
+
+/**
+ * Default ignores in order to avoid scanning node_modules, etc.
+ */
+const defaultIgnores = ignore().add("node_modules");
 
 /**
  * Represents the result of a scan
@@ -41,7 +46,7 @@ export interface ScannedDirectory {
  * @returns Array of file paths
  * @throws If multiple config files are found in the given directory
  */
-export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScannedDirectory> {
+export async function scan(dir: string, ignores: Ignore[] = [defaultIgnores]): Promise<ScannedDirectory> {
     // Initialize an empty result
     const result: ScannedDirectory = {
         dir: path.parse(dir),
