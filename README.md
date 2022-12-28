@@ -358,7 +358,7 @@ A small summary of what to expect:
 
 ## Development & Contribution
 
-You can contribute to the project by opening a pull request. Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. You can do this by running `yarn lint` and `yarn test` commands.
+You can contribute to the project by opening a pull request. Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. You can do this by running `yarn lint` and `yarn test` commands. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
 
 Main development commands:
 - `yarn lint`: Run ESLint and Prettier on all files
