@@ -21,6 +21,7 @@ Table of Contents:
 - [Getting started](#getting-started)
   - [Pre-requisites](#pre-requisites)
   - [Installation](#installation)
+- [VSCode extension](#vscode-extension)
 - [Special comments](#special-comments)
   - [Ignore rules](#ignore-rules)
     - [Ignore single rule](#ignore-single-rule)
@@ -80,6 +81,14 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 3. Run AGlint **in your project folder**:
    - NPM: `aglint lint` (or `npx aglint lint` if you installed it locally)
    - Yarn: `yarn aglint lint`
+
+## VSCode extension
+
+We have created a VSCode extension that fully covers adblock filter list syntax. It is available [here](https://marketplace.visualstudio.com/items?itemName=adguard.adblock).
+
+This extension enables syntax highlighting, and it's compatible with `AGLint`. GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this extension to highlight adblock filter lists.
+
+We strongly recommend using this extension if you are working with adblock filter lists.
 
 ## Special comments
 
