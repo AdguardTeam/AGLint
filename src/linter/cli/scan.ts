@@ -62,7 +62,7 @@ export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScanRes
                 result.configFiles.push(itemPath);
             }
 
-            // We only want to lint txt files (filter lists)
+            // We only want to lint files with the supported extensions
             else if (SUPPORTED_EXTENSIONS.includes(path.parse(item).ext)) {
                 result.lintableFiles.push(itemPath);
             }
