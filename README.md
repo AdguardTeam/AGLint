@@ -289,7 +289,6 @@ RuleParser.generate(ast);
 
 Which returns the rule as string (this is not the same as the original rule, it is generated from the AST, and not related to the original rule):
 ```adblock
-```adblock
 example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 ```
 
