@@ -53,13 +53,14 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 
 - :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus.
 - :white_check_mark: **Error-tolerant**: it can parse any filter list, even if it contains minor syntax errors.
-- :zap: **Fast**: it is written in TypeScript and can be used in Node.js and browsers.
+- :zap: **Fast**: made with performance in mind.
 - :blush: **Easy to use**: it can be used as a CLI tool or programmatically.
 - :art: **Customizable**: you can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo.
 - :chart_with_upwards_trend: **Extensible**: you can add your own rules to the linter.
 - :globe_with_meridians: **Cross-platform**: it works on Windows, Linux and macOS.
 - :globe_with_meridians: **Open-source**: the source code is available here on GitHub.
 - :free: **Free**: it is free to use and free to modify.
+- :rocket: **Latest technologies**: it is written in TypeScript and can be used in Node.js and browsers as well.
 
 ## Getting started
 
