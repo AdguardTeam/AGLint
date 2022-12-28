@@ -47,8 +47,8 @@ export const defaultLinterCliConfig: LinterCliConfig = {
  * @throws If the file extension is not supported or if the config object fails validation.
  */
 export async function parseConfigFile(filename: string): Promise<LinterCliConfig> {
-    // Determine the file extension and remove the dot
-    const extension = path.extname(filename).slice(1);
+    // Determine the file extension
+    const extension = path.extname(filename);
 
     // Read the file contents
     const contents = await readFile(filename, "utf8");
@@ -59,14 +59,14 @@ export async function parseConfigFile(filename: string): Promise<LinterCliConfig
 
     // Parse the file contents based on the extension
     switch (extension) {
-        case "json": {
+        case ".json": {
             // Built-in JSON parser
             parsed = JSON.parse(contents);
             break;
         }
 
-        case "yaml":
-        case "yml": {
+        case ".yaml":
+        case ".yml": {
             // Well-tested external YAML parser
             parsed = yaml.load(contents);
             break;
