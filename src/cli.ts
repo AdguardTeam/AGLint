@@ -34,9 +34,9 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
         .option(
             "-f, --fix",
             "Enable automatic fix, if possible (BE CAREFUL, this overwrites original files with the fixed ones)",
-            false
+            defaultLinterCliConfig.fix
         )
-        .option("-c, --colors", "Enable colors in console reporting", true)
+        .option("-c, --colors", "Enable colors in console reporting", defaultLinterCliConfig.colors)
         .parse(process.argv);
 
     // Create config based on the parsed argumenta
@@ -66,7 +66,7 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
 
                 const filePath = path.join(file.dir, file.base);
 
-                let result = linter.lint(await readFile(filePath, "utf8"), config.fix || false);
+                let result = linter.lint(await readFile(filePath, "utf8"), config.fix || defaultLinterCliConfig.fix);
 
                 // If there are no problems, skip this file, no need to log anything
                 if (result.problems.length === 0) {
@@ -80,7 +80,10 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
 
                         // Re-lint the fixed file (but only once to avoid infinite loops or other problems)
                         // TODO: if there are still problems, they are not fixable or we will not fix them now
-                        result = linter.lint(await readFile(filePath, "utf8"), config.fix || false);
+                        result = linter.lint(
+                            await readFile(filePath, "utf8"),
+                            config.fix || defaultLinterCliConfig.fix
+                        );
 
                         if (result.problems.length === 0) {
                             return;
@@ -139,7 +142,7 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
                 }
             },
         },
-        mergeConfigs(parsedConfig, defaultLinterCliConfig)
+        mergeConfigs(defaultLinterCliConfig, parsedConfig)
     );
 
     // If no problems were encountered, log a success message
