@@ -150,7 +150,6 @@ The configuration file should be a valid JSON or YAML file. The following option
       }
       ```
       or you can change the severity of the `rule-2` rule to `warn`:
-
       ```json
       {
           "rules": {
@@ -159,7 +158,6 @@ The configuration file should be a valid JSON or YAML file. The following option
       }
       ```
       or you can change the severity of the `rule-3` rule to `error` and add an option to it:
-
       ```json
       {
           "rules": {
@@ -168,7 +166,6 @@ The configuration file should be a valid JSON or YAML file. The following option
       }
       ```
       Configuration file example:
-
       ```json
       {
           "colors": true,
