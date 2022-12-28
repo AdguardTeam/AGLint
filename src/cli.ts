@@ -7,12 +7,12 @@
 import { program } from "commander";
 import chalk from "chalk";
 import { readFileSync } from "fs";
-import { LinterCliConfig } from "./linter/cli/config";
+import { mergeConfigs, defaultLinterCliConfig, LinterCliConfig } from "./linter/cli/config";
 import { scan } from "./linter/cli/scan";
 import { walkScannedDirectory } from "./linter/cli/walk";
 import path, { ParsedPath } from "path";
 import { Linter } from ".";
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 
 // Based on https://github.com/rollup/plugins/tree/master/packages/json#usage
 const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
@@ -39,6 +39,12 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
         .option("-c, --colors", "Enable colors in console reporting", true)
         .parse(process.argv);
 
+    // Create config based on the parsed argumenta
+    const parsedConfig: LinterCliConfig = {
+        fix: !!program.opts().fix,
+        colors: !!program.opts().colors,
+    };
+
     // Any problems encountered?
     let anyProblem = false;
 
@@ -51,67 +57,92 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
 
     // TODO: If no files are specified, lint all supported files in the cwd
 
-    walkScannedDirectory(scanResult, {
-        file: async (file: ParsedPath, config: LinterCliConfig) => {
-            const linter = new Linter();
-            linter.addDefaultRules();
-            const result = linter.lint(await readFile(path.join(file.dir, file.base), "utf8"), config.fix || false);
+    walkScannedDirectory(
+        scanResult,
+        {
+            file: async (file: ParsedPath, config: LinterCliConfig) => {
+                const linter = new Linter();
+                linter.addDefaultRules();
 
-            // If there are no problems, skip this file, no need to log anything
-            if (result.problems.length === 0) {
-                return;
-            }
+                const filePath = path.join(file.dir, file.base);
 
-            anyProblem = true;
+                let result = linter.lint(await readFile(filePath, "utf8"), config.fix || false);
 
-            // Log file name
-            console.log(path.join(file.dir, file.base));
-
-            // Log problems
-            for (const problem of result.problems) {
-                let message = "";
-
-                // Problem location
-                message += "\t";
-
-                message += problem.position.startLine;
-
-                if (typeof problem.position.startColumn !== "undefined") {
-                    message += ":";
-                    message += problem.position.startColumn;
+                // If there are no problems, skip this file, no need to log anything
+                if (result.problems.length === 0) {
+                    return;
                 }
 
-                message += "\t";
+                // If fix is enabled, write the fixed file
+                if (config.fix) {
+                    if (result.fixed) {
+                        await writeFile(filePath, result.fixed);
 
-                // Problem type
-                switch (problem.severity) {
-                    case 1: {
-                        message += config.colors ? chalk.yellow("warning") : "warning";
-                        break;
-                    }
-                    case 2: {
-                        message += config.colors ? chalk.red("error") : "error";
-                        break;
-                    }
-                    case 3: {
-                        message += config.colors ? chalk.bgRed.white("fatal") : "fatal";
-                        break;
-                    }
-                    default: {
-                        message += config.colors ? chalk.red("error") : "error";
+                        // Re-lint the fixed file (but only once to avoid infinite loops or other problems)
+                        // TODO: if there are still problems, they are not fixable or we will not fix them now
+                        result = linter.lint(await readFile(filePath, "utf8"), config.fix || false);
+
+                        if (result.problems.length === 0) {
+                            return;
+                        }
                     }
                 }
 
-                message += "\t";
+                // There are problems, so set the flag
+                anyProblem = true;
 
-                // Problem description
-                message += config.colors ? chalk.gray(problem.message) : problem.message;
+                // Log file name
+                console.log(filePath);
 
-                console.error(message);
-            }
+                // Log problems
+                for (const problem of result.problems) {
+                    let message = "";
+
+                    // Problem location
+                    message += "\t";
+
+                    message += problem.position.startLine;
+
+                    if (typeof problem.position.startColumn !== "undefined") {
+                        message += ":";
+                        message += problem.position.startColumn;
+                    }
+
+                    message += "\t";
+
+                    // Problem type
+                    switch (problem.severity) {
+                        case 1: {
+                            message += config.colors ? chalk.yellow("warning") : "warning";
+                            break;
+                        }
+                        case 2: {
+                            message += config.colors ? chalk.red("error") : "error";
+                            break;
+                        }
+                        case 3: {
+                            message += config.colors ? chalk.bgRed.white("fatal") : "fatal";
+                            break;
+                        }
+                        default: {
+                            message += config.colors ? chalk.red("error") : "error";
+                        }
+                    }
+
+                    message += "\t";
+
+                    // Problem description
+                    message += config.colors ? chalk.gray(problem.message) : problem.message;
+
+                    // Log problem to console
+                    console.error(message);
+                }
+            },
         },
-    });
+        mergeConfigs(parsedConfig, defaultLinterCliConfig)
+    );
 
+    // If no problems were encountered, log a success message
     if (!anyProblem) {
         console.log(chalk.green("No problems found"));
     }
