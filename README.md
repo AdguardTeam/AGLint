@@ -180,7 +180,7 @@ The configuration file should be a valid JSON or YAML file. The following option
 
 ## Linter rules
 
-The linter parses your filter list files with the built in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error for that rule and didn't run any other rules for that rule, since it is not possible to check it without AST.
+The linter parses your filter list files with the built in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other rules for that rule, since it is not possible to check it without AST.
 
 Currently, the following linter rules are available (we will add more rules in the future):
 
