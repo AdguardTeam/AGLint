@@ -85,6 +85,7 @@
     },
     "dependencies": {
         "chalk": "^5.1.2",
+        "clone-deep": "^4.0.1",
         "commander": "^9.4.1",
         "css-tree": "^2.2.1",
         "deepmerge": "^4.2.2",
