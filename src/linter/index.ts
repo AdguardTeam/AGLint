@@ -127,42 +127,42 @@ export interface LinterProblem {
  */
 export interface LinterContext {
     /**
-     * Specifies the linter configuration.
+     * Returns the clone of the shared linter configuration.
      *
      * @returns The shared linter configuration
      */
     getLinterConfig: () => LinterConfig;
 
     /**
-     * Specifies the raw content of the adbock filter list currently processed by the linter.
+     * Returns the raw content of the adbock filter list currently processed by the linter.
      *
      * @returns The raw adblock filter list content
      */
     getFilterListContent: () => string;
 
     /**
-     * Specifies the AST of the adblock rule currently being iterated by the linter.
+     * Returns the AST of the adblock rule currently being iterated by the linter.
      *
      * @returns The actual adblock rule as AST
      */
     getActualAdblockRuleAst: () => AnyRule | undefined;
 
     /**
-     * Specifies the raw version of the adblock rule currently being iterated by the linter.
+     * Returns the raw version of the adblock rule currently being iterated by the linter.
      *
      * @returns The actual adblock rule as original string
      */
     getActualAdblockRuleRaw: () => string | undefined;
 
     /**
-     * Specifies the line number that the linter is currently iterating.
+     * Returns the line number that the linter is currently iterating.
      *
      * @returns The actual line number
      */
     getActualLine: () => number;
 
     /**
-     * Specifies whether a fix was requested from the linter. This is an optimization
+     * Returns whether a fix was requested from the linter. This is an optimization
      * for the linter, so it doesn't have to run the fixer if it's not needed.
      *
      * @returns `true` if fix is needed, `false` otherwise
