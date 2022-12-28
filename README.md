@@ -294,7 +294,7 @@ Which returns the rule as string (this is not the same as the original rule, it 
 example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 ```
 
-Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting is different, the rule itself is the same.
+Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same.
 
 You can pass any rule to the parser, it automatically determines the type and category of the rule.
 
