@@ -8,6 +8,11 @@ import { CONFIG_FILE_NAMES, IGNORE_FILE_NAME, SUPPORTED_EXTENSIONS } from "./con
  */
 export interface ScannedDirectory {
     /**
+     * Data about the current directory
+     */
+    dir: ParsedPath;
+
+    /**
      * Only one config file is allowed in a directory, it may be null if no config file is found in
      * the directory
      */
@@ -39,6 +44,7 @@ export interface ScannedDirectory {
 export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScannedDirectory> {
     // Initialize an empty result
     const result: ScannedDirectory = {
+        dir: path.parse(dir),
         configFile: null,
         lintableFiles: [],
         subdirectories: [],
