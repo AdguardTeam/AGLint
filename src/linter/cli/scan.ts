@@ -1,21 +1,27 @@
 import { readFile, readdir, stat } from "fs/promises";
 import ignore, { Ignore } from "ignore";
-import path from "path";
+import path, { ParsedPath } from "path";
 import { CONFIG_FILE_NAMES, IGNORE_FILE_NAME, SUPPORTED_EXTENSIONS } from "./constants";
 
 /**
  * Represents the result of a scan
  */
-export interface ScanResult {
+export interface ScannedDirectory {
     /**
-     * Array of config file paths (if any)
+     * Only one config file is allowed in a directory, it may be null if no config file is found in
+     * the directory
      */
-    configFiles: string[];
+    configFile: ParsedPath | null;
 
     /**
-     * Array of lintable file paths (if any)
+     * Lintable files in the directory (if any)
      */
-    lintableFiles: string[];
+    lintableFiles: ParsedPath[];
+
+    /**
+     * Subdirectories in the directory (if any)
+     */
+    subdirectories: ScannedDirectory[];
 }
 
 /**
@@ -29,10 +35,12 @@ export interface ScanResult {
  * @param ignores File ignores
  * @returns Array of file paths
  */
-export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScanResult> {
-    const result: ScanResult = {
-        configFiles: [],
+export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScannedDirectory> {
+    // Initialize an empty result
+    const result: ScannedDirectory = {
+        configFile: null,
         lintableFiles: [],
+        subdirectories: [],
     };
 
     // Get all files in the directory
@@ -57,24 +65,32 @@ export async function scan(dir: string, ignores: Ignore[] = []): Promise<ScanRes
         const stats = await stat(itemPath);
 
         if (stats.isFile()) {
+            // Parse path
+            const parsedPath = path.parse(itemPath);
+
             // If the file is a config file
             if (CONFIG_FILE_NAMES.includes(item)) {
-                result.configFiles.push(itemPath);
+                // If a config file is already found, throw an error
+                if (result.configFile !== null) {
+                    throw new Error(
+                        `Multiple config files found in the same directory: ${result.configFile.base} and ${item}`
+                    );
+                }
+
+                // Otherwise, set the config file for the current directory
+                result.configFile = parsedPath;
             }
 
             // We only want to lint files with the supported extensions
-            else if (SUPPORTED_EXTENSIONS.includes(path.parse(item).ext)) {
-                result.lintableFiles.push(itemPath);
+            else if (SUPPORTED_EXTENSIONS.includes(parsedPath.ext)) {
+                result.lintableFiles.push(parsedPath);
             }
         }
 
         // If the current item is a directory, recursively scan it
         else if (stats.isDirectory()) {
-            const subResult = await scan(itemPath, ignores);
-
-            // Merge the results
-            result.lintableFiles.push(...subResult.lintableFiles);
-            result.configFiles.push(...subResult.configFiles);
+            // Merge the subdirectory result into the current result
+            result.subdirectories.push(await scan(itemPath, ignores));
         }
     }
 
