@@ -57,7 +57,7 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
 
     // TODO: If no files are specified, lint all supported files in the cwd
 
-    walkScannedDirectory(
+    await walkScannedDirectory(
         scanResult,
         {
             file: async (file: ParsedPath, config: LinterCliConfig) => {
