@@ -20,7 +20,7 @@ Table of Contents:
 - [Features](#features)
 - [Getting started](#getting-started)
   - [Pre-requisites](#pre-requisites)
-  - [Installation](#installation)
+  - [Installation \& Usage](#installation--usage)
 - [VSCode extension](#vscode-extension)
 - [Special comments](#special-comments)
   - [Ignore rules](#ignore-rules)
@@ -70,7 +70,7 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 - Node.js 12 or higher: https://nodejs.org/en/download/
 - NPM or Yarn. NPM is installed with Node.js, so you don't need to install it separately. If you want to use `yarn` instead of `npm`, you can install it from [here](https://classic.yarnpkg.com/en/docs/install)
 
-### Installation
+### Installation & Usage
 1. Install `AGLint` globally or locally. If you want to use just it in your project, we recommend installing it locally.
    - NPM: 
      - Globally: `npm install -g @adguard/aglint` 
@@ -82,6 +82,8 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 3. Run AGlint **in your project folder**:
    - NPM: `aglint lint` (or `npx aglint lint` if you installed it locally)
    - Yarn: `yarn aglint lint`
+
+That's it! :hugs: If you want to customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).
 
 ## VSCode extension
 
