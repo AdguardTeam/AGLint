@@ -30,8 +30,8 @@ Table of Contents:
 - [Ignoring files or folders](#ignoring-files-or-folders)
 - [Configuration](#configuration)
 - [Linter rules](#linter-rules)
-  - [if-closed](#if-closed)
-  - [single-selector](#single-selector)
+  - [`if-closed`](#if-closed)
+  - [`single-selector`](#single-selector)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -47,7 +47,7 @@ Table of Contents:
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists, and we want to make it easy to use them in adblockers.
 
-Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org/). If you are familiar with ESLint, you will find it easy to use `AGLint` as well.
+Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org/). If you are familiar with `ESLint`, you will find it easy to use `AGLint` as well.
 
 ## Features
 
@@ -183,7 +183,7 @@ The configuration file should be a valid JSON or YAML file. The following option
 
 ## Linter rules
 
-### if-closed
+### `if-closed`
 
 Checks if the `if` statement is closed and no unclosed `endif` statements are present.
 
@@ -205,7 +205,7 @@ so the linter will give you the following warning:
     5:0     error   Unclosed "if" directive
 ```
 
-### single-selector
+### `single-selector`
 
 Checks if the CSS selector contains multiple selectors. For example, `example.com##.ad, .something` will be reported as warning, since it is a bad practice to use multiple selectors in a single rule.
 
