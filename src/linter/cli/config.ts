@@ -11,20 +11,20 @@ export interface LinterCliConfig {
     /**
      * Whether to use colors in the output
      */
-    colors: boolean;
+    colors?: boolean;
 
     /**
      * Whether to fix linting errors automatically (if possible)
      */
-    fix: boolean;
+    fix?: boolean;
 }
 
 /**
  * Superstruct schema for the config (used for validation)
  */
 export const linterCliConfigSchema = ss.object({
-    colors: ss.boolean(),
-    fix: ss.boolean(),
+    colors: ss.optional(ss.boolean()),
+    fix: ss.optional(ss.boolean()),
 });
 
 /**
