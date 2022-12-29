@@ -46,7 +46,7 @@ export async function walkScannedDirectory(
 
     // Perform the directory action on the current directory (if it exists)
     if (events.dir) {
-        await events.dir(scannedDirectory.dir, mergedConfig);
+        await events.dir(scannedDirectory.dir, mergedConfigDeepClone);
     }
 
     // Perform the file action on each lintable file
