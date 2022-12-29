@@ -24,11 +24,12 @@ Table of Contents:
 - [VSCode extension](#vscode-extension)
 - [Special comments](#special-comments)
   - [Ignore adblock rules](#ignore-adblock-rules)
-    - [Ignore single rule](#ignore-single-rule)
+    - [Ignore single adblock rule](#ignore-single-adblock-rule)
     - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
     - [Disable some linter rules](#disable-some-linter-rules)
 - [Ignoring files or folders](#ignoring-files-or-folders)
 - [Configuration](#configuration)
+  - [Example configurations](#example-configurations)
 - [Linter rules](#linter-rules)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
@@ -37,7 +38,7 @@ Table of Contents:
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
-- [Ideas](#ideas)
+- [Ideas \& Questions](#ideas--questions)
 - [License](#license)
 - [References](#references)
 
@@ -100,7 +101,7 @@ You may not want to lint some adblock rules, so you can add special config / con
 
 ### Ignore adblock rules
 
-#### Ignore single rule
+#### Ignore single adblock rule
 You can completely disable linting for an adblock rule by adding `! aglint-disable-next-line` comment before the adblock rule. For example, `example.com##.ad` will be ignored in the following case:
 
 ```adblock
@@ -108,6 +109,8 @@ You can completely disable linting for an adblock rule by adding `! aglint-disab
 example.com##.ad
 example.net##.ad
 ```
+
+This lets you disable linting for a single adblock rule, but it doesn't disable linting for the rest of the file. If you want to disable linting for the rest of the file, you can add `! aglint-disable` comment before the first adblock rule or add the file path to the ignore list (`.aglintignore` file). See [Ignoring files or folders](#ignoring-files-or-folders) for more info.
 
 #### Ignore multiple adblock rules
 If you want to ignore multiple adblock rules, you can add `! aglint-disable` comment before the first adblock rule and `! aglint-enable` comment after the last adblock rule. For example, `example.com##.ad` and `example.net##.ad` will be ignored in the following case:
@@ -128,9 +131,14 @@ You can disable some linter rules by adding `! aglint-disable-next-line rule1, r
 
 You can ignore files or folders by creating ignore file named `.aglintignore` in any folder. The syntax and behavior of this file is the same as `.gitignore` file. Learn more about `.gitignore` [here](https://git-scm.com/docs/gitignore), if you are not familiar with it.
 
+If you have a config file in an ignored folder, it will be ignored as well.
+
+Some "problematic" paths are ignored by default:
+- `node_modules`
+
 ## Configuration
 
-You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder.
+You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder (like a chain of inheritance). If you have a configuration file in the root folder, it will be merged with the default configuration.
 
 The configuration file should be a valid JSON or YAML file. The following options are available:
 
@@ -165,22 +173,44 @@ The configuration file should be a valid JSON or YAML file. The following option
           }
       }
       ```
-      Configuration file example:
-      ```json
-      {
-          "colors": true,
-          "fix": false,
-          "rules": {
-              "rule-1": ["error", { "option-1": "value-1" }],
-              "rule-2": ["warn", { "option-2": "value-2" }],
-              "rule-3": ["off"]
-          }
-      }
-      ```
+
+### Example configurations
+
+Here is an example of a configuration file in JSON syntax:
+
+```json
+{
+    "colors": true,
+    "fix": false,
+    "rules": {
+        "rule-1": ["warn", { "option-1": "value-1" }],
+        "rule-2": ["error", { "option-2": "value-2" }],
+        "rule-3": ["off"]
+    }
+}
+```
+
+You can also use YAML syntax:
+
+```yaml
+colors: true
+fix: false
+rules:
+  rule-1:
+    - warn
+    - option-1: value-1
+  rule-2:
+    - error
+    - option-2: value-2
+  rule-3:
+    - off
+```
+
+JavaScript and TypeScript configuration files aren't supported at the moment, but we will add support for them in the future.
 
 ## Linter rules
 
-The linter parses your filter list files with the built in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST.
+The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
 
 Currently, the following linter rules are available (we will add more rules in the future):
 
@@ -223,9 +253,17 @@ so the linter will give you the following warning:
     1:0     warning An element hiding rule should contain only one selector
 ```
 
+It will also suggest a fix for the first rule:
+
+```
+example.com##.ad
+example.com##.something
+example.org##.ad
+```
+
 ## Use programmatically
 
-You can use several parts of `AGLint` programmatically, but it is only recommended for advanced users who are familiar with JavaScript and TypeScript. Generally, the API are well documented with a lot of examples, but you can open a discussion if you have any questions.
+You can use several parts of `AGLint` programmatically, but it is only recommended for advanced users who are familiar with Node.js, JavaScript, TypeScript and the basics of software development. Generally, the API are well documented with a lot of examples, but you can open a discussion if you have any questions, we will be happy to help you.
 
 #### Parser
 
@@ -317,7 +355,7 @@ import { Linter } from "aglint";
 // Create a new linter instance
 const linter = new Linter();
 
-// Add default rules
+// Add default rules - don't forget to add them, otherwise the linter won't do anything
 linter.addDefaultRules();
 
 // Add custom rules (optional). Rules are following LinterRule interface.
@@ -366,9 +404,9 @@ Main development commands:
 - `yarn coverage`: Get test coverage report
 - `yarn build`: Build package (to `dist` folder)
 
-## Ideas
+## Ideas & Questions
 
-If you have any ideas for new features, please open an issue or a discussion. We will be happy to discuss it with you.
+If you have any questions ideas for new features, please open an issue or a discussion. We will be happy to discuss it with you.
 
 ## License
 
