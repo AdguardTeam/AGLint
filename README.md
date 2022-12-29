@@ -178,7 +178,7 @@ The configuration file should be a valid JSON or YAML file. The following option
 
 ### Example configurations
 
-Here is an example of a configuration file in JSON syntax:
+Here is an example of a configuration file in JSON syntax (`aglint.config.json`):
 
 ```json
 {
@@ -192,7 +192,7 @@ Here is an example of a configuration file in JSON syntax:
 }
 ```
 
-You can also use YAML syntax:
+You can also use YAML syntax (`aglint.config.yml`):
 
 ```yaml
 colors: true
