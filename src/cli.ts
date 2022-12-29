@@ -51,11 +51,10 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
     // Get start time
     const startTime = performance.now();
 
-    // Get file list from args, but this can be empty
-    // const files = program.args;
     const scanResult = await scan(cwd);
 
-    // TODO: If no files are specified, lint all supported files in the cwd
+    // TODO: If no files are specified in the arguments, lint all supported files in the cwd
+    // const files = program.args;
 
     await walkScannedDirectory(
         scanResult,
