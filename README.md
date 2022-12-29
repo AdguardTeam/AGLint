@@ -91,7 +91,9 @@ That's all! :hugs: The linter will check all filter lists in your project and pr
 
 We have created a VSCode extension that fully covers adblock filter list syntax. It is available [here](https://marketplace.visualstudio.com/items?itemName=adguard.adblock).
 
-This extension enables syntax highlighting, and it's compatible with `AGLint`. GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this extension to highlight adblock filter lists.
+This extension enables syntax highlighting, and it's compatible with `AGLint`. Typically, it means that this extension will detect all syntax errors and show them in the editor, and on top of that, it will also show some warnings and hints, because it also runs `AGLint` under the hood.
+
+GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this extension to highlight adblock filter lists.
 
 **We strongly recommend using this extension if you are working with adblock filter lists.**
 
@@ -369,10 +371,10 @@ const report = linter.lint("example.com##.ad, #ad");
 
 The `LinterRule` interface has the following structure:
 
-- meta: Metadata for the rule
+- `meta`: Metadata for the rule
   - `type`: problem, suggestion or layout
   - `severity`: warning, error or fatal
-- events:
+- `events`:
   - `onStartFilterList`: called before analyzing a file
   - `onRule`: Called to analyze a single rule
   - `onEndFilterList`: called after analyzing a file
@@ -406,7 +408,7 @@ Main development commands:
 
 ## Ideas & Questions
 
-If you have any questions ideas for new features, please open an issue or a discussion. We will be happy to discuss it with you.
+If you have any questions or ideas for new features, please open an issue or a discussion. We will be happy to discuss it with you.
 
 ## License
 
