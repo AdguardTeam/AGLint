@@ -394,7 +394,7 @@ A small summary of what to expect:
   - Redirects
   - etc. 
 - Rule converter (AST &#8594; AST)
-  - The rule converter allows you to convert from any syntax to any syntax. If possible, of course, otherwise an error will be thrown. For example, you cannot convert a CSS injection to Adblock Plus, since ABP does not support CSS injections.
+  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to Adblock Plus, since ABP simply doesn't support CSS injections.
 
 ## Development & Contribution
 
