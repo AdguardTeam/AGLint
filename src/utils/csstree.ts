@@ -54,7 +54,7 @@ export class CssTree {
             parseValue: true,
             parseCustomProperty: true,
             onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
-                throw new SyntaxError(error.rawMessage);
+                throw new SyntaxError(`CSSTree parsing error: ${error.rawMessage || error.message}`);
             },
         });
     }

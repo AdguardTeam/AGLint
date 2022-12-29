@@ -564,7 +564,7 @@ export class Linter {
                         // since the linter rules can only accept AST.
                         result.problems.push({
                             severity: LinterRuleSeverity.Fatal,
-                            message: error.message,
+                            message: `AGLint parsing error: ${error.message}`,
                             position: {
                                 startLine: index + 1,
                                 startColumn: 0,

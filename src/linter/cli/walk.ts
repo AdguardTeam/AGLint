@@ -56,6 +56,6 @@ export async function walkScannedDirectory(
 
     // Recursively walk each subdirectory
     for (const subdir of scannedDirectory.subdirectories) {
-        walkScannedDirectory(subdir, events, mergedConfigDeepClone);
+        await walkScannedDirectory(subdir, events, mergedConfigDeepClone);
     }
 }
