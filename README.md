@@ -257,7 +257,7 @@ so the linter will give you the following warning:
 
 It will also suggest a fix for the first rule:
 
-```
+```adblock
 example.com##.ad
 example.com##.something
 example.org##.ad
@@ -381,7 +381,7 @@ The `LinterRule` interface has the following structure:
 
 Every event has a `context` parameter, which makes it possible to get the current filter list content, the current rule, report, etc.
 
-You can check the `src/linter/rules` directory for detailed examples.
+You can check the [`src/linter/rules`](src/linter/rules) directory for detailed examples.
 
 ### Converter (WIP)
 
