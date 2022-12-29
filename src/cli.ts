@@ -79,10 +79,7 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
 
                         // Re-lint the fixed file (but only once to avoid infinite loops or other problems)
                         // TODO: if there are still problems, they are not fixable or we will not fix them now
-                        result = linter.lint(
-                            await readFile(filePath, "utf8"),
-                            config.fix || defaultLinterCliConfig.fix
-                        );
+                        result = linter.lint(result.fixed, config.fix || defaultLinterCliConfig.fix);
 
                         if (result.problems.length === 0) {
                             return;
