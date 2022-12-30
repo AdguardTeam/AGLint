@@ -132,7 +132,7 @@ You can disable some linter rules by adding `! aglint-disable-next-line rule1, r
 
 ## Ignoring files or folders
 
-You can ignore files or folders by creating ignore file named `.aglintignore` in any folder. The syntax and behavior of this file is the same as `.gitignore` file. Learn more about `.gitignore` [here](https://git-scm.com/docs/gitignore), if you are not familiar with it.
+You can ignore files or folders by creating an "ignore file" named `.aglintignore` in any directory. The syntax and behavior of this file is the same as `.gitignore` file. Learn more about `.gitignore` [here](https://git-scm.com/docs/gitignore) if you are not familiar with it.
 
 If you have a config file in an ignored folder, it will be ignored as well.
 
