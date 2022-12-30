@@ -16,26 +16,266 @@
 </p>
 
 Table of Contents:
-- [Project structure](#project-structure)
-  - [Parser](#parser)
-    - [Parser example](#parser-example)
-    - [Another parser example](#another-parser-example)
+- [Introduction](#introduction)
+- [Features](#features)
+- [Getting started](#getting-started)
+  - [Pre-requisites](#pre-requisites)
+  - [Installation \& Usage](#installation--usage)
+- [VSCode extension](#vscode-extension)
+- [Special comments](#special-comments)
+  - [Ignore adblock rules](#ignore-adblock-rules)
+    - [Ignore single adblock rule](#ignore-single-adblock-rule)
+    - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
+    - [Disable some linter rules](#disable-some-linter-rules)
+- [Ignoring files or folders](#ignoring-files-or-folders)
+- [Configuration](#configuration)
+  - [Example configurations](#example-configurations)
+- [Linter rules](#linter-rules)
+  - [`if-closed`](#if-closed)
+  - [`single-selector`](#single-selector)
+- [Use programmatically](#use-programmatically)
+    - [Parser](#parser)
+  - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
-  - [Linter (WIP)](#linter-wip)
-- [Development](#development)
+- [Development \& Contribution](#development--contribution)
+- [Ideas \& Questions](#ideas--questions)
+- [License](#license)
 - [References](#references)
 
-## Project structure
+## Introduction
 
-### Parser
+`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
+
+
+Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists, and we want to make it easy to use them in adblockers.
+
+Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org/). If you are familiar with `ESLint`, you will find it easy to use `AGLint` as well.
+
+## Features
+
+- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus.
+- :white_check_mark: **Error-tolerant**: it can parse any filter list, even if it contains minor syntax errors.
+- :zap: **Fast**: made with performance in mind.
+- :thumbsup: **Easy to use**: it can be used as a CLI tool or programmatically.
+- :art: **Customizable**: you can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo.
+- :gear: **Extensible**: you can add your own rules to the linter.
+- :globe_with_meridians: **Cross-platform**: it works on Windows, Linux and macOS.
+- :globe_with_meridians: **Open-source**: the source code is available here on GitHub.
+- :free: **Free**: it is free to use and free to modify.
+- :rocket: **Latest technologies**: it is written in TypeScript and can be used in Node.js and browsers as well.
+
+## Getting started
+
+Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is a very short instruction on how to use it as a CLI tool with the default configuration.
+
+### Pre-requisites
+- Node.js 12 or higher: https://nodejs.org/en/download/
+- NPM or Yarn. NPM is installed with Node.js, so you don't need to install it separately. If you want to use `yarn` instead of `npm`, you can install it from [here](https://classic.yarnpkg.com/en/docs/install)
+
+### Installation & Usage
+1. Install `AGLint` globally or locally. If you want to use just it in your project, we recommend installing it locally.
+   - NPM: 
+     - Globally: `npm install -g @adguard/aglint` 
+     - Locally: `npm install -D @adguard/aglint`
+   - Yarn:
+     - Globally: `yarn global add @adguard/aglint`
+     - Locally: `yarn add -D @adguard/aglint`
+2. Run AGlint **in your project folder**:
+   - NPM: `aglint lint` (or `npx aglint lint` if you installed it locally)
+   - Yarn: `yarn aglint lint`
+
+That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
+
+*If you want to customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
+
+## VSCode extension
+
+We have created a VSCode extension that fully covers adblock filter list syntax. It is available [here](https://marketplace.visualstudio.com/items?itemName=adguard.adblock).
+
+This extension enables syntax highlighting, and it's compatible with `AGLint`. Typically, it means that this extension will detect all syntax errors and show them in the editor, and on top of that, it will also show some warnings and hints, because it also runs `AGLint` under the hood.
+
+GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this extension to highlight adblock filter lists.
+
+**We strongly recommend using this extension if you are working with adblock filter lists.**
+
+## Special comments
+
+You may not want to lint some adblock rules, so you can add special config / control comments to ignore / customize them. Generally these comments begins with the `! aglint-` prefix.
+
+### Ignore adblock rules
+
+#### Ignore single adblock rule
+You can completely disable linting for an adblock rule by adding `! aglint-disable-next-line` comment before the adblock rule. For example, `example.com##.ad` will be ignored in the following case:
+
+```adblock
+! aglint-disable-next-line
+example.com##.ad
+example.net##.ad
+```
+
+This lets you disable linting for a single adblock rule, but it doesn't disable linting for the rest of the file. If you want to disable linting for the rest of the file, you can add `! aglint-disable` comment before the first adblock rule or add the file path to the ignore list (`.aglintignore` file). See [Ignoring files or folders](#ignoring-files-or-folders) for more info.
+
+#### Ignore multiple adblock rules
+If you want to ignore multiple adblock rules, you can add `! aglint-disable` comment before the first adblock rule and `! aglint-enable` comment after the last adblock rule. For example, `example.com##.ad` and `example.net##.ad` will be ignored in the following case:
+
+```adblock
+! aglint-disable
+example.com##.ad
+example.net##.ad
+! aglint-enable
+example.org##.ad
+```
+
+#### Disable some linter rules
+
+You can disable some linter rules by adding `! aglint-disable-next-line rule1, rule2` comment before the adblock rule.
+
+## Ignoring files or folders
+
+You can ignore files or folders by creating an "ignore file" named `.aglintignore` in any directory. The syntax and behavior of this file is the same as `.gitignore` file. Learn more about `.gitignore` [here](https://git-scm.com/docs/gitignore) if you are not familiar with it.
+
+If you have a config file in an ignored folder, it will be ignored as well.
+
+Some "problematic" paths are ignored by default:
+- `node_modules`
+- `.DS_Store`
+
+## Configuration
+
+You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder (like a chain of inheritance). If you have a configuration file in the root folder, it will be merged with the default configuration.
+
+The configuration file should be a valid JSON or YAML file. The following options are available:
+
+- `colors`: enable or disable colors in the output. Default: `true`.
+- `fix`: enable or disable automatic fixing of errors. Default: `false`. **Be careful with this option!** It will modify your filter list files.
+- `rules`: an object with linter rules. See [Linter rules](#linter-rules) for more info. A rule basically has the following structure:
+  - `rule-name`: a string with the name of the rule. For example, `rule-1`.
+  - `rule-value`: an array with two elements:
+    - `rule-severity`: a string with the severity of the rule. It can be `error`, `warn` or `off`.
+    - `rule-options`: an object with options for the rule. For example, `{ "option-1": "value-1" }` (optional).
+    - For example you can disable the `rule-1` rule by adding the following configuration:
+      ```json
+      {
+          "rules": {
+              "rule-1": ["off"]
+          }
+      }
+      ```
+      or you can change the severity of the `rule-2` rule to `warn`:
+      ```json
+      {
+          "rules": {
+              "rule-2": ["warn"]
+          }
+      }
+      ```
+      or you can change the severity of the `rule-3` rule to `error` and add an option to it:
+      ```json
+      {
+          "rules": {
+              "rule-3": ["error", { "option-3": "value-3" }]
+          }
+      }
+      ```
+
+### Example configurations
+
+Here is an example of a configuration file in JSON syntax (`aglint.config.json`):
+
+```json
+{
+    "colors": true,
+    "fix": false,
+    "rules": {
+        "rule-1": ["warn", { "option-1": "value-1" }],
+        "rule-2": ["error", { "option-2": "value-2" }],
+        "rule-3": ["off"]
+    }
+}
+```
+
+You can also use YAML syntax (`aglint.config.yml`):
+
+```yaml
+colors: true
+fix: false
+rules:
+  rule-1:
+    - warn
+    - option-1: value-1
+  rule-2:
+    - error
+    - option-2: value-2
+  rule-3:
+    - off
+```
+
+JavaScript and TypeScript configuration files aren't supported at the moment, but we will add support for them in the future.
+
+## Linter rules
+
+The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
+
+Currently, the following linter rules are available (we will add more rules in the future):
+
+### `if-closed`
+
+Checks if the `if` statement is closed and no unclosed `endif` statements are present.
+
+For example, in the following case, the first `endif` are unnecessary, and the last `if` statement is not closed:
+    
+```adblock
+!#endif
+!#if (adguard_app_android)
+example.com##.ad
+!#endif
+!#if (adguard_ext_firefox)
+example.org##.something
+```
+
+so the linter will give you the following errors:
+
+```
+    1:0     error   Using an "endif" directive without an opening "if" directive
+    5:0     error   Unclosed "if" directive
+```
+
+### `single-selector`
+
+Checks if the CSS selector contains multiple selectors. For example, `example.com##.ad, .something` will be reported as warning, since it is a bad practice to use multiple selectors in a single rule.
+
+For example, in the following case, the first rule is bad, and the second rule is good:
+    
+```adblock
+example.com##.ad, .something
+example.org##.ad
+```
+
+so the linter will give you the following warning:
+
+```
+    1:0     warning An element hiding rule should contain only one selector
+```
+
+It will also suggest a fix for the first rule:
+
+```adblock
+example.com##.ad
+example.com##.something
+example.org##.ad
+```
+
+## Use programmatically
+
+You can use several parts of `AGLint` programmatically, but it is only recommended for advanced users who are familiar with Node.js, JavaScript, TypeScript and the basics of software development. Generally, the API are well documented with a lot of examples, but you can open a discussion if you have any questions, we will be happy to help you.
+
+#### Parser
 
 An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently in use. In other words, any filter list can be parsed with it. The parser API basically has two main parts:
 - Parser: parsing rules (string &#8594; AST)
 - Generator: serialization of ASTs (AST &#8594; string)
 
-#### Parser example
-
-This code:
+For example, this code:
 
 ```typescript
 import { RuleParser } from "aglint";
@@ -43,7 +283,6 @@ import { RuleParser } from "aglint";
 // RuleParser automatically determines the rule type
 const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
 ```
-
 will gives you this AST:
 
 ```json
@@ -92,66 +331,100 @@ Then, you can serialize this AST:
 RuleParser.generate(ast);
 ```
 
-Which returns the rule as string:
+Which returns the rule as string (this is not the same as the original rule, it is generated from the AST, and not related to the original rule):
 ```adblock
 example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
 ```
 
-#### Another parser example
+Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same.
 
-> *Please note that unnecessary spaces will disappear and CSS selectors will be regenerated according to uniform formatting*
+You can pass any rule to the parser, it automatically determines the type and category of the rule.
+
+If the rule is syntactically incorrect, the parser will throw an error.
+
+### Linter
+
+The linter is a tool that checks the rules for errors and bad practices. It is based on the parser, so it can parse all ADG, uBO and ABP rules currently in use. The linter API has two main parts:
+
+- Linter: checks rules (string &#8594; AST &#8594; problem report)
+- CLI: a Node.js command-line interface for the linter
+
+Please keep in mind that the CLI only can be used in Node.js (because it uses the `fs` module for file management), but the linter can be used in both Node.js and browsers.
+
+Example usage:
 
 ```typescript
-import { RuleParser } from "aglint";
+import { Linter } from "aglint";
 
-// General rules (ADG/uBO/ABP)
-console.log(RuleParser.generate(RuleParser.parse("##.ad")));
-console.log(RuleParser.generate(RuleParser.parse("##.ad:-abp-has(> .something)")));
-console.log(RuleParser.generate(RuleParser.parse("-banner-350px-")));
-console.log(RuleParser.generate(RuleParser.parse("/ad.js$script,third-party")));
+// Create a new linter instance
+const linter = new Linter();
 
-// AdGuard-specific rules:
-console.log(RuleParser.generate(RuleParser.parse("!+ NOT_OPTIMIZED PLATFORM(windows, mac)")));
-console.log(RuleParser.generate(RuleParser.parse("!+ NOT_OPTIMIZED PLATFORM( windows, mac )")));
-console.log(RuleParser.generate(RuleParser.parse("[$app=com.apple.Safari]example.org#%#//scriptlet('prevent-setInterval', 'check', '!300')")));
-console.log(RuleParser.generate(RuleParser.parse("example.com,~example.net#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }")));
-console.log(RuleParser.generate(RuleParser.parse("!#if (adguard)")));
-console.log(RuleParser.generate(RuleParser.parse(`@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i`)));
+// Add default rules - don't forget to add them, otherwise the linter won't do anything
+linter.addDefaultRules();
 
-// uBlock-specific rules:
-console.log(RuleParser.generate(RuleParser.parse("example.com,~example.net##:matches-path(/path) .ad")));
-console.log(RuleParser.generate(RuleParser.parse("example.com,~example.net#@#:matches-path(/path) body:style(padding: 0;)")));
-console.log(RuleParser.generate(RuleParser.parse("example.com##^script:has-text(something)")));
-console.log(RuleParser.generate(RuleParser.parse("example.com##+js(scriptlet0, , arg0)")));
+// Add custom rules (optional). Rules are following LinterRule interface.
+// linter.addRule("name", { data });
 
-// Adblock Plus specific rules:
-console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0 arg1")));
-console.log(RuleParser.generate(RuleParser.parse("example.com#$#scriptlet1 arg0\\ arg0 arg1; scriptlet2;   scriptlet3;")));
+// Lint a content (file content - you can pass new lines as well)
+const report = linter.lint("example.com##.ad, #ad");
+
+// Do something with the report :)
 ```
 
+The `LinterRule` interface has the following structure:
+
+- `meta`: Metadata for the rule
+  - `type`: problem, suggestion or layout
+  - `severity`: warning, error or fatal
+- `events`:
+  - `onStartFilterList`: called before analyzing a file
+  - `onRule`: Called to analyze a single rule
+  - `onEndFilterList`: called after analyzing a file
+
+Every event has a `context` parameter, which makes it possible to get the current filter list content, the current rule, report, etc.
+
+You can check the [`src/linter/rules`](src/linter/rules) directory for detailed examples.
+
 ### Converter (WIP)
-- Compatibility tables
-- Rule converter (AST &#8594; AST) 
 
-### Linter (WIP)
-- Validate rules
-- Check redundancies, conflicts
+A tool for converting rules from one syntax to another. Sadly, this feature will only become available in a future version.
 
-## Development
+A small summary of what to expect:
+- Compatibility tables for AdGuard, uBlock Origin and Adblock Plus
+  - Extended CSS elements
+  - Scriptlets
+  - Redirects
+  - etc. 
+- Rule converter (AST &#8594; AST)
+  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to Adblock Plus, since ABP simply doesn't support CSS injections.
 
-Commands:
-- `yarn lint`: Run ESLint
+## Development & Contribution
+
+You can contribute to the project by opening a pull request. Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. You can do this by running `yarn lint` and `yarn test` commands. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
+
+Main development commands:
+- `yarn lint`: Run ESLint and Prettier on all files
 - `yarn test`: Run all tests
 - `yarn coverage`: Get test coverage report
 - `yarn build`: Build package (to `dist` folder)
 
+## Ideas & Questions
+
+If you have any questions or ideas for new features, please open an issue or a discussion. We will be happy to discuss it with you.
+
+## License
+
+AGLint is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+
 ## References
 
-- Basic docs:
+Here are some useful links to help you write adblock rules. This list is not exhaustive, so if you know any other useful resources, please let us know.
+
+- Basic documentations for each syntax:
   - ADG _How to create your own ad filters_: https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters
   - uBO _Static filter syntax_: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax
   - ABP _How to write filters_: https://help.eyeo.com/adblockplus/how-to-write-filters
-- (Extended) CSS:
+- Extended CSS:
   - MDN _CSS selectors_: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors
   - ADG _Extended CSS capabilities_: https://github.com/AdguardTeam/ExtendedCss/blob/master/README.md#extended-capabilities
   - uBO _Procedural cosmetic filters_: https://github.com/gorhill/uBlock/wiki/Procedural-cosmetic-filters
@@ -162,3 +435,5 @@ Commands:
   - ABP snippets: https://help.eyeo.com/adblockplus/snippet-filters-tutorial#snippets-ref
 - Third party libraries:
   - CSSTree: https://github.com/csstree/csstree/tree/master/docs
+- AdGuard's compatibility tables:
+  - https://github.com/AdguardTeam/Scriptlets/blob/master/wiki/compatibility-table.md
