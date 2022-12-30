@@ -138,6 +138,7 @@ If you have a config file in an ignored folder, it will be ignored as well.
 
 Some "problematic" paths are ignored by default:
 - `node_modules`
+- `.DS_Store`
 
 ## Configuration
 
