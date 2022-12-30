@@ -44,7 +44,8 @@ Table of Contents:
 
 ## Introduction
 
-`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. It is written in TypeScript and can be used in Node.js and browsers as well.
+`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
+
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists, and we want to make it easy to use them in adblockers.
 
