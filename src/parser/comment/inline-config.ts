@@ -19,6 +19,7 @@ const CONFIG_COMMENT_MARKER = "--";
 /**
  * Represents an inline linter configuration comment.
  *
+ * @example
  * For example, if the comment is
  * ```adblock
  * ! aglint-disable some-rule another-rule
@@ -29,23 +30,46 @@ export interface ConfigComment extends Comment {
     category: RuleCategory.Comment;
     type: CommentRuleType.ConfigComment;
 
-    /** Comment marker: `!` or `#` */
+    /**
+     * The marker for the comment. It can be `!` or `#`. It is always the first non-whitespace character in the comment.
+     */
     marker: CommentMarker;
 
-    /** Command, for example: `aglint` */
+    /**
+     * The command for the comment. It is always begins with the `aglint` prefix.
+     *
+     * @example
+     * ```adblock
+     * ! aglint-disable-next-line
+     * ```
+     */
     command: string;
 
-    /** Params: can be a rule configuration object or a list of rule names */
+    /**
+     * Params for the command. Can be a rule configuration object or a list of rule names.
+     *
+     * @example
+     * For the following comment:
+     * ```adblock
+     * ! aglint-disable some-rule another-rule
+     * ```
+     * the params would be `["some-rule", "another-rule"]`.
+     */
     params?: object | string[];
 
-    /** Config comment, for example: `! aglint-enable -- this is the comment` */
+    /**
+     * Config comment text. The idea is generally the same as in ESLint.
+     *
+     * @example
+     * You can use the following syntax to specify a comment for a config comment:
+     * `! aglint-enable -- this is the comment`
+     */
     comment?: string;
 }
 
 /**
- * ConfigCommentParser is responsible for parsing inline AGLint configuration rules.
- *
- * Inspired by ESLint inline configuration comments.
+ * `ConfigCommentParser` is responsible for parsing inline AGLint configuration rules.
+ * Generally, the idea is inspired by ESLint inline configuration comments.
  *
  * @see {@link https://eslint.org/docs/latest/user-guide/configuring/rules#using-configuration-comments}
  */
@@ -54,7 +78,7 @@ export class ConfigCommentParser {
      * Determines whether the rule is an inline configuration comment rule.
      *
      * @param raw - Raw rule
-     * @returns true/false
+     * @returns `true` if the rule is an inline configuration comment rule, otherwise `false`.
      */
     public static isConfigComment(raw: string): boolean {
         const trimmed = raw.trim();
@@ -107,7 +131,7 @@ export class ConfigCommentParser {
         const result: ConfigComment = {
             category: RuleCategory.Comment,
             type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             marker: raw[0] as CommentMarker,
             command: text,
         };

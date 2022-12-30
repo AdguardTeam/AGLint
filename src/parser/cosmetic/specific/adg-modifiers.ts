@@ -8,16 +8,28 @@ const MODIFIERS_MARKER = "$";
 
 export const ADG_MODIFIER_LIST_TYPE = "AdgModifierList";
 
-/** Represents AdGuard's cosmetic rule modifiers. */
+/**
+ * Represents AdGuard's cosmetic rule modifiers.
+ */
 export interface AdgModifierList {
-    // Basically, the idea is that each main AST part should have a type
+    /**
+     * Type of the node. Basically, the idea is that each main AST part should have a type
+     */
     type: typeof ADG_MODIFIER_LIST_TYPE;
+
+    /**
+     * List of modifiers
+     */
     modifiers: RuleModifier[];
+
+    /**
+     * Rest of the pattern
+     */
     rest: string;
 }
 
 /**
- * AdgModifierListParser is responsible for parsing AdGuard cosmetic rule modifiers.
+ * `AdgModifierListParser` is responsible for parsing AdGuard cosmetic rule modifiers.
  *
  * For example:
  * ```adblock
@@ -83,6 +95,7 @@ export class AdgModifierListParser {
         result += MODIFIER_LIST_OPEN;
         result += MODIFIERS_MARKER;
 
+        // Generate modifiers
         result += ModifierListParser.generate({
             type: MODIFIER_LIST_TYPE,
             modifiers: ast.modifiers,

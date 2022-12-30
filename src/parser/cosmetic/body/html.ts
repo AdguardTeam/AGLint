@@ -9,13 +9,18 @@ import { CssTree } from "../../../utils/csstree";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
 import { DOUBLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
 
-/**Represents an HTML filtering rule body. */
+/**
+ * Represents an HTML filtering rule body.
+ */
 export interface HtmlRuleBody {
+    /**
+     * HTML rule selector(s).
+     */
     selectors: SelectorPlain[];
 }
 
 /**
- * HtmlBodyParser is responsible for parsing the body of HTML filtering rules.
+ * `HtmlBodyParser` is responsible for parsing the body of HTML filtering rules.
  *
  * Please note that this parser will read ANY selector if it is syntactically correct.
  * Checking whether this selector is actually compatible with a given adblocker is not
@@ -30,8 +35,6 @@ export class HtmlBodyParser {
      *
      * @param selector - CSS selector string
      * @returns Escaped CSS selector
-     * @throws
-     *   - If the selector is invalid according to the CSS syntax
      * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#tag-content}
      */
     public static escapeDoubleQuotes(selector: string): string {
@@ -86,6 +89,7 @@ export class HtmlBodyParser {
      * Please note that compatibility is not yet checked at this point.
      *
      * @param raw - Raw body
+     * @throws If the body is not syntactically correct (CSSTree throws)
      * @returns HTML filtering rule body AST
      */
     public static parse(raw: string): HtmlRuleBody {

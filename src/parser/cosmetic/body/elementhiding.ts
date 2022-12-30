@@ -13,11 +13,14 @@ import { StringUtils } from "../../../utils/string";
  * but the best practice is to place the selectors in separate rules.
  */
 export interface ElementHidingRuleBody {
+    /**
+     * Element hiding rule selector(s).
+     */
     selectors: SelectorPlain[];
 }
 
 /**
- * ElementHidingBodyParser is responsible for parsing element hiding rule bodies.
+ * `ElementHidingBodyParser` is responsible for parsing element hiding rule bodies.
  *
  * It delegates CSS parsing to CSSTree, which is tolerant and therefore able to
  * parse Extended CSS parts as well.

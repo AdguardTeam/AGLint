@@ -1,12 +1,24 @@
 import { EMPTY } from "../../utils/constants";
 import { StringUtils } from "../../utils/string";
 
+// Modifiers are separated by ",". For example: "script,domain=example.com"
 const MODIFIERS_SEPARATOR = ",";
+
+// Modifiers can be assigned. For example: "domain=example.com"
 const MODIFIER_ASSIGN_OPERATOR = "=";
 
 export const MODIFIER_LIST_TYPE = "ModifierList";
 
-/** Represents a modifier list, eg `script,domain=example.com`. */
+/**
+ * Represents a modifier list.
+ *
+ * @example
+ * If the rule is
+ * ```adblock
+ * some-rule$script,domain=example.com
+ * ```
+ * then the list of modifiers will be `script,domain=example.com`.
+ */
 export interface ModifierList {
     // Basically, the idea is that each main AST part should have a type
     type: typeof MODIFIER_LIST_TYPE;
@@ -16,22 +28,27 @@ export interface ModifierList {
 /**
  * Represents a modifier.
  *
- * For example, if the modifier is `third-party`, the value of the modifier property
+ * @example
+ * If the modifier is `third-party`, the value of the modifier property
  * will be `third-party`, but the value will remain undefined.
  *
  * But if the modifier is `domain=example.com`, then the modifier property will be
  * `domain` and the value property will be `example.com`.
  */
 export interface RuleModifier {
-    /** Modifier name */
+    /**
+     * Modifier name
+     */
     modifier: string;
 
-    /** Modifier value (optional) */
+    /**
+     * Modifier value (optional)
+     */
     value?: string;
 }
 
 /**
- * ModifierListParser is responsible for parsing modifiers. Please note that the name is not uniform,
+ * `ModifierListParser` is responsible for parsing modifiers. Please note that the name is not uniform,
  * "modifiers" are also known as "options".
  *
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#basic-rules-modifiers}

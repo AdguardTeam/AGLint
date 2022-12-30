@@ -757,63 +757,63 @@ describe("RuleParser", () => {
         expect(RuleParser.parse("||example.com")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
         });
 
         expect(RuleParser.parse("@@||example.com")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
         });
 
         expect(RuleParser.parse("/regex/")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
         });
 
         expect(RuleParser.parse("@@/regex/")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
         });
 
         expect(RuleParser.parse("/regex/$m1,m2=v2")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
         });
 
         expect(RuleParser.parse("@@/regex/$m1,m2=v2")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
         });
 
         expect(RuleParser.parse("/example/$m1,m2=v2,m3=/^r3$/")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
         });
 
         expect(RuleParser.parse("@@/example/$m1,m2=v2,m3=/^r3$/")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
         });
 
         expect(RuleParser.parse("/ad.js^$m1=/^v1$/")).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: false,
         });
 
@@ -822,7 +822,7 @@ describe("RuleParser", () => {
         ).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
         });
 
@@ -831,7 +831,7 @@ describe("RuleParser", () => {
         ).toMatchObject({
             category: RuleCategory.Network,
             type: NetworkRuleType.BasicNetworkRule,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             exception: true,
         });
     });

@@ -4,7 +4,9 @@ import { StringUtils } from "../../utils/string";
 const DOMAIN_EXCEPTION_MARKER = "~";
 
 /**
- * Example rule:
+ * Classic domain separator.
+ *
+ * @example
  * ```adblock
  * ! Domains are separated by ",":
  * example.com,~example.org##.ads
@@ -13,7 +15,9 @@ const DOMAIN_EXCEPTION_MARKER = "~";
 const CLASSIC_DOMAIN_SEPARATOR = ",";
 
 /**
- * Example rule:
+ * Modifier domain separator.
+ *
+ * @example
  * ```adblock
  * ! Domains are separated by "|":
  * ads.js^$script,domains=example.com|~example.org
@@ -23,29 +27,60 @@ const MODIFIER_DOMAIN_SEPARATOR = "|";
 
 export const DOMAIN_LIST_TYPE = "DomainList";
 
-/** "," for the classic domain list, and "|" for the "domain" modifier parameter  */
+/**
+ * Represents the separator used in a domain list.
+ *
+ * @example
+ * "," for the classic domain list, and "|" for the "domain" modifier parameter
+ */
 export type DomainListSeparator = typeof CLASSIC_DOMAIN_SEPARATOR | typeof MODIFIER_DOMAIN_SEPARATOR;
 
-/** Represents a list of domains, e.g. `example.com,~example.net`. */
+/**
+ * Represents a list of domains
+ *
+ * @example
+ * `example.com,~example.net`.
+ */
 export interface DomainList {
-    // Basically, the idea is that each main AST part should have a type
+    /**
+     * Type of the node. Basically, the idea is that each main AST part should have a type
+     */
     type: typeof DOMAIN_LIST_TYPE;
+
+    /**
+     * Separator used in the domain list.
+     */
     separator: DomainListSeparator;
+
+    /**
+     * List of domains
+     */
     domains: Domain[];
 }
 
 /** Represents an element of the domain list (a domain). */
 export interface Domain {
-    /** Domain name */
+    /**
+     * Domain name
+     */
     domain: string;
 
-    /** Is exception (~ applied)? */
+    /**
+     * If the domain is an exception.
+     *
+     * @example
+     * `~example.com` is an exception, but `example.com` is not. `~` is the exception marker here.
+     */
     exception: boolean;
 }
 
 /**
- * DomainListParser is responsible for parsing a domain list, e.g. `example.com,~example.net`.
+ * `DomainListParser` is responsible for parsing a domain list.
  *
+ * @example
+ * - If the rule is `example.com,~example.net##.ads`, the domain list is `example.com,~example.net`.
+ * - If the rule is `ads.js^$script,domains=example.com|~example.org`, the domain list is `example.com|~example.org`.
+ * This parser is responsible for parsing these domain lists.
  * @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_domains}
  */
 export class DomainListParser {

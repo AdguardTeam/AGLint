@@ -127,43 +127,43 @@ export interface LinterProblem {
  */
 export interface LinterContext {
     /**
-     * Get shared linter configuration
+     * Returns the clone of the shared linter configuration.
      *
      * @returns The shared linter configuration
      */
     getLinterConfig: () => LinterConfig;
 
     /**
-     * Get raw adblock filter list content
+     * Returns the raw content of the adbock filter list currently processed by the linter.
      *
      * @returns The raw adblock filter list content
      */
     getFilterListContent: () => string;
 
     /**
-     * Get actual adblock rule as AST
+     * Returns the AST of the adblock rule currently being iterated by the linter.
      *
      * @returns The actual adblock rule as AST
      */
     getActualAdblockRuleAst: () => AnyRule | undefined;
 
     /**
-     * Get actual adblock rule as original string
+     * Returns the raw version of the adblock rule currently being iterated by the linter.
      *
      * @returns The actual adblock rule as original string
      */
     getActualAdblockRuleRaw: () => string | undefined;
 
     /**
-     * Get the actual line number
+     * Returns the line number that the linter is currently iterating.
      *
      * @returns The actual line number
      */
     getActualLine: () => number;
 
     /**
-     * Is fix needed? This is an optimization for the linter, so it doesn't have to
-     * run the fixer if it's not needed.
+     * Returns whether a fix was requested from the linter. This is an optimization
+     * for the linter, so it doesn't have to run the fixer if it's not needed.
      *
      * @returns `true` if fix is needed, `false` otherwise
      */
@@ -175,7 +175,7 @@ export interface LinterContext {
     storage: LinterRuleStorage;
 
     /**
-     * Function for reporting problems to the linter
+     * Function for reporting problems to the linter.
      *
      * @param problem - The problem to report
      */
@@ -200,7 +200,7 @@ type LinterRuleStorage = {
  */
 interface LinterRuleData {
     /**
-     * The rule itself.
+     * The linter rule itself.
      */
     rule: LinterRule;
 
@@ -564,7 +564,7 @@ export class Linter {
                         // since the linter rules can only accept AST.
                         result.problems.push({
                             severity: LinterRuleSeverity.Fatal,
-                            message: error.message,
+                            message: `AGLint parsing error: ${error.message}`,
                             position: {
                                 startLine: index + 1,
                                 startColumn: 0,

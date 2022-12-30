@@ -1,4 +1,6 @@
-/** Possible types of a Cosmetic rule. */
+/**
+ * Possible types of a Cosmetic rule.
+ */
 export enum CosmeticRuleType {
     ElementHidingRule = "ElementHidingRule",
     CssRule = "CssRule",

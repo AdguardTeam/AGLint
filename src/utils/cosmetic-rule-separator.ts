@@ -3,16 +3,16 @@ import { SPACE } from "./constants";
 /** Represents possible cosmetic rule separators */
 export enum CosmeticRuleSeparator {
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpCSSElemhide = "##",
+    AbpCssElemhide = "##",
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpCSSElemhideException = "#@#",
+    AbpCssElemhideException = "#@#",
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpExtCSSElemHide = "#?#",
+    AbpExtCssElemHide = "#?#",
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpExtCSSElemHideException = "#@?#",
+    AbpExtCssElemHideException = "#@?#",
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
     AbpSnippet = "#$#",
@@ -33,16 +33,16 @@ export enum CosmeticRuleSeparator {
     UboHtmlException = "#@#^",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
-    AdgCSSInject = "#$#",
+    AdgCssInject = "#$#",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
-    AdgCSSInjectException = "#@$#",
+    AdgCssInjectException = "#@$#",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#extended-css-selectors} */
-    AdgExtCSSInject = "#$?#",
+    AdgExtCssInject = "#$?#",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#extended-css-selectors} */
-    AdgExtCSSInjectException = "#@$?#",
+    AdgExtCssInjectException = "#@$?#",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#javascript-rules} */
     AdgJsInject = "#%#",
@@ -57,10 +57,10 @@ export enum CosmeticRuleSeparator {
     AdgScriptletException = "#@%#//scriptlet",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#html-filtering-rules} */
-    AdgHTML = "$$",
+    AdgHtml = "$$",
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#html-filtering-rules} */
-    AdgHTMLException = "$@$",
+    AdgHtmlException = "$@$",
 }
 
 /** In all cases, this means that the separator marks an exception. */
@@ -99,29 +99,29 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is an element hiding separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an element hiding separator, `false` otherwise
      */
     public static isElementHiding(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.AbpCSSElemhide ||
-            separator == CosmeticRuleSeparator.AbpCSSElemhideException ||
-            separator == CosmeticRuleSeparator.AbpExtCSSElemHide ||
-            separator == CosmeticRuleSeparator.AbpExtCSSElemHideException
+            separator == CosmeticRuleSeparator.AbpCssElemhide ||
+            separator == CosmeticRuleSeparator.AbpCssElemhideException ||
+            separator == CosmeticRuleSeparator.AbpExtCssElemHide ||
+            separator == CosmeticRuleSeparator.AbpExtCssElemHideException
         );
     }
 
     /**
-     * Returns whether the specified separator is an AdGuard CSS injection separator.
+     * Returns whether the specified separator is an AdGuard Css injection separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an AdGuard Css injection separator, `false` otherwise
      */
     public static isAdgCss(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.AdgCSSInject ||
-            separator == CosmeticRuleSeparator.AdgCSSInjectException ||
-            separator == CosmeticRuleSeparator.AdgExtCSSInject ||
-            separator == CosmeticRuleSeparator.AdgExtCSSInjectException
+            separator == CosmeticRuleSeparator.AdgCssInject ||
+            separator == CosmeticRuleSeparator.AdgCssInjectException ||
+            separator == CosmeticRuleSeparator.AdgExtCssInject ||
+            separator == CosmeticRuleSeparator.AdgExtCssInjectException
         );
     }
 
@@ -129,7 +129,7 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is an Adblock Plus snippet separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an Adblock Plus snippet separator, `false` otherwise
      */
     public static isAbpSnippet(separator: string): boolean {
         return separator == CosmeticRuleSeparator.AbpSnippet || separator == CosmeticRuleSeparator.AbpSnippetException;
@@ -139,7 +139,7 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is a uBlock scriptlet separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is a uBlock scriptlet separator, `false` otherwise
      */
     public static isUboScriptlet(separator: string): boolean {
         return (
@@ -151,7 +151,7 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is an AdGuard scriptlet separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an AdGuard scriptlet separator, `false` otherwise
      */
     public static isAdgScriptlet(separator: string): boolean {
         return (
@@ -163,7 +163,7 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is an AdGuard JS separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an AdGuard JS separator, `false` otherwise
      */
     public static isAdgJs(separator: string): boolean {
         return (
@@ -175,7 +175,7 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is a uBlock HTML separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is a uBlock HTML separator, `false` otherwise
      */
     public static isUboHtml(separator: string): boolean {
         return separator == CosmeticRuleSeparator.UboHtml || separator == CosmeticRuleSeparator.UboHtmlException;
@@ -185,17 +185,17 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is an AdGuard HTML separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an AdGuard HTML separator, `false` otherwise
      */
     public static isAdgHtml(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.AdgHTML || separator == CosmeticRuleSeparator.AdgHTMLException;
+        return separator == CosmeticRuleSeparator.AdgHtml || separator == CosmeticRuleSeparator.AdgHtmlException;
     }
 
     /**
      * Returns whether the specified separator is a scriptlet separator.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is a scriptlet separator, `false` otherwise
      */
     public static isScriptlet(separator: string): boolean {
         return (
@@ -209,7 +209,7 @@ export class CosmeticRuleSeparatorUtils {
      * Returns whether the specified separator is an exception.
      *
      * @param separator - Separator as string
-     * @returns true/false
+     * @returns `true` if the specified separator is an exception, `false` otherwise
      */
     public static isException(separator?: string): boolean {
         if (!separator) {
@@ -272,7 +272,7 @@ export class CosmeticRuleSeparatorUtils {
                     return [h, h + 3, CosmeticRuleSeparator.UboHtml, false];
                 }
                 // ##
-                return [h, h + 2, CosmeticRuleSeparator.AbpCSSElemhide, false];
+                return [h, h + 2, CosmeticRuleSeparator.AbpCssElemhide, false];
             }
             // #%#
             else if (rule[h + 1] == "%" && rule[h + 2] == "#") {
@@ -296,15 +296,15 @@ export class CosmeticRuleSeparatorUtils {
             }
             // #$#
             else if (rule[h + 1] == "$" && rule[h + 2] == "#") {
-                return [h, h + 3, CosmeticRuleSeparator.AdgCSSInject, false];
+                return [h, h + 3, CosmeticRuleSeparator.AdgCssInject, false];
             }
             // #?#
             else if (rule[h + 1] == "?" && rule[h + 2] == "#") {
-                return [h, h + 3, CosmeticRuleSeparator.AbpExtCSSElemHide, false];
+                return [h, h + 3, CosmeticRuleSeparator.AbpExtCssElemHide, false];
             }
             // #$?#
             else if (rule[h + 1] == "$" && rule[h + 2] == "?" && rule[h + 3] == "#") {
-                return [h, h + 4, CosmeticRuleSeparator.AdgExtCSSInject, false];
+                return [h, h + 4, CosmeticRuleSeparator.AdgExtCssInject, false];
             } else if (rule[h + 1] == "@") {
                 // #@#
                 if (rule[h + 2] == "#") {
@@ -316,7 +316,7 @@ export class CosmeticRuleSeparatorUtils {
                     else if (rule[h + 3] == "^") {
                         return [h, h + 4, CosmeticRuleSeparator.UboHtmlException, true];
                     }
-                    return [h, h + 3, CosmeticRuleSeparator.AbpCSSElemhideException, true];
+                    return [h, h + 3, CosmeticRuleSeparator.AbpCssElemhideException, true];
                 }
                 // #@%#
                 else if (rule[h + 2] == "%" && rule[h + 3] == "#") {
@@ -340,15 +340,15 @@ export class CosmeticRuleSeparatorUtils {
                 }
                 // #@?#
                 else if (rule[h + 2] == "?" && rule[h + 3] == "#") {
-                    return [h, h + 4, CosmeticRuleSeparator.AbpExtCSSElemHideException, true];
+                    return [h, h + 4, CosmeticRuleSeparator.AbpExtCssElemHideException, true];
                 }
                 // #@$#
                 else if (rule[h + 2] == "$" && rule[h + 3] == "#") {
-                    return [h, h + 4, CosmeticRuleSeparator.AdgCSSInjectException, true];
+                    return [h, h + 4, CosmeticRuleSeparator.AdgCssInjectException, true];
                 }
                 // #@$?#
                 else if (rule[h + 2] == "$" && rule[h + 3] == "?" && rule[h + 4] == "#") {
-                    return [h, h + 5, CosmeticRuleSeparator.AdgExtCSSInjectException, true];
+                    return [h, h + 5, CosmeticRuleSeparator.AdgExtCssInjectException, true];
                 }
             }
         } else {
@@ -358,11 +358,11 @@ export class CosmeticRuleSeparatorUtils {
             if (d > -1) {
                 // $$
                 if (rule[d + 1] == "$") {
-                    return [d, d + 2, CosmeticRuleSeparator.AdgHTML, false];
+                    return [d, d + 2, CosmeticRuleSeparator.AdgHtml, false];
                 }
                 // $@$
                 else if (rule[d + 1] == "@" && rule[d + 2] == "$") {
-                    return [d, d + 3, CosmeticRuleSeparator.AdgHTMLException, true];
+                    return [d, d + 3, CosmeticRuleSeparator.AdgHtmlException, true];
                 }
             }
 

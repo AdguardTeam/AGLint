@@ -21,7 +21,7 @@ describe("MetadataParser", () => {
 
         expect(MetadataParser.parse("! Title: Filter")).toEqual(<Metadata>{
             category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             type: CommentRuleType.Metadata,
             marker: "!",
             header: "Title",
@@ -30,7 +30,7 @@ describe("MetadataParser", () => {
 
         expect(MetadataParser.parse("# Title: Filter")).toEqual(<Metadata>{
             category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             type: CommentRuleType.Metadata,
             marker: "#",
             header: "Title",
@@ -39,7 +39,7 @@ describe("MetadataParser", () => {
 
         expect(MetadataParser.parse("! title: Filter")).toEqual(<Metadata>{
             category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             type: CommentRuleType.Metadata,
             marker: "!",
             header: "title",
@@ -48,7 +48,7 @@ describe("MetadataParser", () => {
 
         expect(MetadataParser.parse("!    title:    Filter   ")).toEqual(<Metadata>{
             category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             type: CommentRuleType.Metadata,
             marker: "!",
             header: "title",
@@ -57,7 +57,7 @@ describe("MetadataParser", () => {
 
         expect(MetadataParser.parse("! Homepage: https://github.com/AdguardTeam/some-repo/wiki")).toEqual(<Metadata>{
             category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Unknown,
+            syntax: AdblockSyntax.Common,
             type: CommentRuleType.Metadata,
             marker: "!",
             header: "Homepage",

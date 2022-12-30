@@ -16,6 +16,7 @@ const METADATA_SEPARATOR = ":";
  * Represents a metadata comment rule. This is a special comment that specifies
  * the name and value of the metadata header.
  *
+ * @example
  * For example, in the case of
  * ```adblock
  * ! Title: My List
@@ -25,14 +26,34 @@ const METADATA_SEPARATOR = ":";
 export interface Metadata extends Comment {
     category: RuleCategory.Comment;
     type: CommentRuleType.Metadata;
+
+    /**
+     * Comment marker.
+     */
     marker: string;
+
+    /**
+     * Metadata header name.
+     */
     header: string;
+
+    /**
+     * Metadata header value (always should present).
+     */
     value: string;
 }
 
 /**
- * Metadata Parser is responsible for parsing metadata comments.
+ * `MetadataParser` is responsible for parsing metadata comments.
+ * Metadata comments are special comments that specify some properties of the list.
  *
+ * @example
+ * For example, in the case of
+ * ```adblock
+ * ! Title: My List
+ * ```
+ * the name of the header is `Title`, and the value is `My List`, which means that
+ * the list title is `My List`, and it can be used in the adblocker UI.
  * @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#special-comments}
  */
 export class MetadataParser {
@@ -57,7 +78,7 @@ export class MetadataParser {
                         return {
                             category: RuleCategory.Comment,
                             type: CommentRuleType.Metadata,
-                            syntax: AdblockSyntax.Unknown,
+                            syntax: AdblockSyntax.Common,
                             marker: trimmed[0],
                             header,
                             value: commentText.substring(separatorIndex + 1).trim(),

@@ -1,78 +1,151 @@
-/** AGLint CLI */
+/**
+ * AGLint CLI
+ *
+ * @todo DEV run: node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node cli.ts
+ */
 
-// TODO: dev run
-// node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node cli.ts
-
+import { program } from "commander";
 import chalk from "chalk";
-
-// TODO: commander
-
-// import globPkg from "glob";
-// const { glob } = globPkg;
-
 import { readFileSync } from "fs";
+import path, { ParsedPath } from "path";
+import { readFile, writeFile } from "fs/promises";
+import { walkScannedDirectory } from "./linter/cli/walk";
+import { mergeConfigs, defaultLinterCliConfig, LinterCliConfig } from "./linter/cli/config";
+import { scan } from "./linter/cli/scan";
+import { Linter } from "@aglint";
 
-// ! It is important that the CLI invokes everything via AGLint root, so
-// ! please don't call anything directly from the library source files!
-import { Linter } from ".";
+// Based on https://github.com/rollup/plugins/tree/master/packages/json#usage
+const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
-// TODO: Find config file
-// TODO: Yaml config?
-// const findConfigFile = () => {
+(async () => {
+    // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
+    // and use "process.cwd" as fallback
+    const cwd = process.env.INIT_CWD || process.cwd();
 
-// }
+    // Set-up Commander
+    program
+        // Basic info
+        .name("AGLint")
+        .description(pkg.description)
+        .version(pkg.version)
+        .usage("[options] [file...]")
 
-(() => {
+        // Options
+        .option(
+            "-f, --fix",
+            "Enable automatic fix, if possible (BE CAREFUL, this overwrites original files with the fixed ones)",
+            defaultLinterCliConfig.fix
+        )
+        .option("-c, --colors", "Enable colors in console reporting", defaultLinterCliConfig.colors)
+        .parse(process.argv);
+
+    // Create config based on the parsed argumenta
+    const parsedConfig: LinterCliConfig = {
+        fix: !!program.opts().fix,
+        colors: !!program.opts().colors,
+    };
+
+    // Any problems encountered?
+    let anyProblem = false;
+
+    // Get start time
     const startTime = performance.now();
 
-    // TODO: Read config
+    const scanResult = await scan(cwd);
 
-    // Create new linter instance
-    const linter = new Linter();
+    // TODO: If no files are specified in the arguments, lint all supported files in the cwd
+    // const files = program.args;
 
-    // TODO: Read file list from args / process all txt files
+    await walkScannedDirectory(
+        scanResult,
+        {
+            file: async (file: ParsedPath, config: LinterCliConfig) => {
+                const linter = new Linter();
+                linter.addDefaultRules();
 
-    const problems = linter.lint(readFileSync("src/a.txt").toString(), true);
+                const filePath = path.join(file.dir, file.base);
 
-    console.log(problems.fixed);
+                let result = linter.lint(await readFile(filePath, "utf8"), config.fix || defaultLinterCliConfig.fix);
 
-    for (const problem of problems.problems) {
-        let message = "";
+                // If there are no problems, skip this file, no need to log anything
+                if (result.problems.length === 0) {
+                    return;
+                }
 
-        // Problem type
-        switch (problem.severity) {
-            case 1: {
-                message += chalk.yellow("warning");
-                break;
-            }
-            case 2: {
-                message += chalk.red("error");
-                break;
-            }
-            case 3: {
-                message += chalk.bgRed.white("fatal");
-                break;
-            }
-            default: {
-                message += chalk.red("error");
-            }
-        }
+                // If fix is enabled, write the fixed file
+                if (config.fix) {
+                    if (result.fixed) {
+                        await writeFile(filePath, result.fixed);
 
-        message += chalk.gray(": ");
+                        // Re-lint the fixed file (but only once to avoid infinite loops or other problems)
+                        // TODO: if there are still problems, they are not fixable or we will not fix them now
+                        result = linter.lint(result.fixed, config.fix || defaultLinterCliConfig.fix);
 
-        // Problem description
-        message += chalk.gray(problem.message);
+                        if (result.problems.length === 0) {
+                            return;
+                        }
+                    }
+                }
 
-        // Problem location
-        message += chalk.gray(" ");
-        message += chalk.white(`at line ${problem.position.startLine}`);
+                // There are problems, so set the flag
+                anyProblem = true;
 
-        if (typeof problem.position.startColumn !== "undefined") {
-            message += chalk.white(`:${problem.position.startColumn}`);
-        }
+                // Log file name
+                console.log(filePath);
 
-        console.error(message);
+                // Log problems
+                for (const problem of result.problems) {
+                    let message = "";
+
+                    // Problem location
+                    message += "\t";
+
+                    message += problem.position.startLine;
+
+                    if (typeof problem.position.startColumn !== "undefined") {
+                        message += ":";
+                        message += problem.position.startColumn;
+                    }
+
+                    message += "\t";
+
+                    // Problem type
+                    switch (problem.severity) {
+                        case 1: {
+                            message += config.colors ? chalk.yellow("warning") : "warning";
+                            break;
+                        }
+                        case 2: {
+                            message += config.colors ? chalk.red("error") : "error";
+                            break;
+                        }
+                        case 3: {
+                            message += config.colors ? chalk.bgRed.white("fatal") : "fatal";
+                            break;
+                        }
+                        default: {
+                            message += config.colors ? chalk.red("error") : "error";
+                        }
+                    }
+
+                    message += "\t";
+
+                    // Problem description
+                    message += config.colors ? chalk.gray(problem.message) : problem.message;
+
+                    // Log problem to console
+                    console.error(message);
+                }
+            },
+        },
+        mergeConfigs(defaultLinterCliConfig, parsedConfig)
+    );
+
+    // If no problems were encountered, log a success message
+    if (!anyProblem) {
+        console.log(chalk.green("No problems found"));
     }
 
+    // Calculate and log runtime
     console.log(`Linter runtime: ${performance.now() - startTime} ms`);
 })();

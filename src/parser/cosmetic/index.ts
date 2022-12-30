@@ -19,6 +19,9 @@ import { COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE } from "../../utils/constants";
 import { UBO_RESPONSEHEADER_INDICATOR } from "../network";
 import { Rule } from "../rule";
 
+/**
+ * A generic representation of a cosmetic rule.
+ */
 export type AnyCosmeticRule = CssRule | ElementHidingRule | ScriptletRule | HtmlRule | JsRule;
 
 /**
@@ -30,10 +33,38 @@ export type AnyCosmeticRule = CssRule | ElementHidingRule | ScriptletRule | Html
 export interface CosmeticRule extends Rule {
     category: RuleCategory.Cosmetic;
     type: CosmeticRuleType;
+
+    /**
+     * List of modifiers.
+     */
     modifiers: RuleModifier[] | UboModifier[];
+
+    /**
+     * List of domains.
+     */
     domains: Domain[];
+
+    /**
+     * Separator between pattern and body. For example, in the following rule:
+     * ```adblock
+     * example.com##.ads
+     * ```
+     * then the separator is `##`.
+     */
     separator: CosmeticRuleSeparator;
+
+    /**
+     * If the rule is an exception. For example, in the following rule:
+     * ```adblock
+     * example.com#@#.ads
+     * ```
+     * then the rule is an exception and @ is the exception marker.
+     */
     exception: boolean;
+
+    /**
+     * Body of the rule. It can be a CSS rule, an element hiding rule, a scriptlet rule, etc.
+     */
     body: unknown;
 }
 
@@ -165,14 +196,14 @@ export interface JsRule extends CosmeticRule {
 }
 
 /**
- * CosmeticRuleParser is responsible for parsing cosmetic rules.
+ * `CosmeticRuleParser` is responsible for parsing cosmetic rules.
  *
  * Where possible, it automatically detects the difference between supported syntaxes:
  *  - AdGuard
  *  - uBlock Origin
  *  - Adblock Plus
  *
- * If the syntax is common / cannot be determined, the parser gives `Unknown` syntax.
+ * If the syntax is common / cannot be determined, the parser gives `Common` syntax.
  *
  * Please note that syntactically correct rules are parsed even if they are not actually
  * compatible with the given adblocker. This is a completely natural behavior, meaningful
@@ -180,10 +211,11 @@ export interface JsRule extends CosmeticRule {
  */
 export class CosmeticRuleParser {
     /**
-     * Determines whether a rule is a cosmetic rule.
+     * Determines whether a rule is a cosmetic rule. The rule is considered cosmetic if it
+     * contains a cosmetic rule separator.
      *
      * @param raw - Raw rule
-     * @returns true/false
+     * @returns `true` if the rule is a cosmetic rule, `false` otherwise
      */
     public static isCosmetic(raw: string) {
         const trimmed = raw.trim();
@@ -217,6 +249,7 @@ export class CosmeticRuleParser {
         // Find separator (every cosmetic rule has a separator)
         const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(raw);
 
+        // If there is no separator, it is not a cosmetic rule
         if (!separator) {
             return null;
         }
@@ -225,8 +258,8 @@ export class CosmeticRuleParser {
         let rawPattern = raw.substring(0, start).trim();
         let rawBody = raw.substring(end).trim();
 
-        // The syntax is initially unknown
-        let syntax = AdblockSyntax.Unknown;
+        // The syntax is initially common
+        let syntax = AdblockSyntax.Common;
 
         const modifiers: RuleModifier[] = [];
 

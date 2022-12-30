@@ -13,6 +13,7 @@ import shebang from "rollup-plugin-add-shebang";
 import nodePolyfills from "rollup-plugin-polyfill-node";
 import alias from "@rollup/plugin-alias";
 import { getBabelOutputPlugin } from "@rollup/plugin-babel";
+import json from "@rollup/plugin-json";
 
 const commonPlugins = [externals(), commonjs({ sourceMap: false }), resolve({ preferBuiltins: false })];
 
@@ -70,6 +71,7 @@ const aglintCli = {
         },
     ],
     plugins: [
+        json({ preferConst: true }),
         typescript({
             declaration: false,
             compilerOptions: {

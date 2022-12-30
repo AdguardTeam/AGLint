@@ -356,7 +356,7 @@ export class StringUtils {
      * Checks whether a string is a RegExp pattern.
      *
      * @param pattern - Pattern to check
-     * @returns true/false
+     * @returns `true` if the string is a RegExp pattern, `false` otherwise
      */
     public static isRegexPattern(pattern: string): boolean {
         const trimmedPattern = pattern.trim();
@@ -374,7 +374,7 @@ export class StringUtils {
      * @param pattern - Input string
      * @param character - Character to escape
      * @param escapeCharacter - Escape character (optional)
-     * @returns true/false
+     * @returns Escaped string
      */
     public static escapeCharacter(pattern: string, character: string, escapeCharacter = ESCAPE_CHARACTER): string {
         let result = EMPTY;
