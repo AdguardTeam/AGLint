@@ -139,12 +139,12 @@ You can ignore files or folders by creating an "ignore file" named `.aglintignor
 If you have a config file in an ignored folder, it will be ignored as well.
 
 Some "problematic" paths are ignored by default:
-- `node_modules`
-- `.DS_Store`
-- `.git`
-- `.hg`
-- `.svn`
-- `Thumbs.db`
+- `node_modules` - Vendor files for Node.js, usually contains a lot of files
+- `.DS_Store` - macOS system file
+- `.git` - Git files
+- `.hg` - Mercurial files
+- `.svn` - Subversion files
+- `Thumbs.db` - Windows system file
 
 ## Configuration
 
