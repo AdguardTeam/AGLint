@@ -30,6 +30,8 @@ Table of Contents:
 - [Ignoring files or folders](#ignoring-files-or-folders)
 - [Configuration](#configuration)
   - [Example configurations](#example-configurations)
+  - [Configuration hierarchy](#configuration-hierarchy)
+    - [Hierarchy](#hierarchy)
 - [Linter rules](#linter-rules)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
@@ -139,6 +141,10 @@ If you have a config file in an ignored folder, it will be ignored as well.
 Some "problematic" paths are ignored by default:
 - `node_modules`
 - `.DS_Store`
+- `.git`
+- `.hg`
+- `.svn`
+- `Thumbs.db`
 
 ## Configuration
 
@@ -211,6 +217,44 @@ rules:
 ```
 
 JavaScript and TypeScript configuration files aren't supported at the moment, but we will add support for them in the future.
+
+### Configuration hierarchy
+
+Basically the linter always uses the default configuration as a base. If the current working directory (alias `cwd` - the folder where you call the linter) has a configuration file, it will be merged with the default configuration. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder (like a chain of inheritance). And so on.
+
+Suppose your project has the following structure:
+  
+  ```
+  project-root
+  ├── dir1
+  │   ├── list1.txt
+  │   ├── list2.txt
+  ├── dir2
+  │   ├── aglint.config.json
+  │   ├── dir3
+  │   │   ├── list3.txt
+  │   │   ├── list4.txt
+  ├── list5.txt
+  ├── aglint.config.json
+  ```
+
+If you call the linter in the root folder (`project-root`), it will merge its default configuration with `aglint.config.json` from the root folder.
+- Then it lints `dir1/list1.txt`, `dir1/list2.txt` and `list5.txt` with this merged configuration (default configuration + `project-root/aglint.config.json`).
+- In the `dir2` folder, it will merge the previous merged configuration with `aglint.config.json` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json`).
+- If inline configurations are enabled, then they will be the last in the hierarchy. For example, if you have the following configuration in `project-root/dir2/dir3/list3.txt`:
+  ```adblock
+  ! aglint: {"rules": {"rule-1": ["off"]}}
+  ```
+  then the linter will use this configuration for linting `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json` + inline configuration).
+
+#### Hierarchy
+
+So the hierarchy is the following:
+
+- Default configuration (built-in)
+- Configuration file in the current working directory (if any)
+- Middle configuration files (if any)
+- Inline configuration (if enabled and present)
 
 ## Linter rules
 
