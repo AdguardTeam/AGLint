@@ -245,7 +245,7 @@ If you call the linter in the root folder (`project-root`), it will merge its de
   ```adblock
   ! aglint: {"rules": {"rule-1": ["off"]}}
   ```
-  then the linter will use this configuration for linting `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json` + inline configuration).
+  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json` + inline configuration chain within the file).
 
 #### Hierarchy
 
