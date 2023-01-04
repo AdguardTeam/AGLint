@@ -28,6 +28,7 @@ Table of Contents:
     - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
     - [Disable some linter rules](#disable-some-linter-rules)
 - [Ignoring files or folders](#ignoring-files-or-folders)
+  - [Default ignores](#default-ignores)
 - [Configuration](#configuration)
   - [Example configurations](#example-configurations)
   - [Configuration hierarchy](#configuration-hierarchy)
@@ -138,8 +139,10 @@ You can ignore files or folders by creating an "ignore file" named `.aglintignor
 
 If you have a config file in an ignored folder, it will be ignored as well.
 
-Some "problematic" paths are ignored by default:
-- `node_modules` - Vendor files for Node.js, usually contains a lot of files
+### Default ignores
+
+Some "problematic" paths are ignored by default in order to avoid linting files that are not related to adblock filter lists. These paths are:
+- `node_modules` - Vendor files for Node.js, usually contains a lot of files - this can slow down the linter significantly
 - `.DS_Store` - macOS system file
 - `.git` - Git files
 - `.hg` - Mercurial files
