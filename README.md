@@ -22,7 +22,7 @@ Table of Contents:
   - [Pre-requisites](#pre-requisites)
   - [Installation \& Usage](#installation--usage)
 - [VSCode extension](#vscode-extension)
-- [Special comments](#special-comments)
+- [Special comments (inline configuration)](#special-comments-inline-configuration)
   - [Ignore adblock rules](#ignore-adblock-rules)
     - [Ignore single adblock rule](#ignore-single-adblock-rule)
     - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
@@ -100,9 +100,9 @@ GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this e
 
 **We strongly recommend using this extension if you are working with adblock filter lists.**
 
-## Special comments
+## Special comments (inline configuration)
 
-You may not want to lint some adblock rules, so you can add special config / control comments to ignore / customize them. Generally these comments begins with the `! aglint-` prefix.
+You may not want to lint some adblock rules, so you can add special inline comments to disable linting for a single adblock rule or for the rest of the file. Generally these comments begins with the `! aglint` prefix. In the following sections you can find more info about these comments.
 
 ### Ignore adblock rules
 
