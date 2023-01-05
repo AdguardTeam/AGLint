@@ -131,7 +131,22 @@ example.org##.ad
 
 #### Disable some linter rules
 
-You can disable some linter rules by adding `! aglint-disable-next-line rule1, rule2` comment before the adblock rule.
+In some cases, you may want to disable some linter rules for a single adblock rule or for multiple adblock rules. Here is how you can do it:
+
+- For a single adblock rule: for example, `rule1` linter rule will be ignored for `example.com##.ad` in the following case (but it will be enabled for `example.net##.ad`):
+  ```adblock
+  ! aglint-disable-next-line rule1
+  example.com##.ad
+  example.net##.ad
+  ```
+- For multiple adblock rules: for example, `rule1, rule2` linter rules will be ignored for `example.com##.ad` and `example.net##.ad` in the following case (but they will be enabled for `example.org##.ad`):
+  ```adblock
+  ! aglint-disable rule1, rule2
+  example.com##.ad
+  example.net##.ad
+  ! aglint-enable rule1, rule2
+  example.org##.ad
+  ```
 
 ## Ignoring files or folders
 
@@ -246,7 +261,7 @@ If you call the linter in the root folder (`project-root`), it will merge its de
 - In the `dir2` folder, it will merge the previous merged configuration with `aglint.config.json` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json`).
 - If inline configurations are enabled, then they will be the last in the hierarchy. For example, if you have the following configuration in `project-root/dir2/dir3/list3.txt`:
   ```adblock
-  ! aglint: {"rules": {"rule-1": ["off"]}}
+  ! aglint {"rules": {"rule-1": "off"}}
   ```
   then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json` + inline configuration chain within the file).
 
