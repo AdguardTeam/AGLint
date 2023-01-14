@@ -107,12 +107,10 @@ describe("adg-scriptlet-quotes", () => {
     test("Detects problematic scriptlets with custom config", () => {
         const linter = new Linter();
 
+        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+
         // Prefer DoubleQuoted quotes
-        linter.addRuleEx("adg-scriptlet-quotes", {
-            rule: AdgScriptletQuotes,
-            storage: {},
-            configOverride: "DoubleQuoted",
-        });
+        linter.setRuleConfig("adg-scriptlet-quotes", "DoubleQuoted");
 
         // No problematic scriptlets
         expect(
@@ -245,12 +243,10 @@ describe("adg-scriptlet-quotes", () => {
     test("Suggest fix with custom config", () => {
         const linter = new Linter();
 
+        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+
         // Prefer DoubleQuoted quotes
-        linter.addRuleEx("adg-scriptlet-quotes", {
-            rule: AdgScriptletQuotes,
-            storage: {},
-            configOverride: "DoubleQuoted",
-        });
+        linter.setRuleConfig("adg-scriptlet-quotes", "DoubleQuoted");
 
         expect(
             linter.lint(
