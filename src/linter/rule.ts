@@ -1,4 +1,5 @@
-import { LinterContext } from ".";
+import { Struct } from "superstruct";
+import { GenericRuleContext } from ".";
 
 /**
  * Represents linter rule severity
@@ -18,38 +19,42 @@ export enum LinterRuleSeverity {
 }
 
 /**
- * Represents linter rule type
- */
-export enum LinterRuleType {
-    Problem,
-    Suggestion,
-    Layout,
-}
-
-/**
- * Represents linter rule metadata
- */
-export interface LinterRuleMeta {
-    /**
-     * Linter rule type. It can be problem, suggestion or layout.
-     */
-    type: LinterRuleType;
-
-    /**
-     * Linter rule severity. It can be off, warn, error or fatal.
-     */
-    severity: LinterRuleSeverity;
-
-    // TODO: Handle additional parameters
-}
-
-/**
  * The configuration of the rule can be severity itself, or an array whose first element is severity
  */
 export type LinterRuleConfig = LinterRuleSeverity | [LinterRuleSeverity, ...unknown[]];
 
 /**
- * It represents what events a linter rule can handle
+ * Represents the metadata of a linter rule configuration
+ */
+export interface LinterRuleConfigMeta {
+    /**
+     * Default configuration of the rule
+     */
+    default: unknown;
+
+    /**
+     * Superstruct schema for the rule configuration (used for validation)
+     */
+    schema: Struct;
+}
+
+/**
+ * Represents the metadata of a linter rule
+ */
+export interface LinterRuleMeta {
+    /**
+     * Linter rule severity. It can be off, warn, error or fatal.
+     */
+    severity: LinterRuleSeverity;
+
+    /**
+     * Configuration metadata (if the rule has any configuration)
+     */
+    config?: LinterRuleConfigMeta;
+}
+
+/**
+ * Represents what events a linter rule can handle
  */
 export interface LinterRuleEvents {
     /**
@@ -58,7 +63,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onStartFilterList?: (context: LinterContext) => void;
+    onStartFilterList?: (context: GenericRuleContext) => void;
 
     /**
      * Called after analyzing a filter list (after all rules are analyzed).
@@ -66,7 +71,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onEndFilterList?: (context: LinterContext) => void;
+    onEndFilterList?: (context: GenericRuleContext) => void;
 
     /**
      * Called when analyzing an adblock rule. This event is called for each rule, including comments.
@@ -74,7 +79,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onRule?: (context: LinterContext) => void;
+    onRule?: (context: GenericRuleContext) => void;
 }
 
 /**

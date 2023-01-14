@@ -1,6 +1,6 @@
 // Linter stuff
-import { LinterContext, LinterPosition } from "..";
-import { LinterRule, LinterRuleSeverity, LinterRuleType } from "../rule";
+import { GenericRuleContext, LinterPosition } from "..";
+import { LinterRule, LinterRuleSeverity } from "../rule";
 
 // Parser stuff
 import { AnyRule } from "../../parser";
@@ -40,7 +40,7 @@ interface StoredIf {
 /**
  * Inserting the storage type definition into the context
  */
-type RuleContext = LinterContext & {
+type RuleContext = GenericRuleContext & {
     storage: RuleStorage;
 };
 
@@ -49,7 +49,6 @@ type RuleContext = LinterContext & {
  */
 export const IfClosed = <LinterRule>{
     meta: {
-        type: LinterRuleType.Problem,
         severity: LinterRuleSeverity.Error,
     },
     events: {
