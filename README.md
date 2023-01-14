@@ -167,11 +167,10 @@ Some "problematic" paths are ignored by default in order to avoid linting files 
 
 ## Configuration
 
-You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder (like a chain of inheritance). If you have a configuration file in the root folder, it will be merged with the default configuration.
+You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be used for that subfolder and all its subfolders, but not for the parent folder. It means that the results are always consistent, no matter where you run the linter.
 
 The configuration file should be a valid JSON or YAML file. The following options are available:
 
-- `colors`: enable or disable colors in the output. Default: `true`.
 - `fix`: enable or disable automatic fixing of errors. Default: `false`. **Be careful with this option!** It will modify your filter list files.
 - `rules`: an object with linter rules. See [Linter rules](#linter-rules) for more info. A rule basically has the following structure:
   - `rule-name`: a string with the name of the rule. For example, `rule-1`.
@@ -209,7 +208,6 @@ Here is an example of a configuration file in JSON syntax (`aglint.config.json`)
 
 ```json
 {
-    "colors": true,
     "fix": false,
     "rules": {
         "rule-1": ["warn", { "option-1": "value-1" }],
@@ -222,7 +220,6 @@ Here is an example of a configuration file in JSON syntax (`aglint.config.json`)
 You can also use YAML syntax (`aglint.config.yml`):
 
 ```yaml
-colors: true
 fix: false
 rules:
   rule-1:
@@ -239,7 +236,7 @@ JavaScript and TypeScript configuration files aren't supported at the moment, bu
 
 ### Configuration hierarchy
 
-Basically the linter always uses the default configuration as a base. If the current working directory (alias `cwd` - the folder where you call the linter) has a configuration file, it will be merged with the default configuration. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder (like a chain of inheritance). And so on.
+Basically the linter always uses the default configuration as a base. If the current working directory (alias `cwd` - the folder where you call the linter) has a configuration file, it will be merged with the default configuration. If you have a configuration file in a subfolder, it will be merged with the default configuration, but not with the configuration file from the parent folder. It means that the results are always consistent, no matter where you run the linter.
 
 Suppose your project has the following structure:
   
@@ -259,21 +256,21 @@ Suppose your project has the following structure:
 
 If you call the linter in the root folder (`project-root`), it will merge its default configuration with `aglint.config.json` from the root folder.
 - Then it lints `dir1/list1.txt`, `dir1/list2.txt` and `list5.txt` with this merged configuration (default configuration + `project-root/aglint.config.json`).
-- In the `dir2` folder, it will merge the previous merged configuration with `aglint.config.json` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json`).
+- In the `dir2` folder, it will merge the default configuration with `aglint.config.json` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/dir2/aglint.config.json`).
 - If inline configurations are enabled, then they will be the last in the hierarchy. For example, if you have the following configuration in `project-root/dir2/dir3/list3.txt`:
   ```adblock
   ! aglint {"rules": {"rule-1": "off"}}
   ```
-  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/aglint.config.json` + `project-root/dir2/aglint.config.json` + inline configuration chain within the file).
+  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/dir2/aglint.config.json` + inline configuration chain within the file).
 
 #### Hierarchy
 
 So the hierarchy is the following:
 
-- Default configuration (built-in)
-- Configuration file in the current working directory (if any)
-- Middle configuration files (if any)
 - Inline configuration (if enabled and present)
+- Middle configuration files (if any)
+- Configuration file in the current working directory (if any)
+- Default configuration (built-in)
 
 ## Linter rules
 
