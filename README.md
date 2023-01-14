@@ -34,6 +34,7 @@ Table of Contents:
   - [Configuration hierarchy](#configuration-hierarchy)
     - [Hierarchy](#hierarchy)
 - [Linter rules](#linter-rules)
+  - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
 - [Use programmatically](#use-programmatically)
@@ -279,6 +280,20 @@ So the hierarchy is the following:
 The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
 
 Currently, the following linter rules are available (we will add more rules in the future):
+
+### `adg-scriptlet-quotes`
+
+Check if the scriptlet parameters are wrapped in the expected quotes. For example, `example.com#%#//scriptlet("abort-on-property-read", "window.open")` will be reported as warning, since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+
+You can specify the expected quotes in the configuration file. For example, if you want to use double quotes, you can add the following configuration:
+
+```json
+{
+    "rules": {
+        "adg-scriptlet-quotes": ["warn", "DoubleQuoted"]
+    }
+}
+```
 
 ### `if-closed`
 
