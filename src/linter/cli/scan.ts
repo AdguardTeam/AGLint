@@ -1,12 +1,12 @@
 import { readFile, readdir, stat } from "fs/promises";
 import path, { ParsedPath } from "path";
 import ignore, { Ignore } from "ignore";
-import { CONFIG_FILE_NAMES, IGNORE_FILE_NAME, SUPPORTED_EXTENSIONS } from "./constants";
+import { CONFIG_FILE_NAMES, IGNORE_FILE_NAME, PROBLEMATIC_PATHS, SUPPORTED_EXTENSIONS } from "./constants";
 
 /**
- * Default ignores in order to avoid scanning node_modules, etc.
+ * Ignore instance for the default ignores
  */
-const defaultIgnores = ignore().add("node_modules");
+const defaultIgnores = ignore().add(PROBLEMATIC_PATHS);
 
 /**
  * Represents the result of a scan
@@ -43,10 +43,11 @@ export interface ScannedDirectory {
  *
  * @param dir Directory to search in
  * @param ignores File ignores
+ * @param useIgnoreFiles Use ignore files or not (default: true)
  * @returns The result of the scan (`ScannedDirectory` object)
  * @throws If multiple config files are found in the given directory
  */
-export async function scan(dir: string, ignores: Ignore[] = [defaultIgnores]): Promise<ScannedDirectory> {
+export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles = true): Promise<ScannedDirectory> {
     // Initialize an empty result
     const result: ScannedDirectory = {
         dir: path.parse(dir),
@@ -58,16 +59,22 @@ export async function scan(dir: string, ignores: Ignore[] = [defaultIgnores]): P
     // Get all files in the directory
     const items = await readdir(dir);
 
-    // First of all, let's parse the ignore file in the current directory (if it exists)
-    if (items.includes(IGNORE_FILE_NAME)) {
+    // First of all, let's parse the ignore file in the current directory if ignore files are
+    // enabled and the ignore file exists
+    if (useIgnoreFiles && items.includes(IGNORE_FILE_NAME)) {
         const content = await readFile(path.join(dir, IGNORE_FILE_NAME), "utf8");
         ignores.push(ignore().add(content));
     }
 
     // Loop through all items in the directory
     for (const item of items) {
-        // If the current item is ignored, skip it
-        if (ignores.some((i) => i.ignores(item))) {
+        // If the current item is ignored by the default ignores, skip it
+        if (defaultIgnores.ignores(item)) {
+            continue;
+        }
+
+        // If the current item is ignored by the ignore files, skip it (if ignore files are enabled)
+        if (useIgnoreFiles && ignores.some((i) => i.ignores(item))) {
             continue;
         }
 
@@ -94,18 +101,14 @@ export async function scan(dir: string, ignores: Ignore[] = [defaultIgnores]): P
 
                 // Otherwise, set the config file for the current directory
                 result.configFile = parsedPath;
-            }
-
-            // We only want to lint files with the supported extensions
-            else if (SUPPORTED_EXTENSIONS.includes(parsedPath.ext)) {
+            } else if (SUPPORTED_EXTENSIONS.includes(parsedPath.ext)) {
+                // We only want to lint files with the supported extensions
                 result.lintableFiles.push(parsedPath);
             }
-        }
-
-        // If the current item is a directory, recursively scan it
-        else if (stats.isDirectory()) {
-            // Merge the subdirectory result into the current result
-            result.subdirectories.push(await scan(itemPath, ignores));
+        } else if (stats.isDirectory()) {
+            // If the current item is a directory, recursively scan it, then
+            // merge the subdirectory result into the current result
+            result.subdirectories.push(await scan(itemPath, ignores, useIgnoreFiles));
         }
     }
 
