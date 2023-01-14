@@ -280,10 +280,17 @@ Currently, the following linter rules are available (we will add more rules in t
 
 ### `adg-scriptlet-quotes`
 
-Check if the scriptlet parameters are wrapped in the expected quotes. For example, `example.com#%#//scriptlet("abort-on-property-read", "window.open")` will be reported as warning, since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+Check if the scriptlet parameters are wrapped in the expected quotes. For example
+```adblock
+example.com#%#//scriptlet("abort-on-property-read", "window.open")
+```
+will be reported as warning:
+```
+    1:0     error   The scriptlet should use SingleQuoted quotes
+```
+since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
 
-You can specify the expected quotes in the configuration file. For example, if you want to use double quotes, you can add the following configuration:
-
+But you can specify the expected quotes in the configuration file. If you want to use double quotes, you can add the following configuration:
 ```json
 {
     "rules": {
