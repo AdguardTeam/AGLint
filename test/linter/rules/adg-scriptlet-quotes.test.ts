@@ -251,6 +251,8 @@ describe("adg-scriptlet-quotes", () => {
                     `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
                     // Problematic scriptlet
                     `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    // Problematic scriptlet
+                    `#%#//scriptlet("prevent-setTimeout", ".css('display','block');")`,
                 ].join(NEWLINE),
                 true
             )
@@ -266,6 +268,8 @@ describe("adg-scriptlet-quotes", () => {
                 `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                // Problematic scriptlet
+                `#%#//scriptlet('prevent-setTimeout', '.css(\\'display\\',\\'block\\');')`,
             ].join(NEWLINE),
         });
     });
