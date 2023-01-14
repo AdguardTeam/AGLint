@@ -3,7 +3,7 @@
  */
 
 // Linter stuff
-import { LinterRule, LinterRuleSeverity } from "./rule";
+import { LinterRule } from "./rule";
 import { LinterConfig, defaultLinterConfig } from "./config";
 import { defaultLinterRules } from "./rules";
 import { ConfigCommentType } from "./inline-config";
@@ -17,6 +17,7 @@ import { NEWLINE } from "../utils/constants";
 import { StringUtils } from "../utils/string";
 import { ArrayUtils } from "../utils/array";
 import { assert } from "superstruct";
+import { LinterRuleSeverity } from "./severity";
 
 /**
  * Represents the location of a problem that detected by the linter
@@ -533,7 +534,7 @@ export class Linter {
 
                 // Validate rule configuration (if it exists)
                 if (data.rule.meta.config) {
-                    assert(data.configOverride || data.rule.meta.config, data.rule.meta.config.schema);
+                    assert(data.configOverride || data.rule.meta.config.default, data.rule.meta.config.schema);
                 }
 
                 // Get event handler for the rule
@@ -567,7 +568,7 @@ export class Linter {
                         storage: data.storage,
 
                         // Rule configuration
-                        config: data.configOverride || data.rule.meta.config,
+                        config: data.configOverride || data.rule.meta.config?.default,
 
                         // Reporter function
                         report: (problem: LinterProblemReport) => {

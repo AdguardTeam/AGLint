@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { Linter } from "../../src/linter";
-import { LinterRuleSeverity } from "../../src/linter/rule";
+import { LinterRuleSeverity } from "../../src/linter/severity";
 import { NEWLINE } from "../../src/utils/constants";
 
 describe("Linter", () => {

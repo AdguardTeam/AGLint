@@ -1,22 +1,6 @@
 import { Struct } from "superstruct";
 import { GenericRuleContext } from ".";
-
-/**
- * Represents linter rule severity
- */
-export enum LinterRuleSeverity {
-    /** Rule turned off */
-    Off = 0,
-
-    /** Warning */
-    Warn = 1,
-
-    /** Error */
-    Error = 2,
-
-    /** Fatal error (parsing error, for example) */
-    Fatal = 3,
-}
+import { LinterRuleSeverity } from "./severity";
 
 /**
  * The configuration of the rule can be severity itself, or an array whose first element is severity
