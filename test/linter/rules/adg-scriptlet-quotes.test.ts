@@ -71,6 +71,8 @@ describe("adg-scriptlet-quotes", () => {
                     `example.com#@%#//scriptlet("scriptlet0")`,
                     // Problematic scriptlet
                     `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -97,8 +99,19 @@ describe("adg-scriptlet-quotes", () => {
                         endColumn: 56,
                     },
                 },
+                {
+                    rule: "adg-scriptlet-quotes",
+                    severity: 1,
+                    message: "The scriptlet should use SingleQuoted quotes",
+                    position: {
+                        startLine: 7,
+                        startColumn: 0,
+                        endLine: 7,
+                        endColumn: 56,
+                    },
+                },
             ],
-            warningCount: 2,
+            warningCount: 3,
             errorCount: 0,
             fatalErrorCount: 0,
         });
@@ -174,6 +187,8 @@ describe("adg-scriptlet-quotes", () => {
                     `example.com#@%#//scriptlet('scriptlet0')`,
                     // Problematic scriptlet
                     `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -200,8 +215,19 @@ describe("adg-scriptlet-quotes", () => {
                         endColumn: 56,
                     },
                 },
+                {
+                    rule: "adg-scriptlet-quotes",
+                    severity: 1,
+                    message: "The scriptlet should use DoubleQuoted quotes",
+                    position: {
+                        startLine: 7,
+                        startColumn: 0,
+                        endLine: 7,
+                        endColumn: 56,
+                    },
+                },
             ],
-            warningCount: 2,
+            warningCount: 3,
             errorCount: 0,
             fatalErrorCount: 0,
         });
@@ -223,6 +249,8 @@ describe("adg-scriptlet-quotes", () => {
                     `example.com#@%#//scriptlet("scriptlet0")`,
                     // Problematic scriptlet
                     `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
                 ].join(NEWLINE),
                 true
             )
@@ -234,6 +262,8 @@ describe("adg-scriptlet-quotes", () => {
                 `example.com#%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet('scriptlet0')`,
+                // Problematic scriptlet
+                `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
             ].join(NEWLINE),
@@ -259,6 +289,8 @@ describe("adg-scriptlet-quotes", () => {
                     `example.com#@%#//scriptlet('scriptlet0')`,
                     // Problematic scriptlet
                     `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
                 ].join(NEWLINE),
                 true
             )
@@ -270,6 +302,8 @@ describe("adg-scriptlet-quotes", () => {
                 `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet("scriptlet0")`,
+                // Problematic scriptlet
+                `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
             ].join(NEWLINE),
