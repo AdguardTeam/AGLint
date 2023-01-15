@@ -1,46 +1,51 @@
 import { readFile } from "fs/promises";
+import { assert, boolean, object, optional } from "superstruct";
 import path from "path";
-import * as ss from "superstruct";
 import yaml from "js-yaml";
 import merge from "deepmerge";
+import { LinterConfig, defaultLinterConfig, linterConfigPropsSchema } from "../config";
 
 /**
- * CLI configuration interface (used for type safety)
+ * CLI configuration interface, extends the core linter configuration
  */
-export interface LinterCliConfig {
-    /**
-     * Whether to use colors in the output
-     */
-    colors?: boolean;
-
+export interface LinterCliConfig extends LinterConfig {
     /**
      * Whether to fix linting errors automatically (if possible)
+     * When enabled, the linter will OVERWRITE the original file
+     * with the fixed version.
      */
     fix?: boolean;
+
+    /**
+     * Keep `.aglintignore` ignore files into account when linting
+     */
+    ignores?: boolean;
 }
 
 /**
  * Superstruct schema for the config (used for validation)
  */
-export const linterCliConfigSchema = ss.object({
-    colors: ss.optional(ss.boolean()),
-    fix: ss.optional(ss.boolean()),
+export const linterCliConfigSchema = object({
+    fix: optional(boolean()),
+    ignores: optional(boolean()),
+
+    // Reuse the schema for the linter config object properties
+    ...linterConfigPropsSchema,
 });
 
 /**
  * Default CLI configuration
  */
 export const defaultLinterCliConfig: LinterCliConfig = {
-    colors: true,
     fix: false,
+    ignores: true,
+
+    // Reuse the default linter config
+    ...defaultLinterConfig,
 };
 
 /**
- * Reads and parses a configuration file.
- *
- * Currently supported config file extensions:
- * - .json
- * - .yaml / .yml
+ * Reads and parses supported configuration files.
  *
  * @param filename - The name of the configuration file to be read and parsed.
  * @returns The parsed config object.
@@ -48,7 +53,7 @@ export const defaultLinterCliConfig: LinterCliConfig = {
  */
 export async function parseConfigFile(filename: string): Promise<LinterCliConfig> {
     // Determine the file extension
-    const extension = path.extname(filename);
+    const filePath = path.parse(filename);
 
     // Read the file contents
     const contents = await readFile(filename, "utf8");
@@ -57,29 +62,33 @@ export async function parseConfigFile(filename: string): Promise<LinterCliConfig
     // it as unknown, later we validate it anyway
     let parsed: unknown;
 
-    // Parse the file contents based on the extension
-    switch (extension) {
-        case ".json": {
-            // Built-in JSON parser
-            parsed = JSON.parse(contents);
-            break;
-        }
+    if (filePath.base === ".aglintrc") {
+        parsed = JSON.parse(contents);
+    } else {
+        // Parse the file contents based on the extension
+        switch (filePath.ext) {
+            case ".json": {
+                // Built-in JSON parser
+                parsed = JSON.parse(contents);
+                break;
+            }
 
-        case ".yaml":
-        case ".yml": {
-            // Well-tested external YAML parser
-            parsed = yaml.load(contents);
-            break;
-        }
+            case ".yaml":
+            case ".yml": {
+                // Well-tested external YAML parser
+                parsed = yaml.load(contents);
+                break;
+            }
 
-        // TODO: .aglintrc, js/ts files
-        default: {
-            throw new Error(`Unsupported config file extension: ${extension}`);
+            // TODO: Implement support for JS/TS config files
+            default: {
+                throw new Error(`Unsupported config file extension: ${filePath.ext}`);
+            }
         }
     }
 
     // Validate the parsed config object against the config schema using Superstruct
-    ss.assert(parsed, linterCliConfigSchema);
+    assert(parsed, linterCliConfigSchema);
 
     return parsed;
 }
@@ -95,20 +104,20 @@ export async function parseConfigFile(filename: string): Promise<LinterCliConfig
  * If you have the following config (called `initial` parameter):
  * ```json
  * {
- *   "colors": true,
+ *   "ignores": true,
  *   "fix": false
  * }
  * ```
  * And you want to extend it with the following config (called `extend` parameter):
  * ```json
  * {
- *   "colors": false
+ *   "ignores": false
  * }
  * ```
  * The result will be:
  * ```json
  * {
- *   "colors": false,
+ *   "ignores": false,
  *   "fix": false
  * }
  * ```

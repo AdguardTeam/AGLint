@@ -6,7 +6,7 @@ import { boolean, object, optional, record, string } from "superstruct";
 import { LinterRuleConfig, linterRuleConfigSchema } from "./rule";
 
 /**
- * Represents linter configuration
+ * Represents the core linter configuration
  */
 export interface LinterConfig {
     /**
@@ -26,12 +26,19 @@ export interface LinterConfig {
 }
 
 /**
- * Superstruct schema for the linter rule config (used for validation)
+ * Superstruct schema for the linter config object properties. It is necessary to
+ * separate this from the schema for the whole config object because we reuse it
+ * in the CLI config object.
  */
-export const linterConfigSchema = object({
+export const linterConfigPropsSchema = {
     allowInlineConfig: optional(boolean()),
     rules: optional(record(string(), linterRuleConfigSchema)),
-});
+};
+
+/**
+ * Superstruct schema for the linter rule config (used for validation)
+ */
+export const linterConfigSchema = object(linterConfigPropsSchema);
 
 /**
  * Default linter configuration
