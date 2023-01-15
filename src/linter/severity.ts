@@ -1,4 +1,4 @@
-import { literal, union } from "superstruct";
+import { Struct, define } from "superstruct";
 
 /**
  * Represents linter rule severity
@@ -17,19 +17,27 @@ export enum LinterRuleSeverity {
     Fatal = 3,
 }
 
-/**
- * Superstruct schema for the linter rule severity (used for validation)
- */
-export const severitySchema = union([
-    // Numeric values
-    literal(LinterRuleSeverity.Off),
-    literal(LinterRuleSeverity.Warn),
-    literal(LinterRuleSeverity.Error),
-    literal(LinterRuleSeverity.Fatal),
+export const SEVERITY_VALUES = Object.values(LinterRuleSeverity);
 
-    // String values
-    literal("off"),
-    literal("warn"),
-    literal("error"),
-    literal("fatal"),
-]);
+export const SEVERITY_NAMES = ["off", "warn", "error", "fatal"];
+
+/**
+ * Superstruct type definition for the linter rule severity
+ *
+ * @returns Defined struct
+ * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
+ */
+export function severity(): Struct<LinterRuleSeverity, null> {
+    return define("severity", (value) => {
+        if (typeof value === "string") {
+            return (
+                SEVERITY_NAMES.includes(value) ||
+                `Expected a valid severity string (${SEVERITY_NAMES.join(", ")}), but received ${value}`
+            );
+        } else if (typeof value === "number") {
+            return SEVERITY_VALUES.includes(value) || `Expected a valid severity number, but received ${value}`;
+        } else {
+            return `Expected a string or number, but received ${typeof value}`;
+        }
+    });
+}

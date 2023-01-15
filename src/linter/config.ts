@@ -2,7 +2,8 @@
  * Linter configuration
  */
 
-import { LinterRuleConfig } from "./rule";
+import { boolean, object, optional, record, string } from "superstruct";
+import { LinterRuleConfig, linterRuleConfigSchema } from "./rule";
 
 /**
  * Represents linter configuration
@@ -23,6 +24,14 @@ export interface LinterConfig {
      */
     rules?: { [key: string]: LinterRuleConfig };
 }
+
+/**
+ * Superstruct schema for the linter rule config (used for validation)
+ */
+export const linterConfigSchema = object({
+    allowInlineConfig: optional(boolean()),
+    rules: optional(record(string(), linterRuleConfigSchema)),
+});
 
 /**
  * Default linter configuration

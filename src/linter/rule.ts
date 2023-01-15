@@ -1,11 +1,52 @@
-import { Struct } from "superstruct";
+import { Struct, define, is, union } from "superstruct";
 import { GenericRuleContext } from ".";
-import { LinterRuleSeverity } from "./severity";
+import { LinterRuleSeverity, severity } from "./severity";
 
 /**
- * The configuration of the rule can be severity itself, or an array whose first element is severity
+ * Type definition for the linter rule config, which can be:
+ * - severity itself (number or string): `severity`
+ * - one-element array with severity as the first element: `[severity]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
  */
-export type LinterRuleConfig = LinterRuleSeverity | [LinterRuleSeverity, ...unknown[]];
+export type LinterRuleConfig = LinterRuleSeverity | LinterRuleConfigArray;
+
+/**
+ * Type definition for the linter rule config array, which can be:
+ * - one-element array with severity as the first element: `[severity]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
+ */
+export type LinterRuleConfigArray = [LinterRuleSeverity, ...unknown[]];
+
+/**
+ * Own Superstruct type definition for the linter rule config array
+ *
+ * @returns Defined struct
+ * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
+ */
+function configArray(): Struct<LinterRuleConfigArray, null> {
+    return define("configArray", (value) => {
+        if (Array.isArray(value)) {
+            // First element should be severity
+            if (is(value[0], severity())) {
+                return true;
+            } else {
+                return `Expected a severity as first element, but received ${typeof value[0]}`;
+            }
+        } else {
+            return `Expected an array, but received ${typeof value}`;
+        }
+    });
+}
+
+/**
+ * Superstruct schema for the linter rule config (used for validation)
+ *
+ * Possible values:
+ * - severity itself (number or string): `severity`
+ * - one-element array with severity as the first element: `[severity]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
+ */
+export const linterRuleConfigSchema = union([severity(), configArray()]);
 
 /**
  * Represents the metadata of a linter rule configuration
