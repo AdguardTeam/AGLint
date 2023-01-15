@@ -42,9 +42,19 @@ export const SEVERITY_NAMES = Object.freeze(Object.keys(SEVERITY));
 export const SEVERITY_VALUES = Object.freeze(Object.values(SEVERITY));
 
 /**
+ * Type for the possible severity names
+ */
+export type SeverityName = keyof typeof SEVERITY;
+
+/**
+ * Type for the possible severity values
+ */
+export type SeverityValue = typeof SEVERITY[keyof typeof SEVERITY];
+
+/**
  * Type for the possible severities
  */
-export type AnySeverity = keyof typeof SEVERITY | typeof SEVERITY[keyof typeof SEVERITY];
+export type AnySeverity = SeverityName | SeverityValue;
 
 /**
  * Always returns the severity value. Typically used to get the severity value from a string.
@@ -52,7 +62,7 @@ export type AnySeverity = keyof typeof SEVERITY | typeof SEVERITY[keyof typeof S
  * @param value The value to get the severity value from
  * @returns The severity value
  */
-export function getSeverity(value: AnySeverity): typeof SEVERITY[keyof typeof SEVERITY] {
+export function getSeverity(value: AnySeverity): SeverityValue {
     if (typeof value === "string") {
         return SEVERITY[value];
     } else {
