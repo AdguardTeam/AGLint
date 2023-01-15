@@ -26,7 +26,8 @@ export type LinterRuleConfigArray = [AnySeverity, ...unknown[]];
 function configArray(): Struct<LinterRuleConfigArray, null> {
     return define("configArray", (value) => {
         if (Array.isArray(value)) {
-            // First element should be severity
+            // First element should be severity, the rest can be anything,
+            // we don't know anything about them at this point
             if (is(value[0], severity())) {
                 return true;
             } else {
