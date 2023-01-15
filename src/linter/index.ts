@@ -476,7 +476,9 @@ export class Linter {
 
         const severity = entry.severityOverride || entry.rule.meta.severity;
 
-        return severity === SEVERITY.off;
+        // Don't forget to convert severity to number (it can be a string,
+        // if it was set by the user, and it's can be confusing)
+        return getSeverity(severity) === SEVERITY.off;
     }
 
     /**
