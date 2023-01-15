@@ -49,7 +49,7 @@ export type SeverityName = keyof typeof SEVERITY;
 /**
  * Type for the possible severity values
  */
-export type SeverityValue = typeof SEVERITY[keyof typeof SEVERITY];
+export type SeverityValue = typeof SEVERITY[SeverityName];
 
 /**
  * Type for the possible severities
@@ -93,7 +93,10 @@ export function isSeverity(value: unknown): value is AnySeverity {
  * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
  */
 export function severity(): Struct<AnySeverity, null> {
-    return define("severity", (value) => {
+    // TODO: Fix possible type error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore 2322
+    return define("severity", (value: unknown) => {
         if (typeof value === "string") {
             return (
                 SEVERITY_NAMES.includes(value) ||
@@ -104,8 +107,8 @@ export function severity(): Struct<AnySeverity, null> {
                 (SEVERITY_VALUES as number[]).includes(value) ||
                 `Expected a valid severity number, but received ${value}`
             );
-        } else {
-            return `Expected a string or number, but received ${typeof value}`;
         }
+
+        return `Expected a string or number, but received ${typeof value}`;
     });
 }
