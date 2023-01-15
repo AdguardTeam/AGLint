@@ -1,6 +1,6 @@
 import { Struct, define, is, union } from "superstruct";
 import { GenericRuleContext } from ".";
-import { LinterRuleSeverity, severity } from "./severity";
+import { AnySeverity, severity } from "./severity";
 
 /**
  * Type definition for the linter rule config, which can be:
@@ -8,14 +8,14 @@ import { LinterRuleSeverity, severity } from "./severity";
  * - one-element array with severity as the first element: `[severity]`
  * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
  */
-export type LinterRuleConfig = LinterRuleSeverity | LinterRuleConfigArray;
+export type LinterRuleConfig = AnySeverity | LinterRuleConfigArray;
 
 /**
  * Type definition for the linter rule config array, which can be:
  * - one-element array with severity as the first element: `[severity]`
  * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
  */
-export type LinterRuleConfigArray = [LinterRuleSeverity, ...unknown[]];
+export type LinterRuleConfigArray = [AnySeverity, ...unknown[]];
 
 /**
  * Own Superstruct type definition for the linter rule config array
@@ -70,7 +70,7 @@ export interface LinterRuleMeta {
     /**
      * Linter rule severity. It can be off, warn, error or fatal.
      */
-    severity: LinterRuleSeverity;
+    severity: AnySeverity;
 
     /**
      * Configuration metadata (if the rule has any configuration)

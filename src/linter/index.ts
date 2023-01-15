@@ -7,6 +7,7 @@ import { LinterRule } from "./rule";
 import { LinterConfig, defaultLinterConfig } from "./config";
 import { defaultLinterRules } from "./rules";
 import { ConfigCommentType } from "./inline-config";
+import { SEVERITY, getSeverity } from "./severity";
 
 // Parser stuff
 import { RuleCategory } from "../parser/categories";
@@ -17,7 +18,7 @@ import { NEWLINE } from "../utils/constants";
 import { StringUtils } from "../utils/string";
 import { ArrayUtils } from "../utils/array";
 import { assert } from "superstruct";
-import { LinterRuleSeverity } from "./severity";
+import { AnySeverity, isSeverity } from "./severity";
 
 /**
  * Represents the location of a problem that detected by the linter
@@ -106,7 +107,7 @@ export interface LinterProblem {
     /**
      * The severity of this problem (it practically inherits the rule severity)
      */
-    severity: LinterRuleSeverity;
+    severity: AnySeverity;
 
     /**
      * Text description of the problem
@@ -227,7 +228,7 @@ interface LinterRuleData {
     /**
      * Custom severity for the rule (it overrides the default severity if provided)
      */
-    severityOverride?: LinterRuleSeverity;
+    severityOverride?: AnySeverity;
 }
 
 /**
@@ -323,7 +324,7 @@ export class Linter {
 
         if (data.severityOverride) {
             // Validate severity
-            if (!Object.values(LinterRuleSeverity).includes(data.severityOverride)) {
+            if (!isSeverity(data.severityOverride)) {
                 throw new Error(`Invalid severity "${data.severityOverride}" for rule "${name}"`);
             }
         }
@@ -441,7 +442,7 @@ export class Linter {
             throw new Error(`Rule with name "${name}" does not exist`);
         }
 
-        entry.severityOverride = LinterRuleSeverity.Off;
+        entry.severityOverride = SEVERITY.off;
     }
 
     /**
@@ -475,7 +476,7 @@ export class Linter {
 
         const severity = entry.severityOverride || entry.rule.meta.severity;
 
-        return severity === LinterRuleSeverity.Off;
+        return severity === SEVERITY.off;
     }
 
     /**
@@ -580,12 +581,21 @@ export class Linter {
                                 fix: problem.fix,
                             });
 
-                            if (data.rule.meta.severity === LinterRuleSeverity.Warn) {
-                                result.warningCount++;
-                            } else if (data.rule.meta.severity === LinterRuleSeverity.Error) {
-                                result.errorCount++;
-                            } else if (data.rule.meta.severity === LinterRuleSeverity.Fatal) {
-                                result.fatalErrorCount++;
+                            // Update problem counts
+                            const severity = getSeverity(data.rule.meta.severity);
+
+                            switch (severity) {
+                                case SEVERITY.warn:
+                                    result.warningCount++;
+                                    break;
+                                case SEVERITY.error:
+                                    result.errorCount++;
+                                    break;
+                                case SEVERITY.fatal:
+                                    result.fatalErrorCount++;
+                                    break;
+                                default:
+                                    break;
                             }
                         },
                     });
@@ -700,7 +710,7 @@ export class Linter {
                         // that is, it could not be parsed for some reason. This is a fatal error,
                         // since the linter rules can only accept AST.
                         result.problems.push({
-                            severity: LinterRuleSeverity.Fatal,
+                            severity: SEVERITY.fatal,
                             message: `AGLint parsing error: ${error.message}`,
                             position: {
                                 startLine: index + 1,

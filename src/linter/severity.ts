@@ -1,25 +1,59 @@
 import { Struct, define } from "superstruct";
 
 /**
- * Represents linter rule severity
+ * Represents the possible severities
  */
-export enum LinterRuleSeverity {
-    /** Rule turned off */
-    Off = 0,
+export const SEVERITY = Object.freeze({
+    off: 0,
+    warn: 1,
+    error: 2,
+    fatal: 3,
+});
 
-    /** Warning */
-    Warn = 1,
+/**
+ * Names of the possible severities
+ */
+export const SEVERITY_NAMES = Object.freeze(Object.keys(SEVERITY));
 
-    /** Error */
-    Error = 2,
+/**
+ * Values of the possible severities
+ */
+export const SEVERITY_VALUES = Object.freeze(Object.values(SEVERITY));
 
-    /** Fatal error (parsing error, for example) */
-    Fatal = 3,
+/**
+ * Type for the possible severities
+ */
+export type AnySeverity = keyof typeof SEVERITY | typeof SEVERITY[keyof typeof SEVERITY];
+
+/**
+ * Always returns the severity value. Typically used to get the severity value from a string.
+ *
+ * @param value The value to get the severity value from
+ * @returns The severity value
+ */
+export function getSeverity(value: AnySeverity): typeof SEVERITY[keyof typeof SEVERITY] {
+    if (typeof value === "string") {
+        return SEVERITY[value];
+    } else {
+        return value;
+    }
 }
 
-export const SEVERITY_VALUES = Object.values(LinterRuleSeverity);
+/**
+ * Checks whether the given value is a valid severity
+ *
+ * @param value The value to check
+ * @returns Whether the value is a valid severity
+ */
+export function isSeverity(value: unknown): value is AnySeverity {
+    if (typeof value === "string") {
+        return SEVERITY_NAMES.includes(value);
+    } else if (typeof value === "number") {
+        return (SEVERITY_VALUES as number[]).includes(value);
+    }
 
-export const SEVERITY_NAMES = ["off", "warn", "error", "fatal"];
+    return false;
+}
 
 /**
  * Superstruct type definition for the linter rule severity
@@ -27,7 +61,7 @@ export const SEVERITY_NAMES = ["off", "warn", "error", "fatal"];
  * @returns Defined struct
  * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
  */
-export function severity(): Struct<LinterRuleSeverity, null> {
+export function severity(): Struct<AnySeverity, null> {
     return define("severity", (value) => {
         if (typeof value === "string") {
             return (
@@ -35,7 +69,10 @@ export function severity(): Struct<LinterRuleSeverity, null> {
                 `Expected a valid severity string (${SEVERITY_NAMES.join(", ")}), but received ${value}`
             );
         } else if (typeof value === "number") {
-            return SEVERITY_VALUES.includes(value) || `Expected a valid severity number, but received ${value}`;
+            return (
+                (SEVERITY_VALUES as number[]).includes(value) ||
+                `Expected a valid severity number, but received ${value}`
+            );
         } else {
             return `Expected a string or number, but received ${typeof value}`;
         }

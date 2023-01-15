@@ -1,7 +1,7 @@
 // Linter stuff
 import { GenericRuleContext, LinterPosition } from "..";
 import { LinterRule } from "../rule";
-import { LinterRuleSeverity } from "../severity";
+import { SEVERITY } from "../severity";
 
 // Parser stuff
 import { AnyRule } from "../../parser";
@@ -50,7 +50,7 @@ type RuleContext = GenericRuleContext & {
  */
 export const IfClosed = <LinterRule>{
     meta: {
-        severity: LinterRuleSeverity.Error,
+        severity: SEVERITY.error,
     },
     events: {
         onStartFilterList: (context: RuleContext): void => {

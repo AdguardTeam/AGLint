@@ -4,7 +4,7 @@ import cloneDeep from "clone-deep";
 // Linter stuff
 import { GenericRuleContext, LinterProblemReport } from "..";
 import { LinterRule } from "../rule";
-import { LinterRuleSeverity } from "../severity";
+import { SEVERITY } from "../severity";
 
 // Parser stuff
 import { AnyRule } from "../../parser";
@@ -44,7 +44,7 @@ type RuleContext = GenericRuleContext & {
  */
 export const AdgScriptletQuotes = <LinterRule>{
     meta: {
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.warn,
         config: CONFIG,
     },
     events: {
