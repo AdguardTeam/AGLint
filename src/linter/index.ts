@@ -137,7 +137,7 @@ export interface GenericRuleContext {
     getLinterConfig: () => LinterConfig;
 
     /**
-     * Returns the raw content of the adbock filter list currently processed by the linter.
+     * Returns the raw content of the adblock filter list currently processed by the linter.
      *
      * @returns The raw adblock filter list content
      */
