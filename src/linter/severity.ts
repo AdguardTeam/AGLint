@@ -1,12 +1,33 @@
 import { Struct, define } from "superstruct";
 
 /**
- * Represents the possible severities
+ * Represents the possible severities of a linter rule
  */
 export const SEVERITY = Object.freeze({
+    /**
+     * Rule is disabled, nothing happens
+     */
     off: 0,
+
+    /**
+     * Rule is enabled, and throws a warning when violated.
+     *
+     * @example Bad practices, deprecated syntax, formatting issues, redundant rules, etc.
+     */
     warn: 1,
+
+    /**
+     * Rule is enabled, and throws an error when violated.
+     *
+     * @example Unknown scriptlets, unknown modifiers, etc.
+     */
     error: 2,
+
+    /**
+     * Rule is enabled, and throws a fatal error when violated.
+     *
+     * @example Syntax error (parsing error)
+     */
     fatal: 3,
 });
 
