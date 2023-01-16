@@ -49,7 +49,7 @@ export type SeverityName = keyof typeof SEVERITY;
 /**
  * Type for the possible severity values
  */
-export type SeverityValue = typeof SEVERITY[SeverityName];
+export type SeverityValue = (typeof SEVERITY)[SeverityName];
 
 /**
  * Type for the possible severities
