@@ -1,5 +1,5 @@
 import path, { ParsedPath } from "path";
-import { readFile, writeFile } from "fs/promises";
+import { access, readFile, readdir, writeFile } from "fs/promises";
 import { Linter } from "../../index";
 import { mergeConfigs } from "../config";
 import { walkScannedDirectory } from "./walk";
@@ -7,6 +7,8 @@ import { scan } from "./scan";
 import { LinterCliReporter } from "./reporter";
 import cloneDeep from "clone-deep";
 import { LinterConfig, defaultLinterConfig } from "../config";
+import { CONFIG_FILE_NAMES } from "./constants";
+import { parseConfigFile } from "./config-reader";
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.
@@ -88,12 +90,26 @@ export class LinterCli {
     };
 
     /**
-     * Lints the current working directory.
+     * Checks if a file exists in the specified path.
      *
-     * @param config Initial config
-     * @param files Files to be linted (glob patterns)
+     * @param file The file to be checked
+     * @returns `true` if the file exists, `false` otherwise
      */
-    public lintCurrentWorkingDirectory = async (config?: LinterConfig, files: string[] = []): Promise<void> => {
+    private fileExists = async (file: string): Promise<boolean> => {
+        try {
+            await access(file);
+            return true;
+        } catch {
+            return false;
+        }
+    };
+
+    /**
+     * Lints the current working directory. If you specify files, it will only lint those files.
+     *
+     * @param files The files to be linted (if not specified, it will scan the cwd)
+     */
+    public run = async (files: string[] = []): Promise<void> => {
         // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
         // and use "process.cwd" as fallback. This is the current working directory (cwd).
         const cwd = process.env.INIT_CWD || process.cwd();
@@ -105,10 +121,36 @@ export class LinterCli {
 
         // If files are specified, use them instead of scanning the cwd
         if (files.length > 0) {
-            // TODO: Implement this
-            // for (const file of files) {
-            //
-            // }
+            for (const file of files) {
+                // Check if the file exists
+                if (!(await this.fileExists(file))) {
+                    throw new Error(`File "${file}" does not exist`);
+                }
+
+                // Parse the file path
+                const parsedFile = path.parse(path.join(cwd, file));
+
+                // Check for config files in the file's directory
+                const items = await readdir(parsedFile.dir);
+                const configs = items.filter((item) => CONFIG_FILE_NAMES.includes(item));
+
+                // If multiple config files were found, throw an error, because we don't know which one to use
+                if (configs.length > 1) {
+                    throw new Error(
+                        `Multiple config files found in directory "${parsedFile.dir}" (${configs.join(", ")})`
+                    );
+                }
+
+                // If a config file was found, parse it
+                const config =
+                    configs.length === 1 ? await parseConfigFile(path.join(parsedFile.dir, configs[0])) : undefined;
+
+                // Lint the file
+                await this.lintFile(
+                    parsedFile,
+                    config === undefined ? defaultLinterConfig : mergeConfigs(defaultLinterConfig, config)
+                );
+            }
         } else {
             // Run the scanner on the cwd
             const scanResult = await scan(cwd, [], this.ignore);
@@ -120,10 +162,7 @@ export class LinterCli {
                     // Call the lint function for each file during the walk
                     file: this.lintFile,
                 },
-
-                // Merge the parsed config with the default config
-                config === undefined ? defaultLinterConfig : mergeConfigs(defaultLinterConfig, config),
-
+                defaultLinterConfig,
                 this.fix
             );
         }

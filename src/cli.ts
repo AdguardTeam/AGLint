@@ -44,5 +44,5 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
         !!program.opts().ignores
     );
 
-    await cli.lintCurrentWorkingDirectory();
+    await cli.run(program.args);
 })();
