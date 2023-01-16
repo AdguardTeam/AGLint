@@ -1,6 +1,6 @@
 import { ParsedPath } from "path";
 import { LinterResult } from "../index";
-import { LinterCliConfig } from "./config";
+import { LinterConfig } from "../config";
 
 /**
  * Represents a reporter skeleton for the linter.
@@ -17,7 +17,7 @@ export interface LinterCliReporter {
      * @param file The file that is being linted
      * @param config The linter configuration
      */
-    onFileStart?: (file: ParsedPath, config: LinterCliConfig) => void;
+    onFileStart?: (file: ParsedPath, config: LinterConfig) => void;
 
     /**
      * Called when linting a file ends. It will give you the result of the linting
@@ -27,7 +27,7 @@ export interface LinterCliReporter {
      * @param result The result of the linting
      * @param config The linter configuration
      */
-    onFileEnd?: (file: ParsedPath, result: LinterResult, config: LinterCliConfig) => void;
+    onFileEnd?: (file: ParsedPath, result: LinterResult, config: LinterConfig) => void;
 
     /**
      * Called when the whole linting process ends.

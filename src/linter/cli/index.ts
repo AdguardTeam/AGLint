@@ -1,11 +1,12 @@
 import path, { ParsedPath } from "path";
 import { readFile, writeFile } from "fs/promises";
 import { Linter } from "../../index";
-import { LinterCliConfig, defaultLinterCliConfig, mergeConfigs } from "./config";
+import { mergeConfigs } from "../config";
 import { walkScannedDirectory } from "./walk";
 import { scan } from "./scan";
 import { LinterCliReporter } from "./reporter";
 import cloneDeep from "clone-deep";
+import { LinterConfig, defaultLinterConfig } from "../config";
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.
@@ -16,13 +17,21 @@ export class LinterCli {
      */
     private readonly reporter: LinterCliReporter;
 
+    private fix: boolean;
+
+    private ignore: boolean;
+
     /**
      * Creates a new `LinterCli` instance.
      *
      * @param reporter The reporter to be used for the CLI
+     * @param fix Fix fixable problems automatically
+     * @param ignore Use `.aglintignore` files
      */
-    constructor(reporter: LinterCliReporter) {
+    constructor(reporter: LinterCliReporter, fix = false, ignore = true) {
         this.reporter = reporter;
+        this.fix = fix;
+        this.ignore = ignore;
     }
 
     /**
@@ -32,7 +41,7 @@ export class LinterCli {
      * @param file The file to be linted
      * @param config The active linter config (merged from parent directories)
      */
-    private lintFile = async (file: ParsedPath, config: LinterCliConfig) => {
+    private lintFile = async (file: ParsedPath, config: LinterConfig) => {
         // Create a new linter instance and add the default rules
         const linter = new Linter();
         linter.addDefaultRules();
@@ -49,7 +58,7 @@ export class LinterCli {
         }
 
         // Lint the file
-        let result = linter.lint(await readFile(filePath, "utf8"), config.fix || defaultLinterCliConfig.fix);
+        let result = linter.lint(await readFile(filePath, "utf8"), this.fix || false);
 
         // If there are no problems, skip this file, no need to log anything
         if (result.problems.length === 0) {
@@ -58,12 +67,12 @@ export class LinterCli {
 
         // If fix is enabled and fixable problems were found, write the fixed file,
         // then re-lint the fixed file to see if there are still problems
-        if (config.fix) {
+        if (this.fix) {
             if (result.fixed) {
                 await writeFile(filePath, result.fixed);
 
                 // TODO: Currently fixing runs only once, but it should run until there are no more fixable problems
-                result = linter.lint(result.fixed, config.fix || defaultLinterCliConfig.fix);
+                result = linter.lint(result.fixed, this.fix || false);
 
                 // If everything is fixed, skip this file
                 if (result.problems.length === 0) {
@@ -84,7 +93,7 @@ export class LinterCli {
      * @param config Initial config
      * @param files Files to be linted (glob patterns)
      */
-    public lintCurrentWorkingDirectory = async (config?: LinterCliConfig, files: string[] = []): Promise<void> => {
+    public lintCurrentWorkingDirectory = async (config?: LinterConfig, files: string[] = []): Promise<void> => {
         // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
         // and use "process.cwd" as fallback. This is the current working directory (cwd).
         const cwd = process.env.INIT_CWD || process.cwd();
@@ -113,7 +122,9 @@ export class LinterCli {
                 },
 
                 // Merge the parsed config with the default config
-                config === undefined ? defaultLinterCliConfig : mergeConfigs(defaultLinterCliConfig, config)
+                config === undefined ? defaultLinterConfig : mergeConfigs(defaultLinterConfig, config),
+
+                this.fix
             );
         }
 

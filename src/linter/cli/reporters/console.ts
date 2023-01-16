@@ -80,6 +80,11 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
         // If there are problems, log them to the console
         for (const [file, problems] of Object.entries(this.problems)) {
+            // Typically when found problems are fixed
+            if (problems.length === 0) {
+                continue;
+            }
+
             console.log(
                 this.colors
                     ? chalk.red(`Found ${problems.length} problems in ${file}:`)

@@ -6,7 +6,6 @@
 
 import { program } from "commander";
 import { readFileSync } from "fs";
-import { defaultLinterCliConfig, LinterCliConfig } from "./linter/cli/config";
 import { LinterCli } from "./linter/cli";
 import { LinterConsoleReporter } from "./linter/cli/reporters/console";
 
@@ -29,7 +28,7 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
         .option(
             "-f, --fix",
             "Enable automatic fix, if possible (BE CAREFUL, this overwrites original files with the fixed ones)",
-            defaultLinterCliConfig.fix
+            false
         )
         .option("-c, --colors", "Force enabling colors", true)
         .option("--no-colors", "Force disabling colors")
@@ -38,14 +37,12 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
         // Parse the arguments
         .parse(process.argv);
 
-    // Create config based on the parsed arguments
-    const parsedConfig: LinterCliConfig = {
-        fix: !!program.opts().fix,
-        ignores: !!program.opts().ignores,
-    };
-
     // TODO: Custom reporter support with --reporter option
-    const cli = new LinterCli(new LinterConsoleReporter(program.opts().colors));
+    const cli = new LinterCli(
+        new LinterConsoleReporter(program.opts().colors),
+        !!program.opts().fix,
+        !!program.opts().ignores
+    );
 
-    await cli.lintCurrentWorkingDirectory(parsedConfig);
+    await cli.lintCurrentWorkingDirectory();
 })();

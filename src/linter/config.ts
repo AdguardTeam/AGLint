@@ -2,6 +2,7 @@
  * Linter configuration
  */
 
+import merge from "deepmerge";
 import { boolean, object, optional, record, string } from "superstruct";
 import { LinterRuleConfig, linterRuleConfigSchema } from "./rule";
 
@@ -46,3 +47,36 @@ export const linterConfigSchema = object(linterConfigPropsSchema);
 export const defaultLinterConfig: LinterConfig = {
     allowInlineConfig: true,
 };
+
+/**
+ * Merges two configuration objects using deepmerge. Practically, this means that
+ * the `extend` object will be merged into the `initial` object.
+ *
+ * @param initial The initial config object
+ * @param extend The config object to extend the initial config with
+ * @returns The merged config object
+ * @example
+ * If you have the following config (called `initial` parameter):
+ * ```json
+ * {
+ *   "ignores": true,
+ *   "fix": false
+ * }
+ * ```
+ * And you want to extend it with the following config (called `extend` parameter):
+ * ```json
+ * {
+ *   "ignores": false
+ * }
+ * ```
+ * The result will be:
+ * ```json
+ * {
+ *   "ignores": false,
+ *   "fix": false
+ * }
+ * ```
+ */
+export function mergeConfigs(initial: LinterConfig, extend: LinterConfig): LinterConfig {
+    return merge(initial, extend);
+}
