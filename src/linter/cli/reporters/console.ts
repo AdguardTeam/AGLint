@@ -14,7 +14,7 @@ type CollectedProblems = { [key: string]: LinterProblem[] };
  * You can implement any reporter you want, as long as it implements the
  * `LinterCliReporter` interface.
  */
-export class ConsoleReporter implements LinterCliReporter {
+export class LinterConsoleReporter implements LinterCliReporter {
     /**
      * We save the start time here, so we can calculate the total time at the end.
      */
