@@ -4,7 +4,7 @@
 
 // Linter stuff
 import { LinterRule } from "./rule";
-import { LinterConfig, defaultLinterConfig } from "./config";
+import { LinterConfig, defaultLinterConfig, mergeConfigs, linterRulesSchema, LinterRuleConfigObject } from "./config";
 import { defaultLinterRules } from "./rules";
 import { ConfigCommentType } from "./inline-config";
 import { SEVERITY, getSeverity } from "./severity";
@@ -264,6 +264,44 @@ export class Linter {
     }
 
     /**
+     * Applies given rule configs.
+     *
+     * @param rulesConfig Rule configs
+     */
+    private applyRulesConfig(rulesConfig: LinterRuleConfigObject) {
+        for (const [ruleName, ruleConfig] of Object.entries(rulesConfig)) {
+            const entry = this.rules.get(ruleName);
+
+            // Tolerate unknown rules, simply ignore them
+            if (!entry) {
+                continue;
+            }
+
+            // [severity] or [severity, ...options]
+            if (Array.isArray(ruleConfig)) {
+                entry.severityOverride = ruleConfig[0];
+
+                // Add options (if any)
+                if (ruleConfig.length > 1) {
+                    const rest = [...ruleConfig.slice(1)];
+
+                    // Single option vs multiple options
+                    if (rest.length === 1) {
+                        entry.configOverride = rest[0];
+                    } else {
+                        entry.configOverride = rest;
+                    }
+                }
+            } else {
+                // Simply the severity, without options
+                entry.severityOverride = ruleConfig;
+            }
+
+            this.rules.set(ruleName, entry);
+        }
+    }
+
+    /**
      * Sets the linter configuration. If `reset` is set to `true`, all rule
      * configurations are reset to their default values (removing overrides).
      *
@@ -282,14 +320,7 @@ export class Linter {
         }
 
         if (config.rules) {
-            for (const [rule, ruleConfig] of Object.entries(config.rules)) {
-                const entry = this.rules.get(rule);
-
-                // Tolerate unknown rules, simply ignore them
-                if (entry) {
-                    entry.configOverride = ruleConfig;
-                }
-            }
+            this.applyRulesConfig(config.rules);
         }
     }
 
@@ -577,7 +608,7 @@ export class Linter {
                         report: (problem: LinterProblemReport) => {
                             result.problems.push({
                                 rule: name,
-                                severity: data.rule.meta.severity,
+                                severity: data.severityOverride || data.rule.meta.severity,
                                 message: problem.message,
                                 position: { ...problem.position },
                                 fix: problem.fix,
@@ -637,7 +668,15 @@ export class Linter {
                         // Process the inline config comment
                         switch (ast.command) {
                             case ConfigCommentType.Main: {
-                                // TODO: Modify linter config here
+                                if (ast.params) {
+                                    assert(ast.params, linterRulesSchema);
+
+                                    this.config = mergeConfigs(this.config, {
+                                        rules: ast.params,
+                                    });
+
+                                    this.applyRulesConfig(ast.params);
+                                }
                                 break;
                             }
 
