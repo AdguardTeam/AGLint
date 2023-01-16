@@ -67,6 +67,6 @@ describe("Linter config", () => {
                 },
                 linterConfigSchema
             )
-        ).not.toThrowError();
+        ).toThrowError();
     });
 });
