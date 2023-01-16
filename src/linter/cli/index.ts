@@ -111,7 +111,7 @@ export class LinterCli {
             // }
         } else {
             // Run the scanner on the cwd
-            const scanResult = await scan(cwd);
+            const scanResult = await scan(cwd, [], this.ignore);
 
             // Walk through the scanned directory and lint all files
             await walkScannedDirectory(

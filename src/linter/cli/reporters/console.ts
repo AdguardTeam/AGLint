@@ -131,7 +131,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
                 message += this.colors ? chalk.gray(problem.message) : problem.message;
 
                 // Log problem to console
-                console.error(message);
+                console.log(message);
             }
 
             console.log();
