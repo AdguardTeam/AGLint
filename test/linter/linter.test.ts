@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { Linter } from "../../src/linter";
-import { LinterRuleSeverity } from "../../src/linter/rule";
+import { SEVERITY } from "../../src/linter/severity";
 import { NEWLINE } from "../../src/utils/constants";
 
 describe("Linter", () => {
@@ -21,8 +21,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -54,8 +55,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -64,8 +66,9 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no opening parentheses "(" at call: "..."',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no opening parentheses "(" at call: "..."',
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -74,7 +77,7 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
+                    severity: SEVERITY.fatal,
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -109,8 +112,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -138,8 +142,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -231,8 +236,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -241,8 +247,9 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 8,
                         startColumn: 0,
@@ -282,8 +289,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 10,
                         startColumn: 0,
@@ -292,8 +300,9 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 11,
                         startColumn: 0,
@@ -302,8 +311,9 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 17,
                         startColumn: 0,
@@ -337,8 +347,9 @@ describe("Linter", () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -347,8 +358,9 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 10,
                         startColumn: 0,
@@ -357,8 +369,9 @@ describe("Linter", () => {
                     },
                 },
                 {
-                    severity: LinterRuleSeverity.Fatal,
-                    message: 'Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: SEVERITY.fatal,
+                    message:
+                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 11,
                         startColumn: 0,

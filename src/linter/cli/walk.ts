@@ -1,12 +1,17 @@
 import path, { ParsedPath } from "path";
 import cloneDeep from "clone-deep";
 import { ScannedDirectory } from "./scan";
-import { LinterCliConfig, defaultLinterCliConfig, mergeConfigs, parseConfigFile } from "./config";
+import { parseConfigFile } from "./config-reader";
+import { LinterConfig, defaultLinterConfig } from "../config";
 
 /**
  * An event that is performed on a file or directory.
+ *
+ * @param path The path of the file or directory
+ * @param config The active linter config
+ * @param fix Fix fixable problems automatically
  */
-export type WalkEvent = (path: ParsedPath, config: LinterCliConfig) => Promise<void>;
+export type WalkEvent = (path: ParsedPath, config: LinterConfig, fix: boolean) => Promise<void>;
 
 /**
  * An object containing the events to be performed on each file and directory.
@@ -23,39 +28,32 @@ interface WalkEvents {
  * @param scannedDirectory The `ScannedDirectory` object to be walked
  * @param events The events to be performed on each file and directory
  * @param config The CLI config
+ * @param fix Fix fixable problems automatically
  */
 export async function walkScannedDirectory(
     scannedDirectory: ScannedDirectory,
     events: WalkEvents,
-    config: LinterCliConfig = defaultLinterCliConfig
+    config: LinterConfig = defaultLinterConfig,
+    fix = false
 ) {
-    // Inherit the config from the parent directory
-    let mergedConfig = config;
-
-    // If the current directory has a config file, parse it and merge it with the parent config
-    if (scannedDirectory.configFile) {
-        mergedConfig = mergeConfigs(
-            config,
-            await parseConfigFile(path.join(scannedDirectory.configFile.dir, scannedDirectory.configFile.base))
-        );
-    }
-
-    // Clone the merged config so that we can pass it to the file action
-    // This is necessary to prevent unwanted side effects
-    const mergedConfigDeepClone = cloneDeep(mergedConfig);
+    const configDeepClone = cloneDeep(
+        scannedDirectory.configFile
+            ? await parseConfigFile(path.join(scannedDirectory.configFile.dir, scannedDirectory.configFile.base))
+            : config
+    );
 
     // Perform the directory action on the current directory (if it exists)
     if (events.dir) {
-        await events.dir(scannedDirectory.dir, mergedConfigDeepClone);
+        await events.dir(scannedDirectory.dir, configDeepClone, fix);
     }
 
     // Perform the file action on each lintable file
     for (const file of scannedDirectory.lintableFiles) {
-        await events.file(file, mergedConfigDeepClone);
+        await events.file(file, configDeepClone, fix);
     }
 
     // Recursively walk each subdirectory
-    for (const subdir of scannedDirectory.subdirectories) {
-        await walkScannedDirectory(subdir, events, mergedConfigDeepClone);
+    for (const subDir of scannedDirectory.subdirectories) {
+        await walkScannedDirectory(subDir, events, configDeepClone, fix);
     }
 }

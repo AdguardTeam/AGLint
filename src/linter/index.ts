@@ -3,10 +3,11 @@
  */
 
 // Linter stuff
-import { LinterRule, LinterRuleSeverity } from "./rule";
+import { LinterRule } from "./rule";
 import { LinterConfig, defaultLinterConfig } from "./config";
 import { defaultLinterRules } from "./rules";
 import { ConfigCommentType } from "./inline-config";
+import { SEVERITY, getSeverity } from "./severity";
 
 // Parser stuff
 import { RuleCategory } from "../parser/categories";
@@ -16,6 +17,8 @@ import { NEWLINE } from "../utils/constants";
 
 import { StringUtils } from "../utils/string";
 import { ArrayUtils } from "../utils/array";
+import { assert } from "superstruct";
+import { AnySeverity, isSeverity } from "./severity";
 
 /**
  * Represents the location of a problem that detected by the linter
@@ -104,7 +107,7 @@ export interface LinterProblem {
     /**
      * The severity of this problem (it practically inherits the rule severity)
      */
-    severity: LinterRuleSeverity;
+    severity: AnySeverity;
 
     /**
      * Text description of the problem
@@ -125,7 +128,7 @@ export interface LinterProblem {
 /**
  * Represents a linter context that is passed to the rules when their events are triggered
  */
-export interface LinterContext {
+export interface GenericRuleContext {
     /**
      * Returns the clone of the shared linter configuration.
      *
@@ -134,7 +137,7 @@ export interface LinterContext {
     getLinterConfig: () => LinterConfig;
 
     /**
-     * Returns the raw content of the adbock filter list currently processed by the linter.
+     * Returns the raw content of the adblock filter list currently processed by the linter.
      *
      * @returns The raw adblock filter list content
      */
@@ -175,6 +178,12 @@ export interface LinterContext {
     storage: LinterRuleStorage;
 
     /**
+     * Additional config for the rule. This is unknown at this point, but the concrete
+     * type is defined by the rule.
+     */
+    config: unknown;
+
+    /**
      * Function for reporting problems to the linter.
      *
      * @param problem - The problem to report
@@ -200,7 +209,8 @@ type LinterRuleStorage = {
  */
 interface LinterRuleData {
     /**
-     * The linter rule itself.
+     * The linter rule itself. It's meta provides the rule severity and default config,
+     * which can be overridden by the user here.
      */
     rule: LinterRule;
 
@@ -211,17 +221,19 @@ interface LinterRuleData {
     storage: LinterRuleStorage;
 
     /**
-     * The severity of the rule.
+     * Custom config for the rule (it overrides the default config if provided)
      */
-    severity: LinterRuleSeverity;
+    configOverride?: unknown;
 
     /**
-     * The parameters of the rule. This is unknown at this point, but the concrete
-     * type is defined by the rule.
+     * Custom severity for the rule (it overrides the default severity if provided)
      */
-    parameters?: unknown[];
+    severityOverride?: AnySeverity;
 }
 
+/**
+ * Core linter logic
+ */
 export class Linter {
     /**
      * A map of rule names to `LinterRule` objects
@@ -229,16 +241,18 @@ export class Linter {
     private readonly rules: Map<string, LinterRuleData> = new Map();
 
     /**
-     * A set of disabled rule names
+     * The linter configuration
      */
-    private readonly disabledRules: Set<string> = new Set();
+    private config: LinterConfig = defaultLinterConfig;
 
     /**
      * Creates a new linter instance.
      *
      * @param config - The linter configuration
      */
-    constructor(private readonly config: LinterConfig = defaultLinterConfig) {}
+    constructor(config: LinterConfig = defaultLinterConfig) {
+        this.setConfig(config);
+    }
 
     /**
      * Adds all default rules to the linter.
@@ -250,29 +264,129 @@ export class Linter {
     }
 
     /**
-     * Adds a new rule to the linter. If a rule with the same name already exists,
-     * an error is thrown, because rule names must be unique.
+     * Sets the linter configuration. If `reset` is set to `true`, all rule
+     * configurations are reset to their default values (removing overrides).
      *
-     * @param name - The name of the rule
-     * @param rule - The `LinterRule` object
-     * @throws If the rule name is already taken
+     * @param config Core linter configuration
+     * @param reset Whether to reset all rule configs
+     */
+    public setConfig(config: LinterConfig, reset = true): void {
+        this.config = config;
+
+        // Reset all rule configs
+        if (reset) {
+            for (const entry of this.rules.values()) {
+                entry.configOverride = undefined;
+                entry.severityOverride = undefined;
+            }
+        }
+
+        if (config.rules) {
+            for (const [rule, ruleConfig] of Object.entries(config.rules)) {
+                const entry = this.rules.get(rule);
+
+                // Tolerate unknown rules, simply ignore them
+                if (entry) {
+                    entry.configOverride = ruleConfig;
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds a new rule to the linter.
+     *
+     * @param name The name of the rule
+     * @param rule The rule itself
      */
     public addRule(name: string, rule: LinterRule): void {
+        this.addRuleEx(name, {
+            rule,
+
+            // Initialize storage as empty object
+            storage: {},
+        });
+    }
+
+    /**
+     * Adds a new rule to the linter, but you can specify the rule data.
+     *
+     * @param name The name of the rule
+     * @param data The rule data, see `LinterRuleData` interface for more details
+     * @throws If the rule name is already taken
+     * @throws If the rule severity is invalid
+     * @throws If the rule config is invalid
+     */
+    public addRuleEx(name: string, data: LinterRuleData): void {
         if (this.rules.has(name)) {
             throw new Error(`Rule with name "${name}" already exists`);
         }
 
+        if (data.severityOverride) {
+            // Validate severity
+            if (!isSeverity(data.severityOverride)) {
+                throw new Error(`Invalid severity "${data.severityOverride}" for rule "${name}"`);
+            }
+        }
+
+        if (data.configOverride) {
+            if (!data.rule.meta.config) {
+                throw new Error(`Rule "${name}" doesn't have any config, but you tried to provide one`);
+            } else {
+                assert(data.configOverride, data.rule.meta.config.schema);
+            }
+        }
+
         // Add rule to the repository
-        this.rules.set(name, {
-            // Add rule itself
-            rule,
+        this.rules.set(name, data);
+    }
 
-            // Create an empty storage for the rule
-            storage: {},
+    /**
+     * Sets the config for the rule with the specified name.
+     *
+     * @param name The name of the rule
+     * @param config New config for the rule
+     */
+    public setRuleConfig(name: string, config: unknown): void {
+        // Find the rule
+        const entry = this.rules.get(name);
 
-            // Get rule severity
-            severity: rule.meta.severity,
-        });
+        // Check if the rule exists
+        if (!entry) {
+            throw new Error(`Rule with name "${name}" doesn't exist`);
+        }
+
+        if (!entry.rule.meta.config) {
+            throw new Error(`Rule "${name}" doesn't have any config, but you tried to provide one`);
+        }
+
+        // Validate config with Superstruct
+        assert(config, entry.rule.meta.config.schema);
+
+        // Set the config
+        entry.configOverride = config;
+    }
+
+    /**
+     * Resets default config for the rule with the specified name.
+     *
+     * @param name The name of the rule
+     */
+    public resetRuleConfig(name: string): void {
+        // Find the rule
+        const entry = this.rules.get(name);
+
+        // Check if the rule exists
+        if (!entry) {
+            throw new Error(`Rule with name "${name}" doesn't exist`);
+        }
+
+        if (!entry.rule.meta.config) {
+            throw new Error(`Rule "${name}" doesn't have any config`);
+        }
+
+        // Set the config to undefined, so the default config will be used
+        entry.configOverride = undefined;
     }
 
     /**
@@ -321,13 +435,14 @@ export class Linter {
      * @throws If the rule does not exist
      */
     public disableRule(name: string): void {
+        const entry = this.rules.get(name);
+
         // Check if the rule exists
-        if (!this.hasRule(name)) {
+        if (!entry) {
             throw new Error(`Rule with name "${name}" does not exist`);
         }
 
-        // Add rule to the disabled rules set
-        this.disabledRules.add(name);
+        entry.severityOverride = SEVERITY.off;
     }
 
     /**
@@ -336,7 +451,14 @@ export class Linter {
      * @param name - The name of the rule
      */
     public enableRule(name: string): void {
-        this.disabledRules.delete(name);
+        const entry = this.rules.get(name);
+
+        // Check if the rule exists
+        if (!entry) {
+            throw new Error(`Rule with name "${name}" does not exist`);
+        }
+
+        entry.severityOverride = undefined;
     }
 
     /**
@@ -346,7 +468,17 @@ export class Linter {
      * @returns `true` if the rule is disabled, `false` otherwise
      */
     public isRuleDisabled(name: string): boolean {
-        return this.disabledRules.has(name);
+        const entry = this.rules.get(name);
+
+        if (!entry) {
+            return false;
+        }
+
+        const severity = entry.severityOverride || entry.rule.meta.severity;
+
+        // Don't forget to convert severity to number (it can be a string,
+        // if it was set by the user, and it's can be confusing)
+        return getSeverity(severity) === SEVERITY.off;
     }
 
     /**
@@ -403,14 +535,19 @@ export class Linter {
                     continue;
                 }
 
+                // Validate rule configuration (if it exists)
+                if (data.rule.meta.config) {
+                    assert(data.configOverride || data.rule.meta.config.default, data.rule.meta.config.schema);
+                }
+
                 // Get event handler for the rule
                 const eventHandler = data.rule.events[event];
 
-                // Invoke event handler if it exists
+                // Invoke event handler (if it exists)
                 if (eventHandler) {
                     // Create a context object and freeze it in order to prevent
                     // accidental / unwanted modifications
-                    const context: LinterContext = Object.freeze({
+                    const context: GenericRuleContext = Object.freeze({
                         // Deep copy of the linter configuration
                         getLinterConfig: () => ({ ...this.config }),
 
@@ -433,22 +570,34 @@ export class Linter {
                         // Storage reference
                         storage: data.storage,
 
+                        // Rule configuration
+                        config: data.configOverride || data.rule.meta.config?.default,
+
                         // Reporter function
                         report: (problem: LinterProblemReport) => {
                             result.problems.push({
                                 rule: name,
-                                severity: data.severity,
+                                severity: data.rule.meta.severity,
                                 message: problem.message,
                                 position: { ...problem.position },
                                 fix: problem.fix,
                             });
 
-                            if (data.severity === LinterRuleSeverity.Warn) {
-                                result.warningCount++;
-                            } else if (data.severity === LinterRuleSeverity.Error) {
-                                result.errorCount++;
-                            } else if (data.severity === LinterRuleSeverity.Fatal) {
-                                result.fatalErrorCount++;
+                            // Update problem counts
+                            const severity = getSeverity(data.rule.meta.severity);
+
+                            switch (severity) {
+                                case SEVERITY.warn:
+                                    result.warningCount++;
+                                    break;
+                                case SEVERITY.error:
+                                    result.errorCount++;
+                                    break;
+                                case SEVERITY.fatal:
+                                    result.fatalErrorCount++;
+                                    break;
+                                default:
+                                    break;
                             }
                         },
                     });
@@ -563,7 +712,7 @@ export class Linter {
                         // that is, it could not be parsed for some reason. This is a fatal error,
                         // since the linter rules can only accept AST.
                         result.problems.push({
-                            severity: LinterRuleSeverity.Fatal,
+                            severity: SEVERITY.fatal,
                             message: `AGLint parsing error: ${error.message}`,
                             position: {
                                 startLine: index + 1,

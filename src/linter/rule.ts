@@ -1,55 +1,86 @@
-import { LinterContext } from ".";
+import { Struct, define, is, union } from "superstruct";
+import { GenericRuleContext } from ".";
+import { AnySeverity, severity } from "./severity";
 
 /**
- * Represents linter rule severity
+ * Type definition for the linter rule config, which can be:
+ * - severity itself (number or string): `severity`
+ * - one-element array with severity as the first element: `[severity]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
  */
-export enum LinterRuleSeverity {
-    /** Rule turned off */
-    Off = 0,
+export type LinterRuleConfig = AnySeverity | LinterRuleConfigArray;
 
-    /** Warning */
-    Warn = 1,
+/**
+ * Type definition for the linter rule config array, which can be:
+ * - one-element array with severity as the first element: `[severity]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
+ */
+export type LinterRuleConfigArray = [AnySeverity, ...unknown[]];
 
-    /** Error */
-    Error = 2,
-
-    /** Fatal error (parsing error, for example) */
-    Fatal = 3,
+/**
+ * Own Superstruct type definition for the linter rule config array
+ *
+ * @returns Defined struct
+ * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
+ */
+function configArray(): Struct<LinterRuleConfigArray, null> {
+    return define("configArray", (value) => {
+        if (Array.isArray(value)) {
+            // First element should be severity, the rest can be anything,
+            // we don't know anything about them at this point
+            if (is(value[0], severity())) {
+                return true;
+            } else {
+                return `Expected a severity as first element, but received ${typeof value[0]}`;
+            }
+        } else {
+            return `Expected an array, but received ${typeof value}`;
+        }
+    });
 }
 
 /**
- * Represents linter rule type
+ * Superstruct schema for the linter rule config (used for validation)
+ *
+ * Possible values:
+ * - severity itself (number or string): `severity`
+ * - one-element array with severity as the first element: `[severity]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
  */
-export enum LinterRuleType {
-    Problem,
-    Suggestion,
-    Layout,
+export const linterRuleConfigSchema = union([severity(), configArray()]);
+
+/**
+ * Represents the metadata of a linter rule configuration
+ */
+export interface LinterRuleConfigMeta {
+    /**
+     * Default configuration of the rule
+     */
+    default: unknown;
+
+    /**
+     * Superstruct schema for the rule configuration (used for validation)
+     */
+    schema: Struct;
 }
 
 /**
- * Represents linter rule metadata
+ * Represents the metadata of a linter rule
  */
 export interface LinterRuleMeta {
     /**
-     * Linter rule type. It can be problem, suggestion or layout.
-     */
-    type: LinterRuleType;
-
-    /**
      * Linter rule severity. It can be off, warn, error or fatal.
      */
-    severity: LinterRuleSeverity;
+    severity: AnySeverity;
 
-    // TODO: Handle additional parameters
+    /**
+     * Configuration metadata (if the rule has any configuration)
+     */
+    config?: LinterRuleConfigMeta;
 }
 
 /**
- * The configuration of the rule can be severity itself, or an array whose first element is severity
- */
-export type LinterRuleConfig = LinterRuleSeverity | [LinterRuleSeverity, ...unknown[]];
-
-/**
- * It represents what events a linter rule can handle
+ * Represents what events a linter rule can handle
  */
 export interface LinterRuleEvents {
     /**
@@ -58,7 +89,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onStartFilterList?: (context: LinterContext) => void;
+    onStartFilterList?: (context: GenericRuleContext) => void;
 
     /**
      * Called after analyzing a filter list (after all rules are analyzed).
@@ -66,7 +97,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onEndFilterList?: (context: LinterContext) => void;
+    onEndFilterList?: (context: GenericRuleContext) => void;
 
     /**
      * Called when analyzing an adblock rule. This event is called for each rule, including comments.
@@ -74,7 +105,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onRule?: (context: LinterContext) => void;
+    onRule?: (context: GenericRuleContext) => void;
 }
 
 /**

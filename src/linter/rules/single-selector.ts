@@ -1,6 +1,7 @@
 // Linter stuff
-import { LinterContext, LinterProblemReport } from "..";
-import { LinterRule, LinterRuleSeverity, LinterRuleType } from "../rule";
+import { GenericRuleContext, LinterProblemReport } from "..";
+import { LinterRule } from "../rule";
+import { SEVERITY } from "../severity";
 
 // Parser stuff
 import { AnyRule } from "../../parser";
@@ -12,11 +13,10 @@ import { CosmeticRuleType } from "../../parser/cosmetic/types";
  */
 export const SingleSelector = <LinterRule>{
     meta: {
-        type: LinterRuleType.Problem,
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.warn,
     },
     events: {
-        onRule: (context: LinterContext): void => {
+        onRule: (context: GenericRuleContext): void => {
             // Get actually iterated adblock rule
             const ast = <AnyRule>context.getActualAdblockRuleAst();
             const raw = <string>context.getActualAdblockRuleRaw();

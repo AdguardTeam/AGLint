@@ -22,15 +22,19 @@ Table of Contents:
   - [Pre-requisites](#pre-requisites)
   - [Installation \& Usage](#installation--usage)
 - [VSCode extension](#vscode-extension)
-- [Special comments](#special-comments)
+- [Special comments (inline configuration)](#special-comments-inline-configuration)
   - [Ignore adblock rules](#ignore-adblock-rules)
     - [Ignore single adblock rule](#ignore-single-adblock-rule)
     - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
     - [Disable some linter rules](#disable-some-linter-rules)
 - [Ignoring files or folders](#ignoring-files-or-folders)
+  - [Default ignores](#default-ignores)
 - [Configuration](#configuration)
   - [Example configurations](#example-configurations)
+  - [Configuration hierarchy](#configuration-hierarchy)
+    - [Hierarchy](#hierarchy)
 - [Linter rules](#linter-rules)
+  - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
 - [Use programmatically](#use-programmatically)
@@ -98,9 +102,9 @@ GitHub Linguist [also uses](https://github.com/github/linguist/pull/5968) this e
 
 **We strongly recommend using this extension if you are working with adblock filter lists.**
 
-## Special comments
+## Special comments (inline configuration)
 
-You may not want to lint some adblock rules, so you can add special config / control comments to ignore / customize them. Generally these comments begins with the `! aglint-` prefix.
+You may not want to lint some adblock rules, so you can add special inline comments to disable linting for a single adblock rule or for the rest of the file. Generally these comments begins with the `! aglint` prefix. In the following sections you can find more info about these comments.
 
 ### Ignore adblock rules
 
@@ -128,7 +132,22 @@ example.org##.ad
 
 #### Disable some linter rules
 
-You can disable some linter rules by adding `! aglint-disable-next-line rule1, rule2` comment before the adblock rule.
+In some cases, you may want to disable some linter rules for a single adblock rule or for multiple adblock rules. Here is how you can do it:
+
+- For a single adblock rule: for example, `rule1` linter rule will be ignored for `example.com##.ad` in the following case (but it will be enabled for `example.net##.ad`):
+  ```adblock
+  ! aglint-disable-next-line rule1
+  example.com##.ad
+  example.net##.ad
+  ```
+- For multiple adblock rules: for example, `rule1, rule2` linter rules will be ignored for `example.com##.ad` and `example.net##.ad` in the following case (but they will be enabled for `example.org##.ad`):
+  ```adblock
+  ! aglint-disable rule1, rule2
+  example.com##.ad
+  example.net##.ad
+  ! aglint-enable rule1, rule2
+  example.org##.ad
+  ```
 
 ## Ignoring files or folders
 
@@ -136,17 +155,22 @@ You can ignore files or folders by creating an "ignore file" named `.aglintignor
 
 If you have a config file in an ignored folder, it will be ignored as well.
 
-Some "problematic" paths are ignored by default:
-- `node_modules`
-- `.DS_Store`
+### Default ignores
+
+Some "problematic" paths are ignored by default in order to avoid linting files that are not related to adblock filter lists. These paths are:
+- `node_modules` - Vendor files for Node.js, usually contains a lot of files - this can slow down the linter significantly
+- `.DS_Store` - macOS system file
+- `.git` - Git files
+- `.hg` - Mercurial files
+- `.svn` - Subversion files
+- `Thumbs.db` - Windows system file
 
 ## Configuration
 
-You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be merged with the configuration file in the parent folder (like a chain of inheritance). If you have a configuration file in the root folder, it will be merged with the default configuration.
+You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be used for that subfolder and all its subfolders, but not for the parent folder. It means that the results are always consistent, no matter where you run the linter.
 
 The configuration file should be a valid JSON or YAML file. The following options are available:
 
-- `colors`: enable or disable colors in the output. Default: `true`.
 - `fix`: enable or disable automatic fixing of errors. Default: `false`. **Be careful with this option!** It will modify your filter list files.
 - `rules`: an object with linter rules. See [Linter rules](#linter-rules) for more info. A rule basically has the following structure:
   - `rule-name`: a string with the name of the rule. For example, `rule-1`.
@@ -184,7 +208,6 @@ Here is an example of a configuration file in JSON syntax (`aglint.config.json`)
 
 ```json
 {
-    "colors": true,
     "fix": false,
     "rules": {
         "rule-1": ["warn", { "option-1": "value-1" }],
@@ -197,7 +220,6 @@ Here is an example of a configuration file in JSON syntax (`aglint.config.json`)
 You can also use YAML syntax (`aglint.config.yml`):
 
 ```yaml
-colors: true
 fix: false
 rules:
   rule-1:
@@ -212,11 +234,70 @@ rules:
 
 JavaScript and TypeScript configuration files aren't supported at the moment, but we will add support for them in the future.
 
+### Configuration hierarchy
+
+Basically the linter always uses the default configuration as a base. If the current working directory (alias `cwd` - the folder where you call the linter) has a configuration file, it will be merged with the default configuration. If you have a configuration file in a subfolder, it will be merged with the default configuration, but not with the configuration file from the parent folder. It means that the results are always consistent, no matter where you run the linter.
+
+Suppose your project has the following structure:
+  
+  ```
+  project-root
+  ├── dir1
+  │   ├── list1.txt
+  │   ├── list2.txt
+  ├── dir2
+  │   ├── aglint.config.json
+  │   ├── dir3
+  │   │   ├── list3.txt
+  │   │   ├── list4.txt
+  ├── list5.txt
+  ├── aglint.config.json
+  ```
+
+If you call the linter in the root folder (`project-root`), it will merge its default configuration with `aglint.config.json` from the root folder.
+- Then it lints `dir1/list1.txt`, `dir1/list2.txt` and `list5.txt` with this merged configuration (default configuration + `project-root/aglint.config.json`).
+- In the `dir2` folder, it will merge the default configuration with `aglint.config.json` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/dir2/aglint.config.json`).
+- If inline configurations are enabled, then they will be the last in the hierarchy. For example, if you have the following configuration in `project-root/dir2/dir3/list3.txt`:
+  ```adblock
+  ! aglint {"rules": {"rule-1": "off"}}
+  ```
+  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/dir2/aglint.config.json` + inline configuration chain within the file).
+
+#### Hierarchy
+
+So the hierarchy is the following:
+
+- Inline configuration (if enabled and present)
+- Middle configuration files (if any)
+- Configuration file in the current working directory (if any)
+- Default configuration (built-in)
+
 ## Linter rules
 
 The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
 
 Currently, the following linter rules are available (we will add more rules in the future):
+
+### `adg-scriptlet-quotes`
+
+Check if the scriptlet parameters are wrapped in the expected quotes. For example
+```adblock
+example.com#%#//scriptlet("abort-on-property-read", "window.open")
+```
+will be reported as warning:
+```
+    1:0     warning The scriptlet should use SingleQuoted quotes
+```
+since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+
+But you can specify the expected quotes in the configuration file. If you want to use double quotes, you can add the following configuration:
+```json
+{
+    "rules": {
+        "adg-scriptlet-quotes": ["warn", "DoubleQuoted"]
+    }
+}
+```
 
 ### `if-closed`
 
