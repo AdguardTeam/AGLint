@@ -7,6 +7,11 @@ import { boolean, object, optional, record, string } from "superstruct";
 import { LinterRuleConfig, linterRuleConfigSchema } from "./rule";
 
 /**
+ * Type for rule configuration object
+ */
+export type LinterRuleConfigObject = { [key: string]: LinterRuleConfig };
+
+/**
  * Represents the core linter configuration
  */
 export interface LinterConfig {
@@ -23,8 +28,13 @@ export interface LinterConfig {
     /**
      * A map of rule names to their configuration
      */
-    rules?: { [key: string]: LinterRuleConfig };
+    rules?: LinterRuleConfigObject;
 }
+
+/**
+ * Superstruct schema for the linter rules config object
+ */
+export const linterRulesSchema = optional(record(string(), linterRuleConfigSchema));
 
 /**
  * Superstruct schema for the linter config object properties. It is necessary to
@@ -33,7 +43,7 @@ export interface LinterConfig {
  */
 export const linterConfigPropsSchema = {
     allowInlineConfig: optional(boolean()),
-    rules: optional(record(string(), linterRuleConfigSchema)),
+    rules: linterRulesSchema,
 };
 
 /**
