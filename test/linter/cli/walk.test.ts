@@ -19,7 +19,7 @@ describe("walk", () => {
     test("run on bad fixture", async () => {
         const base = "test/fixtures/walk/invalid_config";
 
-        // Invalid config option "unknown" in "test/fixtures/bad_config/aglint.config.json"
+        // Invalid config option "unknown" in "test/fixtures/walk/invalid_config/aglint.config.json"
         await expect(
             walk(await scan(base), {
                 dir: async () => {},
@@ -41,8 +41,6 @@ describe("walk", () => {
                 events.push({ event: "file", path, config, fix });
             },
         });
-
-        // console.log(JSON.stringify(await scan(base), null, 4));
 
         expect(events).toMatchObject([
             {
