@@ -29,7 +29,7 @@ describe("walk", () => {
     });
 
     test("run on good fixture", async () => {
-        const base = "test/fixtures/scan";
+        const base = "test/fixtures/scan/valid";
         const events: StoredEvent[] = [];
 
         // Scan the directory and walk it, and store all events

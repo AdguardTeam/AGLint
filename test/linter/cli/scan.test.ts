@@ -4,7 +4,7 @@ import { scan } from "../../../src/linter/cli/scan";
 
 describe("scan", () => {
     test("run on bad fixture", async () => {
-        const base = "test/fixtures/scan_bad";
+        const base = "test/fixtures/scan/double_config";
 
         await expect(scan(base)).rejects.toThrowError(
             `Multiple config files found in the same directory: "${path.join(
@@ -15,7 +15,7 @@ describe("scan", () => {
     });
 
     test("run on good fixture", async () => {
-        const base = "test/fixtures/scan";
+        const base = "test/fixtures/scan/valid";
         const result = await scan(base);
 
         expect(result).toMatchObject({
