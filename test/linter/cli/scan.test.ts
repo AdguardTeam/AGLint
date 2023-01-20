@@ -3,7 +3,7 @@ import path from "path";
 import { scan } from "../../../src/linter/cli/scan";
 
 describe("scan", () => {
-    test("run on bad fixture", async () => {
+    test("run on invalid fixture (double config files)", async () => {
         const base = "test/fixtures/scan/double_config";
 
         await expect(scan(base)).rejects.toThrowError(
@@ -14,7 +14,7 @@ describe("scan", () => {
         );
     });
 
-    test("run on good fixture", async () => {
+    test("run on valid fixture", async () => {
         const base = "test/fixtures/scan/valid";
         const result = await scan(base);
 
