@@ -30,7 +30,7 @@ interface WalkEvents {
  * @param config The CLI config
  * @param fix Fix fixable problems automatically
  */
-export async function walkScannedDirectory(
+export async function walk(
     scannedDirectory: ScannedDirectory,
     events: WalkEvents,
     config: LinterConfig = defaultLinterConfig,
@@ -54,6 +54,6 @@ export async function walkScannedDirectory(
 
     // Recursively walk each subdirectory
     for (const subDir of scannedDirectory.subdirectories) {
-        await walkScannedDirectory(subDir, events, configDeepClone, fix);
+        await walk(subDir, events, configDeepClone, fix);
     }
 }

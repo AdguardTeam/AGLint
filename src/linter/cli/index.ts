@@ -2,7 +2,7 @@ import path, { ParsedPath } from "path";
 import { access, readFile, readdir, writeFile } from "fs/promises";
 import { Linter } from "../../index";
 import { mergeConfigs } from "../config";
-import { walkScannedDirectory } from "./walk";
+import { walk } from "./walk";
 import { scan } from "./scan";
 import { LinterCliReporter } from "./reporter";
 import cloneDeep from "clone-deep";
@@ -38,7 +38,7 @@ export class LinterCli {
 
     /**
      * Lints a file with the given config. Also compatible with the `WalkEvent` type,
-     * so it can be used with the `walkScannedDirectory` function.
+     * so it can be used with the `walk` function.
      *
      * @param file The file to be linted
      * @param config The active linter config (merged from parent directories)
@@ -156,7 +156,7 @@ export class LinterCli {
             const scanResult = await scan(cwd, [], this.ignore);
 
             // Walk through the scanned directory and lint all files
-            await walkScannedDirectory(
+            await walk(
                 scanResult,
                 {
                     // Call the lint function for each file during the walk

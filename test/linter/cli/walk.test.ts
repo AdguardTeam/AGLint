@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { join, parse, ParsedPath } from "path";
-import { walkScannedDirectory } from "../../../src/linter/cli/walk";
+import { walk } from "../../../src/linter/cli/walk";
 import { scan } from "../../../src/linter/cli/scan";
 import { LinterConfig } from "../../../src/linter/config";
 
@@ -21,7 +21,7 @@ describe("walk", () => {
 
         // Invalid config option "unknown" in "test/fixtures/bad_config/aglint.config.json"
         await expect(
-            walkScannedDirectory(await scan(base), {
+            walk(await scan(base), {
                 dir: async () => {},
                 file: async () => {},
             })
@@ -33,7 +33,7 @@ describe("walk", () => {
         const events: StoredEvent[] = [];
 
         // Scan the directory and walk it, and store all events
-        await walkScannedDirectory(await scan(base), {
+        await walk(await scan(base), {
             dir: async (path: ParsedPath, config: LinterConfig, fix: boolean) => {
                 events.push({ event: "dir", path, config, fix });
             },
