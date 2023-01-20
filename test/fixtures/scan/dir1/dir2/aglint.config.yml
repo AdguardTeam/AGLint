@@ -1,2 +1,7 @@
 # this file should appear as config
-colors: false
+allowInlineConfig: true
+rules:
+  rule-1:
+  - error
+  - value-1
+  - value-2
