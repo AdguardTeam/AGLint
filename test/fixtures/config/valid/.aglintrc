@@ -1,0 +1,9 @@
+{
+    "allowInlineConfig": true,
+    "rules": {
+        "rule-1": ["warn", "value-1", "value-2"],
+        "rule-2": ["error", "value-1", "value-2"],
+        "rule-3": "off",
+        "rule-4": 2
+    }
+}
