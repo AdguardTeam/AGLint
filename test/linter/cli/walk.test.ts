@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { join, parse, ParsedPath } from "path";
 import { walk } from "../../../src/linter/cli/walk";
 import { scan } from "../../../src/linter/cli/scan";
