@@ -50,7 +50,7 @@ export interface ScannedDirectory {
 export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles = true): Promise<ScannedDirectory> {
     // Initialize an empty result
     const result: ScannedDirectory = {
-        dir: path.parse(dir),
+        dir: path.parse(path.join(dir)),
         configFile: null,
         lintableFiles: [],
         subdirectories: [],
