@@ -3,7 +3,7 @@
  */
 
 // Linter stuff
-import { LinterRule } from "./rule";
+import { LinterRule, LinterRuleConfig } from "./rule";
 import { LinterConfig, defaultLinterConfig, mergeConfigs, linterRulesSchema, LinterRuleConfigObject } from "./config";
 import { defaultLinterRules } from "./rules";
 import { ConfigCommentType } from "./inline-config";
@@ -19,6 +19,7 @@ import { StringUtils } from "../utils/string";
 import { ArrayUtils } from "../utils/array";
 import { assert } from "superstruct";
 import { AnySeverity, isSeverity } from "./severity";
+import cloneDeep from "clone-deep";
 
 /**
  * Represents the location of a problem that detected by the linter
@@ -207,7 +208,7 @@ type LinterRuleStorage = {
  * Represents a linter rule data object. Basically used internally by the linter,
  * so no need to export this.
  */
-interface LinterRuleData {
+export interface LinterRuleData {
     /**
      * The linter rule itself. It's meta provides the rule severity and default config,
      * which can be overridden by the user here.
@@ -264,41 +265,70 @@ export class Linter {
     }
 
     /**
-     * Applies given rule configs.
+     * Sets the config for a given rule. It just overrides the default config.
      *
-     * @param rulesConfig Rule configs
+     * @param ruleName The name of the rule to set the config for
+     * @param ruleConfig The config to set
+     * @throws If the rule doesn't exist
+     * @throws If the rule severity / config is invalid
+     * @throws If the rule doesn't support config
      */
-    private applyRulesConfig(rulesConfig: LinterRuleConfigObject) {
-        for (const [ruleName, ruleConfig] of Object.entries(rulesConfig)) {
-            const entry = this.rules.get(ruleName);
+    public setRuleConfig(ruleName: string, ruleConfig: LinterRuleConfig): void {
+        const entry = this.rules.get(ruleName);
 
-            // Tolerate unknown rules, simply ignore them
-            if (!entry) {
-                continue;
-            }
-
-            // [severity] or [severity, ...options]
-            if (Array.isArray(ruleConfig)) {
-                entry.severityOverride = ruleConfig[0];
-
-                // Add options (if any)
-                if (ruleConfig.length > 1) {
-                    const rest = [...ruleConfig.slice(1)];
-
-                    // Single option vs multiple options
-                    if (rest.length === 1) {
-                        entry.configOverride = rest[0];
-                    } else {
-                        entry.configOverride = rest;
-                    }
-                }
-            } else {
-                // Simply the severity, without options
-                entry.severityOverride = ruleConfig;
-            }
-
-            this.rules.set(ruleName, entry);
+        if (!entry) {
+            throw new Error(`Rule "${ruleName}" doesn't exist`);
         }
+
+        const severity = Array.isArray(ruleConfig) ? ruleConfig[0] : ruleConfig;
+
+        let config: undefined | unknown = undefined;
+
+        if (Array.isArray(ruleConfig) && ruleConfig.length > 1) {
+            const rest = ruleConfig.slice(1);
+            config = rest.length === 1 ? rest[0] : rest;
+        }
+
+        if (!isSeverity(severity)) {
+            throw new Error(`Invalid severity "${severity}" for rule "${ruleName}"`);
+        }
+
+        entry.severityOverride = getSeverity(severity);
+
+        if (config !== undefined) {
+            if (!entry.rule.meta.config) {
+                throw new Error(`Rule "${ruleName}" doesn't support config`);
+            }
+
+            try {
+                assert(config, entry.rule.meta.config.schema);
+            } catch (err: unknown) {
+                throw new Error(`Invalid config for rule "${ruleName}": ${(err as Error).message}`);
+            }
+            entry.configOverride = config;
+        }
+
+        this.rules.set(ruleName, entry);
+    }
+
+    /**
+     * This method applies the configuration "rules" part to the linter.
+     *
+     * @param rulesConfig Rules config object
+     */
+    public applyRulesConfig(rulesConfig: LinterRuleConfigObject) {
+        for (const [ruleName, ruleConfig] of Object.entries(rulesConfig)) {
+            this.setRuleConfig(ruleName, ruleConfig);
+        }
+    }
+
+    /**
+     * Gets the linter configuration.
+     *
+     * @returns The linter configuration
+     */
+    public getConfig(): LinterConfig {
+        return cloneDeep(this.config);
     }
 
     /**
@@ -309,7 +339,8 @@ export class Linter {
      * @param reset Whether to reset all rule configs
      */
     public setConfig(config: LinterConfig, reset = true): void {
-        this.config = config;
+        // Merge with default config
+        this.config = mergeConfigs(defaultLinterConfig, config);
 
         // Reset all rule configs
         if (reset) {
@@ -329,6 +360,7 @@ export class Linter {
      *
      * @param name The name of the rule
      * @param rule The rule itself
+     * @throws If the rule name is already taken
      */
     public addRule(name: string, rule: LinterRule): void {
         this.addRuleEx(name, {
@@ -358,13 +390,20 @@ export class Linter {
             if (!isSeverity(data.severityOverride)) {
                 throw new Error(`Invalid severity "${data.severityOverride}" for rule "${name}"`);
             }
+
+            // Convert to number
+            data.severityOverride = getSeverity(data.severityOverride);
         }
 
         if (data.configOverride) {
             if (!data.rule.meta.config) {
-                throw new Error(`Rule "${name}" doesn't have any config, but you tried to provide one`);
+                throw new Error(`Rule "${name}" doesn't support config`);
             } else {
-                assert(data.configOverride, data.rule.meta.config.schema);
+                try {
+                    assert(data.configOverride, data.rule.meta.config.schema);
+                } catch (err: unknown) {
+                    throw new Error(`Invalid config for rule "${name}": ${(err as Error).message}`);
+                }
             }
         }
 
@@ -373,35 +412,11 @@ export class Linter {
     }
 
     /**
-     * Sets the config for the rule with the specified name.
-     *
-     * @param name The name of the rule
-     * @param config New config for the rule
-     */
-    public setRuleConfig(name: string, config: unknown): void {
-        // Find the rule
-        const entry = this.rules.get(name);
-
-        // Check if the rule exists
-        if (!entry) {
-            throw new Error(`Rule with name "${name}" doesn't exist`);
-        }
-
-        if (!entry.rule.meta.config) {
-            throw new Error(`Rule "${name}" doesn't have any config, but you tried to provide one`);
-        }
-
-        // Validate config with Superstruct
-        assert(config, entry.rule.meta.config.schema);
-
-        // Set the config
-        entry.configOverride = config;
-    }
-
-    /**
      * Resets default config for the rule with the specified name.
      *
      * @param name The name of the rule
+     * @throws If the rule doesn't exist
+     * @throws If the rule doesn't support config
      */
     public resetRuleConfig(name: string): void {
         // Find the rule
@@ -413,11 +428,40 @@ export class Linter {
         }
 
         if (!entry.rule.meta.config) {
-            throw new Error(`Rule "${name}" doesn't have any config`);
+            throw new Error(`Rule "${name}" doesn't support config`);
         }
 
-        // Set the config to undefined, so the default config will be used
+        // Set the config to undefined, so the default config will be used next time
+        entry.severityOverride = undefined;
         entry.configOverride = undefined;
+    }
+
+    /**
+     * Gets the current config for the rule with the specified name.
+     *
+     * @param name The name of the rule
+     * @returns The currently active config for the rule. If no override is set,
+     * the default config is returned.
+     * @throws If the rule doesn't exist
+     * @throws If the rule doesn't support config
+     */
+    public getRuleConfig(name: string): LinterRuleConfig {
+        // Find the rule
+        const entry = this.rules.get(name);
+
+        // Check if the rule exists
+        if (!entry) {
+            throw new Error(`Rule with name "${name}" doesn't exist`);
+        }
+
+        if (!entry.rule.meta.config) {
+            throw new Error(`Rule "${name}" doesn't support config`);
+        }
+
+        return [
+            isSeverity(entry.severityOverride) ? entry.severityOverride : entry.rule.meta.severity,
+            entry.configOverride || entry.rule.meta.config.default,
+        ];
     }
 
     /**
@@ -427,8 +471,7 @@ export class Linter {
      * @returns The `LinterRule` object, or `undefined` if no such rule exists
      */
     public getRule(name: string): LinterRule | undefined {
-        // Return the rule (if it exists)
-        return this.rules.get(name)?.rule;
+        return cloneDeep(this.rules.get(name)?.rule);
     }
 
     /**
@@ -437,7 +480,7 @@ export class Linter {
      * @returns The map of rule names to `LinterRule` objects
      */
     public getRules(): Map<string, LinterRuleData> {
-        return this.rules;
+        return cloneDeep(this.rules);
     }
 
     /**
@@ -456,6 +499,10 @@ export class Linter {
      * @param name - The name of the rule
      */
     public removeRule(name: string): void {
+        if (!this.rules.has(name)) {
+            throw new Error(`Rule with name "${name}" does not exist`);
+        }
+
         this.rules.delete(name);
     }
 
@@ -474,12 +521,15 @@ export class Linter {
         }
 
         entry.severityOverride = SEVERITY.off;
+
+        this.rules.set(name, entry);
     }
 
     /**
      * Enables a rule
      *
      * @param name - The name of the rule
+     * @throws If the rule does not exist
      */
     public enableRule(name: string): void {
         const entry = this.rules.get(name);
@@ -490,6 +540,8 @@ export class Linter {
         }
 
         entry.severityOverride = undefined;
+
+        this.rules.set(name, entry);
     }
 
     /**
@@ -505,7 +557,7 @@ export class Linter {
             return false;
         }
 
-        const severity = entry.severityOverride || entry.rule.meta.severity;
+        const severity = isSeverity(entry.severityOverride) ? entry.severityOverride : entry.rule.meta.severity;
 
         // Don't forget to convert severity to number (it can be a string,
         // if it was set by the user, and it's can be confusing)
@@ -606,17 +658,23 @@ export class Linter {
 
                         // Reporter function
                         report: (problem: LinterProblemReport) => {
+                            let severity = getSeverity(data.rule.meta.severity);
+
+                            if (!nextLineEnabled.has(name)) {
+                                if (isSeverity(data.severityOverride)) {
+                                    severity = getSeverity(data.severityOverride);
+                                }
+                            }
+
                             result.problems.push({
                                 rule: name,
-                                severity: data.severityOverride || data.rule.meta.severity,
+                                severity,
                                 message: problem.message,
                                 position: { ...problem.position },
                                 fix: problem.fix,
                             });
 
                             // Update problem counts
-                            const severity = getSeverity(data.rule.meta.severity);
-
                             switch (severity) {
                                 case SEVERITY.warn:
                                     result.warningCount++;
@@ -681,11 +739,27 @@ export class Linter {
                             }
 
                             case ConfigCommentType.Disable: {
+                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
+                                    for (const param of ast.params) {
+                                        this.disableRule(param);
+                                    }
+
+                                    break;
+                                }
+
                                 isDisabled = true;
                                 break;
                             }
 
                             case ConfigCommentType.Enable: {
+                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
+                                    for (const param of ast.params) {
+                                        this.enableRule(param);
+                                    }
+
+                                    break;
+                                }
+
                                 isDisabled = false;
                                 break;
                             }
