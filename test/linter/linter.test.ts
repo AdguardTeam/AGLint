@@ -1762,6 +1762,318 @@ describe("Linter", () => {
         });
     });
 
+    test("fixable interface (single line fix)", () => {
+        const linter = new Linter();
+
+        const fix1 = RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com");
+
+        const rule1: LinterRule = {
+            meta: {
+                severity: SEVERITY.error,
+            },
+            events: {
+                onRule: (context: GenericRuleContext) => {
+                    const raw = <string>context.getActualAdblockRuleRaw();
+                    const line = context.getActualLine();
+
+                    context.report({
+                        message: "Fixable problem 1",
+                        position: {
+                            startLine: line,
+                            startColumn: 0,
+                            endLine: line,
+                            endColumn: raw.length,
+                        },
+                        fix: fix1,
+                    });
+                },
+            },
+        };
+
+        linter.addRule("rule-1", rule1);
+
+        expect(
+            linter.lint(
+                [
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                    "! aglint-disable-next-line",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE),
+
+                // Enable fix
+                true
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-1",
+                    severity: 2,
+                    message: "Fixable problem 1",
+                    position: {
+                        startLine: 1,
+                        startColumn: 0,
+                        endLine: 1,
+                        endColumn: 25,
+                    },
+                    fix: fix1,
+                },
+                {
+                    rule: "rule-1",
+                    severity: 2,
+                    message: "Fixable problem 1",
+                    position: {
+                        startLine: 2,
+                        startColumn: 0,
+                        endLine: 2,
+                        endColumn: 25,
+                    },
+                    fix: fix1,
+                },
+            ],
+            warningCount: 0,
+            errorCount: 2,
+            fatalErrorCount: 0,
+            fixed: [
+                // First fix
+                "aaa.js$script,redirect=noopjs,domain=example.com",
+                // Second fix
+                "aaa.js$script,redirect=noopjs,domain=example.com",
+                // Remaining lines
+                "! aglint-disable-next-line",
+                "abcdefghijklmnopqrstuvxyz",
+            ].join(NEWLINE),
+        });
+    });
+
+    test("fixable interface (multiple line fix)", () => {
+        const linter = new Linter();
+
+        const fix2 = [
+            RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com"),
+            RuleParser.parse("bbb.js$script,redirect=noopjs,domain=example.com"),
+            RuleParser.parse("ccc.js$script,redirect=noopjs,domain=example.com"),
+        ];
+
+        const rule2: LinterRule = {
+            meta: {
+                severity: SEVERITY.error,
+            },
+            events: {
+                onRule: (context: GenericRuleContext) => {
+                    const raw = <string>context.getActualAdblockRuleRaw();
+                    const line = context.getActualLine();
+
+                    context.report({
+                        message: "Fixable problem 2",
+                        position: {
+                            startLine: line,
+                            startColumn: 0,
+                            endLine: line,
+                            endColumn: raw.length,
+                        },
+                        fix: fix2,
+                    });
+                },
+            },
+        };
+
+        linter.addRule("rule-2", rule2);
+
+        expect(
+            linter.lint(
+                [
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                    "! aglint-disable-next-line",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE),
+
+                // Enable fix
+                true
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-2",
+                    severity: 2,
+                    message: "Fixable problem 2",
+                    position: {
+                        startLine: 1,
+                        startColumn: 0,
+                        endLine: 1,
+                        endColumn: 25,
+                    },
+                    fix: fix2,
+                },
+                {
+                    rule: "rule-2",
+                    severity: 2,
+                    message: "Fixable problem 2",
+                    position: {
+                        startLine: 2,
+                        startColumn: 0,
+                        endLine: 2,
+                        endColumn: 25,
+                    },
+                    fix: fix2,
+                },
+            ],
+            warningCount: 0,
+            errorCount: 2,
+            fatalErrorCount: 0,
+            fixed: [
+                // First fix
+                "aaa.js$script,redirect=noopjs,domain=example.com",
+                "bbb.js$script,redirect=noopjs,domain=example.com",
+                "ccc.js$script,redirect=noopjs,domain=example.com",
+                // Second fix
+                "aaa.js$script,redirect=noopjs,domain=example.com",
+                "bbb.js$script,redirect=noopjs,domain=example.com",
+                "ccc.js$script,redirect=noopjs,domain=example.com",
+                // Remaining lines
+                "! aglint-disable-next-line",
+                "abcdefghijklmnopqrstuvxyz",
+            ].join(NEWLINE),
+        });
+    });
+
+    test("fixable interface (conflicting fixes)", () => {
+        const linter = new Linter();
+
+        const fix1 = RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com");
+
+        const rule1: LinterRule = {
+            meta: {
+                severity: SEVERITY.error,
+            },
+            events: {
+                onRule: (context: GenericRuleContext) => {
+                    const raw = <string>context.getActualAdblockRuleRaw();
+                    const line = context.getActualLine();
+
+                    context.report({
+                        message: "Fixable problem 1",
+                        position: {
+                            startLine: line,
+                            startColumn: 0,
+                            endLine: line,
+                            endColumn: raw.length,
+                        },
+                        fix: fix1,
+                    });
+                },
+            },
+        };
+
+        const fix2 = [
+            RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com"),
+            RuleParser.parse("bbb.js$script,redirect=noopjs,domain=example.com"),
+            RuleParser.parse("ccc.js$script,redirect=noopjs,domain=example.com"),
+        ];
+
+        const rule2: LinterRule = {
+            meta: {
+                severity: SEVERITY.error,
+            },
+            events: {
+                onRule: (context: GenericRuleContext) => {
+                    const raw = <string>context.getActualAdblockRuleRaw();
+                    const line = context.getActualLine();
+
+                    context.report({
+                        message: "Fixable problem 2",
+                        position: {
+                            startLine: line,
+                            startColumn: 0,
+                            endLine: line,
+                            endColumn: raw.length,
+                        },
+                        fix: fix2,
+                    });
+                },
+            },
+        };
+
+        linter.addRule("rule-1", rule1);
+        linter.addRule("rule-2", rule2);
+
+        expect(
+            linter.lint(
+                [
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                    "! aglint-disable-next-line",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE),
+
+                // Enable fix
+                true
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-1",
+                    severity: 2,
+                    message: "Fixable problem 1",
+                    position: {
+                        startLine: 1,
+                        startColumn: 0,
+                        endLine: 1,
+                        endColumn: 25,
+                    },
+                    fix: fix1,
+                },
+                {
+                    rule: "rule-2",
+                    severity: 2,
+                    message: "Fixable problem 2",
+                    position: {
+                        startLine: 1,
+                        startColumn: 0,
+                        endLine: 1,
+                        endColumn: 25,
+                    },
+                    fix: fix2,
+                },
+                {
+                    rule: "rule-1",
+                    severity: 2,
+                    message: "Fixable problem 1",
+                    position: {
+                        startLine: 2,
+                        startColumn: 0,
+                        endLine: 2,
+                        endColumn: 25,
+                    },
+                    fix: fix1,
+                },
+                {
+                    rule: "rule-2",
+                    severity: 2,
+                    message: "Fixable problem 2",
+                    position: {
+                        startLine: 2,
+                        startColumn: 0,
+                        endLine: 2,
+                        endColumn: 25,
+                    },
+                    fix: fix2,
+                },
+            ],
+            warningCount: 0,
+            errorCount: 4,
+            fatalErrorCount: 0,
+            fixed: [
+                // Fixing should be skipped, because there are conflicting fixes
+                "abcdefghijklmnopqrstuvxyz",
+                "abcdefghijklmnopqrstuvxyz",
+                "! aglint-disable-next-line",
+                "abcdefghijklmnopqrstuvxyz",
+            ].join(NEWLINE),
+        });
+    });
+
     test("rule with different severities", () => {
         const linter = new Linter();
 

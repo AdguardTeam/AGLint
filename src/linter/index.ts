@@ -685,8 +685,6 @@ export class Linter {
                                 case SEVERITY.fatal:
                                     result.fatalErrorCount++;
                                     break;
-                                default:
-                                    break;
                             }
                         },
                     });
