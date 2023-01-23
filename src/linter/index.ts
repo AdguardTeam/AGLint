@@ -737,7 +737,7 @@ export class Linter {
                             }
 
                             case ConfigCommentType.Disable: {
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
+                                if (ArrayUtils.isArrayOfStrings(ast.params)) {
                                     for (const param of ast.params) {
                                         this.disableRule(param);
                                     }
