@@ -76,6 +76,37 @@ const demoRuleEverythingIsProblem2: LinterRule = {
     },
 };
 
+const demoRuleEverythingIsProblem3: LinterRule = {
+    meta: {
+        severity: SEVERITY.warn,
+        config: {
+            default: {
+                message: "Problem3",
+            },
+            schema: ss.object({
+                message: ss.string(),
+            }) as Struct,
+        },
+    },
+    events: {
+        onRule: (context: GenericRuleContext) => {
+            const raw = <string>context.getActualAdblockRuleRaw();
+            const line = context.getActualLine();
+            const message = (context.config as { message: string }).message;
+
+            context.report({
+                message,
+                position: {
+                    startLine: line,
+                    startColumn: 0,
+                    endLine: line,
+                    endColumn: raw.length,
+                },
+            });
+        },
+    },
+};
+
 describe("Linter", () => {
     test("addDefaultRules", () => {
         const linter = new Linter();
@@ -1758,6 +1789,194 @@ describe("Linter", () => {
             ],
             warningCount: 2,
             errorCount: 0,
+            fatalErrorCount: 0,
+        });
+    });
+
+    test("aglint inline config comment", () => {
+        const linter = new Linter();
+
+        linter.addRule("rule-1", demoRuleEverythingIsProblem1);
+        linter.addRule("rule-2", demoRuleEverythingIsProblem2);
+
+        // Disable at start and enable before last line
+        expect(
+            linter.lint(
+                [
+                    `! aglint "rule-1": "off", "rule-2": "off"`,
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                    `! aglint "rule-1": "warn", "rule-2": "warn"`,
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-1",
+                    severity: 1,
+                    message: "Problem1",
+                    position: {
+                        startLine: 5,
+                        startColumn: 0,
+                        endLine: 5,
+                        endColumn: 25,
+                    },
+                },
+                {
+                    rule: "rule-2",
+                    severity: 1,
+                    message: "Problem2",
+                    position: {
+                        startLine: 5,
+                        startColumn: 0,
+                        endLine: 5,
+                        endColumn: 25,
+                    },
+                },
+            ],
+            warningCount: 2,
+            errorCount: 0,
+            fatalErrorCount: 0,
+        });
+
+        // Disable, then re-enable, then disable again, then re-enable again
+        expect(
+            linter.lint(
+                [
+                    `! aglint "rule-1": "off", "rule-2": "off"`,
+                    `! aglint "rule-1": "warn", "rule-2": "warn"`,
+                    `! aglint "rule-1": "off", "rule-2": "off"`,
+                    `! aglint "rule-1": "warn", "rule-2": "warn"`,
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-1",
+                    severity: 1,
+                    message: "Problem1",
+                    position: {
+                        startLine: 5,
+                        startColumn: 0,
+                        endLine: 5,
+                        endColumn: 25,
+                    },
+                },
+                {
+                    rule: "rule-2",
+                    severity: 1,
+                    message: "Problem2",
+                    position: {
+                        startLine: 5,
+                        startColumn: 0,
+                        endLine: 5,
+                        endColumn: 25,
+                    },
+                },
+                {
+                    rule: "rule-1",
+                    severity: 1,
+                    message: "Problem1",
+                    position: {
+                        startLine: 6,
+                        startColumn: 0,
+                        endLine: 6,
+                        endColumn: 25,
+                    },
+                },
+                {
+                    rule: "rule-2",
+                    severity: 1,
+                    message: "Problem2",
+                    position: {
+                        startLine: 6,
+                        startColumn: 0,
+                        endLine: 6,
+                        endColumn: 25,
+                    },
+                },
+            ],
+            warningCount: 4,
+            errorCount: 0,
+            fatalErrorCount: 0,
+        });
+
+        // Complicated case
+        expect(
+            linter.lint(
+                [
+                    `! aglint "rule-1": "off", "rule-2": "off"`,
+                    `! aglint "rule-1": "warn", "rule-2": "warn"`,
+                    `! aglint "rule-1": "off", "rule-2": "off"`,
+                    `! aglint "rule-1": "warn", "rule-2": "warn"`,
+                    `! aglint "rule-1": "off"`,
+                    "abcdefghijklmnopqrstuvxyz",
+                    `! aglint "rule-1": "warn"`,
+                    `! aglint "rule-2": "off"`,
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-2",
+                    position: {
+                        startLine: 6,
+                    },
+                },
+                {
+                    rule: "rule-1",
+                    position: {
+                        startLine: 9,
+                    },
+                },
+            ],
+            warningCount: 2,
+            errorCount: 0,
+            fatalErrorCount: 0,
+        });
+
+        // Overwrite rule severity & config
+        linter.addRule("rule-3", demoRuleEverythingIsProblem3);
+
+        expect(
+            linter.lint(
+                [
+                    `! aglint "rule-1": "off", "rule-2": "off", "rule-3": ["error", { message: "Custom message for rule-3" }]`,
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
+            problems: [
+                {
+                    rule: "rule-3",
+                    severity: 2,
+                    message: "Custom message for rule-3",
+                    position: {
+                        startLine: 2,
+                        startColumn: 0,
+                        endLine: 2,
+                        endColumn: 25,
+                    },
+                },
+                {
+                    rule: "rule-3",
+                    severity: 2,
+                    message: "Custom message for rule-3",
+                    position: {
+                        startLine: 3,
+                        startColumn: 0,
+                        endLine: 3,
+                        endColumn: 25,
+                    },
+                },
+            ],
+            warningCount: 0,
+            errorCount: 2,
             fatalErrorCount: 0,
         });
     });
