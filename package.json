@@ -36,6 +36,7 @@
     },
     "scripts": {
         "prepare": "husky install",
+        "check-types": "tsc --noEmit",
         "lint": "eslint . --ext .ts",
         "test": "jest --runInBand .",
         "coverage": "jest --coverage",
