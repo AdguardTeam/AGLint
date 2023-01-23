@@ -348,6 +348,42 @@ describe("Linter", () => {
         expect(linter.getRuleConfig("rule-3")).toEqual([2, { a: 300, b: 300 }]);
     });
 
+    test("setConfig", () => {
+        const linter = new Linter();
+
+        // Initially no rules
+        expect(linter.getRules().size).toEqual(0);
+
+        // Add demo rules
+        linter.addRule("rule-1", demoRule);
+
+        expect(linter.getRules().size).toEqual(1);
+        expect(linter.hasRule("rule-1")).toBeTruthy();
+
+        linter.addRule("rule-2", demoRule);
+
+        expect(linter.getRules().size).toEqual(2);
+        expect(linter.hasRule("rule-2")).toBeTruthy();
+
+        linter.addRule("rule-3", demoRule);
+
+        expect(linter.getRules().size).toEqual(3);
+        expect(linter.hasRule("rule-3")).toBeTruthy();
+
+        // Set config
+        linter.setConfig({
+            rules: {
+                "rule-1": "off",
+                "rule-2": "warn",
+                "rule-3": "error",
+            },
+        });
+
+        expect(linter.getRuleConfig("rule-1")).toEqual([0, { a: 1, b: 2 }]);
+        expect(linter.getRuleConfig("rule-2")).toEqual([1, { a: 1, b: 2 }]);
+        expect(linter.getRuleConfig("rule-3")).toEqual([2, { a: 1, b: 2 }]);
+    });
+
     test("addRule", () => {
         const linter = new Linter();
 
@@ -494,6 +530,8 @@ describe("Linter", () => {
         expect(linter.hasRule("rule-1")).toBeTruthy();
 
         expect(linter.getRule("rule-1")).toEqual(demoRule);
+
+        expect(linter.getRule("rule-100")).toBeUndefined();
     });
 
     test("getRules", () => {
