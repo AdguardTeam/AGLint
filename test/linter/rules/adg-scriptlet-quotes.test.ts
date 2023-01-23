@@ -123,7 +123,7 @@ describe("adg-scriptlet-quotes", () => {
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", "DoubleQuoted");
+        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "DoubleQuoted"]);
 
         // No problematic scriptlets
         expect(
@@ -280,7 +280,7 @@ describe("adg-scriptlet-quotes", () => {
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", "DoubleQuoted");
+        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "DoubleQuoted"]);
 
         expect(
             linter.lint(

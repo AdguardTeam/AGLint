@@ -49,6 +49,7 @@ export type SeverityName = keyof typeof SEVERITY;
 /**
  * Type for the possible severity values
  */
+// eslint-disable-next-line prettier/prettier
 export type SeverityValue = typeof SEVERITY[SeverityName];
 
 /**

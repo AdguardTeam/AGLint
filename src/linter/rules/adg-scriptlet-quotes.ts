@@ -1,4 +1,4 @@
-import { enums } from "superstruct";
+import { Struct, enums } from "superstruct";
 import cloneDeep from "clone-deep";
 
 // Linter stuff
@@ -23,15 +23,6 @@ type QuoteType =
     | ScriptletParameterType.SingleQuoted
     | ScriptletParameterType.DoubleQuoted;
 
-const CONFIG = {
-    default: ScriptletParameterType.SingleQuoted,
-    schema: enums([
-        ScriptletParameterType.Unquoted,
-        ScriptletParameterType.SingleQuoted,
-        ScriptletParameterType.DoubleQuoted,
-    ]),
-};
-
 /**
  * Inserting the storage type definition into the context
  */
@@ -45,7 +36,14 @@ type RuleContext = GenericRuleContext & {
 export const AdgScriptletQuotes = <LinterRule>{
     meta: {
         severity: SEVERITY.warn,
-        config: CONFIG,
+        config: {
+            default: ScriptletParameterType.SingleQuoted,
+            schema: enums([
+                ScriptletParameterType.Unquoted,
+                ScriptletParameterType.SingleQuoted,
+                ScriptletParameterType.DoubleQuoted,
+            ]) as Struct,
+        },
     },
     events: {
         onRule: (context: RuleContext): void => {
@@ -55,7 +53,7 @@ export const AdgScriptletQuotes = <LinterRule>{
             const line = context.getActualLine();
 
             // Get preferred quote from linter rule options
-            const preferredQuote = context.config || CONFIG.default;
+            const preferredQuote = context.config;
 
             // Check if a rule is an AdGuard scriptlet rule
             if (
