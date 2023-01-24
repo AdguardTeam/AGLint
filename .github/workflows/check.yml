@@ -3,10 +3,10 @@ name: Check code
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   lint:
@@ -15,7 +15,7 @@ jobs:
       - name: Check out to repository
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: master
       
       - name: Set up Node.js
         uses: actions/setup-node@v3
