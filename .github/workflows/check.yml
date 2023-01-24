@@ -1,0 +1,36 @@
+name: Check code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out to repository
+        uses: actions/checkout@v3
+        with:
+          ref: main
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+    
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      
+      - name: Check TypeScript types
+        run: yarn check-types
+      
+      - name: Run ESLint
+        run: yarn lint
+  
+      - name: Run Jest tests
+        run: yarn test
