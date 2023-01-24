@@ -1,5 +1,6 @@
 import path, { ParsedPath } from "path";
-import { access, readFile, readdir, writeFile } from "fs/promises";
+import { readFile, readdir, writeFile } from "fs/promises";
+import { pathExists } from "fs-extra";
 import { Linter } from "../../index";
 import { mergeConfigs } from "../config";
 import { walk } from "./walk";
@@ -90,30 +91,12 @@ export class LinterCli {
     };
 
     /**
-     * Checks if a file exists in the specified path.
-     *
-     * @param file The file to be checked
-     * @returns `true` if the file exists, `false` otherwise
-     */
-    private fileExists = async (file: string): Promise<boolean> => {
-        try {
-            await access(file);
-            return true;
-        } catch {
-            return false;
-        }
-    };
-
-    /**
      * Lints the current working directory. If you specify files, it will only lint those files.
      *
+     * @param cwd The current working directory
      * @param files The files to be linted (if not specified, it will scan the cwd)
      */
-    public run = async (files: string[] = []): Promise<void> => {
-        // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
-        // and use "process.cwd" as fallback. This is the current working directory (cwd).
-        const cwd = process.env.INIT_CWD || process.cwd();
-
+    public run = async (cwd: string, files: string[] = []): Promise<void> => {
         // If the reporter has an onLintStart event, call it
         if (this.reporter.onLintStart) {
             this.reporter.onLintStart();
@@ -123,7 +106,7 @@ export class LinterCli {
         if (files.length > 0) {
             for (const file of files) {
                 // Check if the file exists
-                if (!(await this.fileExists(file))) {
+                if (!(await pathExists(file))) {
                     throw new Error(`File "${file}" does not exist`);
                 }
 

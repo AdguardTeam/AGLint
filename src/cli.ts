@@ -44,5 +44,9 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
         !!program.opts().ignores
     );
 
-    await cli.run(program.args);
+    // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
+    // and use "process.cwd" as fallback. This is the current working directory (cwd).
+    const cwd = process.env.INIT_CWD || process.cwd();
+
+    await cli.run(cwd, program.args);
 })();
