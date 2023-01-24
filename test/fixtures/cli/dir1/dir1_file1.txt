@@ -1,0 +1,5 @@
+! Multiple selectors
+example.com##.ad1, .ad2, .ad3
+
+! aglint-disable-next-line
+example.com##.ad1, .ad2, .ad3

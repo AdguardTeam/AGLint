@@ -1,0 +1,2 @@
+! No problems
+||example.com/ads.js^$script

@@ -1,0 +1,2 @@
+! Invalid selector
+example.com###.ad
