@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import path, { ParsedPath } from "path";
 import fs from "fs-extra";
 import { LinterCli } from "../../../src/linter/cli";
@@ -213,6 +212,7 @@ describe("CLI tests", () => {
                             {
                                 severity: 3,
                                 message:
+                                    // eslint-disable-next-line max-len
                                     'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no opening parentheses "(" at call: ""',
                                 position: {
                                     startLine: 2,
