@@ -95,13 +95,15 @@ export class LinterCli {
         // If files are specified, use them instead of scanning the cwd
         if (files.length > 0) {
             for (const file of files) {
+                const fullPath = path.join(cwd, file);
+
                 // Check if the file exists
-                if (!(await pathExists(file))) {
-                    throw new Error(`File "${file}" does not exist`);
+                if (!(await pathExists(fullPath))) {
+                    throw new Error(`File "${fullPath}" does not exist`);
                 }
 
                 // Parse the file path
-                const parsedFile = path.parse(path.join(cwd, file));
+                const parsedFile = path.parse(fullPath);
 
                 // Check for config files in the file's directory
                 const items = await readdir(parsedFile.dir);
