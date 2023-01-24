@@ -63,11 +63,6 @@ export class LinterCli {
         // Lint the file
         let result = linter.lint(await readFile(filePath, "utf8"), this.fix || false);
 
-        // If there are no problems, skip this file, no need to log anything
-        if (result.problems.length === 0) {
-            return;
-        }
-
         // If fix is enabled and fixable problems were found, write the fixed file,
         // then re-lint the fixed file to see if there are still problems
         if (this.fix) {
@@ -76,11 +71,6 @@ export class LinterCli {
 
                 // TODO: Currently fixing runs only once, but it should run until there are no more fixable problems
                 result = linter.lint(result.fixed, this.fix || false);
-
-                // If everything is fixed, skip this file
-                if (result.problems.length === 0) {
-                    return;
-                }
             }
         }
 
