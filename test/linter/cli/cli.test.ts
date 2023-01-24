@@ -399,4 +399,52 @@ describe("CLI tests", () => {
             "",
         ]);
     });
+
+    test("works with custom file list", async () => {
+        const reporter = new TestReporter();
+
+        const cli = new LinterCli(reporter);
+
+        await cli.run(FIXTURE_PATH, ["dir1/dir1_file1.txt"]);
+
+        expect(reporter.getLoggedEvents()).toMatchObject([
+            ["onLintStart", null],
+            ["onFileStart", path.parse(path.join(FIXTURE_PATH, "dir1/dir1_file1.txt"))],
+            [
+                "onFileEnd",
+                {
+                    file: path.parse(path.join(FIXTURE_PATH, "dir1/dir1_file1.txt")),
+                    result: {
+                        problems: [
+                            {
+                                rule: "single-selector",
+                                severity: 1,
+                                message: "An element hiding rule should contain only one selector",
+                                position: {
+                                    startLine: 2,
+                                    startColumn: 0,
+                                    endLine: 2,
+                                    endColumn: 29,
+                                },
+                            },
+                        ],
+                        warningCount: 1,
+                        errorCount: 0,
+                        fatalErrorCount: 0,
+                    },
+                },
+            ],
+            ["onLintEnd", null],
+        ]);
+    });
+
+    test("throws error for non-existent files", async () => {
+        const reporter = new TestReporter();
+
+        const cli = new LinterCli(reporter);
+
+        await expect(cli.run(FIXTURE_PATH, ["dir1/dir1_file1.txt", "dir100/dir100_file1.txt"])).rejects.toThrowError(
+            `File "${path.join(FIXTURE_PATH, "dir100/dir100_file1.txt")}" does not exist`
+        );
+    });
 });
