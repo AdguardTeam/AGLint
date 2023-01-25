@@ -1,4 +1,4 @@
-name: Release
+name: NPM release
 
 on:
   push:
@@ -8,13 +8,13 @@ on:
       - v*
 
 jobs:
-  lint:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: master
       
       - name: Set up Node.js
         uses: actions/setup-node@v3
