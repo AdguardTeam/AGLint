@@ -2,7 +2,7 @@ import path, { ParsedPath } from "path";
 import cloneDeep from "clone-deep";
 import { ScannedDirectory } from "./scan";
 import { parseConfigFile } from "./config-reader";
-import { LinterConfig, defaultLinterConfig } from "../config";
+import { LinterConfig, defaultLinterConfig, mergeConfigs } from "../config";
 
 /**
  * An event that is performed on a file or directory.
@@ -36,10 +36,14 @@ export async function walk(
     config: LinterConfig = defaultLinterConfig,
     fix = false
 ) {
+    // If the directory contains a config file, use it, but merge it with the default config
     const configDeepClone = cloneDeep(
-        scannedDirectory.configFile
-            ? await parseConfigFile(path.join(scannedDirectory.configFile.dir, scannedDirectory.configFile.base))
-            : config
+        (scannedDirectory.configFile &&
+            mergeConfigs(
+                defaultLinterConfig,
+                await parseConfigFile(path.join(scannedDirectory.configFile.dir, scannedDirectory.configFile.base))
+            )) ||
+            config
     );
 
     // Perform the directory action on the current directory (if it exists)

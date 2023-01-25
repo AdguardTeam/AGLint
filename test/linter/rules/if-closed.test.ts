@@ -6,7 +6,7 @@ import { NEWLINE } from "../../../src/utils/constants";
 
 describe("if-closed", () => {
     test("Detects unclosed if-s", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Add if-closed rule
         linter.addRule("if-closed", IfClosed);
@@ -83,7 +83,7 @@ describe("if-closed", () => {
     });
 
     test("Detects unopened endif-s", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Add if-closed rule
         linter.addRule("if-closed", IfClosed);

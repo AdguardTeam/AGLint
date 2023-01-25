@@ -109,7 +109,7 @@ const demoRuleEverythingIsProblem3: LinterRule = {
 
 describe("Linter", () => {
     test("addDefaultRules", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -124,7 +124,7 @@ describe("Linter", () => {
     });
 
     test("setRuleConfig", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -232,7 +232,7 @@ describe("Linter", () => {
     });
 
     test("applyRulesConfig", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Initially no rules
         expect(linter.getRules().size).toEqual(0);
@@ -349,7 +349,7 @@ describe("Linter", () => {
     });
 
     test("setConfig", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Initially no rules
         expect(linter.getRules().size).toEqual(0);
@@ -385,7 +385,7 @@ describe("Linter", () => {
     });
 
     test("addRule", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Initially no rules
         expect(linter.getRules().size).toEqual(0);
@@ -411,7 +411,7 @@ describe("Linter", () => {
     });
 
     test("addRuleEx", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Initially no rules
         expect(linter.getRules().size).toEqual(0);
@@ -466,7 +466,7 @@ describe("Linter", () => {
     });
 
     test("resetRuleConfig", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -494,7 +494,7 @@ describe("Linter", () => {
     });
 
     test("getRuleConfig", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -521,7 +521,7 @@ describe("Linter", () => {
     });
 
     test("getRule", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -535,7 +535,7 @@ describe("Linter", () => {
     });
 
     test("getRules", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -565,7 +565,7 @@ describe("Linter", () => {
     });
 
     test("hasRule", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -588,7 +588,7 @@ describe("Linter", () => {
     });
 
     test("removeRule", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -633,7 +633,7 @@ describe("Linter", () => {
     });
 
     test("disableRule", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -657,7 +657,7 @@ describe("Linter", () => {
     });
 
     test("isRuleDisabled", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -683,7 +683,7 @@ describe("Linter", () => {
     });
 
     test("enableRule", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         expect(linter.getRules().size).toEqual(0);
 
@@ -715,7 +715,7 @@ describe("Linter", () => {
     });
 
     test("lint detect parsing issues as fatal errors", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // 1 invalid rule
         expect(
@@ -803,7 +803,7 @@ describe("Linter", () => {
     });
 
     test("lint ignores inline config comments if they aren't allowed in the linter config", () => {
-        const linter = new Linter({
+        const linter = new Linter(false, {
             allowInlineConfig: false,
         });
 
@@ -870,7 +870,7 @@ describe("Linter", () => {
     });
 
     test("lint uses config comments properly", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Don't report invalid rule if it preceded by aglint-disable-next-line
         expect(
@@ -1097,7 +1097,7 @@ describe("Linter", () => {
     });
 
     test("aglint-disable-next-line inline config comment", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("rule-1", demoRuleEverythingIsProblem1);
         linter.addRule("rule-2", demoRuleEverythingIsProblem2);
@@ -1293,7 +1293,7 @@ describe("Linter", () => {
     });
 
     test("aglint-enable-next-line inline config comment", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("rule-1", demoRuleEverythingIsProblem1);
         linter.addRule("rule-2", demoRuleEverythingIsProblem2);
@@ -1492,7 +1492,7 @@ describe("Linter", () => {
     });
 
     test("aglint-disable inline config comment", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("rule-1", demoRuleEverythingIsProblem1);
         linter.addRule("rule-2", demoRuleEverythingIsProblem2);
@@ -1685,7 +1685,7 @@ describe("Linter", () => {
     });
 
     test("aglint-enable inline config comment", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("rule-1", demoRuleEverythingIsProblem1);
         linter.addRule("rule-2", demoRuleEverythingIsProblem2);
@@ -1832,7 +1832,7 @@ describe("Linter", () => {
     });
 
     test("aglint inline config comment", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("rule-1", demoRuleEverythingIsProblem1);
         linter.addRule("rule-2", demoRuleEverythingIsProblem2);
@@ -2020,7 +2020,7 @@ describe("Linter", () => {
     });
 
     test("fixable interface (single line fix)", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         const fix1 = RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com");
 
@@ -2104,7 +2104,7 @@ describe("Linter", () => {
     });
 
     test("fixable interface (multiple line fix)", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         const fix2 = [
             RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com"),
@@ -2196,7 +2196,7 @@ describe("Linter", () => {
     });
 
     test("fixable interface (conflicting fixes)", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         const fix1 = RuleParser.parse("aaa.js$script,redirect=noopjs,domain=example.com");
 
@@ -2332,7 +2332,7 @@ describe("Linter", () => {
     });
 
     test("rule with different severities", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("rule-1", demoRuleEverythingIsProblem1);
         linter.setRuleConfig("rule-1", "off");
@@ -2381,7 +2381,7 @@ describe("Linter", () => {
     });
 
     test("rule context getters", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         let config: LinterConfig | null = null;
         let content: string | null = null;

@@ -249,9 +249,14 @@ export class Linter {
     /**
      * Creates a new linter instance.
      *
+     * @param defaultRules - Whether to add all default rules to the linter
      * @param config - The linter configuration
      */
-    constructor(config: LinterConfig = defaultLinterConfig) {
+    constructor(defaultRules = true, config: LinterConfig = defaultLinterConfig) {
+        if (defaultRules) {
+            this.addDefaultRules();
+        }
+
         this.setConfig(config);
     }
 

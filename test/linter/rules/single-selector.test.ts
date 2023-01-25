@@ -5,7 +5,7 @@ import { NEWLINE } from "../../../src/utils/constants";
 
 describe("single-selector", () => {
     test("Detects multiple selectors", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Add single-selector rule
         linter.addRule("single-selector", SingleSelector);
@@ -71,7 +71,7 @@ describe("single-selector", () => {
     });
 
     test("Suggest fix", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         // Add single-selector rule
         linter.addRule("single-selector", SingleSelector);

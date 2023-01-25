@@ -5,7 +5,7 @@ import { NEWLINE } from "../../../src/utils/constants";
 
 describe("adg-scriptlet-quotes", () => {
     test("Detects problematic scriptlets", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
@@ -118,7 +118,7 @@ describe("adg-scriptlet-quotes", () => {
     });
 
     test("Detects problematic scriptlets with custom config", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
@@ -234,7 +234,7 @@ describe("adg-scriptlet-quotes", () => {
     });
 
     test("Suggest fix", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
@@ -275,7 +275,7 @@ describe("adg-scriptlet-quotes", () => {
     });
 
     test("Suggest fix with custom config", () => {
-        const linter = new Linter();
+        const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
