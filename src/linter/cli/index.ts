@@ -46,8 +46,7 @@ export class LinterCli {
      */
     private lintFile = async (file: ParsedPath, config: LinterConfig) => {
         // Create a new linter instance and add the default rules
-        const linter = new Linter();
-        linter.addDefaultRules();
+        const linter = new Linter(true, config);
 
         // Get the file path from the current directory
         const filePath = path.join(file.dir, file.base);
