@@ -27,6 +27,7 @@ Table of Contents:
     - [Ignore single adblock rule](#ignore-single-adblock-rule)
     - [Ignore multiple adblock rules](#ignore-multiple-adblock-rules)
     - [Disable some linter rules](#disable-some-linter-rules)
+    - [Change linter rules configuration](#change-linter-rules-configuration)
 - [Ignoring files or folders](#ignoring-files-or-folders)
   - [Default ignores](#default-ignores)
 - [Configuration](#configuration)
@@ -42,6 +43,8 @@ Table of Contents:
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
+  - [Setting up the development environment](#setting-up-the-development-environment)
+  - [Available commands](#available-commands)
 - [Ideas \& Questions](#ideas--questions)
 - [License](#license)
 - [References](#references)
@@ -50,8 +53,7 @@ Table of Contents:
 
 `AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
 
-
-Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists, and we want to make it easy to use them in adblockers.
+Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists.
 
 Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org/). If you are familiar with `ESLint`, you will find it easy to use `AGLint` as well.
 
@@ -61,7 +63,7 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 - :white_check_mark: **Error-tolerant**: it can parse any filter list, even if it contains minor syntax errors.
 - :zap: **Fast**: made with performance in mind.
 - :thumbsup: **Easy to use**: it can be used as a CLI tool or programmatically.
-- :art: **Customizable**: you can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo.
+- :art: **Customizable**: you can customize the default configuration by creating a file named `.aglintrc` in the root of your repo.
 - :gear: **Extensible**: you can add your own rules to the linter.
 - :globe_with_meridians: **Cross-platform**: it works on Windows, Linux and macOS.
 - :globe_with_meridians: **Open-source**: the source code is available here on GitHub.
@@ -73,7 +75,7 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is a very short instruction on how to use it as a CLI tool with the default configuration.
 
 ### Pre-requisites
-- Node.js 12 or higher: https://nodejs.org/en/download/
+- Node.js 14 or higher: https://nodejs.org/en/download/
 - NPM or Yarn. NPM is installed with Node.js, so you don't need to install it separately. If you want to use `yarn` instead of `npm`, you can install it from [here](https://classic.yarnpkg.com/en/docs/install)
 
 ### Installation & Usage
@@ -149,6 +151,17 @@ In some cases, you may want to disable some linter rules for a single adblock ru
   example.org##.ad
   ```
 
+#### Change linter rules configuration
+
+In some cases, you may want to change the configuration of some linter rules during linting. Here is how you can do it:
+```adblock
+! aglint "rule-1": ["warn", { "option1": "value1" }], "rule-2": "off"
+example.com##.ad
+example.net##.ad
+```
+
+After the `! aglint` comment, you should specify the list of the rules that you want to change. It will applied to all lines after the comment until the end of the file or until the next `! aglint` comment. The syntax is the same as in the [configuration file](#configuration).
+
 ## Ignoring files or folders
 
 You can ignore files or folders by creating an "ignore file" named `.aglintignore` in any directory. The syntax and behavior of this file is the same as `.gitignore` file. Learn more about `.gitignore` [here](https://git-scm.com/docs/gitignore) if you are not familiar with it.
@@ -167,17 +180,25 @@ Some "problematic" paths are ignored by default in order to avoid linting files 
 
 ## Configuration
 
-You can customize the default configuration by creating a file named `aglint.config.json` in the root of your repo. You can also use `aglint.config.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be used for that subfolder and all its subfolders, but not for the parent folder. It means that the results are always consistent, no matter where you run the linter.
+You can customize the default configuration by creating a file named `.aglintrc` in the root of your repo. You can also use `.aglintrc.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be used for that subfolder and all its subfolders, but not for the parent folder. It means that the results are always consistent, no matter where you run the linter.
 
 The configuration file should be a valid JSON or YAML file. The following options are available:
 
-- `fix`: enable or disable automatic fixing of errors. Default: `false`. **Be careful with this option!** It will modify your filter list files.
+- `allowInlineConfig`: enable or disable inline config comments. For example, `! aglint-disable-next-line` (default: `true`).
 - `rules`: an object with linter rules. See [Linter rules](#linter-rules) for more info. A rule basically has the following structure:
-  - `rule-name`: a string with the name of the rule. For example, `rule-1`.
-  - `rule-value`: an array with two elements:
-    - `rule-severity`: a string with the severity of the rule. It can be `error`, `warn` or `off`.
-    - `rule-options`: an object with options for the rule. For example, `{ "option-1": "value-1" }` (optional).
+  - The key is the name of the rule. For example, `rule-1`.
+  - The value is the severity and the configuration of the rule. For example, `"error"` or `["error", { "option-1": "value-1" }]`.
+    - The severity always must be specified. It can be `off`, `warn`, `error` or `fatal`. If the rule doesn't have any configuration, you can use a string with the severity. For example, `"error"`. You can also use severity codes instead of severity names (0 = `off`, 1 = `warn`, 2 = `error`, 3 = `fatal`).
+    - If the rule has configuration, you must use an array with two elements. The first element is the severity and the rest of the elements are the configuration. For example, `["error", { "option-1": "value-1" }]`.
     - For example you can disable the `rule-1` rule by adding the following configuration:
+      ```json
+      {
+          "rules": {
+              "rule-1": "off"
+          }
+      }
+      ```
+      but an array also can be used:
       ```json
       {
           "rules": {
@@ -193,7 +214,7 @@ The configuration file should be a valid JSON or YAML file. The following option
           }
       }
       ```
-      or you can change the severity of the `rule-3` rule to `error` and add an option to it:
+      or you can change the severity of the `rule-3` rule to `error` and add a configuration to it:
       ```json
       {
           "rules": {
@@ -204,11 +225,11 @@ The configuration file should be a valid JSON or YAML file. The following option
 
 ### Example configurations
 
-Here is an example of a configuration file in JSON syntax (`aglint.config.json`):
+Here is an example of a configuration file in JSON syntax (`.aglintrc`):
 
 ```json
 {
-    "fix": false,
+    "allowInlineConfig": true,
     "rules": {
         "rule-1": ["warn", { "option-1": "value-1" }],
         "rule-2": ["error", { "option-2": "value-2" }],
@@ -217,10 +238,10 @@ Here is an example of a configuration file in JSON syntax (`aglint.config.json`)
 }
 ```
 
-You can also use YAML syntax (`aglint.config.yml`):
+You can also use YAML syntax (`.aglintrc.yml`):
 
 ```yaml
-fix: false
+allowInlineConfig: true
 rules:
   rule-1:
     - warn
@@ -246,22 +267,22 @@ Suppose your project has the following structure:
   │   ├── list1.txt
   │   ├── list2.txt
   ├── dir2
-  │   ├── aglint.config.json
+  │   ├── .aglintrc
   │   ├── dir3
   │   │   ├── list3.txt
   │   │   ├── list4.txt
   ├── list5.txt
-  ├── aglint.config.json
+  ├── .aglintrc
   ```
 
-If you call the linter in the root folder (`project-root`), it will merge its default configuration with `aglint.config.json` from the root folder.
-- Then it lints `dir1/list1.txt`, `dir1/list2.txt` and `list5.txt` with this merged configuration (default configuration + `project-root/aglint.config.json`).
-- In the `dir2` folder, it will merge the default configuration with `aglint.config.json` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/dir2/aglint.config.json`).
+If you call the linter in the root folder (`project-root`), it will merge its default configuration with `.aglintrc` from the root folder.
+- Then it lints `dir1/list1.txt`, `dir1/list2.txt` and `list5.txt` with this merged configuration (default configuration + `project-root/.aglintrc`).
+- In the `dir2` folder, it will merge the default configuration with `.aglintrc` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/dir2/.aglintrc`).
 - If inline configurations are enabled, then they will be the last in the hierarchy. For example, if you have the following configuration in `project-root/dir2/dir3/list3.txt`:
   ```adblock
-  ! aglint {"rules": {"rule-1": "off"}}
+  ! aglint "rule-1": "off"
   ```
-  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/dir2/aglint.config.json` + inline configuration chain within the file).
+  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/dir2/.aglintrc` + inline configuration chain within the file).
 
 #### Hierarchy
 
@@ -286,7 +307,7 @@ example.com#%#//scriptlet("abort-on-property-read", "window.open")
 ```
 will be reported as warning:
 ```
-    1:0     warning The scriptlet should use SingleQuoted quotes
+ 1:0  warn  The scriptlet should use SingleQuoted quotes
 ```
 since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
 
@@ -317,8 +338,8 @@ example.org##.something
 so the linter will give you the following errors:
 
 ```
-    1:0     error   Using an "endif" directive without an opening "if" directive
-    5:0     error   Unclosed "if" directive
+ 1:0  error  Using an "endif" directive without an opening "if" directive
+ 5:0  error  Unclosed "if" directive
 ```
 
 ### `single-selector`
@@ -335,7 +356,7 @@ example.org##.ad
 so the linter will give you the following warning:
 
 ```
-    1:0     warning An element hiding rule should contain only one selector
+ 1:0  warn  An element hiding rule should contain only one selector
 ```
 
 It will also suggest a fix for the first rule:
@@ -437,16 +458,14 @@ Example usage:
 ```typescript
 import { Linter } from "aglint";
 
-// Create a new linter instance
-const linter = new Linter();
-
-// Add default rules - don't forget to add them, otherwise the linter won't do anything
-linter.addDefaultRules();
+// Create a new linter instance and add default rules (make first parameter true to add default rules)
+const linter = new Linter(true);
 
 // Add custom rules (optional). Rules are following LinterRule interface.
 // linter.addRule("name", { data });
 
 // Lint a content (file content - you can pass new lines as well)
+// If you want to enable the fixer, pass true as the second parameter
 const report = linter.lint("example.com##.ad, #ad");
 
 // Do something with the report :)
@@ -455,8 +474,10 @@ const report = linter.lint("example.com##.ad, #ad");
 The `LinterRule` interface has the following structure:
 
 - `meta`: Metadata for the rule
-  - `type`: problem, suggestion or layout
   - `severity`: warning, error or fatal
+  - `config`: configuration for the rule (optional)
+    - `default`: default value for the configuration
+    - `schema`: [Superstruct](https://www.npmjs.com/package/superstruct) schema for the configuration
 - `events`:
   - `onStartFilterList`: called before analyzing a file
   - `onRule`: Called to analyze a single rule
@@ -465,6 +486,8 @@ The `LinterRule` interface has the following structure:
 Every event has a `context` parameter, which makes it possible to get the current filter list content, the current rule, report, etc.
 
 You can check the [`src/linter/rules`](src/linter/rules) directory for detailed examples.
+
+You can find the detailed linter rule documentation [here](src/linter/rules/README.md).
 
 ### Converter (WIP)
 
@@ -481,13 +504,26 @@ A small summary of what to expect:
 
 ## Development & Contribution
 
-You can contribute to the project by opening a pull request. Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. You can do this by running `yarn lint` and `yarn test` commands. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
+You can contribute to the project by opening a pull request. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
 
-Main development commands:
+Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. If you have Git hooks enabled, the tests will be run automatically before committing, thanks to Husky.
+
+### Setting up the development environment
+
+1. Install [Node.js](https://nodejs.org/en/), [Yarn](https://yarnpkg.com/) and [Git](https://git-scm.com/). We recommend using [Visual Studio Code](https://code.visualstudio.com/) as your IDE.
+2. Clone the repository
+3. Install dependencies by running `yarn` in the project directory
+4. Start developing!
+
+### Available commands
+
+You can run the following commands while developing:
+
+- `yarn check-types`: Check types
 - `yarn lint`: Run ESLint and Prettier on all files
-- `yarn test`: Run all tests
+- `yarn test`: Run all tests (Jest)
 - `yarn coverage`: Get test coverage report
-- `yarn build`: Build package (to `dist` folder)
+- `yarn build`: Build package (to `dist` folder) (Rollup)
 
 ## Ideas & Questions
 
