@@ -1,7 +1,11 @@
 name: Release
+
 on:
-  # Run manually
-  workflow_dispatch:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
 
 jobs:
   lint:
@@ -16,64 +20,28 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+          registry-url: https://registry.npmjs.org
           cache: yarn
     
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      
+      # Test before build
+      - name: Check TypeScript types
+        run: yarn check-types
       
       - name: Run ESLint
         run: yarn lint
   
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out to repository
-        uses: actions/checkout@v3
-        with:
-          ref: main
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: yarn
-    
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      
-      - name: Run tests
+      - name: Run Jest tests
         run: yarn test
 
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out to repository
-        uses: actions/checkout@v3
-        with:
-          ref: main
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: yarn
-    
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      
-      - name: Run build script
+      # Build before publish
+      - name: Run Rollup build
         run: yarn build
 
-      # TODO: Artifact / Create release:
-
-      # - name: Create release artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: release_artifact
-      #     path: |
-      #       .
-      #       !./node_modules
-
-      # TODO: Publish to NPM
+      # Publish to NPM
+      - name: Publish to NPM
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
