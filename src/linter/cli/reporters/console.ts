@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import { Chalk, ChalkInstance, Options as ChalkOptions } from "chalk";
 import stripAnsi from "strip-ansi";
 import table from "text-table";
 import { inflect } from "inflection";
@@ -34,6 +34,11 @@ export class LinterConsoleReporter implements LinterCliReporter {
     private startTime: number | null = null;
 
     /**
+     * Custom Chalk instance to use for coloring the console output.
+     */
+    private chalk: ChalkInstance;
+
+    /**
      * Total number of warnings
      */
     private warnings = 0;
@@ -53,7 +58,13 @@ export class LinterConsoleReporter implements LinterCliReporter {
      *
      * @param colors Whether to use colors in the console output or not
      */
-    constructor(private readonly colors: boolean = true) {}
+    constructor(colors = true) {
+        // By default, Chalk determines the color support automatically, but we
+        // want to disable colors if the user doesn't want them.
+        const chalkOptions: ChalkOptions = colors ? {} : { level: 0 };
+
+        this.chalk = new Chalk(chalkOptions);
+    }
 
     /**
      * Collected problems, where the key is the file path and the value is an array of problems.
@@ -90,16 +101,14 @@ export class LinterConsoleReporter implements LinterCliReporter {
         let timeOutput = EMPTY;
 
         if (lintTime > 0) {
-            timeOutput += `Linting took ${this.colors ? chalk.dim(lintTime) : lintTime} ms.`;
+            timeOutput += `Linting took ${this.chalk.dim(lintTime)} ms.`;
         } else {
-            timeOutput += this.colors
-                ? chalk.red("Error: Could not calculate linting time.")
-                : "Error: Could not calculate linting time.";
+            timeOutput += this.chalk.red("Error: Could not calculate linting time.");
         }
 
         // If there are no problems, log that there are no problems
         if (this.warnings === 0 && this.errors === 0 && this.fatals === 0) {
-            output += this.colors ? chalk.green("No problems found!") : "No problems found!";
+            output += this.chalk.green("No problems found!");
             output += DOUBLE_NEWLINE;
             output += timeOutput;
 
@@ -114,7 +123,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
                 continue;
             }
 
-            output += this.colors ? chalk.underline(file) : file;
+            output += this.chalk.underline(file);
             output += NEWLINE;
 
             const rows = [];
@@ -135,24 +144,24 @@ export class LinterConsoleReporter implements LinterCliReporter {
                 // Column: Problem type
                 switch (problem.severity) {
                     case 1: {
-                        row.push(this.colors ? chalk.yellow("warn") : "warn");
+                        row.push(this.chalk.yellow("warn"));
                         break;
                     }
                     case 2: {
-                        row.push(this.colors ? chalk.red("error") : "error");
+                        row.push(this.chalk.red("error"));
                         break;
                     }
                     case 3: {
-                        row.push(this.colors ? chalk.red("fatal") : "fatal");
+                        row.push(this.chalk.red("fatal"));
                         break;
                     }
                     default: {
-                        row.push(this.colors ? chalk.red("error") : "error");
+                        row.push(this.chalk.red("error"));
                     }
                 }
 
                 // Column: Problem description
-                row.push(this.colors ? chalk.dim(problem.message) : problem.message);
+                row.push(this.chalk.dim(problem.message));
 
                 rows.push(row);
             }
@@ -175,32 +184,26 @@ export class LinterConsoleReporter implements LinterCliReporter {
         // Stats
         output += "Found";
         output += SPACE;
-        output += this.colors ? chalk[anyErrors ? "red" : "yellow"](total) : total;
+        output += this.chalk[anyErrors ? "red" : "yellow"](total);
         output += SPACE;
         output += inflect("problem", total);
 
         output += SPACE + OPEN_PARENTHESIS;
 
         // Warnings
-        output += this.colors
-            ? chalk.yellow(`${this.warnings} ${inflect("warning", this.warnings)}`)
-            : `${this.warnings} ${inflect("warning", this.warnings)}`;
+        output += this.chalk.yellow(`${this.warnings} ${inflect("warning", this.warnings)}`);
 
         output += COMMA + SPACE;
 
         // Errors
-        output += this.colors
-            ? chalk.red(`${this.errors} ${inflect("error", this.errors)}`)
-            : `${this.errors} ${inflect("error", this.errors)}`;
+        output += this.chalk.red(`${this.errors} ${inflect("error", this.errors)}`);
 
         output += SPACE;
         output += "and";
         output += SPACE;
 
         // Fatal errors
-        output += this.colors
-            ? chalk.red(`${this.fatals} fatal ${inflect("error", this.fatals)}`)
-            : `${this.fatals} fatal ${inflect("error", this.fatals)}`;
+        output += this.chalk.red(`${this.fatals} fatal ${inflect("error", this.fatals)}`);
 
         output += CLOSE_PARENTHESIS + DOT + DOUBLE_NEWLINE;
 
