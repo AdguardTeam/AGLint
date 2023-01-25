@@ -7,11 +7,13 @@ export const EMPTY = "";
 export const SPACE = " ";
 export const COMMA = ",";
 export const COLON = ":";
+export const DOT = ".";
 export const SEMICOLON = ";";
 export const HASHMARK = "#";
 export const UNDERSCORE = "_";
 export const TAB = "\t";
 export const NEWLINE = "\n";
+export const DOUBLE_NEWLINE = "\n\n";
 export const ESCAPE_CHARACTER = "\\";
 
 // Brackets
