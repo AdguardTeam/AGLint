@@ -36,19 +36,21 @@ export async function walk(
     config: LinterConfig = defaultLinterConfig,
     fix = false
 ) {
-    let configDeepClone: LinterConfig;
+    // Initially use the given config
+    let usedConfig = config;
 
-    // If the directory contains a config file, use it, but merge it with the default config.
-    // Otherwise, use the default config.
+    // However, if a config file was found in the directory, use that instead
     if (scannedDirectory.configFile) {
-        const configFile = await parseConfigFile(
-            path.join(scannedDirectory.configFile.dir, scannedDirectory.configFile.base)
-        );
+        const filePath = path.join(scannedDirectory.configFile.dir, scannedDirectory.configFile.base);
+        const fileConfig = await parseConfigFile(filePath);
 
-        configDeepClone = cloneDeep(mergeConfigs(defaultLinterConfig, configFile));
-    } else {
-        configDeepClone = cloneDeep(config);
+        // Don't forget to merge the parsed config with the default config
+        usedConfig = mergeConfigs(defaultLinterConfig, fileConfig);
     }
+
+    // Make a deep clone of the config so that it can be modified without affecting the original
+    // in any way
+    const configDeepClone = cloneDeep(usedConfig);
 
     // Perform the directory action on the current directory (if it exists)
     if (events.dir) {
