@@ -1,7 +1,20 @@
-import chalk from "chalk";
+import { Chalk, ChalkInstance, Options as ChalkOptions } from "chalk";
+import stripAnsi from "strip-ansi";
+import table from "text-table";
+import { inflect } from "inflection";
 import { LinterProblem, LinterResult } from "../../index";
 import { LinterCliReporter } from "../reporter";
-import { ParsedPath } from "path";
+import path, { ParsedPath } from "path";
+import {
+    CLOSE_PARENTHESIS,
+    COMMA,
+    DOT,
+    DOUBLE_NEWLINE,
+    EMPTY,
+    NEWLINE,
+    OPEN_PARENTHESIS,
+    SPACE,
+} from "src/utils/constants";
 
 /**
  * Type for the collected problems, where the key is the file path and the value
@@ -19,6 +32,11 @@ export class LinterConsoleReporter implements LinterCliReporter {
      * We save the start time here, so we can calculate the total time at the end.
      */
     private startTime: number | null = null;
+
+    /**
+     * Custom Chalk instance to use for coloring the console output.
+     */
+    private chalk: ChalkInstance;
 
     /**
      * Total number of warnings
@@ -40,7 +58,13 @@ export class LinterConsoleReporter implements LinterCliReporter {
      *
      * @param colors Whether to use colors in the console output or not
      */
-    constructor(private readonly colors: boolean = true) {}
+    constructor(colors = true) {
+        // By default, Chalk determines the color support automatically, but we
+        // want to disable colors if the user doesn't want them.
+        const chalkOptions: ChalkOptions = colors ? {} : { level: 0 };
+
+        this.chalk = new Chalk(chalkOptions);
+    }
 
     /**
      * Collected problems, where the key is the file path and the value is an array of problems.
@@ -55,12 +79,12 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
     onFileStart = (file: ParsedPath) => {
         // Initialize the problems array for the file as empty
-        this.problems[file.base] = [];
+        this.problems[path.join(file.dir, file.base)] = [];
     };
 
     onFileEnd = (file: ParsedPath, result: LinterResult) => {
         // Initialize the problems array for the file as empty
-        this.problems[file.base].push(...result.problems);
+        this.problems[path.join(file.dir, file.base)].push(...result.problems);
 
         // Count the problems
         this.warnings += result.warningCount;
@@ -70,11 +94,25 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
     onLintEnd = () => {
         // Calculate the linting time
-        const lintTime = this.startTime ? performance.now() - this.startTime : 0;
+        const lintTime =
+            Math.round(((this.startTime ? performance.now() - this.startTime : 0) + Number.EPSILON) * 100) / 100;
+
+        let output = EMPTY;
+        let timeOutput = EMPTY;
+
+        if (lintTime > 0) {
+            timeOutput += `Linting took ${this.chalk.dim(lintTime)} ms.`;
+        } else {
+            timeOutput += this.chalk.red("Error: Could not calculate linting time.");
+        }
 
         // If there are no problems, log that there are no problems
-        if (Object.keys(this.problems).length === 0) {
-            console.log(this.colors ? chalk.green("No problems found!") : "No problems found!");
+        if (this.warnings === 0 && this.errors === 0 && this.fatals === 0) {
+            output += this.chalk.green("No problems found!");
+            output += DOUBLE_NEWLINE;
+            output += timeOutput;
+
+            console.log(output);
             return;
         }
 
@@ -85,76 +123,93 @@ export class LinterConsoleReporter implements LinterCliReporter {
                 continue;
             }
 
-            console.log(
-                this.colors
-                    ? chalk.red(`Found ${problems.length} problems in ${file}:`)
-                    : `Found ${problems.length} problems in ${file}:`
-            );
+            output += this.chalk.underline(file);
+            output += NEWLINE;
+
+            const rows = [];
 
             for (const problem of problems) {
-                let message = "";
+                const row = [];
 
-                // Problem location
-                message += "  ";
+                // Column: Empty column
+                row.push(EMPTY);
 
-                message += problem.position.startLine;
+                // Column: Problem location
+                row.push(
+                    `${problem.position.startLine}:${
+                        problem.position.startColumn !== undefined ? problem.position.startColumn : 0
+                    }`
+                );
 
-                if (typeof problem.position.startColumn !== "undefined") {
-                    message += ":";
-                    message += problem.position.startColumn;
-                }
-
-                message += "\t";
-
-                // Problem type
+                // Column: Problem type
                 switch (problem.severity) {
                     case 1: {
-                        message += this.colors ? chalk.yellow("warning") : "warning";
+                        row.push(this.chalk.yellow("warn"));
                         break;
                     }
                     case 2: {
-                        message += this.colors ? chalk.red("error") : "error";
+                        row.push(this.chalk.red("error"));
                         break;
                     }
                     case 3: {
-                        message += this.colors ? chalk.bgRed.white("fatal") : "fatal";
+                        row.push(this.chalk.red("fatal"));
                         break;
                     }
                     default: {
-                        message += this.colors ? chalk.red("error") : "error";
+                        row.push(this.chalk.red("error"));
                     }
                 }
 
-                message += "\t";
+                // Column: Problem description
+                row.push(this.chalk.dim(problem.message));
 
-                // Problem description
-                message += this.colors ? chalk.gray(problem.message) : problem.message;
-
-                // Log problem to console
-                console.log(message);
+                rows.push(row);
             }
 
-            console.log();
+            if (rows.length > 0) {
+                output += table(rows, {
+                    align: ["l", "c", "l", "l"],
+                    stringLength(str: string) {
+                        return stripAnsi(str).length;
+                    },
+                });
+
+                output += DOUBLE_NEWLINE;
+            }
         }
 
-        // Log stats
-        let stats = "";
-        stats += "Found ";
-        stats += this.colors ? chalk.yellow(`${this.warnings} warnings`) : `${this.warnings} warnings`;
-        stats += ", ";
-        stats += this.colors ? chalk.red(`${this.errors} errors`) : `${this.errors} errors`;
-        stats += " and ";
-        stats += this.colors ? chalk.bgRed.white(`${this.fatals} fatal errors`) : `${this.fatals} fatal errors`;
-        stats += ".";
+        const anyErrors = this.errors > 0 || this.fatals > 0;
+        const total = this.warnings + this.errors + this.fatals;
 
-        console.log(stats);
-        console.log();
+        // Stats
+        output += "Found";
+        output += SPACE;
+        output += this.chalk[anyErrors ? "red" : "yellow"](total);
+        output += SPACE;
+        output += inflect("problem", total);
 
-        // Log the linting time
-        if (lintTime > 0) {
-            console.log(`Linting took ${lintTime} ms.`);
-        } else {
-            console.log("Error: Could not calculate linting time.");
-        }
+        output += SPACE + OPEN_PARENTHESIS;
+
+        // Warnings
+        output += this.chalk.yellow(`${this.warnings} ${inflect("warning", this.warnings)}`);
+
+        output += COMMA + SPACE;
+
+        // Errors
+        output += this.chalk.red(`${this.errors} ${inflect("error", this.errors)}`);
+
+        output += SPACE;
+        output += "and";
+        output += SPACE;
+
+        // Fatal errors
+        output += this.chalk.red(`${this.fatals} fatal ${inflect("error", this.fatals)}`);
+
+        output += CLOSE_PARENTHESIS + DOT + DOUBLE_NEWLINE;
+
+        // Linting time
+        output += timeOutput;
+
+        console[anyErrors ? "error" : "warn"](output);
     };
 }
