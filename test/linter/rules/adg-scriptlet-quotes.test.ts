@@ -4,7 +4,7 @@ import { AdgScriptletQuotes } from "../../../src/linter/rules/adg-scriptlet-quot
 import { NEWLINE } from "../../../src/utils/constants";
 
 describe("adg-scriptlet-quotes", () => {
-    test("Detects problematic scriptlets", () => {
+    test("detects problematic scriptlets", () => {
         const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
@@ -21,6 +21,16 @@ describe("adg-scriptlet-quotes", () => {
                     `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
                 ].join(NEWLINE)
             )
+        ).toMatchObject({
+            problems: [],
+            warningCount: 0,
+            errorCount: 0,
+            fatalErrorCount: 0,
+        });
+
+        // Ignore "aa'aa" because it contains a single quote
+        expect(
+            linter.lint([`example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/, "aa'aa")`].join(NEWLINE))
         ).toMatchObject({
             problems: [],
             warningCount: 0,
@@ -46,7 +56,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use SingleQuoted quotes",
+                    message: "The scriptlet should use single quotes",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -80,7 +90,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use SingleQuoted quotes",
+                    message: "The scriptlet should use single quotes",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -91,7 +101,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use SingleQuoted quotes",
+                    message: "The scriptlet should use single quotes",
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -102,7 +112,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use SingleQuoted quotes",
+                    message: "The scriptlet should use single quotes",
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -117,13 +127,13 @@ describe("adg-scriptlet-quotes", () => {
         });
     });
 
-    test("Detects problematic scriptlets with custom config", () => {
+    test("detects problematic scriptlets with custom config", () => {
         const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "DoubleQuoted"]);
+        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "double"]);
 
         // No problematic scriptlets
         expect(
@@ -162,7 +172,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use DoubleQuoted quotes",
+                    message: "The scriptlet should use double quotes",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -196,7 +206,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use DoubleQuoted quotes",
+                    message: "The scriptlet should use double quotes",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -207,7 +217,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use DoubleQuoted quotes",
+                    message: "The scriptlet should use double quotes",
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -218,7 +228,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use DoubleQuoted quotes",
+                    message: "The scriptlet should use double quotes",
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -233,7 +243,7 @@ describe("adg-scriptlet-quotes", () => {
         });
     });
 
-    test("Suggest fix", () => {
+    test("suggest fix with default config", () => {
         const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
@@ -269,18 +279,18 @@ describe("adg-scriptlet-quotes", () => {
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
                 // Problematic scriptlet
-                `#%#//scriptlet('prevent-setTimeout', '.css(\\'display\\',\\'block\\');')`,
+                `#%#//scriptlet('prevent-setTimeout', ".css('display','block');")`,
             ].join(NEWLINE),
         });
     });
 
-    test("Suggest fix with custom config", () => {
+    test("suggest fix with double quotes config", () => {
         const linter = new Linter(false);
 
         linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "DoubleQuoted"]);
+        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "double"]);
 
         expect(
             linter.lint(
@@ -310,6 +320,46 @@ describe("adg-scriptlet-quotes", () => {
                 `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
                 // Problematic scriptlet
                 `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+            ].join(NEWLINE),
+        });
+    });
+
+    test("suggest fix with no-quotes config", () => {
+        const linter = new Linter(false);
+
+        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+
+        // Prefer DoubleQuoted quotes
+        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "none"]);
+
+        expect(
+            linter.lint(
+                [
+                    `example.com##.ad1`,
+                    `example.com##.ad2`,
+                    `example.com#%#//scriptlet("scriptlet0")`,
+                    `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet('scriptlet0')`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    // Problematic scriptlet
+                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                ].join(NEWLINE),
+                true
+            )
+        ).toMatchObject({
+            fixed: [
+                `example.com##.ad1`,
+                `example.com##.ad2`,
+                `example.com#%#//scriptlet(scriptlet0)`,
+                `example.com#%#//scriptlet(scriptlet0, arg0, /arg1/)`,
+                // Problematic scriptlet
+                `example.com#@%#//scriptlet(scriptlet0)`,
+                // Problematic scriptlet
+                `example.com#@%#//scriptlet(scriptlet0, arg0, /arg1/)`,
+                // Problematic scriptlet
+                `example.com#@%#//scriptlet(scriptlet0, arg0, /arg1/)`,
             ].join(NEWLINE),
         });
     });

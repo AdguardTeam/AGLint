@@ -307,7 +307,7 @@ example.com#%#//scriptlet("abort-on-property-read", "window.open")
 ```
 will be reported as warning:
 ```
- 1:0  warn  The scriptlet should use SingleQuoted quotes
+ 1:0  warn  The scriptlet should use single quotes
 ```
 since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
 
@@ -315,10 +315,12 @@ But you can specify the expected quotes in the configuration file. If you want t
 ```json
 {
     "rules": {
-        "adg-scriptlet-quotes": ["warn", "DoubleQuoted"]
+        "adg-scriptlet-quotes": ["warn", "double"]
     }
 }
 ```
+
+Possible config values are `none`, `single` and `double`. The default value is `single`.
 
 ### `if-closed`
 
