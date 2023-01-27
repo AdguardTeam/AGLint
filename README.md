@@ -87,12 +87,17 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
      - Globally: `yarn global add @adguard/aglint`
      - Locally: `yarn add -D @adguard/aglint`
 2. Run AGlint **in your project folder**:
-   - NPM: `aglint lint` (or `npx aglint lint` if you installed it locally)
-   - Yarn: `yarn aglint lint`
+   - NPM: `aglint` (or `npx aglint` if you installed it locally)
+   - Yarn: `yarn aglint`
 
 That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
 
-*If you want to customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
+If you want to lint just some specific files, you can pass them as arguments:
+`aglint path/to/file.txt path/to/another/file.txt`
+
+To see all available options, run `aglint --help`.
+
+*To customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
 
 ## VSCode extension
 
