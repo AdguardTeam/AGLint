@@ -5,7 +5,7 @@ import { LinterRule } from "../../src/linter/rule";
 import { defaultLinterRules } from "../../src/linter/rules";
 import { SEVERITY, SeverityValue, SeverityName } from "../../src/linter/severity";
 import { AnyRule, RuleParser } from "../../src/parser";
-import { NEWLINE } from "../../src/utils/constants";
+import { EMPTY, NEWLINE } from "../../src/utils/constants";
 import ss, { Struct } from "superstruct";
 
 const demoRule: LinterRule = {
@@ -2140,11 +2140,11 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    "abcdefghijklmnopqrstuvxyz\n",
+                    "abcdefghijklmnopqrstuvxyz\n",
+                    "! aglint-disable-next-line\r\n",
                     "abcdefghijklmnopqrstuvxyz",
-                    "abcdefghijklmnopqrstuvxyz",
-                    "! aglint-disable-next-line",
-                    "abcdefghijklmnopqrstuvxyz",
-                ].join(NEWLINE),
+                ].join(EMPTY),
 
                 // Enable fix
                 true
@@ -2181,17 +2181,17 @@ describe("Linter", () => {
             fatalErrorCount: 0,
             fixed: [
                 // First fix
-                "aaa.js$script,redirect=noopjs,domain=example.com",
-                "bbb.js$script,redirect=noopjs,domain=example.com",
-                "ccc.js$script,redirect=noopjs,domain=example.com",
+                "aaa.js$script,redirect=noopjs,domain=example.com\n",
+                "bbb.js$script,redirect=noopjs,domain=example.com\n",
+                "ccc.js$script,redirect=noopjs,domain=example.com\n",
                 // Second fix
-                "aaa.js$script,redirect=noopjs,domain=example.com",
-                "bbb.js$script,redirect=noopjs,domain=example.com",
-                "ccc.js$script,redirect=noopjs,domain=example.com",
+                "aaa.js$script,redirect=noopjs,domain=example.com\n",
+                "bbb.js$script,redirect=noopjs,domain=example.com\n",
+                "ccc.js$script,redirect=noopjs,domain=example.com\n",
                 // Remaining lines
-                "! aglint-disable-next-line",
+                "! aglint-disable-next-line\r\n",
                 "abcdefghijklmnopqrstuvxyz",
-            ].join(NEWLINE),
+            ].join(EMPTY),
         });
     });
 

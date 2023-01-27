@@ -13,9 +13,8 @@ import { SEVERITY, getSeverity } from "./severity";
 import { RuleCategory } from "../parser/categories";
 import { CommentRuleType } from "../parser/comment/types";
 import { AnyRule, RuleParser } from "../parser";
-import { NEWLINE } from "../utils/constants";
 
-import { StringUtils } from "../utils/string";
+import { NewLineSplit, StringUtils } from "../utils/string";
 import { ArrayUtils } from "../utils/array";
 import { assert } from "superstruct";
 import { AnySeverity, isSeverity } from "./severity";
@@ -704,7 +703,7 @@ export class Linter {
         invokeEvent("onStartFilterList");
 
         // Get lines (rules) of the filter list
-        const rules = StringUtils.splitStringByNewLines(content);
+        const rules = StringUtils.splitStringByNewLinesEx(content);
 
         // Iterate over all filter list adblock rules
         rules.forEach((rule, index) => {
@@ -716,7 +715,7 @@ export class Linter {
                 try {
                     // Parse the current adblock rule, but this throw an error if the rule is invalid.
                     // We catch the error and report it as a problem.
-                    const ast = RuleParser.parse(rule);
+                    const ast = RuleParser.parse(rule[0]);
 
                     // Handle inline config comments
                     if (ast.category == RuleCategory.Comment && ast.type == CommentRuleType.ConfigComment) {
@@ -812,7 +811,7 @@ export class Linter {
 
                         // Deep copy of the line data
                         actualAdblockRuleAst = { ...ast };
-                        actualAdblockRuleRaw = rule;
+                        actualAdblockRuleRaw = rule[0];
 
                         // Invoke onRule event for all rules (process actual adblock rule)
                         invokeEvent("onRule");
@@ -834,7 +833,7 @@ export class Linter {
                                 startLine: index + 1,
                                 startColumn: 0,
                                 endLine: index + 1,
-                                endColumn: rule.length,
+                                endColumn: rule[0].length,
                             },
                         });
 
@@ -861,7 +860,7 @@ export class Linter {
         // Build fixed content if fixing is enabled
         if (fix) {
             // Create a new array for the fixed content (later we will join it)
-            const fixes: string[] = [];
+            const fixes: NewLineSplit = [];
 
             // Iterate over all lines in the original content (filter list content)
             for (let i = 0; i < rules.length; i++) {
@@ -889,11 +888,13 @@ export class Linter {
                 if (foundFix && !conflict) {
                     // If the fix is an array, we need to push all its elements
                     if (Array.isArray(foundFix)) {
-                        fixes.push(...foundFix.map((ast) => RuleParser.generate(ast)));
+                        for (const ast of foundFix) {
+                            fixes.push([RuleParser.generate(ast), rules[i][1]]);
+                        }
                     }
                     // Otherwise, we can simply push the generated (fixed) rule
                     else {
-                        fixes.push(RuleParser.generate(foundFix));
+                        fixes.push([RuleParser.generate(foundFix), rules[i][1]]);
                     }
                 } else {
                     // Otherwise, push the original rule
@@ -902,7 +903,7 @@ export class Linter {
             }
 
             // Join the fixed rules by newlines
-            result.fixed = fixes.join(NEWLINE);
+            result.fixed = StringUtils.mergeStringByNewLines(fixes);
         }
 
         // Return linting result
