@@ -10,18 +10,17 @@ import { SEVERITY } from "../severity";
 import { AnyRule } from "../../parser";
 import { RuleCategory } from "../../parser/categories";
 import { CosmeticRuleType } from "../../parser/cosmetic/types";
-import { ScriptletParameterType } from "../../parser/cosmetic/body/scriptlet";
+import { ScriptletParameter, ScriptletParameterType } from "../../parser/cosmetic/body/scriptlet";
 
 // Utils
 import { AdblockSyntax } from "../../utils/adblockers";
+import { StringUtils } from "../../utils/string";
+import { EMPTY, SPACE } from "../../utils/constants";
 
 /**
- * Possible quote types (basically same as in the parser, but we ignore regexes here)
+ * Possible quote types
  */
-type QuoteType =
-    | ScriptletParameterType.Unquoted
-    | ScriptletParameterType.SingleQuoted
-    | ScriptletParameterType.DoubleQuoted;
+type QuoteType = "none" | "single" | "double";
 
 /**
  * Inserting the storage type definition into the context
@@ -31,18 +30,61 @@ type RuleContext = GenericRuleContext & {
 };
 
 /**
+ * Converts a quote type to a ScriptletParameterType. For simplicity, we use
+ * "none", "single" and "double" as quote types instead of the ScriptletParameterType.
+ *
+ * @param preferred Preferred quote type
+ * @returns ScriptletParameterType
+ */
+function convertQuoteType(preferred: QuoteType): ScriptletParameterType {
+    switch (preferred) {
+        case "single":
+            return ScriptletParameterType.SingleQuoted;
+        case "double":
+            return ScriptletParameterType.DoubleQuoted;
+        default:
+            return ScriptletParameterType.Unquoted;
+    }
+}
+
+/**
+ * Checks if a quote type of a parameter is different from the preferred quote type, but handles
+ * some edge cases.
+ *
+ * @param parameter Scriptlet parameter
+ * @param preferred Preferred quote type
+ * @returns `true` if the quote type of the parameter is different from the preferred quote type, `false` otherwise
+ */
+function isQuoteMismatch(parameter: ScriptletParameter, preferred: ScriptletParameterType): boolean {
+    if (parameter.type !== preferred) {
+        // Ignore regex parameters
+        if (parameter.type === ScriptletParameterType.RegExp) {
+            return false;
+        }
+
+        if (preferred === ScriptletParameterType.SingleQuoted || preferred === ScriptletParameterType.DoubleQuoted) {
+            // Parameter can't contain the preferred quote type, so it's fine. For example, if the preferred
+            // quote type is single quotes, then the parameter `foo'bar` is fine, because if we change it to
+            // `'foo\'bar'`, then its readability will be worse.
+            const char = preferred === ScriptletParameterType.SingleQuoted ? "'" : '"';
+            return StringUtils.findNextUnescapedCharacter(parameter.value, char) === -1;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Rule that checks if a cosmetic rule contains multiple selectors
  */
 export const AdgScriptletQuotes = <LinterRule>{
     meta: {
         severity: SEVERITY.warn,
         config: {
-            default: ScriptletParameterType.SingleQuoted,
-            schema: enums([
-                ScriptletParameterType.Unquoted,
-                ScriptletParameterType.SingleQuoted,
-                ScriptletParameterType.DoubleQuoted,
-            ]) as Struct,
+            default: "single",
+            schema: enums(["none", "single", "double"]) as Struct,
         },
     },
     events: {
@@ -53,7 +95,7 @@ export const AdgScriptletQuotes = <LinterRule>{
             const line = context.getActualLine();
 
             // Get preferred quote from linter rule options
-            const preferredQuote = context.config;
+            const preferredQuote = convertQuoteType(context.config);
 
             // Check if a rule is an AdGuard scriptlet rule
             if (
@@ -64,13 +106,15 @@ export const AdgScriptletQuotes = <LinterRule>{
                 // Any quote mismatch
                 let mismatch = false;
 
+                // Scriptlet names doesn't contain quote characters in normal cases,
+                // so we don't need to check them here
                 if (ast.body.scriptlets[0].scriptlet.type !== preferredQuote) {
                     mismatch = true;
                 }
 
                 if (!mismatch && ast.body.scriptlets[0].parameters) {
                     for (const parameter of ast.body.scriptlets[0].parameters) {
-                        if (parameter.type !== preferredQuote && parameter.type !== ScriptletParameterType.RegExp) {
+                        if (isQuoteMismatch(parameter, preferredQuote)) {
                             mismatch = true;
                             break;
                         }
@@ -78,9 +122,26 @@ export const AdgScriptletQuotes = <LinterRule>{
                 }
 
                 if (mismatch) {
+                    let message = EMPTY;
+
+                    switch (context.config) {
+                        case "single":
+                            message += "Single quoted";
+                            break;
+                        case "double":
+                            message += "Double quoted";
+                            break;
+                        default:
+                            message += "Unquoted";
+                            break;
+                    }
+
+                    message += SPACE;
+                    message += "AdGuard scriptlet parameters are preferred";
+
                     // Basic problem report
                     const report = <LinterProblemReport>{
-                        message: `The scriptlet should use ${preferredQuote} quotes`,
+                        message,
                         position: {
                             startLine: line,
                             startColumn: 0,
@@ -97,7 +158,7 @@ export const AdgScriptletQuotes = <LinterRule>{
 
                         if (report.fix.body.scriptlets[0].parameters) {
                             for (const parameter of report.fix.body.scriptlets[0].parameters) {
-                                if (parameter.type !== ScriptletParameterType.RegExp) {
+                                if (isQuoteMismatch(parameter, preferredQuote)) {
                                     parameter.type = preferredQuote;
                                 }
                             }
