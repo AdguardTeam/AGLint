@@ -15,6 +15,7 @@ import { ScriptletParameter, ScriptletParameterType } from "../../parser/cosmeti
 // Utils
 import { AdblockSyntax } from "../../utils/adblockers";
 import { StringUtils } from "../../utils/string";
+import { EMPTY, SPACE } from "../../utils/constants";
 
 /**
  * Possible quote types
@@ -121,11 +122,22 @@ export const AdgScriptletQuotes = <LinterRule>{
                 }
 
                 if (mismatch) {
-                    let message = "The scriptlet should not use quotes";
+                    let message = EMPTY;
 
-                    if (context.config !== "none") {
-                        message = `The scriptlet should use ${context.config} quotes`;
+                    switch (context.config) {
+                        case "single":
+                            message += "Single quoted";
+                            break;
+                        case "double":
+                            message += "Double quoted";
+                            break;
+                        default:
+                            message += "Unquoted";
+                            break;
                     }
+
+                    message += SPACE;
+                    message += "AdGuard scriptlet parameters are preferred";
 
                     // Basic problem report
                     const report = <LinterProblemReport>{

@@ -56,7 +56,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use single quotes",
+                    message: "Single quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -90,7 +90,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use single quotes",
+                    message: "Single quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -101,7 +101,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use single quotes",
+                    message: "Single quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -112,7 +112,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use single quotes",
+                    message: "Single quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -172,7 +172,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use double quotes",
+                    message: "Double quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -206,7 +206,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use double quotes",
+                    message: "Double quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -217,7 +217,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use double quotes",
+                    message: "Double quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -228,7 +228,7 @@ describe("adg-scriptlet-quotes", () => {
                 {
                     rule: "adg-scriptlet-quotes",
                     severity: 1,
-                    message: "The scriptlet should use double quotes",
+                    message: "Double quoted AdGuard scriptlet parameters are preferred",
                     position: {
                         startLine: 7,
                         startColumn: 0,
