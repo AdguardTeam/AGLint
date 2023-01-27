@@ -307,7 +307,7 @@ example.com#%#//scriptlet("abort-on-property-read", "window.open")
 ```
 will be reported as warning:
 ```
- 1:0  warn  The scriptlet should use single quotes
+ 1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
 ```
 since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
 
