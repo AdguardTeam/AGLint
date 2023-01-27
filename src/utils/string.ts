@@ -8,6 +8,9 @@ export const SINGLE_QUOTE_MARKER = "'";
 export const DOUBLE_QUOTE_MARKER = '"';
 export const REGEX_MARKER = "/";
 
+export type NewLineType = "lf" | "crlf" | "cr";
+export type NewLineSplit = [string, NewLineType | null][];
+
 export class StringUtils {
     /**
      * Finds the first occurrence of a character that:
@@ -397,5 +400,80 @@ export class StringUtils {
      */
     public static splitStringByNewLines(input: string): string[] {
         return input.split(/\r?\n/);
+    }
+
+    /**
+     * Splits a string by new lines and stores the new line type for each line
+     *
+     * @param input The input string to be split
+     * @returns An array of tuples, where each tuple contains a line of the input string and its
+     * corresponding new line type ("lf", "crlf", or "cr")
+     */
+    public static splitStringByNewLinesEx(input: string): NewLineSplit {
+        // Array to store the tuples of line and new line type
+        const result: NewLineSplit = [];
+        let currentLine = EMPTY;
+        let newLineType: NewLineType | null = null;
+
+        // Iterate over each character in the input string
+        for (let i = 0; i < input.length; i++) {
+            const char = input[i];
+
+            if (char === "\r") {
+                if (input[i + 1] === "\n") {
+                    newLineType = "crlf";
+                    i++;
+                } else {
+                    newLineType = "cr";
+                }
+
+                result.push([currentLine, newLineType]);
+                currentLine = EMPTY;
+                newLineType = null;
+            } else if (char === "\n") {
+                newLineType = "lf";
+                result.push([currentLine, newLineType]);
+                currentLine = EMPTY;
+                newLineType = null;
+            } else {
+                currentLine += char;
+            }
+        }
+
+        if (result.length == 0 || currentLine !== EMPTY) {
+            result.push([currentLine, newLineType]);
+        }
+
+        return result;
+    }
+
+    /**
+     * Merges an array of tuples (line, newLineType) into a single string
+     *
+     * @param input The array of tuples to be merged
+     * @returns A single string containing the lines and new line characters from the input array
+     */
+    public static mergeStringByNewLines(input: NewLineSplit): string {
+        let result = EMPTY;
+
+        // Iterate over each tuple in the input array
+        for (let i = 0; i < input.length; i++) {
+            const [line, newLineType] = input[i];
+            // Add the line to the result string
+            result += line;
+
+            // Add the appropriate new line character based on the newLineType
+            if (newLineType !== null) {
+                if (newLineType === "crlf") {
+                    result += "\r\n";
+                } else if (newLineType === "cr") {
+                    result += "\r";
+                } else {
+                    result += "\n";
+                }
+            }
+        }
+
+        return result;
     }
 }
