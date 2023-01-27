@@ -164,4 +164,54 @@ describe("String utils", () => {
         expect(StringUtils.splitStringByNewLines(`a\nb\nc`)).toStrictEqual(["a", "b", "c"]);
         expect(StringUtils.splitStringByNewLines(`a\r\nb\nc`)).toStrictEqual(["a", "b", "c"]);
     });
+
+    test("splitStringByNewLinesEx", () => {
+        console.log(StringUtils.splitStringByNewLinesEx(``));
+
+        expect(StringUtils.splitStringByNewLinesEx(EMPTY)).toStrictEqual([[EMPTY, null]]);
+
+        expect(StringUtils.splitStringByNewLinesEx(`a\nb\nc`)).toStrictEqual([
+            ["a", "lf"],
+            ["b", "lf"],
+            ["c", null],
+        ]);
+
+        expect(StringUtils.splitStringByNewLinesEx(`a\r\nb\nc`)).toStrictEqual([
+            ["a", "crlf"],
+            ["b", "lf"],
+            ["c", null],
+        ]);
+
+        expect(StringUtils.splitStringByNewLinesEx(`a\r\nb\nc\n`)).toStrictEqual([
+            ["a", "crlf"],
+            ["b", "lf"],
+            ["c", "lf"],
+        ]);
+
+        expect(StringUtils.splitStringByNewLinesEx(`a\r\nb\nc\rd\n\n`)).toStrictEqual([
+            ["a", "crlf"],
+            ["b", "lf"],
+            ["c", "cr"],
+            ["d", "lf"],
+            [EMPTY, "lf"],
+        ]);
+    });
+
+    test("mergeStringByNewLines", () => {
+        expect(StringUtils.mergeStringByNewLines(StringUtils.splitStringByNewLinesEx(EMPTY))).toEqual(EMPTY);
+
+        expect(StringUtils.mergeStringByNewLines(StringUtils.splitStringByNewLinesEx(`a\nb\nc`))).toEqual(`a\nb\nc`);
+
+        expect(StringUtils.mergeStringByNewLines(StringUtils.splitStringByNewLinesEx(`a\r\nb\nc`))).toEqual(
+            `a\r\nb\nc`
+        );
+
+        expect(StringUtils.mergeStringByNewLines(StringUtils.splitStringByNewLinesEx(`a\r\nb\nc\n`))).toEqual(
+            `a\r\nb\nc\n`
+        );
+
+        expect(StringUtils.mergeStringByNewLines(StringUtils.splitStringByNewLinesEx(`a\r\nb\nc\rd\n\n`))).toEqual(
+            `a\r\nb\nc\rd\n\n`
+        );
+    });
 });
