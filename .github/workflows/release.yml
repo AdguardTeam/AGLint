@@ -1,11 +1,7 @@
 name: NPM release
 
-on:
-  push:
-    branches:
-      - master
-    tags:
-      - v*
+on: 
+  workflow_dispatch:
 
 jobs:
   release:
@@ -25,8 +21,7 @@ jobs:
     
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      
-      # Test before build
+  
       - name: Check TypeScript types
         run: yarn check-types
       
@@ -36,12 +31,13 @@ jobs:
       - name: Run Jest tests
         run: yarn test
 
-      # Build before publish
       - name: Run Rollup build
         run: yarn build
 
-      # Publish to NPM
+      - name: Pack files
+        run: yarn pack --filename release.tgz
+     
       - name: Publish to NPM
-        run: yarn publish
+        run: yarn publish release.tgz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
