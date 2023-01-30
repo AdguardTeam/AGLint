@@ -1,79 +1,43 @@
-name: Release
-on:
-  # Run manually
+name: NPM release
+
+on: 
   workflow_dispatch:
 
 jobs:
-  lint:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: master
       
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
+          registry-url: https://registry.npmjs.org
           cache: yarn
     
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+  
+      - name: Check TypeScript types
+        run: yarn check-types
       
       - name: Run ESLint
         run: yarn lint
   
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out to repository
-        uses: actions/checkout@v3
-        with:
-          ref: main
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: yarn
-    
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      
-      - name: Run tests
+      - name: Run Jest tests
         run: yarn test
 
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out to repository
-        uses: actions/checkout@v3
-        with:
-          ref: main
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: yarn
-    
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      
-      - name: Run build script
+      - name: Run Rollup build
         run: yarn build
 
-      # TODO: Artifact / Create release:
-
-      # - name: Create release artifact
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: release_artifact
-      #     path: |
-      #       .
-      #       !./node_modules
-
-      # TODO: Publish to NPM
+      - name: Pack files
+        run: yarn pack --filename release.tgz
+     
+      - name: Publish to NPM
+        run: yarn publish release.tgz
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

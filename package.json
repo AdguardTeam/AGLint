@@ -1,5 +1,5 @@
 {
-    "name": "aglint",
+    "name": "@adguard/aglint",
     "version": "1.0.0",
     "description": "Universal adblock filter list parser, linter and converter.",
     "keywords": [
