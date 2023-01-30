@@ -1,33 +1,33 @@
 name: NPM release
 
-on: 
-  workflow_dispatch:
+on:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out to repository
+      - name: Check out the repository
         uses: actions/checkout@v3
-        with:
-          ref: master
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org
           cache: yarn
-    
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-  
+
       - name: Check TypeScript types
         run: yarn check-types
-      
+
       - name: Run ESLint
         run: yarn lint
-  
+
       - name: Run Jest tests
         run: yarn test
 
@@ -36,8 +36,8 @@ jobs:
 
       - name: Pack files
         run: yarn pack --filename release.tgz
-     
+
       - name: Publish to NPM
-        run: yarn publish release.tgz
+        run: yarn publish release.tgz --access=public --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
