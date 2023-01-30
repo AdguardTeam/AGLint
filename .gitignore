@@ -3,3 +3,6 @@ dist
 *.log
 coverage
 .vscode
+
+# Release file for npm.
+release.tgz
