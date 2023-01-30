@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-    # Temporary, to be removed before the final push.
-      - "npm-deploy-*"
 
 jobs:
   release:
