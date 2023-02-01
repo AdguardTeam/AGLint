@@ -116,7 +116,7 @@ const browserPlugins = [
 
 // Browser-friendly UMD build
 const aglintUmd = {
-    input: "./src/index.ts",
+    input: "./src/index.browser.ts",
     output: [
         {
             file: "./dist/aglint.umd.js",
@@ -130,7 +130,7 @@ const aglintUmd = {
 
 // Browser-friendly IIFE build
 const aglintIife = {
-    input: "./src/index.ts",
+    input: "./src/index.browser.ts",
     output: [
         {
             file: "./dist/aglint.iife.js",
@@ -146,7 +146,7 @@ const aglintIife = {
 const aglintDts = {
     input: "./dist/types/index.d.ts",
     output: [{ file: "dist/aglint.d.ts", format: "es" }],
-    plugins: [dts()],
+    plugins: [externals(), dts()],
 };
 
 // Export build configs for Rollup

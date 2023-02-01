@@ -1,7 +1,7 @@
 import path, { ParsedPath } from "path";
 import { readFile, readdir, writeFile } from "fs/promises";
 import { pathExists } from "fs-extra";
-import { Linter } from "../../index";
+import { Linter } from "../index";
 import { mergeConfigs } from "../config";
 import { walk } from "./walk";
 import { scan } from "./scan";
