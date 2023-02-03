@@ -5,6 +5,7 @@ export * from "./parser";
 
 // Core linter
 export * from "./linter";
+export * from "./linter/config";
 
 // Linter CLI
 export * from "./linter/cli";
