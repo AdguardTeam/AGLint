@@ -1,4 +1,4 @@
-import { Chalk, ChalkInstance, Options as ChalkOptions } from "chalk";
+import chalk, { Chalk, Options as ChalkOptions } from "chalk";
 import stripAnsi from "strip-ansi";
 import table from "text-table";
 import { inflect } from "inflection";
@@ -36,7 +36,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
     /**
      * Custom Chalk instance to use for coloring the console output.
      */
-    private chalk: ChalkInstance;
+    private chalk: Chalk;
 
     /**
      * Total number of warnings
@@ -63,7 +63,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
         // want to disable colors if the user doesn't want them.
         const chalkOptions: ChalkOptions = colors ? {} : { level: 0 };
 
-        this.chalk = new Chalk(chalkOptions);
+        this.chalk = new chalk.Instance(chalkOptions);
     }
 
     /**
