@@ -6,8 +6,7 @@
 
 import { program } from "commander";
 import { readFileSync } from "fs";
-import { LinterCli } from "./linter/cli";
-import { LinterConsoleReporter } from "./linter/cli/reporters/console";
+import { LinterCli, LinterConsoleReporter } from "@aglint";
 
 // Based on https://github.com/rollup/plugins/tree/master/packages/json#usage
 const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
