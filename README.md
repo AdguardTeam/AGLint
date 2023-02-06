@@ -15,6 +15,11 @@
     <a href="https://adblockplus.org/"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
 </p>
 
+<p align="center">
+    <a href="https://www.npmjs.com/package/@adguard/aglint"><img src="https://img.shields.io/npm/v/@adguard/aglint" alt="NPM version" /></a>
+    <a href="https://github.com/AdguardTeam/AGLint/blob/master/LICENSE"><img src="https://img.shields.io/badge/GPL-3.0-only" alt="License: GPL-3.0-only" /></a>
+</p>
+
 Table of Contents:
 - [Introduction](#introduction)
 - [Features](#features)
