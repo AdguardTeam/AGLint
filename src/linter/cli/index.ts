@@ -24,6 +24,8 @@ export class LinterCli {
 
     private ignore: boolean;
 
+    private errors: boolean;
+
     /**
      * Creates a new `LinterCli` instance.
      *
@@ -35,6 +37,7 @@ export class LinterCli {
         this.reporter = reporter;
         this.fix = fix;
         this.ignore = ignore;
+        this.errors = false;
     }
 
     /**
@@ -62,6 +65,11 @@ export class LinterCli {
         // Lint the file
         let result = linter.lint(await readFile(filePath, "utf8"), this.fix || false);
 
+        // Set the errors flag if there are any errors
+        if (!this.errors && (result.errorCount > 0 || result.fatalErrorCount > 0)) {
+            this.errors = true;
+        }
+
         // If fix is enabled and fixable problems were found, write the fixed file,
         // then re-lint the fixed file to see if there are still problems
         if (this.fix) {
@@ -77,6 +85,15 @@ export class LinterCli {
         if (this.reporter.onFileEnd) {
             this.reporter.onFileEnd(file, result, configDeepClone);
         }
+    };
+
+    /**
+     * Returns true if the linter found any errors.
+     *
+     * @returns `true` if the linter found any errors, `false` otherwise
+     */
+    public hasErrors = (): boolean => {
+        return this.errors;
     };
 
     /**
