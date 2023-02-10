@@ -48,4 +48,10 @@ const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url),
     const cwd = process.env.INIT_CWD || process.cwd();
 
     await cli.run(cwd, program.args);
+
+    // If there are errors, exit with code 1. This is necessary for CI/CD pipelines,
+    // see https://docs.github.com/en/actions/creating-actions/setting-exit-codes-for-actions#about-exit-codes
+    if (cli.hasErrors()) {
+        process.exit(1);
+    }
 })();
