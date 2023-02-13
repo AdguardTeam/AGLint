@@ -85,7 +85,7 @@ describe("CLI tests", () => {
                         problems: [
                             {
                                 severity: 3,
-                                message: "AGLint parsing error: Name is expected",
+                                message: "AGLint parsing error: CSSTree failed to parse selector: Name is expected",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,
@@ -198,7 +198,7 @@ describe("CLI tests", () => {
                         problems: [
                             {
                                 severity: 3,
-                                message: "AGLint parsing error: Name is expected",
+                                message: "AGLint parsing error: CSSTree failed to parse selector: Name is expected",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,
@@ -337,7 +337,7 @@ describe("CLI tests", () => {
                         problems: [
                             {
                                 severity: 3,
-                                message: "AGLint parsing error: Name is expected",
+                                message: "AGLint parsing error: CSSTree failed to parse selector: Name is expected",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,

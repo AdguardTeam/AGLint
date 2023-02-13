@@ -47,16 +47,26 @@ export class CssTree {
      * @returns CSSTree node (AST)
      */
     public static parse(raw: string, context: CssTreeParserContext): CssNode {
-        return parse(raw, {
-            context,
-            parseAtrulePrelude: true,
-            parseRulePrelude: true,
-            parseValue: true,
-            parseCustomProperty: true,
-            onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
-                throw new SyntaxError(`CSSTree parsing error: ${error.rawMessage || error.message}`);
-            },
-        });
+        try {
+            return parse(raw, {
+                context,
+                parseAtrulePrelude: true,
+                parseRulePrelude: true,
+                parseValue: true,
+                parseCustomProperty: true,
+                // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
+                onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
+                    throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.rawMessage || error.message}`);
+                },
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.message}`);
+            }
+
+            // Pass through
+            throw error;
+        }
     }
 
     /**
@@ -67,18 +77,28 @@ export class CssTree {
      * @returns CSSTree node (AST)
      */
     public static parsePlain(raw: string, context: CssTreeParserContext): CssNodePlain {
-        return toPlainObject(
-            parse(raw, {
-                context,
-                parseAtrulePrelude: true,
-                parseRulePrelude: true,
-                parseValue: true,
-                parseCustomProperty: true,
-                onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
-                    throw new SyntaxError(error.rawMessage);
-                },
-            })
-        );
+        try {
+            return toPlainObject(
+                parse(raw, {
+                    context,
+                    parseAtrulePrelude: true,
+                    parseRulePrelude: true,
+                    parseValue: true,
+                    parseCustomProperty: true,
+                    // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
+                    onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
+                        throw new SyntaxError(error.rawMessage);
+                    },
+                })
+            );
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.message}`);
+            }
+
+            // Pass through
+            throw error;
+        }
     }
 
     /**
