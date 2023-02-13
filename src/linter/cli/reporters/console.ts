@@ -1,4 +1,5 @@
 import chalk, { Chalk, Options as ChalkOptions } from "chalk";
+import terminalLink from "terminal-link";
 import stripAnsi from "strip-ansi";
 import table from "text-table";
 import { inflect } from "inflection";
@@ -161,7 +162,18 @@ export class LinterConsoleReporter implements LinterCliReporter {
                 }
 
                 // Column: Problem description
-                row.push(this.chalk.dim(problem.message));
+                row.push(problem.message);
+
+                // Column: Linter rule name (if available)
+                if (problem.rule) {
+                    if (terminalLink.isSupported) {
+                        row.push(terminalLink(problem.rule, `https://github.com/AdguardTeam/AGLint#${problem.rule}`));
+                    } else {
+                        row.push(this.chalk.dim(problem.rule));
+                    }
+                } else {
+                    row.push(EMPTY);
+                }
 
                 rows.push(row);
             }
