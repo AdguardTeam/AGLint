@@ -20,12 +20,22 @@ describe("parseConfigFile", () => {
             )}": Value "false" for "rules" is not a valid "record" type`
         );
 
+        await expect(parseConfigFile(path.join(base, "invalid-json.json"))).rejects.toThrowError(
+            `Failed to parse config file "${path.join(
+                base,
+                "invalid-json.json"
+            )}": Unexpected token / in JSON at position 7`
+        );
+
         await expect(parseConfigFile(path.join(base, "aglint.config.yaml"))).rejects.toThrowError();
         await expect(parseConfigFile(path.join(base, "aglint.config.yml"))).rejects.toThrowError();
 
         // TODO: Implement support for JS/TS config files
         await expect(parseConfigFile(path.join(base, "aglint.config.txt"))).rejects.toThrowError(
-            `Unsupported config file extension ".txt" at path "${path.join(base, "aglint.config.txt")}"`
+            `Failed to parse config file "${path.join(
+                base,
+                "aglint.config.txt"
+            )}": Unsupported config file extension ".txt"`
         );
     });
 

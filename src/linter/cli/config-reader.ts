@@ -10,49 +10,54 @@ import { EMPTY } from "../../utils/constants";
  *
  * @param filePath - The name of the configuration file to be read and parsed.
  * @returns The parsed config object.
- * @throws If the file extension is not supported or if the config object fails validation.
+ * @throws If the file not found or the file extension is not supported.
+ * @throws If the file contents are not valid JSON or YAML.
+ * @throws If the file contents are not valid according to the config schema.
  */
 export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
-    // Determine the file extension
-    const parsedFilePath = parse(filePath);
+    try {
+        // Determine the file extension
+        const parsedFilePath = parse(filePath);
 
-    // Read the file contents
-    const contents = await readFile(filePath, "utf8");
+        // Read the file contents
+        const contents = await readFile(filePath, "utf8");
 
-    // At this point, we don't know exactly what the file contains, so simply mark
-    // it as unknown, later we validate it anyway
-    let parsed: unknown;
+        // At this point, we don't know exactly what the file contains, so simply mark
+        // it as unknown, later we validate it anyway
+        let parsed: unknown;
 
-    if (parsedFilePath.base === ".aglintrc") {
-        parsed = JSON.parse(contents);
-    } else {
-        // Parse the file contents based on the extension
-        switch (parsedFilePath.ext) {
-            case ".json": {
-                // Built-in JSON parser
-                parsed = JSON.parse(contents);
-                break;
-            }
+        if (parsedFilePath.base === ".aglintrc") {
+            parsed = JSON.parse(contents);
+        } else {
+            // Parse the file contents based on the extension
+            switch (parsedFilePath.ext) {
+                case ".json": {
+                    // Built-in JSON parser
+                    parsed = JSON.parse(contents);
+                    break;
+                }
 
-            case ".yaml":
-            case ".yml": {
-                // Well-tested external YAML parser
-                parsed = yaml.load(contents);
-                break;
-            }
+                case ".yaml":
+                case ".yml": {
+                    // Well-tested external YAML parser
+                    parsed = yaml.load(contents);
+                    break;
+                }
 
-            // TODO: Implement support for JS/TS config files
-            default: {
-                throw new Error(`Unsupported config file extension "${parsedFilePath.ext}" at path "${filePath}"`);
+                // TODO: Implement support for JS/TS config files
+                default: {
+                    throw new Error(`Unsupported config file extension "${parsedFilePath.ext}"`);
+                }
             }
         }
-    }
 
-    // Validate the parsed config object against the config schema using Superstruct
-    try {
+        // Validate the parsed config object against the config schema using Superstruct
         assert(parsed, linterConfigSchema);
+
+        return parsed;
     } catch (error: unknown) {
         if (error instanceof Error) {
+            // Handle Superstruct errors
             if (error instanceof StructError) {
                 // We can customize the error message here to make it more user-friendly
                 // https://docs.superstructjs.org/guides/05-handling-errors#customizing-errors
@@ -68,7 +73,6 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
                     message = `Value "${value}" for "${key}" is not a valid "${type}" type`;
                 }
 
-                // If the error is a StructError, we can provide a more helpful message
                 throw new Error(`Failed to parse config file "${filePath}": ${message}`);
             }
 
@@ -78,6 +82,4 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
         // Pass through any other errors
         throw error;
     }
-
-    return parsed;
 }
