@@ -17,6 +17,7 @@ describe("AdgModifierListParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
             ],
             rest: "example.com",
@@ -27,9 +28,11 @@ describe("AdgModifierListParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
             ],
@@ -41,9 +44,11 @@ describe("AdgModifierListParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
             ],
@@ -56,6 +61,7 @@ describe("AdgModifierListParser", () => {
             modifiers: [
                 {
                     modifier: "path",
+                    exception: false,
                     value: "/test",
                 },
             ],
@@ -65,21 +71,24 @@ describe("AdgModifierListParser", () => {
         // Complicated case
         expect(
             AdgModifierListParser.parse(
-                `[$path=/test,domain=/(^|.+\\.)example\\.(com|org)\\$/,modifier1]example.com,example.org`
+                `[$path=/test,~domain=/(^|.+\\.)example\\.(com|org)\\$/,modifier1]example.com,example.org`
             )
         ).toEqual({
             type: ADG_MODIFIER_LIST_TYPE,
             modifiers: [
                 {
                     modifier: "path",
+                    exception: false,
                     value: "/test",
                 },
                 {
                     modifier: "domain",
+                    exception: true,
                     value: "/(^|.+\\.)example\\.(com|org)\\$/",
                 },
                 {
                     modifier: "modifier1",
+                    exception: false,
                 },
             ],
             rest: "example.com,example.org",

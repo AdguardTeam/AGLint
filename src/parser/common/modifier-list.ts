@@ -7,6 +7,8 @@ const MODIFIERS_SEPARATOR = ",";
 // Modifiers can be assigned. For example: "domain=example.com"
 const MODIFIER_ASSIGN_OPERATOR = "=";
 
+const MODIFIER_EXCEPTION_MARKER = "~";
+
 export const MODIFIER_LIST_TYPE = "ModifierList";
 
 /**
@@ -40,6 +42,11 @@ export interface RuleModifier {
      * Modifier name
      */
     modifier: string;
+
+    /**
+     * Is this modifier an exception? For example, `~third-party` is an exception
+     */
+    exception?: boolean;
 
     /**
      * Modifier value (optional)
@@ -83,13 +90,30 @@ export class ModifierListParser {
 
             // Modifier without value, eg simply `script`
             if (assignmentOperatorIndex == -1) {
-                result.modifiers.push({ modifier: rawModifier.trim() });
+                let modifier = rawModifier.trim();
+                let exception = false;
+
+                if (modifier.startsWith(MODIFIER_EXCEPTION_MARKER)) {
+                    modifier = modifier.slice(1);
+                    exception = true;
+                }
+
+                result.modifiers.push({ modifier: modifier.trim(), exception });
             }
 
             // Modifier with value assignment, eg `redirect=value...`
             else {
+                let modifier = rawModifier.substring(0, assignmentOperatorIndex).trim();
+                let exception = false;
+
+                if (modifier.startsWith(MODIFIER_EXCEPTION_MARKER)) {
+                    modifier = modifier.slice(1);
+                    exception = true;
+                }
+
                 result.modifiers.push({
-                    modifier: rawModifier.substring(0, assignmentOperatorIndex).trim(),
+                    modifier: modifier.trim(),
+                    exception,
                     value: rawModifier.substring(assignmentOperatorIndex + 1).trim(),
                 });
             }
@@ -106,8 +130,14 @@ export class ModifierListParser {
      */
     public static generate(ast: ModifierList): string {
         const result = ast.modifiers
-            .map(({ modifier, value }) => {
-                let subresult = modifier.trim();
+            .map(({ modifier, exception, value }) => {
+                let subresult = EMPTY;
+
+                if (exception) {
+                    subresult += MODIFIER_EXCEPTION_MARKER;
+                }
+
+                subresult += modifier.trim();
 
                 if (value) {
                     subresult += MODIFIER_ASSIGN_OPERATOR;
