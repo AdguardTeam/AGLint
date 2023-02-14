@@ -22,9 +22,9 @@ export const DuplicatedModifiers = <LinterRule>{
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            // Check if the rule is an element hiding rule
+            // Check if the rule is a basic network rule
             if (ast.category == RuleCategory.Network && ast.type === NetworkRuleType.BasicNetworkRule) {
-                // Do not report problem for EVERY modifier, just only for the first one
+                // Do not report problem for EVERY same modifier, just only for the first one
                 const alreadyHandledModifiers: string[] = [];
 
                 for (const { modifier } of ast.modifiers) {
