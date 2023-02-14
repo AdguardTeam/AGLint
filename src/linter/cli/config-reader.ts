@@ -4,6 +4,7 @@ import { parse } from "path";
 import yaml from "js-yaml";
 import { LinterConfig, linterConfigSchema } from "../config";
 import { EMPTY } from "../../utils/constants";
+import { EXT_JSON, EXT_YAML, EXT_YML, RC_CONFIG_FILE } from "./constants";
 
 /**
  * Reads and parses supported configuration files.
@@ -26,19 +27,19 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
         // it as unknown, later we validate it anyway
         let parsed: unknown;
 
-        if (parsedFilePath.base === ".aglintrc") {
+        if (parsedFilePath.base === RC_CONFIG_FILE) {
             parsed = JSON.parse(contents);
         } else {
             // Parse the file contents based on the extension
             switch (parsedFilePath.ext) {
-                case ".json": {
+                case EXT_JSON: {
                     // Built-in JSON parser
                     parsed = JSON.parse(contents);
                     break;
                 }
 
-                case ".yaml":
-                case ".yml": {
+                case EXT_YAML:
+                case EXT_YML: {
                     // Well-tested external YAML parser
                     parsed = yaml.load(contents);
                     break;
