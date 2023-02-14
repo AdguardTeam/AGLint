@@ -75,48 +75,43 @@ export class ModifierListParser {
             modifiers: [],
         };
 
-        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
+        // Split modifiers by unescaped commas
+        const rawModifiers = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
-        if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == EMPTY) {
+        if (rawModifiers.length == 1 && rawModifiers[0].trim() == EMPTY) {
             return result;
         }
 
-        for (const rawModifier of rawModifiersSplitted) {
+        // Parse each modifier separately
+        for (const rawModifier of rawModifiers) {
+            const trimmedRawModifier = rawModifier.trim();
+
+            // Find the index of the first unescaped "=" character
             const assignmentOperatorIndex = StringUtils.findNextUnescapedCharacter(
-                rawModifier,
+                trimmedRawModifier,
                 MODIFIER_ASSIGN_OPERATOR
             );
 
-            // Modifier without value, eg simply `script`
+            const parsedModifier: Partial<RuleModifier> = {
+                exception: trimmedRawModifier.startsWith(MODIFIER_EXCEPTION_MARKER),
+            };
+
             if (assignmentOperatorIndex == -1) {
-                let modifier = rawModifier.trim();
-                let exception = false;
-
-                if (modifier.startsWith(MODIFIER_EXCEPTION_MARKER)) {
-                    modifier = modifier.slice(1);
-                    exception = true;
-                }
-
-                result.modifiers.push({ modifier: modifier.trim(), exception });
+                // Modifier without value, eg simply `script`
+                parsedModifier.modifier = trimmedRawModifier;
+            } else {
+                // Modifier with value assignment, eg `redirect=value`
+                parsedModifier.modifier = trimmedRawModifier.substring(0, assignmentOperatorIndex).trim();
+                parsedModifier.value = trimmedRawModifier.substring(assignmentOperatorIndex + 1).trim();
             }
 
-            // Modifier with value assignment, eg `redirect=value...`
-            else {
-                let modifier = rawModifier.substring(0, assignmentOperatorIndex).trim();
-                let exception = false;
-
-                if (modifier.startsWith(MODIFIER_EXCEPTION_MARKER)) {
-                    modifier = modifier.slice(1);
-                    exception = true;
-                }
-
-                result.modifiers.push({
-                    modifier: modifier.trim(),
-                    exception,
-                    value: rawModifier.substring(assignmentOperatorIndex + 1).trim(),
-                });
+            // Remove exception marker from the modifier name
+            if (parsedModifier.exception) {
+                parsedModifier.modifier = parsedModifier.modifier.slice(1).trim();
             }
+
+            result.modifiers.push(<RuleModifier>parsedModifier);
         }
 
         return result;
