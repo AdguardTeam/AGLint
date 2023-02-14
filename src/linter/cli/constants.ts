@@ -1,17 +1,24 @@
+export const CONFIG_FILE = "aglint.config";
+export const RC_CONFIG_FILE = ".aglintrc";
+
+export const EXT_JSON = ".json";
+export const EXT_YAML = ".yaml";
+export const EXT_YML = ".yml";
+
 /**
  * Possible names of the config file
  */
 export const CONFIG_FILE_NAMES = [
     // aglint.config stuff
-    "aglint.config.json",
-    "aglint.config.yaml",
-    "aglint.config.yml",
+    CONFIG_FILE + EXT_JSON,
+    CONFIG_FILE + EXT_YAML,
+    CONFIG_FILE + EXT_YML,
 
     // .aglintrc stuff
-    ".aglintrc",
-    ".aglintrc.json",
-    ".aglintrc.yaml",
-    ".aglintrc.yml",
+    RC_CONFIG_FILE,
+    RC_CONFIG_FILE + EXT_JSON,
+    RC_CONFIG_FILE + EXT_YAML,
+    RC_CONFIG_FILE + EXT_YML,
 ];
 
 /**
