@@ -6,13 +6,26 @@ describe("parseConfigFile", () => {
     test("run on invalid fixtures", async () => {
         const base = "test/fixtures/config/invalid";
 
-        await expect(parseConfigFile(path.join(base, ".aglintrc"))).rejects.toThrowError();
-        await expect(parseConfigFile(path.join(base, "aglint.config.json"))).rejects.toThrowError();
+        await expect(parseConfigFile(path.join(base, ".aglintrc"))).rejects.toThrowError(
+            `Failed to parse config file "${path.join(
+                base,
+                ".aglintrc"
+            )}": "unknownConfigOption" is unknown in the config schema, please remove it`
+        );
+
+        await expect(parseConfigFile(path.join(base, "aglint.config.json"))).rejects.toThrowError(
+            `Failed to parse config file "${path.join(
+                base,
+                "aglint.config.json"
+            )}": Value "false" for "rules" is not a valid "record" type`
+        );
+
         await expect(parseConfigFile(path.join(base, "aglint.config.yaml"))).rejects.toThrowError();
         await expect(parseConfigFile(path.join(base, "aglint.config.yml"))).rejects.toThrowError();
 
+        // TODO: Implement support for JS/TS config files
         await expect(parseConfigFile(path.join(base, "aglint.config.txt"))).rejects.toThrowError(
-            "Unsupported config file extension: .txt"
+            `Unsupported config file extension ".txt" at path "${path.join(base, "aglint.config.txt")}"`
         );
     });
 
