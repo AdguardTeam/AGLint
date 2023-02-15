@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Linter } from "../../../src/linter";
 import { DuplicatedModifiers } from "../../../src/linter/rules/duplicated-modifiers";
 import { NEWLINE } from "../../../src/utils/constants";
