@@ -33,9 +33,11 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
             ],
@@ -68,9 +70,11 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
             ],
@@ -86,13 +90,16 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
                 {
                     modifier: "m3",
+                    exception: false,
                     value: "/^r3$/",
                 },
             ],
@@ -108,13 +115,16 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
                 {
                     modifier: "m3",
+                    exception: false,
                     value: "/^r3\\$/",
                 },
             ],
@@ -140,6 +150,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1$m2$m3$m4$m5",
+                    exception: false,
                 },
             ],
         });
@@ -153,6 +164,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                     value: "v1$m2$m3=v3$m4$m5=v5",
                 },
             ],
@@ -168,6 +180,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                     value: "v1",
                 },
             ],
@@ -183,6 +196,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                     value: "v1",
                 },
             ],
@@ -197,6 +211,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                     value: "/^v1$/",
                 },
             ],
@@ -212,6 +227,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                     value: "v1",
                 },
             ],
@@ -226,9 +242,11 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "/^regex$/",
                 },
             ],
@@ -246,21 +264,26 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "m1",
+                    exception: false,
                 },
                 {
                     modifier: "m2",
+                    exception: false,
                     value: "v2",
                 },
                 {
                     modifier: "m3",
+                    exception: false,
                     value: "/^r3\\$/",
                 },
                 {
                     modifier: "m4",
+                    exception: false,
                     value: "/r4\\/r4$/",
                 },
                 {
                     modifier: "m5",
+                    exception: false,
                     value: "/^r5\\$/",
                 },
             ],
@@ -277,6 +300,7 @@ describe("NetworkRuleParser", () => {
             modifiers: [
                 {
                     modifier: "replace",
+                    exception: false,
                     value: "/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i",
                 },
             ],

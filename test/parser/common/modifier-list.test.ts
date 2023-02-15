@@ -16,44 +16,100 @@ describe("ModifierListParser", () => {
         // Valid modifiers
         expect(ModifierListParser.parse("modifier1")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1" }],
+            modifiers: [{ modifier: "modifier1", exception: false }],
+        });
+
+        expect(ModifierListParser.parse("~modifier1")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [{ modifier: "modifier1", exception: true }],
         });
 
         expect(ModifierListParser.parse("modifier1,modifier2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2" }],
+            modifiers: [
+                { modifier: "modifier1", exception: false },
+                { modifier: "modifier2", exception: false },
+            ],
+        });
+
+        expect(ModifierListParser.parse("modifier1,~modifier2")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [
+                { modifier: "modifier1", exception: false },
+                { modifier: "modifier2", exception: true },
+            ],
+        });
+
+        expect(ModifierListParser.parse("~modifier1,modifier2")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [
+                { modifier: "modifier1", exception: true },
+                { modifier: "modifier2", exception: false },
+            ],
+        });
+
+        expect(ModifierListParser.parse("~modifier1,~modifier2")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [
+                { modifier: "modifier1", exception: true },
+                { modifier: "modifier2", exception: true },
+            ],
         });
 
         expect(ModifierListParser.parse("modifier1, modifier2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2" }],
+            modifiers: [
+                { modifier: "modifier1", exception: false },
+                { modifier: "modifier2", exception: false },
+            ],
+        });
+
+        expect(ModifierListParser.parse("modifier1, ~modifier2")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [
+                { modifier: "modifier1", exception: false },
+                { modifier: "modifier2", exception: true },
+            ],
         });
 
         expect(ModifierListParser.parse("modifier1=value1")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1", value: "value1" }],
+            modifiers: [{ modifier: "modifier1", exception: false, value: "value1" }],
+        });
+
+        expect(ModifierListParser.parse("~modifier1=value1")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [{ modifier: "modifier1", exception: true, value: "value1" }],
         });
 
         expect(ModifierListParser.parse("modifier1 = value1")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1", value: "value1" }],
+            modifiers: [{ modifier: "modifier1", exception: false, value: "value1" }],
+        });
+
+        expect(ModifierListParser.parse("~modifier1 = value1")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [{ modifier: "modifier1", exception: true, value: "value1" }],
         });
 
         expect(ModifierListParser.parse("   modifier1   =    value1       ")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1", value: "value1" }],
+            modifiers: [{ modifier: "modifier1", exception: false, value: "value1" }],
         });
 
         expect(ModifierListParser.parse("modifier1,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
-            modifiers: [{ modifier: "modifier1" }, { modifier: "modifier2", value: "value2" }],
+            modifiers: [
+                { modifier: "modifier1", exception: false },
+                { modifier: "modifier2", exception: false, value: "value2" },
+            ],
         });
 
         expect(ModifierListParser.parse("modifier1=value1,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [
-                { modifier: "modifier1", value: "value1" },
-                { modifier: "modifier2", value: "value2" },
+                { modifier: "modifier1", exception: false, value: "value1" },
+                { modifier: "modifier2", exception: false, value: "value2" },
             ],
         });
 
@@ -62,8 +118,16 @@ describe("ModifierListParser", () => {
         expect(ModifierListParser.parse("modifier1=a\\,b\\,c,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [
-                { modifier: "modifier1", value: "a\\,b\\,c" },
-                { modifier: "modifier2", value: "value2" },
+                { modifier: "modifier1", exception: false, value: "a\\,b\\,c" },
+                { modifier: "modifier2", exception: false, value: "value2" },
+            ],
+        });
+
+        expect(ModifierListParser.parse("modifier1=a\\,b\\,c,~modifier2=value2")).toEqual(<ModifierList>{
+            type: MODIFIER_LIST_TYPE,
+            modifiers: [
+                { modifier: "modifier1", exception: false, value: "a\\,b\\,c" },
+                { modifier: "modifier2", exception: true, value: "value2" },
             ],
         });
 
@@ -76,10 +140,12 @@ describe("ModifierListParser", () => {
             modifiers: [
                 {
                     modifier: "path",
+                    exception: false,
                     value: "/\\/(sub1|sub2)\\/page\\.html/",
                 },
                 {
                     modifier: "replace",
+                    exception: false,
                     value: "/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i",
                 },
             ],
@@ -98,20 +164,32 @@ describe("ModifierListParser", () => {
         };
 
         expect(parseAndGenerate("modifier1")).toEqual("modifier1");
+        expect(parseAndGenerate("~modifier1")).toEqual("~modifier1");
         expect(parseAndGenerate("modifier1=value1")).toEqual("modifier1=value1");
+        expect(parseAndGenerate("~modifier1=value1")).toEqual("~modifier1=value1");
 
         expect(parseAndGenerate("modifier1=value1,modifier2")).toEqual("modifier1=value1,modifier2");
+        expect(parseAndGenerate("~modifier1=value1,modifier2")).toEqual("~modifier1=value1,modifier2");
+        expect(parseAndGenerate("modifier1=value1,~modifier2")).toEqual("modifier1=value1,~modifier2");
+        expect(parseAndGenerate("~modifier1=value1,~modifier2")).toEqual("~modifier1=value1,~modifier2");
 
         expect(parseAndGenerate("modifier1,modifier2=value2")).toEqual("modifier1,modifier2=value2");
 
         expect(parseAndGenerate("modifier1,modifier2")).toEqual("modifier1,modifier2");
 
         expect(parseAndGenerate("modifier1=value1,modifier2=value2")).toEqual("modifier1=value1,modifier2=value2");
+        expect(parseAndGenerate("~modifier1=value1,~modifier2=value2")).toEqual("~modifier1=value1,~modifier2=value2");
 
         expect(
             parseAndGenerate(
                 "path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i"
             )
         ).toEqual("path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i");
+
+        expect(
+            parseAndGenerate(
+                "~path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i"
+            )
+        ).toEqual("~path=/\\/(sub1|sub2)\\/page\\.html/,replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/\\$1<\\/VAST>/i");
     });
 });
