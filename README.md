@@ -43,6 +43,7 @@ Table of Contents:
   - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
+  - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -378,6 +379,17 @@ example.com##.ad
 example.com##.something
 example.org##.ad
 ```
+
+### `unknown-preprocessor-directives`
+
+Checks if the preprocessor directives are known. For example, `!#unknown` will be reported as error, since `unknown` is not a known preprocessor directive.
+
+Currently, the following preprocessor directives are supported:
+- `if`
+- `endif`
+- `include`
+
+For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
 
 ## Use programmatically
 
