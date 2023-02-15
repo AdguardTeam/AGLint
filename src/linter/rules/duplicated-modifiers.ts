@@ -24,17 +24,15 @@ export const DuplicatedModifiers = <LinterRule>{
 
             // Check if the rule is a basic network rule
             if (ast.category == RuleCategory.Network && ast.type === NetworkRuleType.BasicNetworkRule) {
-                // Do not report problem for EVERY same modifier, just only for the first one
-                const alreadyHandledModifiers: string[] = [];
+                // Count the number of each modifier
+                const stat: { [key: string]: number } = {};
 
                 for (const { modifier } of ast.modifiers) {
-                    // Check if the modifier is already handled
-                    if (alreadyHandledModifiers.includes(modifier)) {
-                        continue;
-                    }
+                    stat[modifier] = stat[modifier] ? stat[modifier] + 1 : 1;
+                }
 
+                for (const [modifier, count] of Object.entries(stat)) {
                     // Check if the modifier is occurs multiple times
-                    const count = ast.modifiers.filter((m) => m.modifier === modifier).length;
                     if (count > 1) {
                         context.report({
                             // eslint-disable-next-line max-len
@@ -47,9 +45,6 @@ export const DuplicatedModifiers = <LinterRule>{
                             },
                         });
                     }
-
-                    // Add the modifier to the already handled modifiers
-                    alreadyHandledModifiers.push(modifier);
                 }
             }
         },
