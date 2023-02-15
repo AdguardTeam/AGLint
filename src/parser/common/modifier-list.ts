@@ -93,25 +93,27 @@ export class ModifierListParser {
                 MODIFIER_ASSIGN_OPERATOR
             );
 
-            const parsedModifier: Partial<RuleModifier> = {
-                exception: trimmedRawModifier.startsWith(MODIFIER_EXCEPTION_MARKER),
-            };
+            const exception = trimmedRawModifier.startsWith(MODIFIER_EXCEPTION_MARKER);
 
-            if (assignmentOperatorIndex == -1) {
-                // Modifier without value, eg simply `script`
-                parsedModifier.modifier = trimmedRawModifier;
+            let modifier;
+            let value;
+
+            if (assignmentOperatorIndex === -1) {
+                // Modifier without assigned value. For example: "third-party"
+                modifier = trimmedRawModifier.substring(exception ? MODIFIER_EXCEPTION_MARKER.length : 0);
             } else {
-                // Modifier with value assignment, eg `redirect=value`
-                parsedModifier.modifier = trimmedRawModifier.substring(0, assignmentOperatorIndex).trim();
-                parsedModifier.value = trimmedRawModifier.substring(assignmentOperatorIndex + 1).trim();
+                // Modifier with assigned value. For example: "domain=example.com"
+                value = trimmedRawModifier.substring(assignmentOperatorIndex + MODIFIER_ASSIGN_OPERATOR.length).trim();
+                modifier = trimmedRawModifier
+                    .substring(exception ? MODIFIER_EXCEPTION_MARKER.length : 0, assignmentOperatorIndex)
+                    .trim();
             }
 
-            // Remove exception marker from the modifier name
-            if (parsedModifier.exception) {
-                parsedModifier.modifier = parsedModifier.modifier.slice(1).trim();
-            }
-
-            result.modifiers.push(<RuleModifier>parsedModifier);
+            result.modifiers.push({
+                modifier,
+                value,
+                exception,
+            });
         }
 
         return result;
