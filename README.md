@@ -44,6 +44,7 @@ Table of Contents:
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
+  - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -383,6 +384,17 @@ example.org##.ad
 ### `duplicated-modifiers`
 
 Checks if the same modifier is used multiple times in a single network rule. For example, `example.com$important,important` will be reported as error, since the `important` modifier is used twice.
+
+### `unknown-preprocessor-directives`
+
+Checks if the preprocessor directives are known. For example, `!#unknown` will be reported as error, since `unknown` is not a known preprocessor directive.
+
+Currently, the following preprocessor directives are supported:
+- `if`
+- `endif`
+- `include`
+
+For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
 
 ## Use programmatically
 
