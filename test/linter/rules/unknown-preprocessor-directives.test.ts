@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Linter } from "../../../src/linter";
 import { UnknownPreProcessorDirectives } from "../../../src/linter/rules/unknown-preprocessor-directives";
 import { NEWLINE } from "../../../src/utils/constants";
@@ -44,6 +43,7 @@ describe("unknown-preprocessor-directives", () => {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
                     message:
+                        // eslint-disable-next-line max-len
                         'Unknown preprocessor directive "incl2ude", known preprocessor directives are: if, endif, include',
                     position: { startLine: 1, startColumn: 0, endLine: 1, endColumn: 52 },
                 },
@@ -65,6 +65,7 @@ describe("unknown-preprocessor-directives", () => {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
                     message:
+                        // eslint-disable-next-line max-len
                         'Unknown preprocessor directive "end-if", known preprocessor directives are: if, endif, include',
                     position: { startLine: 4, startColumn: 0, endLine: 4, endColumn: 8 },
                 },
@@ -72,6 +73,7 @@ describe("unknown-preprocessor-directives", () => {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
                     message:
+                        // eslint-disable-next-line max-len
                         'Unknown preprocessor directive "something", known preprocessor directives are: if, endif, include',
                     position: { startLine: 5, startColumn: 0, endLine: 5, endColumn: 11 },
                 },
