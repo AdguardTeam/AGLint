@@ -43,6 +43,7 @@ Table of Contents:
   - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
+  - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
@@ -379,6 +380,10 @@ example.com##.ad
 example.com##.something
 example.org##.ad
 ```
+
+### `duplicated-modifiers`
+
+Checks if the same modifier is used multiple times in a single network rule. For example, `example.com$important,important` will be reported as error, since the `important` modifier is used twice.
 
 ### `unknown-preprocessor-directives`
 
