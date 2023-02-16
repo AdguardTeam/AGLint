@@ -146,10 +146,10 @@ describe("NetworkRuleParser", () => {
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: "example.com",
+            pattern: "example.com$m1$m2$m3$m4",
             modifiers: [
                 {
-                    modifier: "m1$m2$m3$m4$m5",
+                    modifier: "m5",
                     exception: false,
                 },
             ],
@@ -160,12 +160,12 @@ describe("NetworkRuleParser", () => {
             type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: "example.com",
+            pattern: "example.com$m1=v1$m2$m3=v3$m4",
             modifiers: [
                 {
-                    modifier: "m1",
+                    modifier: "m5",
                     exception: false,
-                    value: "v1$m2$m3=v3$m4$m5=v5",
+                    value: "v5",
                 },
             ],
         });
@@ -239,6 +239,26 @@ describe("NetworkRuleParser", () => {
             syntax: AdblockSyntax.Common,
             exception: false,
             pattern: "example.com",
+            modifiers: [
+                {
+                    modifier: "m1",
+                    exception: false,
+                },
+                {
+                    modifier: "m2",
+                    exception: false,
+                    value: "/^regex$/",
+                },
+            ],
+        });
+
+        // https://github.com/AdguardTeam/AGLint/issues/60
+        expect(NetworkRuleParser.parse("||example.com/$aa/bb^$m1,m2=/^regex$/")).toEqual({
+            category: RuleCategory.Network,
+            type: NetworkRuleType.BasicNetworkRule,
+            syntax: AdblockSyntax.Common,
+            exception: false,
+            pattern: "||example.com/$aa/bb^",
             modifiers: [
                 {
                     modifier: "m1",
