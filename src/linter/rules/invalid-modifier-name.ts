@@ -56,7 +56,6 @@ export const InvalidModifierName = <LinterRule>{
                 for (const { modifier } of ast.modifiers) {
                     if (!isValidModifierName(modifier)) {
                         context.report({
-                            // eslint-disable-next-line max-len
                             message: `Name of the modifier "${modifier}" has invalid format`,
                             position: {
                                 startLine: line,

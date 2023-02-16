@@ -38,9 +38,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "IMPORTANT" has invalid format',
+                    message: 'Name of the modifier "IMPORTANT" has invalid format',
                     position: {
                         startLine: 3,
                         startColumn: 0,
@@ -51,9 +49,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "-a" has invalid format',
+                    message: 'Name of the modifier "-a" has invalid format',
                     position: {
                         startLine: 3,
                         startColumn: 0,
@@ -64,9 +60,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "b-" has invalid format',
+                    message: 'Name of the modifier "b-" has invalid format',
                     position: {
                         startLine: 3,
                         startColumn: 0,
@@ -77,9 +71,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "-" has invalid format',
+                    message: 'Name of the modifier "-" has invalid format',
                     position: {
                         startLine: 3,
                         startColumn: 0,
@@ -90,9 +82,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "--" has invalid format',
+                    message: 'Name of the modifier "--" has invalid format',
                     position: {
                         startLine: 3,
                         startColumn: 0,
@@ -103,9 +93,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "third_party" has invalid format',
+                    message: 'Name of the modifier "third_party" has invalid format',
                     position: {
                         startLine: 4,
                         startColumn: 0,
@@ -116,9 +104,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "$script" has invalid format',
+                    message: 'Name of the modifier "$script" has invalid format',
                     position: {
                         startLine: 4,
                         startColumn: 0,
@@ -129,9 +115,7 @@ describe("invalid-modifier-name", () => {
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Name of the modifier "something--2" has invalid format',
+                    message: 'Name of the modifier "something--2" has invalid format',
                     position: {
                         startLine: 4,
                         startColumn: 0,
