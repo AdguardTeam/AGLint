@@ -51,7 +51,7 @@ export const InvalidModifierName = <LinterRule>{
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            // Check if the rule is an element hiding rule
+            // Check if the rule is a basic network rule
             if (ast.category == RuleCategory.Network && ast.type === NetworkRuleType.BasicNetworkRule) {
                 for (const { modifier } of ast.modifiers) {
                     if (!isValidModifierName(modifier)) {
