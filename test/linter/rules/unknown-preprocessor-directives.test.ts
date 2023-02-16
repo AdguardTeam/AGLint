@@ -4,14 +4,16 @@ import { NEWLINE } from "../../../src/utils/constants";
 
 describe("unknown-preprocessor-directives", () => {
     test("Detects unknown preprocessor directives", () => {
+        // Create and configure linter
         const linter = new Linter(false);
 
         linter.addRule("unknown-preprocessor-directives", UnknownPreProcessorDirectives);
 
-        // No multiple selectors
+        // Problem-free rules
         expect(
             linter.lint(
                 [
+                    // Rules:
                     `!#include https://example.org/path/includedfile.txt`,
                     `!#if (conditions)`,
                     `!#if (conditions_2)`,
@@ -30,9 +32,11 @@ describe("unknown-preprocessor-directives", () => {
             fatalErrorCount: 0,
         });
 
+        // Problematic rules
         expect(
             linter.lint(
                 [
+                    // Rules:
                     `!#incl2ude https://example.org/path/includedfile.txt`,
                     `!#IF (conditions)`,
                     `!#if2 (conditions_2)`,

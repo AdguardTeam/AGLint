@@ -4,12 +4,12 @@ import { NEWLINE } from "../../../src/utils/constants";
 
 describe("if-closed", () => {
     test("Detects unclosed if-s", () => {
+        // Create and configure linter
         const linter = new Linter(false);
 
-        // Add if-closed rule
         linter.addRule("if-closed", IfClosed);
 
-        // If-s are closed
+        // Problem-free rules
         expect(
             linter.lint(
                 [

@@ -4,15 +4,16 @@ import { NEWLINE } from "../../../src/utils/constants";
 
 describe("single-selector", () => {
     test("Detects multiple selectors", () => {
+        // Create and configure linter
         const linter = new Linter(false);
 
-        // Add single-selector rule
         linter.addRule("single-selector", SingleSelector);
 
-        // No multiple selectors
+        // Problem-free rules
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.com##.ad1",
                     "example.com##.ad2",
                     "example.com##.ad3",
@@ -27,10 +28,11 @@ describe("single-selector", () => {
             fatalErrorCount: 0,
         });
 
-        // Multiple selectors
+        // Problematic rules
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.com##.ad1",
                     "example.com##.ad2,.ad3", // multiple selectors
                     "example.com##.ad4",
@@ -79,6 +81,7 @@ describe("single-selector", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.com##.ad1",
                     "example.com##.ad2",
                     "example.com##.ad3",
@@ -89,6 +92,7 @@ describe("single-selector", () => {
             )
         ).toMatchObject({
             fixed: [
+                // Rules:
                 "example.com##.ad1",
                 "example.com##.ad2",
                 "example.com##.ad3",
@@ -101,6 +105,7 @@ describe("single-selector", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.com##.ad1",
                     "example.com##.ad2,.ad3", // multiple selectors
                     "example.com##.ad4",
@@ -111,6 +116,7 @@ describe("single-selector", () => {
             )
         ).toMatchObject({
             fixed: [
+                // Rules:
                 "example.com##.ad1",
                 "example.com##.ad2",
                 "example.com##.ad3",
