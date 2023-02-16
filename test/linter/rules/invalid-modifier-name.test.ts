@@ -11,6 +11,7 @@ describe("invalid-modifier-name", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.com##.ad",
                     "||example.net/ads.js",
                     "/something/$important,1p",
@@ -27,10 +28,11 @@ describe("invalid-modifier-name", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.com##.ad",
                     "||example.net/ads.js",
                     "/something/$important,IMPORTANT,-a,b-,-,--",
-                    "||example.com^$script,third_party,$script,something--2",
+                    "||example.com^$script,third_party,\\$script,something--2",
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -98,18 +100,18 @@ describe("invalid-modifier-name", () => {
                         startLine: 4,
                         startColumn: 0,
                         endLine: 4,
-                        endColumn: 54,
+                        endColumn: 55,
                     },
                 },
                 {
                     rule: "invalid-modifier-name",
                     severity: 2,
-                    message: 'Name of the modifier "$script" has invalid format',
+                    message: 'Name of the modifier "\\$script" has invalid format',
                     position: {
                         startLine: 4,
                         startColumn: 0,
                         endLine: 4,
-                        endColumn: 54,
+                        endColumn: 55,
                     },
                 },
                 {
@@ -120,7 +122,7 @@ describe("invalid-modifier-name", () => {
                         startLine: 4,
                         startColumn: 0,
                         endLine: 4,
-                        endColumn: 54,
+                        endColumn: 55,
                     },
                 },
             ],
