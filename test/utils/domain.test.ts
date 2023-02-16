@@ -1,7 +1,7 @@
 import { DomainUtils } from "../../src/utils/domain";
 
 describe("Domain utils", () => {
-    test("isValidDomainOrHostname", () => {
+    test("isValidDomainOrHostname should return true for valid domains", () => {
         // Wildcard-only
         expect(DomainUtils.isValidDomainOrHostname("*")).toBeTruthy();
 
@@ -26,6 +26,11 @@ describe("Domain utils", () => {
         // IP address
         expect(DomainUtils.isValidDomainOrHostname("127.0.0.1")).toBeTruthy();
 
+        // IDN
+        expect(DomainUtils.isValidDomainOrHostname("한글코딩.org")).toBeTruthy();
+    });
+
+    test("isValidDomainOrHostname should return false for invalid domains", () => {
         // Missed TLD
         expect(DomainUtils.isValidDomainOrHostname("example.")).toBeFalsy();
 

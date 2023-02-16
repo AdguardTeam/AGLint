@@ -22,16 +22,18 @@ describe("invalid-domain-list", () => {
                     `*.example.com##.banner`,
                     `*.example.*##.banner`,
                     `127.0.0.1##.banner`,
+                    `한글코딩.org##.banner`,
 
                     `~example.com##.banner`,
                     `~example.*##.banner`,
                     `~*.example.com##.banner`,
                     `~*.example.*##.banner`,
                     `~127.0.0.1##.banner`,
+                    `~한글코딩.org##.banner`,
 
                     // Mixed
                     // eslint-disable-next-line max-len
-                    `example.com,~example.com,example.*,~example.*,*.example.com,~*.example.com,*.example.*,~*.example.*,127.0.0.1,~127.0.0.1##.banner`,
+                    `example.com,~example.com,example.*,~example.*,*.example.com,~*.example.com,*.example.*,~*.example.*,127.0.0.1,~127.0.0.1,한글코딩.org,~한글코딩.org##.banner`,
                 ].join(NEWLINE)
             )
         ).toMatchObject({
