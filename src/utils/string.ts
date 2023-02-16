@@ -2,7 +2,18 @@
  * String helpers.
  */
 
-import { EMPTY, ESCAPE_CHARACTER, SPACE, TAB } from "./constants";
+import {
+    CAPITAL_LETTER_A,
+    CAPITAL_LETTER_Z,
+    EMPTY,
+    ESCAPE_CHARACTER,
+    NUMBER_0,
+    NUMBER_9,
+    SMALL_LETTER_A,
+    SMALL_LETTER_Z,
+    SPACE,
+    TAB,
+} from "./constants";
 
 export const SINGLE_QUOTE_MARKER = "'";
 export const DOUBLE_QUOTE_MARKER = '"';
@@ -322,6 +333,46 @@ export class StringUtils {
      */
     public static isWhitespace(char: string): boolean {
         return char == SPACE || char == TAB;
+    }
+
+    /**
+     * Checks if the given character is a digit.
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a digit, `false` otherwise.
+     */
+    public static isDigit(char: string): boolean {
+        return char >= NUMBER_0 && char <= NUMBER_9;
+    }
+
+    /**
+     * Checks if the given character is a small letter.
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a small letter, `false` otherwise.
+     */
+    public static isSmallLetter(char: string): boolean {
+        return char >= SMALL_LETTER_A && char <= SMALL_LETTER_Z;
+    }
+
+    /**
+     * Checks if the given character is a capital letter.
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a capital letter, `false` otherwise.
+     */
+    public static isCapitalLetter(char: string): boolean {
+        return char >= CAPITAL_LETTER_A && char <= CAPITAL_LETTER_Z;
+    }
+
+    /**
+     * Checks if the given character is a letter (small or capital).
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a letter, `false` otherwise.
+     */
+    public static isLetter(char: string): boolean {
+        return StringUtils.isSmallLetter(char) || StringUtils.isCapitalLetter(char);
     }
 
     /**

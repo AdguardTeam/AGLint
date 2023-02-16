@@ -44,6 +44,7 @@ Table of Contents:
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`invalid-modifier-name`](#invalid-modifier-name)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -390,6 +391,15 @@ Currently, the following preprocessor directives are supported:
 - `include`
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `invalid-modifier-name`
+
+Checks if the modifier name is valid. For example, `||example.com/ads.js$SCRIPT` will be reported as error, since `SCRIPT` is not a valid modifier name.
+
+A valid modifier name should contain only:
+- lowercase letters or
+- numbers or
+- dashes, but not at the beginning or end of the name, and not two dashes after each other
 
 ## Use programmatically
 

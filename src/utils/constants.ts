@@ -7,6 +7,7 @@ export const EMPTY = "";
 export const SPACE = " ";
 export const COMMA = ",";
 export const COLON = ":";
+export const DASH = "-";
 export const DOT = ".";
 export const SEMICOLON = ";";
 export const HASHMARK = "#";
@@ -15,6 +16,18 @@ export const TAB = "\t";
 export const NEWLINE = "\n";
 export const DOUBLE_NEWLINE = "\n\n";
 export const ESCAPE_CHARACTER = "\\";
+
+// Letters
+export const SMALL_LETTER_A = "a";
+export const SMALL_LETTER_Z = "z";
+
+// Capital letters
+export const CAPITAL_LETTER_A = "A";
+export const CAPITAL_LETTER_Z = "Z";
+
+// Numbers as strings
+export const NUMBER_0 = "0";
+export const NUMBER_9 = "9";
 
 // Brackets
 export const OPEN_PARENTHESIS = "(";
