@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { assert } from "superstruct";
 import { getSeverity, isSeverity, severity } from "../../src/linter/severity";
 

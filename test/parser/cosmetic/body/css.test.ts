@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { MediaQueryListPlain, SelectorPlain } from "css-tree";
 import { CssInjectionBodyParser, CssRuleBody, REMOVE_BLOCK_TYPE } from "../../../../src/parser/cosmetic/body/css";
 import { AdblockSyntax } from "../../../../src/utils/adblockers";
@@ -286,6 +285,7 @@ describe("CssInjectionBodyParser", () => {
 
         expect(() =>
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 "@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { remove: true; } }",
                 AdblockSyntax.Ubo
             )

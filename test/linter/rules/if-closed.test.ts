@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable max-len */
 import { Linter } from "../../../src/linter";
 import { IfClosed } from "../../../src/linter/rules/if-closed";
 import { NEWLINE } from "../../../src/utils/constants";
@@ -15,6 +13,7 @@ describe("if-closed", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "rule",
                     "!#if (condition1)",
                     "rule",
@@ -32,6 +31,7 @@ describe("if-closed", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "rule",
                     "!#if (condition1)",
                     "!#if (condition2)",
@@ -53,13 +53,14 @@ describe("if-closed", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "rule",
                     "!#if (condition1)",
                     "!#if (condition2)",
                     "rule",
                     "!#endif",
                     "rule",
-                    "rule"
+                    "rule",
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -89,15 +90,18 @@ describe("if-closed", () => {
         linter.addRule("if-closed", IfClosed);
 
         expect(
-            linter.lint([
-                "rule",
-                "!#if (condition1)",
-                "rule",
-                "!#endif",
-                "!#endif",
-                "rule",
-                "rule"
-            ].join(NEWLINE))
+            linter.lint(
+                [
+                    // Rules:
+                    "rule",
+                    "!#if (condition1)",
+                    "rule",
+                    "!#endif",
+                    "!#endif",
+                    "rule",
+                    "rule",
+                ].join(NEWLINE)
+            )
         ).toMatchObject({
             problems: [
                 {

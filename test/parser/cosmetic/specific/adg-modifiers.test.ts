@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/adg-modifiers";
 import { EMPTY } from "../../../../src/utils/constants";
 
@@ -124,6 +123,7 @@ describe("AdgModifierListParser", () => {
             return null;
         };
 
+        // eslint-disable-next-line max-len
         // Please note that this generation does not affect the classic domain list, only the modifier list is generated.
         expect(
             parseAndGenerate("[$path=/test,domain=/(^|.+\\.)example\\.(com|org)\\$/,modifier1]example.com,example.org")

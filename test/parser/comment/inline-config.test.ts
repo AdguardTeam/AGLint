@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { CommentRuleType } from "../../../src/parser/comment/types";
 import { CommentMarker } from "../../../src/parser/comment/marker";
 import { ConfigComment, ConfigCommentParser } from "../../../src/parser/comment/inline-config";
@@ -202,6 +201,7 @@ describe("PreProcessorParser", () => {
         // Complicated case
         expect(
             ConfigCommentParser.parse(
+                // eslint-disable-next-line max-len
                 '! aglint rule1: "off", rule2: [1, 2], rule3: ["error", { "max": 100 }] -- this is a comment -- this doesn\'t matter'
             )
         ).toEqual(<ConfigComment>{

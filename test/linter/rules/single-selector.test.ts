@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Linter } from "../../../src/linter";
 import { SingleSelector } from "../../../src/linter/rules/single-selector";
 import { NEWLINE } from "../../../src/utils/constants";

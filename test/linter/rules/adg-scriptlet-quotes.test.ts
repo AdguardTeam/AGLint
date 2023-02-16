@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Linter } from "../../../src/linter";
 import { AdgScriptletQuotes } from "../../../src/linter/rules/adg-scriptlet-quotes";
 import { NEWLINE } from "../../../src/utils/constants";
