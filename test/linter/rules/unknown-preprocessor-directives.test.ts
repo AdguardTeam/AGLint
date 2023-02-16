@@ -17,6 +17,10 @@ describe("unknown-preprocessor-directives", () => {
                     `!#if (conditions_2)`,
                     `!#endif`,
                     `!#endif`,
+                    `!#safari_cb_affinity`,
+                    `!#safari_cb_affinity()`,
+                    `!#safari_cb_affinity(params)`,
+                    `!#safari_cb_affinity(general,privacy)`,
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -35,6 +39,7 @@ describe("unknown-preprocessor-directives", () => {
                     `!#end-if`,
                     `!#something`,
                     `!#endif`,
+                    `!#safari_cb_affinity(`,
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -42,44 +47,42 @@ describe("unknown-preprocessor-directives", () => {
                 {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Unknown preprocessor directive "incl2ude", known preprocessor directives are: if, endif, include',
+                    message: 'Unknown preprocessor directive "incl2ude"',
                     position: { startLine: 1, startColumn: 0, endLine: 1, endColumn: 52 },
                 },
                 {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
-                    message:
-                        'Unknown preprocessor directive "IF", known preprocessor directives are: if, endif, include',
+                    message: 'Unknown preprocessor directive "IF"',
                     position: { startLine: 2, startColumn: 0, endLine: 2, endColumn: 17 },
                 },
                 {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
-                    message:
-                        'Unknown preprocessor directive "if2", known preprocessor directives are: if, endif, include',
+                    message: 'Unknown preprocessor directive "if2"',
                     position: { startLine: 3, startColumn: 0, endLine: 3, endColumn: 20 },
                 },
                 {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Unknown preprocessor directive "end-if", known preprocessor directives are: if, endif, include',
+                    message: 'Unknown preprocessor directive "end-if"',
                     position: { startLine: 4, startColumn: 0, endLine: 4, endColumn: 8 },
                 },
                 {
                     rule: "unknown-preprocessor-directives",
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Unknown preprocessor directive "something", known preprocessor directives are: if, endif, include',
+                    message: 'Unknown preprocessor directive "something"',
                     position: { startLine: 5, startColumn: 0, endLine: 5, endColumn: 11 },
+                },
+                {
+                    rule: "unknown-preprocessor-directives",
+                    severity: 2,
+                    message: 'Unknown preprocessor directive "safari_cb_affinity("',
+                    position: { startLine: 7, startColumn: 0, endLine: 7, endColumn: 21 },
                 },
             ],
             warningCount: 0,
-            errorCount: 5,
+            errorCount: 6,
             fatalErrorCount: 0,
         });
     });

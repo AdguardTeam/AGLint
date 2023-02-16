@@ -385,9 +385,10 @@ example.org##.ad
 Checks if the preprocessor directives are known. For example, `!#unknown` will be reported as error, since `unknown` is not a known preprocessor directive.
 
 Currently, the following preprocessor directives are supported:
-- `if`
-- `endif`
-- `include`
+- `if`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
+- `endif`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
+- `include`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#include-directive)
+- `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
 

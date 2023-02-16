@@ -7,8 +7,32 @@ import { SEVERITY } from "../severity";
 import { AnyRule } from "../../parser";
 import { RuleCategory } from "../../parser/categories";
 import { CommentRuleType } from "../../parser/comment/types";
+import { CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
 
-const KNOWN_PREPROCESSOR_DIRECTIVES = ["if", "endif", "include"];
+const COMMON_PREPROCESSOR_DIRECTIVES = ["if", "endif", "include"];
+
+// Special case: Safari Content Blocker Affinity
+const SAFARI_CB_AFFINITY = "safari_cb_affinity";
+
+/**
+ * Checks if a preprocessor directive is known
+ *
+ * @param name Preprocessor directive name to check
+ * @returns `true` if the preprocessor directive is known, `false` otherwise
+ */
+function isKnownPreProcessorDirective(name: string): boolean {
+    if (COMMON_PREPROCESSOR_DIRECTIVES.includes(name)) {
+        return true;
+    }
+
+    // Special case: safari_cb_affinity and safari_cb_affinity(params) are also valid
+    if (name.startsWith(SAFARI_CB_AFFINITY)) {
+        const params = name.substring(SAFARI_CB_AFFINITY.length);
+        return params === EMPTY || (params.startsWith(OPEN_PARENTHESIS) && params.endsWith(CLOSE_PARENTHESIS));
+    }
+
+    return false;
+}
 
 /**
  * Rule that checks if a preprocessor directive is known
@@ -26,11 +50,9 @@ export const UnknownPreProcessorDirectives = <LinterRule>{
 
             // Check if the rule is a preprocessor comment
             if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.PreProcessor) {
-                if (!KNOWN_PREPROCESSOR_DIRECTIVES.includes(ast.name)) {
+                if (!isKnownPreProcessorDirective(ast.name)) {
                     context.report({
-                        message: `Unknown preprocessor directive "${
-                            ast.name
-                        }", known preprocessor directives are: ${KNOWN_PREPROCESSOR_DIRECTIVES.join(", ")}`,
+                        message: `Unknown preprocessor directive "${ast.name}"`,
                         position: {
                             startLine: line,
                             startColumn: 0,
