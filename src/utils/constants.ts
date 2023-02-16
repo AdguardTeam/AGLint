@@ -46,3 +46,5 @@ export const CSS_ATTRIBUTE_SELECTOR_CLOSE = "]";
 export const CSS_IMPORTANT = "!important";
 export const CSS_DECLARATION_END = ";";
 export const CSS_DECLARATION_SEPARATOR = ":";
+
+export const REPO_URL = "https://github.com/AdguardTeam/AGLint";

@@ -12,8 +12,10 @@ import {
     DOT,
     DOUBLE_NEWLINE,
     EMPTY,
+    HASHMARK,
     NEWLINE,
     OPEN_PARENTHESIS,
+    REPO_URL,
     SPACE,
 } from "src/utils/constants";
 
@@ -166,8 +168,10 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
                 // Column: Linter rule name (if available)
                 if (problem.rule) {
+                    // Some terminals support links, so we can link to the rule documentation directly
+                    // in this case.
                     if (terminalLink.isSupported) {
-                        row.push(terminalLink(problem.rule, `https://github.com/AdguardTeam/AGLint#${problem.rule}`));
+                        row.push(terminalLink(problem.rule, `${REPO_URL}${HASHMARK}${problem.rule}`));
                     } else {
                         row.push(this.chalk.dim(problem.rule));
                     }
