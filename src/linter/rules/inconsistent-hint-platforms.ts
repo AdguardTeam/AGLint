@@ -12,6 +12,9 @@ import { EMPTY } from "../../utils/constants";
 const PLATFORM = "PLATFORM";
 const NOT_PLATFORM = "NOT_PLATFORM";
 
+const FLAG_TARGETED = 1;
+const FLAG_EXCLUDED = 2;
+
 /**
  * Rule that checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM()
  * hint at the same time.
@@ -35,18 +38,10 @@ export const InconsistentHintPlatforms = <LinterRule>{
                 }
 
                 // Store all affected platforms in an object, where the key is the platform name and the
-                // value is a tuple of two booleans, where
-                //  - the first one indicates if the platform is targeted by a PLATFORM hint and
-                //  - the second one indicates if the platform is excluded by a NOT_PLATFORM hint
-                const platforms: {
-                    [key: string]: [
-                        // Targeted by PLATFORM
-                        boolean,
-
-                        // Excluded by NOT_PLATFORM
-                        boolean
-                    ];
-                } = {};
+                // value is a flag number, where
+                //  - the first bit indicates if the platform is targeted by a PLATFORM hint and
+                //  - the second bit indicates if the platform is excluded by a NOT_PLATFORM hint
+                const platforms: { [key: string]: number } = {};
 
                 // Iterate over all hints within the comment rule
                 for (const hint of ast.hints) {
@@ -58,14 +53,10 @@ export const InconsistentHintPlatforms = <LinterRule>{
                             for (const param of hint.params) {
                                 // Add the platform to the table if it's not already there
                                 if (!(param in platforms)) {
-                                    platforms[param] = [hint.name === PLATFORM, hint.name === NOT_PLATFORM];
+                                    platforms[param] = hint.name === PLATFORM ? FLAG_TARGETED : FLAG_EXCLUDED;
                                 } else {
                                     // Update the platforms table (leave the other value untouched)
-                                    if (hint.name === PLATFORM) {
-                                        platforms[param] = [true, platforms[param][1]];
-                                    } else {
-                                        platforms[param] = [platforms[param][0], true];
-                                    }
+                                    platforms[param] |= hint.name === PLATFORM ? FLAG_TARGETED : FLAG_EXCLUDED;
                                 }
                             }
                         }
@@ -73,9 +64,9 @@ export const InconsistentHintPlatforms = <LinterRule>{
                 }
 
                 // Report problems based on the platforms table
-                for (const [platform, [targeted, excluded]] of Object.entries(platforms)) {
+                for (const [platform, flags] of Object.entries(platforms)) {
                     // The platform targeted and excluded at the same time
-                    if (targeted && excluded) {
+                    if (flags === (FLAG_TARGETED | FLAG_EXCLUDED)) {
                         context.report({
                             // eslint-disable-next-line max-len
                             message: `Platform "${platform}" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time`,
