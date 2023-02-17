@@ -45,6 +45,7 @@ Table of Contents:
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -396,6 +397,15 @@ Currently, the following preprocessor directives are supported:
 - `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `inconsistent-hint-platforms`
+
+Check if the hint platforms are targeted inconsistently. For example, if you have the following hint:
+```adblock
+!+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
+example.com##.ad
+```
+then the linter will report an error, since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded.
 
 ## Use programmatically
 
