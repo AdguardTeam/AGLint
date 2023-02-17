@@ -48,7 +48,7 @@ export const UnknownHintsAndPlatforms = <LinterRule>{
 
             if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
                 for (const hint of ast.hints) {
-                    // Check if the hint name is known (case sensitive)
+                    // Check if the hint name is known (case-sensitive)
                     if (!KNOWN_HINTS.includes(hint.name)) {
                         context.report({
                             message: `Unknown hint name "${hint.name}"`,
