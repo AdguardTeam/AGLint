@@ -17,7 +17,7 @@ const NOT_PLATFORM = "NOT_PLATFORM";
  * Rule that checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM()
  * hint at the same time.
  */
-export const InconsistentHintPlatforms = <LinterRule>{
+export const InconsistentHintPlatforms: LinterRule = {
     meta: {
         severity: SEVERITY.error,
     },
