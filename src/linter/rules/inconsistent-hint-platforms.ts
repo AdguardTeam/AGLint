@@ -37,34 +37,31 @@ export const InconsistentHintPlatforms = <LinterRule>{
 
                 // Collect platforms targeted and excluded by PLATFORM() and NOT_PLATFORM() hints,
                 // so we can compare them later
-                const targeted: string[] = [];
-                const excluded: string[] = [];
+                let targeted: string[] = [];
+                let excluded: string[] = [];
 
                 // Iterate over all hints within the comment rule
                 for (const hint of ast.hints) {
-                    if (hint.name === PLATFORM || hint.name === NOT_PLATFORM) {
-                        // Check if the PLATFORM or NOT_PLATFORM hint has any parameters. If it
-                        // has 1 parameter and it's empty, it means "PLATFORM()" or "NOT_PLATFORM()",
-                        // which has no parameters practically
-                        if (hint.params.length > 1 || (hint.params.length === 1 && hint.params[0] !== EMPTY)) {
-                            for (const param of hint.params) {
-                                if (hint.name === PLATFORM) {
-                                    // Platform targeted by a PLATFORM() hint
-                                    targeted.push(param);
-                                } else {
-                                    // Platform excluded by a NOT_PLATFORM() hint
-                                    excluded.push(param);
-                                }
-                            }
-                        }
+                    if (hint.name === PLATFORM) {
+                        // Platform targeted by a PLATFORM() hint
+                        targeted = targeted.concat(hint.params);
+                    } else if (hint.name === NOT_PLATFORM) {
+                        // Platform excluded by a NOT_PLATFORM() hint
+                        excluded = excluded.concat(hint.params);
                     }
                 }
 
                 // Get platforms that are targeted and excluded at the same time
+                // and don't forget to filter out empty parameter (if there are any)
                 const intersection = ArrayUtils.getIntersection(targeted, excluded);
 
                 // Report problems
                 for (const platform of intersection) {
+                    // Skip empty parameter
+                    if (platform === EMPTY) {
+                        continue;
+                    }
+
                     context.report({
                         // eslint-disable-next-line max-len
                         message: `Platform "${platform}" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time`,
