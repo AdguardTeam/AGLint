@@ -29,10 +29,15 @@ export const InconsistentHintPlatforms = <LinterRule>{
             const line = context.getActualLine();
 
             if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+                // Only makes sense to check this, if there are at least two hints within the comment
+                if (ast.hints.length < 2) {
+                    return;
+                }
+
                 // Store all affected platforms in an object, where the key is the platform name and the
-                // value is a tuple of two booleans, where the first one indicates if the platform is
-                // targeted by a PLATFORM hint and the second one indicates if the platform is
-                // excluded by a NOT_PLATFORM hint
+                // value is a tuple of two booleans, where
+                //  - the first one indicates if the platform is targeted by a PLATFORM hint and
+                //  - the second one indicates if the platform is excluded by a NOT_PLATFORM hint
                 const platforms: {
                     [key: string]: [
                         // Targeted by PLATFORM
