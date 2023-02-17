@@ -45,6 +45,7 @@ Table of Contents:
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`duplicated-hints`](#duplicated-hints)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -396,6 +397,20 @@ Currently, the following preprocessor directives are supported:
 - `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `duplicated-hints`
+
+Checks if the same hint is used multiple times within a single comment. For example, if you have the following hint comment:
+```adblock
+!+ PLATFORM(ios, ext_android_cb) PLATFORM(ext_ff) NOT_OPTIMIZED
+```
+then the linter will report a warning, since the `PLATFORM` hint is used twice in the same comment, which is unnecessary.
+
+In this case, the proper way is:
+```adblock
+!+ PLATFORM(ios, ext_android_cb, ext_ff) NOT_OPTIMIZED
+```
+with using single `PLATFORM` hint.
 
 ## Use programmatically
 

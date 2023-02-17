@@ -1,5 +1,6 @@
 import { LinterRule } from "../rule";
 import { AdgScriptletQuotes } from "./adg-scriptlet-quotes";
+import { DuplicatedHints } from "./duplicated-hints";
 import { DuplicatedModifiers } from "./duplicated-modifiers";
 import { IfClosed } from "./if-closed";
 import { SingleSelector } from "./single-selector";
@@ -11,4 +12,5 @@ export const defaultLinterRules = new Map<string, LinterRule>([
     ["single-selector", SingleSelector],
     ["duplicated-modifiers", DuplicatedModifiers],
     ["unknown-preprocessor-directives", UnknownPreProcessorDirectives],
+    ["duplicated-hints", DuplicatedHints],
 ]);
