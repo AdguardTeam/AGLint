@@ -37,6 +37,8 @@ export interface Rule {
  * Represents an "empty rule" (practically an empty line)
  */
 export interface EmptyRule extends Rule {
+    category: RuleCategory.Empty;
+
     /**
      * Type of the adblock rule (should be always present)
      */

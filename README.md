@@ -46,6 +46,9 @@ Table of Contents:
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
   - [`duplicated-hints`](#duplicated-hints)
+  - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
+  - [`invalid-domain-list`](#invalid-domain-list)
+  - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -411,6 +414,47 @@ In this case, the proper way is:
 !+ PLATFORM(ios, ext_android_cb, ext_ff) NOT_OPTIMIZED
 ```
 with using single `PLATFORM` hint.
+
+### `unknown-hints-and-platforms`
+
+Checks if the hints and platforms are known. For example, `!+ HINT` or `!+ HINT(param)` will be reported as error, since `HINT` is not a known hint. Also, `!+ PLATFORM(something)` will be reported as error, since `something` is not a known platform (`PLATFORM` is a known hint, but in this case, it parameterized with an unknown platform).
+
+Currently, the following hints are supported:
+- `NOT_OPTIMIZED`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#not_optimized-hint)
+- `PLATFORM` / `NOT_PLATFORM`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints)
+
+Currently, the following platforms are supported:
+- windows
+- mac
+- android
+- ios
+- ext_chromium
+- ext_ff
+- ext_edge
+- ext_opera
+- ext_safari
+- ext_android_cb
+- ext_ublock
+
+### `invalid-domain-list`
+
+Checks for invalid domains in cosmetic rules. For example, `example.##.ad` will be reported as error, since `example.` is not a valid domain, because it's TLD is empty.
+
+Accepted values are:
+- Domains: `example.com`, `example.org`, `example.net`, etc.
+- Domains with wildcards: `*.example.com`, `*.example.org`, `*.example.net`, etc.
+- Wildcard-only domain: `*`
+- Hostnames: `example`, `example-2`, `example-3`, etc.
+- IP addresses: `127.0.0.1`
+
+### `inconsistent-hint-platforms`
+
+Check if the hint platforms are targeted inconsistently. For example, if you have the following hint:
+```adblock
+!+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
+example.com##.ad
+```
+then the linter will report an error, since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded.
 
 ## Use programmatically
 
