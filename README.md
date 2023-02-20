@@ -46,6 +46,8 @@ Table of Contents:
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
   - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
+  - [`invalid-domain-list`](#invalid-domain-list)
+  - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -398,7 +400,6 @@ Currently, the following preprocessor directives are supported:
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
 
-
 ### `unknown-hints-and-platforms`
 
 Checks if the hints and platforms are known. For example, `!+ HINT` or `!+ HINT(param)` will be reported as error, since `HINT` is not a known hint. Also, `!+ PLATFORM(something)` will be reported as error, since `something` is not a known platform (`PLATFORM` is a known hint, but in this case, it parameterized with an unknown platform).
@@ -419,6 +420,26 @@ Currently, the following platforms are supported:
 - ext_safari
 - ext_android_cb
 - ext_ublock
+
+### `invalid-domain-list`
+
+Checks for invalid domains in cosmetic rules. For example, `example.##.ad` will be reported as error, since `example.` is not a valid domain, because it's TLD is empty.
+
+Accepted values are:
+- Domains: `example.com`, `example.org`, `example.net`, etc.
+- Domains with wildcards: `*.example.com`, `*.example.org`, `*.example.net`, etc.
+- Wildcard-only domain: `*`
+- Hostnames: `example`, `example-2`, `example-3`, etc.
+- IP addresses: `127.0.0.1`
+
+### `inconsistent-hint-platforms`
+
+Check if the hint platforms are targeted inconsistently. For example, if you have the following hint:
+```adblock
+!+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
+example.com##.ad
+```
+then the linter will report an error, since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded.
 
 ## Use programmatically
 
