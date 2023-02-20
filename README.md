@@ -17,7 +17,8 @@
 
 <p align="center">
     <a href="https://www.npmjs.com/package/@adguard/aglint"><img src="https://img.shields.io/npm/v/@adguard/aglint" alt="NPM version" /></a>
-    <a href="https://github.com/AdguardTeam/AGLint/blob/master/LICENSE"><img src="https://img.shields.io/badge/GPL-3.0-only" alt="License: GPL-3.0-only" /></a>
+    <a href="https://www.npmjs.com/package/@adguard/aglint"><img src="https://img.shields.io/npm/dm/@adguard/aglint" alt="NPM Downloads" /></a>
+    <a href="https://github.com/AdguardTeam/AGLint/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/@adguard/aglint" alt="License" /></a>
 </p>
 
 Table of Contents:
@@ -634,7 +635,7 @@ If you have any questions or ideas for new features, please open an issue or a d
 
 ## License
 
-AGLint is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+AGLint is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## References
 

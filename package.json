@@ -13,7 +13,7 @@
         "compatibility"
     ],
     "author": "AdGuard Software Ltd.",
-    "license": "GPL-3.0-only",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/AdguardTeam/AGLint.git"
