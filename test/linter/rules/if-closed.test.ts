@@ -2,14 +2,17 @@ import { Linter } from "../../../src/linter";
 import { IfClosed } from "../../../src/linter/rules/if-closed";
 import { NEWLINE } from "../../../src/utils/constants";
 
+let linter: Linter;
+
 describe("if-closed", () => {
-    test("Detects unclosed if-s", () => {
-        // Create and configure linter
-        const linter = new Linter(false);
-
+    beforeAll(() => {
+        // Configure linter with the rule
+        linter = new Linter(false);
         linter.addRule("if-closed", IfClosed);
+    });
 
-        // Problem-free rules
+    test("should ignore non-problematic cases", () => {
+        // if is closed properly
         expect(
             linter.lint(
                 [
@@ -23,11 +26,9 @@ describe("if-closed", () => {
             )
         ).toMatchObject({
             problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
         });
 
+        // both if-s are closed properly
         expect(
             linter.lint(
                 [
@@ -48,8 +49,9 @@ describe("if-closed", () => {
             errorCount: 0,
             fatalErrorCount: 0,
         });
+    });
 
-        // If-s are not closed
+    test("should detect unclosed if-s", () => {
         expect(
             linter.lint(
                 [
@@ -83,12 +85,7 @@ describe("if-closed", () => {
         });
     });
 
-    test("Detects unopened endif-s", () => {
-        const linter = new Linter(false);
-
-        // Add if-closed rule
-        linter.addRule("if-closed", IfClosed);
-
+    test("should detect unopened endif-s", () => {
         expect(
             linter.lint(
                 [
