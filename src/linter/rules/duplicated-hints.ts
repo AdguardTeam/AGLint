@@ -11,7 +11,7 @@ import { CommentRuleType } from "../../parser/comment/types";
 /**
  * Rule that checks if hints are duplicated within the same comment rule.
  */
-export const DuplicatedHints = <LinterRule>{
+export const DuplicatedHints: LinterRule = {
     meta: {
         severity: SEVERITY.warn,
     },
