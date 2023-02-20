@@ -1,136 +1,155 @@
 import { Linter } from "../../../src/linter";
 import { InvalidDomainList } from "../../../src/linter/rules/invalid-domain-list";
-import { NEWLINE } from "../../../src/utils/constants";
+
+let linter: Linter;
 
 describe("invalid-domain-list", () => {
-    test("Detects invalid domains", () => {
-        const linter = new Linter(false);
-
+    beforeAll(() => {
+        // Configure linter with the rule
+        linter = new Linter(false);
         linter.addRule("invalid-domain-list", InvalidDomainList);
+    });
 
+    test("should ignore non-problematic cases", () => {
+        // No domain at all
+        expect(linter.lint(`##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard-only
+        expect(linter.lint(`*##.banner`)).toMatchObject({ problems: [] });
+
+        // Simple domain
+        expect(linter.lint(`example.com##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard TLD
+        expect(linter.lint(`example.*##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard subdomain
+        expect(linter.lint(`*.example.com##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard subdomain and TLD
+        expect(linter.lint(`*.example.*##.banner`)).toMatchObject({ problems: [] });
+
+        // IP address
+        expect(linter.lint(`127.0.0.1##.banner`)).toMatchObject({ problems: [] });
+
+        // Unicode domain (IDN)
+        expect(linter.lint(`한글코딩.org##.banner`)).toMatchObject({ problems: [] });
+
+        // Simple domain exception
+        expect(linter.lint(`~example.com##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard TLD exception
+        expect(linter.lint(`~example.*##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard subdomain exception
+        expect(linter.lint(`~*.example.com##.banner`)).toMatchObject({ problems: [] });
+
+        // Wildcard subdomain and TLD exception
+        expect(linter.lint(`~*.example.*##.banner`)).toMatchObject({ problems: [] });
+
+        // IP address exception
+        expect(linter.lint(`~127.0.0.1##.banner`)).toMatchObject({ problems: [] });
+
+        // Unicode domain (IDN) exception
+        expect(linter.lint(`~한글코딩.org##.banner`)).toMatchObject({ problems: [] });
+
+        // Mixed
         expect(
             linter.lint(
-                [
-                    // No domain at all
-                    `##.banner`,
-
-                    // Wildcard-only
-                    `*##.banner`,
-
-                    `example.com##.banner`,
-                    `example.*##.banner`,
-                    `*.example.com##.banner`,
-                    `*.example.*##.banner`,
-                    `127.0.0.1##.banner`,
-                    `한글코딩.org##.banner`,
-
-                    `~example.com##.banner`,
-                    `~example.*##.banner`,
-                    `~*.example.com##.banner`,
-                    `~*.example.*##.banner`,
-                    `~127.0.0.1##.banner`,
-                    `~한글코딩.org##.banner`,
-
-                    // Mixed
-                    // eslint-disable-next-line max-len
-                    `example.com,~example.com,example.*,~example.*,*.example.com,~*.example.com,*.example.*,~*.example.*,127.0.0.1,~127.0.0.1,한글코딩.org,~한글코딩.org##.banner`,
-                ].join(NEWLINE)
+                // eslint-disable-next-line max-len
+                `example.com,~example.com,example.*,~example.*,*.example.com,~*.example.com,*.example.*,~*.example.*,127.0.0.1,~127.0.0.1,한글코딩.org,~한글코딩.org##.banner`
             )
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
+        ).toMatchObject({ problems: [] });
+    });
 
-        expect(
-            linter.lint(
-                [
-                    // Missed TLD
-                    `example.##.banner`,
-
-                    // Dot only
-                    `.##.banner`,
-                    `...##.banner`,
-
-                    // Invalid characters
-                    `AA BB##.banner`,
-                    `AA BB CC##.banner`,
-                    `a^b##.banner`,
-                ].join(NEWLINE)
-            )
-        ).toMatchObject({
+    it("should detect problematic cases", () => {
+        // Missed TLD
+        expect(linter.lint(`example.##.banner`)).toMatchObject({
             problems: [
                 {
                     rule: "invalid-domain-list",
                     severity: 2,
                     message: 'Invalid domain "example."',
                     position: {
-                        startLine: 1,
                         startColumn: 0,
-                        endLine: 1,
                         endColumn: 17,
                     },
                 },
+            ],
+        });
+
+        // Dot only
+        expect(linter.lint(`.##.banner`)).toMatchObject({
+            problems: [
                 {
                     rule: "invalid-domain-list",
                     severity: 2,
                     message: 'Invalid domain "."',
                     position: {
-                        startLine: 2,
                         startColumn: 0,
-                        endLine: 2,
                         endColumn: 10,
                     },
                 },
+            ],
+        });
+
+        expect(linter.lint(`...##.banner`)).toMatchObject({
+            problems: [
                 {
                     rule: "invalid-domain-list",
                     severity: 2,
                     message: 'Invalid domain "..."',
                     position: {
-                        startLine: 3,
                         startColumn: 0,
-                        endLine: 3,
                         endColumn: 12,
                     },
                 },
+            ],
+        });
+
+        // Invalid character
+        expect(linter.lint(`AA BB##.banner`)).toMatchObject({
+            problems: [
                 {
                     rule: "invalid-domain-list",
                     severity: 2,
                     message: 'Invalid domain "AA BB"',
                     position: {
-                        startLine: 4,
                         startColumn: 0,
-                        endLine: 4,
                         endColumn: 14,
                     },
                 },
+            ],
+        });
+
+        // Invalid character
+        expect(linter.lint(`AA BB CC##.banner`)).toMatchObject({
+            problems: [
                 {
                     rule: "invalid-domain-list",
                     severity: 2,
                     message: 'Invalid domain "AA BB CC"',
                     position: {
-                        startLine: 5,
                         startColumn: 0,
-                        endLine: 5,
                         endColumn: 17,
                     },
                 },
+            ],
+        });
+
+        // Invalid character
+        expect(linter.lint(`a^b##.banner`)).toMatchObject({
+            problems: [
                 {
                     rule: "invalid-domain-list",
                     severity: 2,
                     message: 'Invalid domain "a^b"',
                     position: {
-                        startLine: 6,
                         startColumn: 0,
-                        endLine: 6,
                         endColumn: 12,
                     },
                 },
             ],
-            warningCount: 0,
-            errorCount: 6,
-            fatalErrorCount: 0,
         });
     });
 });
