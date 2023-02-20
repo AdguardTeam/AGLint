@@ -91,6 +91,7 @@ const aglintCli = {
 // Browser builds - the goal is to make everything work by inserting a single .js file.
 // File operations are delegated to the CLI tool, the core library only handles strings.
 const browserPlugins = [
+    json({ preferConst: true }),
     typescript({ declaration: false }),
     commonjs({ sourceMap: false }),
     resolve({ preferBuiltins: false, browser: true }),

@@ -45,6 +45,7 @@ Table of Contents:
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`invalid-domain-list`](#invalid-domain-list)
   - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
@@ -397,6 +398,17 @@ Currently, the following preprocessor directives are supported:
 - `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `invalid-domain-list`
+
+Checks for invalid domains in cosmetic rules. For example, `example.##.ad` will be reported as error, since `example.` is not a valid domain, because it's TLD is empty.
+
+Accepted values are:
+- Domains: `example.com`, `example.org`, `example.net`, etc.
+- Domains with wildcards: `*.example.com`, `*.example.org`, `*.example.net`, etc.
+- Wildcard-only domain: `*`
+- Hostnames: `example`, `example-2`, `example-3`, etc.
+- IP addresses: `127.0.0.1`
 
 ### `inconsistent-hint-platforms`
 
