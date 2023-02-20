@@ -43,8 +43,10 @@ Table of Contents:
   - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
+  - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
   - [`invalid-domain-list`](#invalid-domain-list)
+  - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
@@ -381,6 +383,10 @@ example.com##.something
 example.org##.ad
 ```
 
+### `duplicated-modifiers`
+
+Checks if the same modifier is used multiple times in a single network rule. For example, `example.com$important,important` will be reported as error, since the `important` modifier is used twice.
+
 ### `unknown-preprocessor-directives`
 
 Checks if the preprocessor directives are known. For example, `!#unknown` will be reported as error, since `unknown` is not a known preprocessor directive.
@@ -403,6 +409,15 @@ Accepted values are:
 - Wildcard-only domain: `*`
 - Hostnames: `example`, `example-2`, `example-3`, etc.
 - IP addresses: `127.0.0.1`
+
+### `inconsistent-hint-platforms`
+
+Check if the hint platforms are targeted inconsistently. For example, if you have the following hint:
+```adblock
+!+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
+example.com##.ad
+```
+then the linter will report an error, since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded.
 
 ## Use programmatically
 

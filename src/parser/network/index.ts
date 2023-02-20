@@ -1,9 +1,9 @@
 import { AdblockSyntax } from "../../utils/adblockers";
-import { REGEX_MARKER, StringUtils } from "../../utils/string";
+import { REGEX_MARKER } from "../../utils/string";
 import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
 import { RuleCategory } from "../categories";
 import { NetworkRuleType } from "./types";
-import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
+import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, ESCAPE_CHARACTER, OPEN_PARENTHESIS } from "../../utils/constants";
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
 import { Rule } from "../rule";
 
@@ -161,15 +161,7 @@ export class NetworkRuleParser {
         }
 
         // Find corresponding (last) separator
-        // Handle these issues:
-        //  /ad.js$m1=/v1/
-        //  example.com$m1,m2=/^regex$/
-        const separatorIndex = StringUtils.findNextUnescapedCharacterThatNotFollowedBy(
-            rule,
-            0,
-            NETWORK_RULE_SEPARATOR,
-            REGEX_MARKER
-        );
+        const separatorIndex = NetworkRuleParser.findNetworkRuleSeparatorIndex(rule);
 
         // Get rule parts
         const modifiers: RuleModifier[] = [];
@@ -201,6 +193,26 @@ export class NetworkRuleParser {
             ...common,
             modifiers,
         };
+    }
+
+    /**
+     * Finds the index of the separator character in a network rule.
+     *
+     * @param rule Network rule to check
+     * @returns The index of the separator character, or -1 if there is no separator
+     */
+    private static findNetworkRuleSeparatorIndex(rule: string): number {
+        // As we are looking for the last separator, we start from the end of the string
+        for (let i = rule.length - 1; i >= 0; i--) {
+            // If we find a potential separator, we should check
+            // - if it's not escaped
+            // - if it's not followed by a regex marker, for example: `example.org^$removeparam=/regex$/`
+            if (rule[i] == NETWORK_RULE_SEPARATOR && rule[i + 1] != REGEX_MARKER && rule[i - 1] != ESCAPE_CHARACTER) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     /**
