@@ -11,7 +11,7 @@ import { DomainUtils } from "../../utils/domain";
 /**
  * Rule that checks if a preprocessor directive is known
  */
-export const InvalidDomainList = <LinterRule>{
+export const InvalidDomainList: LinterRule = {
     meta: {
         severity: SEVERITY.error,
     },
