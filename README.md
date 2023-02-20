@@ -45,6 +45,7 @@ Table of Contents:
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
   - [`invalid-domain-list`](#invalid-domain-list)
   - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
@@ -398,6 +399,27 @@ Currently, the following preprocessor directives are supported:
 - `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `unknown-hints-and-platforms`
+
+Checks if the hints and platforms are known. For example, `!+ HINT` or `!+ HINT(param)` will be reported as error, since `HINT` is not a known hint. Also, `!+ PLATFORM(something)` will be reported as error, since `something` is not a known platform (`PLATFORM` is a known hint, but in this case, it parameterized with an unknown platform).
+
+Currently, the following hints are supported:
+- `NOT_OPTIMIZED`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#not_optimized-hint)
+- `PLATFORM` / `NOT_PLATFORM`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints)
+
+Currently, the following platforms are supported:
+- windows
+- mac
+- android
+- ios
+- ext_chromium
+- ext_ff
+- ext_edge
+- ext_opera
+- ext_safari
+- ext_android_cb
+- ext_ublock
 
 ### `invalid-domain-list`
 
