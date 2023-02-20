@@ -1,5 +1,6 @@
 import { LinterRule } from "../rule";
 import { AdgScriptletQuotes } from "./adg-scriptlet-quotes";
+import { DuplicatedHintPlatforms } from "./duplicated-hint-platforms";
 import { DuplicatedHints } from "./duplicated-hints";
 import { UnknownHintsAndPlatforms } from "./unknown-hints-and-platforms";
 import { DuplicatedModifiers } from "./duplicated-modifiers";
@@ -15,6 +16,7 @@ export const defaultLinterRules = new Map<string, LinterRule>([
     ["single-selector", SingleSelector],
     ["duplicated-modifiers", DuplicatedModifiers],
     ["unknown-preprocessor-directives", UnknownPreProcessorDirectives],
+    ["duplicated-hint-platforms", DuplicatedHintPlatforms],
     ["duplicated-hints", DuplicatedHints],
     ["unknown-hints-and-platforms", UnknownHintsAndPlatforms],
     ["invalid-domain-list", InvalidDomainList],

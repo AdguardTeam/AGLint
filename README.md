@@ -45,6 +45,7 @@ Table of Contents:
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
   - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`duplicated-hint-platforms`](#duplicated-hint-platforms)
   - [`duplicated-hints`](#duplicated-hints)
   - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
   - [`invalid-domain-list`](#invalid-domain-list)
@@ -400,6 +401,19 @@ Currently, the following preprocessor directives are supported:
 - `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
 
 For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `duplicated-hint-platforms`
+
+Checks if the same platform is used multiple times in a single hint. For example, if you have the following hint:
+```adblock
+!+ PLATFORM(ios, android, ios)
+```
+then the linter will report a warning, since the `ios` platform is used twice, and it is not necessary.
+
+In this case, the correct way to remove the duplicated platform is to use the following hint:
+```adblock
+!+ PLATFORM(ios, android)
+```
 
 ### `duplicated-hints`
 
