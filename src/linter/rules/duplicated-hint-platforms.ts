@@ -14,7 +14,7 @@ const NOT_PLATFORM = "NOT_PLATFORM";
 /**
  * Rule that checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint.
  */
-export const DuplicatedHintPlatforms = <LinterRule>{
+export const DuplicatedHintPlatforms: LinterRule = {
     meta: {
         severity: SEVERITY.warn,
     },
