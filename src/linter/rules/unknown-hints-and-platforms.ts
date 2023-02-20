@@ -34,7 +34,7 @@ const KNOWN_PLATFORMS = [
 /**
  * Rule that checks if hints and platforms are known.
  */
-export const UnknownHintsAndPlatforms = <LinterRule>{
+export const UnknownHintsAndPlatforms: LinterRule = {
     meta: {
         severity: SEVERITY.error,
     },
