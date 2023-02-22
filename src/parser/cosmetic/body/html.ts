@@ -2,7 +2,7 @@
  * HTML filtering rule body parser
  */
 
-import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "css-tree";
+import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "@adguard/ecss-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
 import { CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";

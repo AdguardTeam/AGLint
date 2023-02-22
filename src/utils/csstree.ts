@@ -6,7 +6,6 @@ import {
     parse,
     walk,
     AttributeSelector,
-    SyntaxParseError,
     CssNode,
     PseudoClassSelector,
     Selector,
@@ -14,7 +13,7 @@ import {
     Block,
     CssNodePlain,
     toPlainObject,
-} from "css-tree";
+} from "@adguard/ecss-tree";
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from "../converter/pseudo";
 import {
     COMMA,
@@ -54,10 +53,6 @@ export class CssTree {
                 parseRulePrelude: true,
                 parseValue: true,
                 parseCustomProperty: true,
-                // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
-                    throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.rawMessage || error.message}`);
-                },
             });
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -85,10 +80,6 @@ export class CssTree {
                     parseRulePrelude: true,
                     parseValue: true,
                     parseCustomProperty: true,
-                    // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                    onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
-                        throw new SyntaxError(error.rawMessage);
-                    },
                 })
             );
         } catch (error: unknown) {

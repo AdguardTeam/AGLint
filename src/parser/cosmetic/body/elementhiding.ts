@@ -2,7 +2,7 @@
  * Elementhiding rule body parser
  */
 
-import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "css-tree";
+import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "@adguard/ecss-tree";
 import { CSS_SELECTORS_SEPARATOR, SPACE } from "../../../utils/constants";
 import { CssTree } from "../../../utils/csstree";
 import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";

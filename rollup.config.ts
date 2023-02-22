@@ -99,7 +99,9 @@ const browserPlugins = [
     // The build of CSSTree is a bit complicated (patches, require "emulation", etc.),
     // so here we only specify the pre-built version by an alias
     alias({
-        entries: [{ find: "css-tree", replacement: "node_modules/css-tree/dist/csstree.esm.js" }],
+        entries: [
+            { find: "@adguard/ecss-tree", replacement: "node_modules/@adguard/ecss-tree/dist/ecsstree.umd.min.js" },
+        ],
     }),
     getBabelOutputPlugin({
         presets: [

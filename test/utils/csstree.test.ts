@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Block, Selector } from "css-tree";
+import { Block, Selector } from "@adguard/ecss-tree";
 import { CssTree } from "../../src/utils/csstree";
 import { CssTreeParserContext } from "../../src/utils/csstree-constants";
 

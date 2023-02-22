@@ -13,7 +13,7 @@ import {
     toPlainObject,
     fromPlainObject,
     MediaQueryListPlain,
-} from "css-tree";
+} from "@adguard/ecss-tree";
 import { AdblockSyntax } from "../../../utils/adblockers";
 import {
     CSS_BLOCK_CLOSE,

@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@adguard/ecss-tree@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@adguard/ecss-tree/-/ecss-tree-1.0.6.tgz#b9c897bc63bc52e928d9d0399c4a3b5994718ab8"
+  integrity sha512-XAD4JPvtandme7s2U24JLWzUJzplkcJMSvSGBM1M1vF2jjS7cPsXR0GerwUaVg63J69e74o8YPLHN5Be60EL5g==
+  dependencies:
+    css-tree "^2.3.1"
+
 "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -1463,11 +1470,6 @@
   resolved "https://registry.yarnpkg.com/@types/clone-deep/-/clone-deep-4.0.1.tgz#7c488443ab9f571cd343d774551b78e9264ea990"
   integrity sha512-bdkCSkyVHsgl3Goe1y16T9k6JuQx7SiDREkq728QjKmTZkGJZuS8R3gGcnGzVuGBP0mssKrzM/GlMOQxtip9cg==
 
-"@types/css-tree@^1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@types/css-tree/-/css-tree-1.0.7.tgz#4483b824a7923d9a7819408a33144014b0c5124c"
-  integrity sha512-Pz+DfVODpQTAV6PwPBK6kzyy7+f6EyPbr1+mYkc1YolJfl2NAJ4wbg0TC/AJPBsqn9jWfyiO19A/sgpvFLfqnw==
-
 "@types/eslint@^8.4.2":
   version "8.4.10"
   resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.4.10.tgz#19731b9685c19ed1552da7052b6f668ed7eb64bb"
@@ -2197,7 +2199,7 @@ cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
-css-tree@^2.2.1:
+css-tree@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-2.3.1.tgz#10264ce1e5442e8572fc82fbe490644ff54b5c20"
   integrity sha512-6Fv1DV/TYw//QF5IzQdqsNDjx/wc8TrMBZsqjL9eW01tWb7R7k/mq+/VXfJCl7SoD5emsJop9cOByJZfs8hYIw==
