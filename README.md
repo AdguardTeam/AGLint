@@ -621,13 +621,13 @@ Before opening a pull request, make sure that all tests pass and that the code i
 
 ### Available commands
 
-You can run the following commands while developing:
+During development, you can use the following commands (listed in `package.json`):
 
-- `yarn check-types`: Check types
-- `yarn lint`: Run ESLint and Prettier on all files
-- `yarn test`: Run all tests (Jest)
-- `yarn coverage`: Get test coverage report
-- `yarn build`: Build package (to `dist` folder) (Rollup)
+- `yarn check-types` - check types with [TypeScript](https://www.typescriptlang.org/)
+- `yarn lint` - lint the code with [ESLint](https://eslint.org/)
+- `yarn test` - run tests with [Jest](https://jestjs.io/) (you can also run a specific test with `yarn test <test-name>`)
+- `yarn coverage` - print test coverage report
+- `yarn build` - build the library to the `dist` folder by using [Rollup](https://rollupjs.org/)
 
 ## Ideas & Questions
 
