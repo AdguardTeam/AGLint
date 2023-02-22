@@ -56,7 +56,6 @@ Table of Contents:
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
-  - [Setting up the development environment](#setting-up-the-development-environment)
   - [Available commands](#available-commands)
 - [Ideas \& Questions](#ideas--questions)
 - [License](#license)
@@ -610,14 +609,19 @@ A small summary of what to expect:
 
 You can contribute to the project by opening a pull request. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
 
-Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. If you have Git hooks enabled, the tests will be run automatically before committing, thanks to Husky.
+Here is a short guide on how to set up the development environment and how to submit your changes:
 
-### Setting up the development environment
+- Pre-requisites: [Node.js](https://nodejs.org/en/) (v14 or higher), [Yarn](https://yarnpkg.com/) (v2 or higher), [Git](https://git-scm.com/), [VSCode](https://code.visualstudio.com/) (optional)
+- Clone the repository with `git clone`
+- Install dependencies with `yarn` (this will also initialize the Git hooks via Husky)
+- Create a new branch with `git checkout -b <branch-name>` (e.g. `git checkout -b feature/add-some-feature`, please add `/feature` or `/fix` prefix to your branch name)
+- Make your changes in the `src` folder and make suitable tests for them in the `test` folder
+- Check code by running `yarn lint` and `yarn test` commands (during development, you can run only a specific test with `yarn test <test-name>`)
+- Build the library with `yarn build` and check the `dist` folder to make sure that the build is successful, then install the library locally with `yarn add <path-to-local-library>` and test it in your project
+- If everything is OK, commit your changes and push them to your forked repository. If Husky is set up correctly, it don't allow you to commit if the linter or tests fail.
+- Create a pull request to the main repository from your forked repository's branch.
 
-1. Install [Node.js](https://nodejs.org/en/), [Yarn](https://yarnpkg.com/) and [Git](https://git-scm.com/). We recommend using [Visual Studio Code](https://code.visualstudio.com/) as your IDE.
-2. Clone the repository
-3. Install dependencies by running `yarn` in the project directory
-4. Start developing!
+We would be happy to review your pull request and merge it if it is suitable for the project.
 
 ### Available commands
 
