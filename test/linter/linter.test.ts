@@ -757,8 +757,7 @@ describe("Linter", () => {
                     "example.com##+js(aopr, test)", // Missing closing bracket
                     "example.com##+js(aopr, test", // Missing opening bracket
                     "example.com##+js...",
-                    // TODO: Validate it in linter rules
-                    // "example.com#$#body { padding 2px !important; }", // Invalid CSS rule (missing : after padding)
+                    "example.com#$#body { padding 2px !important; }", // Invalid CSS rule (missing : after padding)
                     "! comment",
                     "||example.net^$third-party",
                 ].join(NEWLINE)
@@ -787,20 +786,19 @@ describe("Linter", () => {
                         endColumn: 19,
                     },
                 },
-                // TODO: Validate it in linter rules
-                // {
-                //     severity: SEVERITY.fatal,
-                //     position: {
-                //         startLine: 7,
-                //         startColumn: 0,
-                //         endLine: 7,
-                //         endColumn: 46,
-                //     },
-                // },
+                {
+                    severity: SEVERITY.fatal,
+                    position: {
+                        startLine: 7,
+                        startColumn: 0,
+                        endLine: 7,
+                        endColumn: 46,
+                    },
+                },
             ],
             warningCount: 0,
             errorCount: 0,
-            fatalErrorCount: 2,
+            fatalErrorCount: 3,
         });
     });
 

@@ -14,6 +14,7 @@ import nodePolyfills from "rollup-plugin-polyfill-node";
 import alias from "@rollup/plugin-alias";
 import { getBabelOutputPlugin } from "@rollup/plugin-babel";
 import json from "@rollup/plugin-json";
+import terser from "@rollup/plugin-terser";
 
 const commonPlugins = [externals(), commonjs({ sourceMap: false }), resolve({ preferBuiltins: false })];
 
@@ -114,7 +115,7 @@ const browserPlugins = [
         ],
         allowAllFormats: true,
     }),
-    // TODO: Terser plugin https://github.com/rollup/plugins/issues/1366
+    terser(),
 ];
 
 // Browser-friendly UMD build
@@ -122,7 +123,7 @@ const aglintUmd = {
     input: "./src/index.browser.ts",
     output: [
         {
-            file: "./dist/aglint.umd.js",
+            file: "./dist/aglint.umd.min.js",
             name: "AGLint",
             format: "umd",
             sourcemap: false,
@@ -136,7 +137,7 @@ const aglintIife = {
     input: "./src/index.browser.ts",
     output: [
         {
-            file: "./dist/aglint.iife.js",
+            file: "./dist/aglint.iife.min.js",
             name: "AGLint",
             format: "iife",
             sourcemap: false,

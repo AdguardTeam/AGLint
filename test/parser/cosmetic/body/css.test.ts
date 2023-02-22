@@ -133,8 +133,7 @@ describe("CssInjectionBodyParser", () => {
             /^In addition to the remove property, the following CSS injection body also uses other properties:/
         );
 
-        // TODO: Validate it in linter rules
-        // expect(() => CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { asd }")).toThrowError();
+        expect(() => CssInjectionBodyParser.parseAdgCssInjection("body > section[ad-source] { asd }")).toThrowError();
     });
 
     test("parseUboCssInjection", () => {
