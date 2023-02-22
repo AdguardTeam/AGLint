@@ -483,51 +483,31 @@ An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently
 For example, this code:
 
 ```typescript
-import { RuleParser } from "aglint";
+import { RuleParser } from 'aglint';
 
 // RuleParser automatically determines the rule type
-const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
+const ast = RuleParser.parse('/ads.js^$script,domain=example.com');
 ```
 will gives you this AST:
 
 ```json
 {
-    "category": "Cosmetic",
-    "type": "ScriptletRule",
-    "syntax": "AdGuard",
+    "category": "Network",
+    "type": "BasicNetworkRule",
+    "syntax": "Common",
     "exception": false,
-    "modifiers": [],
-    "domains": [
+    "pattern": "/ads.js^",
+    "modifiers": [
         {
-            "domain": "example.com",
+            "modifier": "script",
             "exception": false
         },
         {
-            "domain": "example.net",
-            "exception": true
+            "modifier": "domain",
+            "value": "example.com",
+            "exception": false
         }
-    ],
-    "separator": "#%#//scriptlet",
-    "body": {
-        "scriptlets": [
-            {
-                "scriptlet": {
-                    "type": "SingleQuoted",
-                    "value": "prevent-setInterval"
-                },
-                "parameters": [
-                    {
-                        "type": "SingleQuoted",
-                        "value": "check"
-                    },
-                    {
-                        "type": "SingleQuoted",
-                        "value": "!300"
-                    }
-                ]
-            }
-        ]
-    }
+    ]
 }
 ```
 
@@ -538,14 +518,10 @@ RuleParser.generate(ast);
 
 Which returns the rule as string (this is not the same as the original rule, it is generated from the AST, and not related to the original rule):
 ```adblock
-example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
+/ads.js^$script,domain=example.com
 ```
 
-Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same.
-
-You can pass any rule to the parser, it automatically determines the type and category of the rule.
-
-If the rule is syntactically incorrect, the parser will throw an error.
+Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same. You can pass any rule to the parser, it automatically determines the type and category of the rule. If the rule is syntactically incorrect, the parser will throw an error.
 
 ### Linter
 
