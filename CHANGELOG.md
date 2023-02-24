@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Detailed error messages when linter config parsing fails.
+- Migrate from CSSTree to ECSSTree in order to fully support Extended CSS selectors parsing.
 - Changed license to MIT.
 
 ### Fixed
