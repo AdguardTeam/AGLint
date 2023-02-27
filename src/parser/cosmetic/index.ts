@@ -1,5 +1,3 @@
-import { RuleCategory } from '../categories';
-
 // Utils
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from '../../utils/cosmetic-rule-separator';
 import { AdblockSyntax } from '../../utils/adblockers';
@@ -19,7 +17,7 @@ import {
     COMMA, EMPTY, NEWLINE, SEMICOLON, SPACE,
 } from '../../utils/constants';
 import { UBO_RESPONSEHEADER_INDICATOR } from '../network';
-import { Rule } from '../rule';
+import { Rule, RuleCategory } from '../common';
 
 /**
  * A generic representation of a cosmetic rule.

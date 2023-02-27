@@ -3,7 +3,7 @@ import { SEVERITY } from '../severity';
 
 // Parser stuff
 import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/categories';
+import { RuleCategory } from '../../parser/common';
 import { CommentRuleType } from '../../parser/comment/types';
 import { CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from '../../utils/constants';
 import { GenericRuleContext, LinterRule } from '../common';

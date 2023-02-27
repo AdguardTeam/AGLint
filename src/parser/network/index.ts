@@ -1,13 +1,12 @@
 import { AdblockSyntax } from '../../utils/adblockers';
 import { REGEX_MARKER } from '../../utils/string';
 import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from '../common/modifier-list';
-import { RuleCategory } from '../categories';
 import { NetworkRuleType } from './types';
 import {
     ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, ESCAPE_CHARACTER, OPEN_PARENTHESIS,
 } from '../../utils/constants';
 import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from '../../utils/cosmetic-rule-separator';
-import { Rule } from '../rule';
+import { Rule, RuleCategory } from '../common';
 
 const NETWORK_RULE_EXCEPTION_MARKER = '@@';
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = NETWORK_RULE_EXCEPTION_MARKER.length;

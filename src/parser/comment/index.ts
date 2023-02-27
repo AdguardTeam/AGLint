@@ -8,21 +8,13 @@ import { Metadata, MetadataParser } from './metadata';
 import { PreProcessor, PreProcessorParser } from './preprocessor';
 import { AdblockSyntax } from '../../utils/adblockers';
 import { ConfigCommentParser, ConfigComment } from './inline-config';
-import { RuleCategory } from '../categories';
-import { Rule } from '../rule';
+import { RuleCategory } from '../common';
+import { Comment } from './common';
 
 /**
  * Represents any comment-like adblock rule.
  */
 export type AnyCommentRule = Agent | Hint | ConfigComment | Metadata | PreProcessor | SimpleComment;
-
-/**
- * Represents the basic comment rule interface.
- */
-export interface Comment extends Rule {
-    category: RuleCategory.Comment;
-    type: CommentRuleType;
-}
 
 /**
  * Represents a simple comment.

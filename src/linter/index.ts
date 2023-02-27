@@ -15,13 +15,16 @@ import {
 } from './severity';
 
 // Parser stuff
-import { RuleCategory } from '../parser/categories';
+import { RuleCategory } from '../parser/common';
 import { CommentRuleType } from '../parser/comment/types';
 import { AnyRule, RuleParser } from '../parser';
 
 import { NewLineSplit, StringUtils } from '../utils/string';
 import { ArrayUtils } from '../utils/array';
-import { GenericRuleContext, LinterConfig, LinterPosition, LinterProblemReport, LinterRule, LinterRuleConfig, LinterRuleConfigObject, LinterRuleStorage } from './common';
+import {
+    // eslint-disable-next-line max-len
+    GenericRuleContext, LinterConfig, LinterPosition, LinterProblemReport, LinterRule, LinterRuleConfig, LinterRuleConfigObject, LinterRuleStorage,
+} from './common';
 
 /**
  * Represents a linter result that is returned by the `lint` method

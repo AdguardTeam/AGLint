@@ -5,10 +5,10 @@
 import { METADATA_HEADERS } from '../../converter/metadata';
 import { AdblockSyntax } from '../../utils/adblockers';
 import { SPACE } from '../../utils/constants';
-import { RuleCategory } from '../categories';
 import { CommentRuleType } from './types';
 import { CommentMarker } from './marker';
-import { Comment } from '.';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
 const METADATA_SEPARATOR = ':';
 

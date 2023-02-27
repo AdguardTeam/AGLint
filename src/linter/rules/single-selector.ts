@@ -4,7 +4,7 @@ import { SEVERITY } from '../severity';
 
 // Parser stuff
 import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/categories';
+import { RuleCategory } from '../../parser/common';
 import { CosmeticRuleType } from '../../parser/cosmetic/types';
 
 /**

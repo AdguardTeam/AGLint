@@ -1,6 +1,6 @@
 import { AgentParser, Agent } from '../../../src/parser/comment/agent';
 import { CommentRuleType } from '../../../src/parser/comment/types';
-import { RuleCategory } from '../../../src/parser/categories';
+import { RuleCategory } from '../../../src/parser/common';
 import { AdblockSyntax } from '../../../src/utils/adblockers';
 import { EMPTY, SPACE } from '../../../src/utils/constants';
 

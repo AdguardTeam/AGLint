@@ -1,5 +1,5 @@
 import { CommentRuleType } from '../../src/parser/comment/types';
-import { RuleCategory } from '../../src/parser/categories';
+import { RuleCategory } from '../../src/parser/common';
 import { CosmeticRuleType } from '../../src/parser/cosmetic/types';
 import { NetworkRuleType } from '../../src/parser/network/types';
 import { EMPTY_RULE_TYPE, RuleParser } from '../../src/parser/rule';

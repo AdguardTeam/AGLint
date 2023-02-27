@@ -4,7 +4,7 @@ import { SEVERITY } from '../severity';
 
 // Parser stuff
 import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/categories';
+import { RuleCategory } from '../../parser/common';
 import { CommentRuleType } from '../../parser/comment/types';
 import { EMPTY } from '../../utils/constants';
 import { ArrayUtils } from '../../utils/array';

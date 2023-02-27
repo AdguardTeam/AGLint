@@ -1,3 +1,5 @@
+import { AdblockSyntax } from '../utils/adblockers';
+
 /**
  * Represents the main categories that an adblock rule can belong to.
  * Of course, these include additional subcategories.
@@ -23,4 +25,25 @@ export enum RuleCategory {
      * response header filtering rules, etc.
      */
     Network = 'Network',
+}
+
+/**
+ * Specifies the general structure of an adblock rule. This information must
+ * be included in all rules, regardless of category.
+ */
+export interface Rule {
+    /**
+     * Syntax of the adblock rule (if cannot be clearly determined then the value is `Common`)
+     */
+    syntax: AdblockSyntax;
+
+    /**
+     * Category of the adblock rule (should be always present)
+     */
+    category: RuleCategory;
+
+    /**
+     * Type of the adblock rule (should be always present)
+     */
+    type: string;
 }

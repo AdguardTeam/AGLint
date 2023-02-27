@@ -1,4 +1,4 @@
-import { RuleCategory } from '../../../src/parser/categories';
+import { RuleCategory } from '../../../src/parser/common';
 import { NetworkRuleType } from '../../../src/parser/network/types';
 import { RemoveHeaderNetworkRule, NetworkRuleParser, UBO_RESPONSEHEADER_INDICATOR } from '../../../src/parser/network';
 import { AdblockSyntax } from '../../../src/utils/adblockers';

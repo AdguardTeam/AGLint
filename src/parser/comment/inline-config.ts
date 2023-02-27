@@ -7,10 +7,10 @@
 import JSON5 from 'json5';
 import { AdblockSyntax } from '../../utils/adblockers';
 import { COMMA, EMPTY, SPACE } from '../../utils/constants';
-import { RuleCategory } from '../categories';
 import { CommentRuleType } from './types';
 import { CommentMarker } from './marker';
-import { Comment } from '.';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
 const AGLINT_COMMAND_PREFIX = 'aglint';
 const PARAMS_SEPARATOR = COMMA;

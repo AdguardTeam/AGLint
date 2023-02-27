@@ -1,10 +1,10 @@
 import { AdblockSyntax } from '../../utils/adblockers';
 import { SPACE } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
-import { RuleCategory } from '../categories';
 import { CommentRuleType } from './types';
 import { CommentMarker } from './marker';
-import { Comment } from '.';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
 // Agent list is started with `[` and ended with `]`, and agents are separated by `;`.
 // For example, `[Adblock Plus 2.0; AdGuard]`.

@@ -8,9 +8,9 @@
 import { AdblockSyntax } from '../../utils/adblockers';
 import { EMPTY, HASHMARK } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
-import { RuleCategory } from '../categories';
 import { CommentRuleType } from './types';
-import { Comment } from '.';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
 const PREPROCESSOR_MARKER = '!#';
 const PREPROCESSOR_MARKER_LEN = PREPROCESSOR_MARKER.length;
