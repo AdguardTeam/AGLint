@@ -590,7 +590,7 @@ Here is a short guide on how to set up the development environment and how to su
 - Pre-requisites: [Node.js](https://nodejs.org/en/) (v14 or higher), [Yarn](https://yarnpkg.com/) (v2 or higher), [Git](https://git-scm.com/), [VSCode](https://code.visualstudio.com/) (optional)
 - Clone the repository with `git clone`
 - Install dependencies with `yarn` (this will also initialize the Git hooks via Husky)
-- Create a new branch with `git checkout -b <branch-name>` (e.g. `git checkout -b feature/add-some-feature`, please add `feature/` or `fix/` prefix to your branch name)
+- Create a new branch with `git checkout -b <branch-name>` (e.g. `git checkout -b feature/add-some-feature`, please add `feature/` or `fix/` prefix to your branch name, and refer to the issue number if there is one)
 - Make your changes in the `src` folder and make suitable tests for them in the `test` folder
 - Check code by running `yarn lint` and `yarn test` commands (during development, you can run only a specific test with `yarn test <test-name>`)
 - Build the library with `yarn build` and check the `dist` folder to make sure that the build is successful, then install the library locally with `yarn add <path-to-local-library>` and test it in your project
