@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from "../../../../src/parser/cosmetic/specific/ubo-modifiers";
 import { EMPTY } from "../../../../src/utils/constants";
 
@@ -110,6 +109,7 @@ describe("UboModifierListParser", () => {
 
         expect(
             UboModifierListParser.parse(
+                // eslint-disable-next-line max-len
                 ":not(:matches-path(a)) .ad:matches-path(b):not(:matches-path(c)) > .something:matches-path(d) > .advert"
             )
         ).toEqual({
@@ -183,6 +183,7 @@ describe("UboModifierListParser", () => {
 
         expect(
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 ":not(:matches-path(a)) .ad:matches-path(b):not(:matches-path(c)) > .something:matches-path(d) > .advert"
             )
         ).toEqual(

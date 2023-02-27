@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Block, Selector } from "css-tree";
 import { CssTree } from "../../src/utils/csstree";
 import { CssTreeParserContext } from "../../src/utils/csstree-constants";
@@ -79,9 +78,11 @@ describe("CSSTree utils", () => {
 
         expect(
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 `.teasers > div[class=" display"]:has(> div[class] > div[class] > div:not([class]):not([id]) > div:not([class]):not([id]):contains(/^REKLAMA$/))`
             )
         ).toEqual(
+            // eslint-disable-next-line max-len
             `.teasers > div[class=" display"]:has(> div[class] > div[class] > div:not([class]):not([id]) > div:not([class]):not([id]):contains(/^REKLAMA$/))`
         );
     });

@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 import { CommentRuleType } from "../../src/parser/comment/types";
 import { RuleCategory } from "../../src/parser/categories";
 import { CosmeticRuleType } from "../../src/parser/cosmetic/types";
@@ -221,6 +219,7 @@ describe("RuleParser", () => {
 
         expect(
             RuleParser.parse(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toMatchObject({
@@ -241,6 +240,7 @@ describe("RuleParser", () => {
 
         expect(
             RuleParser.parse(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#@$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toMatchObject({
@@ -291,6 +291,7 @@ describe("RuleParser", () => {
 
         expect(
             RuleParser.parse(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toMatchObject({
@@ -313,6 +314,7 @@ describe("RuleParser", () => {
 
         expect(
             RuleParser.parse(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toMatchObject({
@@ -913,6 +915,7 @@ describe("RuleParser", () => {
         ).toEqual("#$#@media (min-height:1024px) and (max-height:1920px) { body { padding: 0; } }");
         expect(
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toEqual(
@@ -923,6 +926,7 @@ describe("RuleParser", () => {
         ).toEqual("#@$#@media (min-height:1024px) and (max-height:1920px) { body { padding: 0; } }");
         expect(
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#@$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toEqual(
@@ -943,9 +947,11 @@ describe("RuleParser", () => {
         ).toEqual("#$?#@media (min-height:1024px) and (max-height:1920px) { body:has(.ads) { padding: 0; } }");
         expect(
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toEqual(
+            // eslint-disable-next-line max-len
             "example.com,~example.net#$?#@media (min-height:1024px) and (max-height:1920px) { body:has(.ads) { padding: 0; } }"
         );
         expect(
@@ -955,9 +961,11 @@ describe("RuleParser", () => {
         ).toEqual("#@$?#@media (min-height:1024px) and (max-height:1920px) { body:has(.ads) { padding: 0; } }");
         expect(
             parseAndGenerate(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:has(.ads) { padding: 0; } }"
             )
         ).toEqual(
+            // eslint-disable-next-line max-len
             "example.com,~example.net#@$?#@media (min-height:1024px) and (max-height:1920px) { body:has(.ads) { padding: 0; } }"
         );
 

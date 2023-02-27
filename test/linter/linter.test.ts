@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { GenericRuleContext, Linter, LinterRuleData } from "../../src/linter";
 import { LinterConfig } from "../../src/linter/config";
 import { LinterRule } from "../../src/linter/rule";
@@ -721,6 +720,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -733,6 +733,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 5,
@@ -751,6 +752,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[AdGuard; uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -767,6 +769,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 5,
@@ -778,6 +781,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no opening parentheses "(" at call: "..."',
                     position: {
                         startLine: 6,
@@ -811,6 +815,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -824,6 +829,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 6,
@@ -841,6 +847,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -854,6 +861,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 6,
@@ -876,6 +884,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -895,6 +904,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -913,6 +923,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -933,6 +944,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -948,6 +960,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 7,
@@ -959,6 +972,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 8,
@@ -977,6 +991,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "[uBlock Origin]",
                     "example.org##.ad",
                     "@@||example.org^$generichide",
@@ -1001,6 +1016,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 10,
@@ -1012,6 +1028,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 11,
@@ -1023,6 +1040,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 17,
@@ -1041,6 +1059,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "example.org##.ad",
                     "@@||example.org^$generichide",
                     "example.com##+js(aopr, test)",
@@ -1059,6 +1078,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 7,
@@ -1070,6 +1090,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 10,
@@ -1081,6 +1102,7 @@ describe("Linter", () => {
                 {
                     severity: SEVERITY.fatal,
                     message:
+                        // eslint-disable-next-line max-len
                         'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
                     position: {
                         startLine: 11,
@@ -1103,7 +1125,15 @@ describe("Linter", () => {
         linter.addRule("rule-2", demoRuleEverythingIsProblem2);
 
         // Both rules are enabled
-        expect(linter.lint(["abcdefghijklmnopqrstuvxyz", "abcdefghijklmnopqrstuvxyz"].join(NEWLINE))).toMatchObject({
+        expect(
+            linter.lint(
+                [
+                    // Rules:
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
             problems: [
                 {
                     rule: "rule-1",
@@ -1159,6 +1189,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable-next-line rule-1",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable-next-line rule-1",
@@ -1199,6 +1230,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable-next-line rule-2",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable-next-line rule-2",
@@ -1239,6 +1271,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable-next-line rule-1, rule-2",
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1278,6 +1311,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable-next-line rule-1, rule-2",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable-next-line rule-1, rule-2",
@@ -1302,7 +1336,15 @@ describe("Linter", () => {
         linter.disableRule("rule-2");
 
         // No rules are enabled
-        expect(linter.lint(["abcdefghijklmnopqrstuvxyz", "abcdefghijklmnopqrstuvxyz"].join(NEWLINE))).toMatchObject({
+        expect(
+            linter.lint(
+                [
+                    // Rules:
+                    "abcdefghijklmnopqrstuvxyz",
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
             problems: [],
             warningCount: 0,
             errorCount: 0,
@@ -1313,6 +1355,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-enable-next-line rule-1",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-enable-next-line rule-1",
@@ -1353,6 +1396,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-enable-next-line rule-2",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-enable-next-line rule-2",
@@ -1393,6 +1437,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-enable-next-line rule-1, rule-2",
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1432,6 +1477,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-enable-next-line rule-1, rule-2",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-enable-next-line rule-1, rule-2",
@@ -1501,6 +1547,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable",
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1518,6 +1565,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1558,6 +1606,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable",
@@ -1620,6 +1669,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable rule-1",
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1656,6 +1706,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable rule-1",
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1694,6 +1745,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable",
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1735,6 +1787,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable",
                     "! aglint-enable",
                     "! aglint-disable",
@@ -1799,6 +1852,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "! aglint-disable",
                     "! aglint-enable",
                     "! aglint-disable",
@@ -1841,6 +1895,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     `! aglint "rule-1": "off", "rule-2": "off"`,
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -1882,6 +1937,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     `! aglint "rule-1": "off", "rule-2": "off"`,
                     `! aglint "rule-1": "warn", "rule-2": "warn"`,
                     `! aglint "rule-1": "off", "rule-2": "off"`,
@@ -1946,6 +2002,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     `! aglint "rule-1": "off", "rule-2": "off"`,
                     `! aglint "rule-1": "warn", "rule-2": "warn"`,
                     `! aglint "rule-1": "off", "rule-2": "off"`,
@@ -1983,6 +2040,8 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
+                    // eslint-disable-next-line max-len
                     `! aglint "rule-1": "off", "rule-2": "off", "rule-3": ["error", { message: "Custom message for rule-3" }]`,
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
@@ -2052,6 +2111,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable-next-line",
@@ -2140,6 +2200,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "abcdefghijklmnopqrstuvxyz\n",
                     "abcdefghijklmnopqrstuvxyz\n",
                     "! aglint-disable-next-line\r\n",
@@ -2258,6 +2319,7 @@ describe("Linter", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "abcdefghijklmnopqrstuvxyz",
                     "abcdefghijklmnopqrstuvxyz",
                     "! aglint-disable-next-line",
@@ -2347,7 +2409,14 @@ describe("Linter", () => {
         linter.setRuleConfig("rule-4", "fatal");
 
         // Disable at start and enable before last line
-        expect(linter.lint(["abcdefghijklmnopqrstuvxyz"].join(NEWLINE))).toMatchObject({
+        expect(
+            linter.lint(
+                [
+                    // Rules:
+                    "abcdefghijklmnopqrstuvxyz",
+                ].join(NEWLINE)
+            )
+        ).toMatchObject({
             problems: [
                 {
                     rule: "rule-2",

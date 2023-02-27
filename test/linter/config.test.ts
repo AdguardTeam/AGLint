@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { assert } from "superstruct";
 import { linterConfigSchema, mergeConfigs } from "../../src/linter/config";
 

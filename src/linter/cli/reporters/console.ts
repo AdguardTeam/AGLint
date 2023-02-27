@@ -12,10 +12,15 @@ import {
     DOT,
     DOUBLE_NEWLINE,
     EMPTY,
+    HASHMARK,
     NEWLINE,
     OPEN_PARENTHESIS,
+    REPO_URL,
     SPACE,
 } from "src/utils/constants";
+
+const ALIGN_LEFT = "l";
+const ALIGN_CENTER = "c";
 
 /**
  * Type for the collected problems, where the key is the file path and the value
@@ -132,17 +137,17 @@ export class LinterConsoleReporter implements LinterCliReporter {
             for (const problem of problems) {
                 const row = [];
 
-                // Column: Empty column
+                // Column 1: Empty column
                 row.push(EMPTY);
 
-                // Column: Problem location
+                // Column 2: Problem location
                 row.push(
                     `${problem.position.startLine}:${
                         problem.position.startColumn !== undefined ? problem.position.startColumn : 0
                     }`
                 );
 
-                // Column: Problem type
+                // Column 3: Problem type
                 switch (problem.severity) {
                     case 1: {
                         row.push(this.chalk.yellow("warn"));
@@ -161,13 +166,15 @@ export class LinterConsoleReporter implements LinterCliReporter {
                     }
                 }
 
-                // Column: Problem description
+                // Column 4: Problem description
                 row.push(problem.message);
 
-                // Column: Linter rule name (if available)
+                // Column 5: Linter rule name (if available)
                 if (problem.rule) {
+                    // Some terminals support links, so we can link to the rule documentation directly
+                    // in this case.
                     if (terminalLink.isSupported) {
-                        row.push(terminalLink(problem.rule, `https://github.com/AdguardTeam/AGLint#${problem.rule}`));
+                        row.push(terminalLink(problem.rule, `${REPO_URL}${HASHMARK}${problem.rule}`));
                     } else {
                         row.push(this.chalk.dim(problem.rule));
                     }
@@ -180,7 +187,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
             if (rows.length > 0) {
                 output += table(rows, {
-                    align: ["l", "c", "l", "l"],
+                    align: [ALIGN_LEFT, ALIGN_CENTER, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT],
                     stringLength(str: string) {
                         return stripAnsi(str).length;
                     },

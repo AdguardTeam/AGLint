@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { assert } from "superstruct";
 import { linterRuleConfigSchema } from "../../src/linter/rule";
 

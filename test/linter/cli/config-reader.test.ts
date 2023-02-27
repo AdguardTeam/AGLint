@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import path from "path";
 import { parseConfigFile } from "../../../src/linter/cli/config-reader";
 

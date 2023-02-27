@@ -1,20 +1,22 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable max-len */
 import { Linter } from "../../../src/linter";
 import { IfClosed } from "../../../src/linter/rules/if-closed";
 import { NEWLINE } from "../../../src/utils/constants";
 
+let linter: Linter;
+
 describe("if-closed", () => {
-    test("Detects unclosed if-s", () => {
-        const linter = new Linter(false);
-
-        // Add if-closed rule
+    beforeAll(() => {
+        // Configure linter with the rule
+        linter = new Linter(false);
         linter.addRule("if-closed", IfClosed);
+    });
 
-        // If-s are closed
+    test("should ignore non-problematic cases", () => {
+        // if is closed properly
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "rule",
                     "!#if (condition1)",
                     "rule",
@@ -24,14 +26,13 @@ describe("if-closed", () => {
             )
         ).toMatchObject({
             problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
         });
 
+        // both if-s are closed properly
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "rule",
                     "!#if (condition1)",
                     "!#if (condition2)",
@@ -48,18 +49,20 @@ describe("if-closed", () => {
             errorCount: 0,
             fatalErrorCount: 0,
         });
+    });
 
-        // If-s are not closed
+    test("should detect unclosed if-s", () => {
         expect(
             linter.lint(
                 [
+                    // Rules:
                     "rule",
                     "!#if (condition1)",
                     "!#if (condition2)",
                     "rule",
                     "!#endif",
                     "rule",
-                    "rule"
+                    "rule",
                 ].join(NEWLINE)
             )
         ).toMatchObject({
@@ -82,22 +85,20 @@ describe("if-closed", () => {
         });
     });
 
-    test("Detects unopened endif-s", () => {
-        const linter = new Linter(false);
-
-        // Add if-closed rule
-        linter.addRule("if-closed", IfClosed);
-
+    test("should detect unopened endif-s", () => {
         expect(
-            linter.lint([
-                "rule",
-                "!#if (condition1)",
-                "rule",
-                "!#endif",
-                "!#endif",
-                "rule",
-                "rule"
-            ].join(NEWLINE))
+            linter.lint(
+                [
+                    // Rules:
+                    "rule",
+                    "!#if (condition1)",
+                    "rule",
+                    "!#endif",
+                    "!#endif",
+                    "rule",
+                    "rule",
+                ].join(NEWLINE)
+            )
         ).toMatchObject({
             problems: [
                 {

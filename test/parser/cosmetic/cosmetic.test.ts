@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { DomainListParser } from "../../../src/parser/common/domain-list";
 import { CssInjectionBodyParser } from "../../../src/parser/cosmetic/body/css";
 import { ElementHidingBodyParser } from "../../../src/parser/cosmetic/body/elementhiding";
@@ -193,6 +192,7 @@ describe("CosmeticRuleParser", () => {
 
         expect(
             CosmeticRuleParser.parse(
+                // eslint-disable-next-line max-len
                 "example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }"
             )
         ).toMatchObject({

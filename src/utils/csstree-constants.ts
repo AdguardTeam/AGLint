@@ -6,8 +6,6 @@
  * @see {@link https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62536}
  */
 
-/* eslint-disable max-len */
-
 /** @see {@link https://github.com/csstree/csstree/blob/master/docs/ast.md#node-types} */
 export enum CssTreeNodeType {
     AnPlusB = "AnPlusB",
@@ -82,6 +80,7 @@ export enum CssTreeParserContext {
     /** block with curly braces ({ color: red; border: 1px solid black; } for rule example) */
     block = "block",
 
+    // eslint-disable-next-line max-len
     /** block content w/o curly braces (`color: red; border: 1px solid black;` for rule example), useful for parsing HTML style attribute value */
     declarationList = "declarationList",
 
