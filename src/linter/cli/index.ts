@@ -1,15 +1,14 @@
-import path, { ParsedPath } from "path";
-import { readFile, readdir, writeFile } from "fs/promises";
-import { pathExists } from "fs-extra";
-import { Linter } from "../index";
-import { mergeConfigs } from "../config";
-import { walk } from "./walk";
-import { scan } from "./scan";
-import { LinterCliReporter } from "./reporter";
-import cloneDeep from "clone-deep";
-import { LinterConfig, defaultLinterConfig } from "../config";
-import { CONFIG_FILE_NAMES } from "./constants";
-import { parseConfigFile } from "./config-reader";
+import path, { ParsedPath } from 'path';
+import { readFile, readdir, writeFile } from 'fs/promises';
+import { pathExists } from 'fs-extra';
+import cloneDeep from 'clone-deep';
+import { Linter } from '../index';
+import { mergeConfigs, LinterConfig, defaultLinterConfig } from '../config';
+import { walk } from './walk';
+import { scan } from './scan';
+import { LinterCliReporter } from './reporter';
+import { CONFIG_FILE_NAMES } from './constants';
+import { parseConfigFile } from './config-reader';
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.
@@ -63,7 +62,7 @@ export class LinterCli {
         }
 
         // Lint the file
-        let result = linter.lint(await readFile(filePath, "utf8"), this.fix || false);
+        let result = linter.lint(await readFile(filePath, 'utf8'), this.fix || false);
 
         // Set the errors flag if there are any errors
         if (!this.errors && (result.errorCount > 0 || result.fatalErrorCount > 0)) {
@@ -128,18 +127,18 @@ export class LinterCli {
                 // If multiple config files were found, throw an error, because we don't know which one to use
                 if (configs.length > 1) {
                     throw new Error(
-                        `Multiple config files found in directory "${parsedFile.dir}" (${configs.join(", ")})`
+                        `Multiple config files found in directory "${parsedFile.dir}" (${configs.join(', ')})`,
                     );
                 }
 
                 // If a config file was found, parse it
-                const config =
-                    configs.length === 1 ? await parseConfigFile(path.join(parsedFile.dir, configs[0])) : undefined;
+                // eslint-disable-next-line max-len
+                const config = configs.length === 1 ? await parseConfigFile(path.join(parsedFile.dir, configs[0])) : undefined;
 
                 // Lint the file
                 await this.lintFile(
                     parsedFile,
-                    config === undefined ? defaultLinterConfig : mergeConfigs(defaultLinterConfig, config)
+                    config === undefined ? defaultLinterConfig : mergeConfigs(defaultLinterConfig, config),
                 );
             }
         } else {
@@ -154,7 +153,7 @@ export class LinterCli {
                     file: this.lintFile,
                 },
                 defaultLinterConfig,
-                this.fix
+                this.fix,
             );
         }
 

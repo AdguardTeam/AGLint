@@ -2,13 +2,15 @@
  * String helpers.
  */
 
-import { EMPTY, ESCAPE_CHARACTER, SPACE, TAB } from "./constants";
+import {
+    EMPTY, ESCAPE_CHARACTER, SPACE, TAB,
+} from './constants';
 
 export const SINGLE_QUOTE_MARKER = "'";
 export const DOUBLE_QUOTE_MARKER = '"';
-export const REGEX_MARKER = "/";
+export const REGEX_MARKER = '/';
 
-export type NewLineType = "lf" | "crlf" | "cr";
+export type NewLineType = 'lf' | 'crlf' | 'cr';
 export type NewLineSplit = [string, NewLineType | null][];
 
 export class StringUtils {
@@ -26,11 +28,11 @@ export class StringUtils {
         pattern: string,
         searchedCharacter: string,
         start = 0,
-        escapeCharacter: string = ESCAPE_CHARACTER
+        escapeCharacter: string = ESCAPE_CHARACTER,
     ): number {
-        for (let i = start; i < pattern.length; i++) {
+        for (let i = start; i < pattern.length; i += 1) {
             // The searched character cannot be preceded by an escape
-            if (pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
+            if (pattern[i] === searchedCharacter && pattern[i - 1] !== escapeCharacter) {
                 return i;
             }
         }
@@ -49,11 +51,11 @@ export class StringUtils {
     public static findLastUnescapedCharacter(
         pattern: string,
         searchedCharacter: string,
-        escapeCharacter: string = ESCAPE_CHARACTER
+        escapeCharacter: string = ESCAPE_CHARACTER,
     ): number {
-        for (let i = pattern.length - 1; i >= 0; i--) {
+        for (let i = pattern.length - 1; i >= 0; i -= 1) {
             // The searched character cannot be preceded by an escape
-            if (pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
+            if (pattern[i] === searchedCharacter && pattern[i - 1] !== escapeCharacter) {
                 return i;
             }
         }
@@ -77,14 +79,14 @@ export class StringUtils {
         start: number,
         searchedCharacter: string,
         notFollowedBy: string,
-        escapeCharacter: string = ESCAPE_CHARACTER
+        escapeCharacter: string = ESCAPE_CHARACTER,
     ): number {
-        for (let i = start; i < pattern.length; i++) {
+        for (let i = start; i < pattern.length; i += 1) {
             // The searched character cannot be preceded by an escape
             if (
-                pattern[i] == searchedCharacter &&
-                pattern[i + 1] != notFollowedBy &&
-                pattern[i - 1] != escapeCharacter
+                pattern[i] === searchedCharacter
+                && pattern[i + 1] !== notFollowedBy
+                && pattern[i - 1] !== escapeCharacter
             ) {
                 return i;
             }
@@ -107,14 +109,14 @@ export class StringUtils {
         pattern: string,
         searchedCharacter: string,
         notFollowedBy: string,
-        escapeCharacter: string = ESCAPE_CHARACTER
+        escapeCharacter: string = ESCAPE_CHARACTER,
     ): number {
-        for (let i = pattern.length - 1; i >= 0; i--) {
+        for (let i = pattern.length - 1; i >= 0; i -= 1) {
             // The searched character cannot be preceded by an escape
             if (
-                pattern[i] == searchedCharacter &&
-                pattern[i + 1] != notFollowedBy &&
-                pattern[i - 1] != escapeCharacter
+                pattern[i] === searchedCharacter
+                && pattern[i + 1] !== notFollowedBy
+                && pattern[i - 1] !== escapeCharacter
             ) {
                 return i;
             }
@@ -135,19 +137,19 @@ export class StringUtils {
     public static findUnescapedNonStringNonRegexChar(pattern: string, searchedCharacter: string, start = 0) {
         let open: string | null = null;
 
-        for (let i = start; i < pattern.length; i++) {
+        for (let i = start; i < pattern.length; i += 1) {
             if (
-                (pattern[i] == SINGLE_QUOTE_MARKER ||
-                    pattern[i] == DOUBLE_QUOTE_MARKER ||
-                    pattern[i] == REGEX_MARKER) &&
-                pattern[i - 1] != ESCAPE_CHARACTER
+                (pattern[i] === SINGLE_QUOTE_MARKER
+                    || pattern[i] === DOUBLE_QUOTE_MARKER
+                    || pattern[i] === REGEX_MARKER)
+                && pattern[i - 1] !== ESCAPE_CHARACTER
             ) {
                 if (open === pattern[i]) {
                     open = null;
                 } else if (open === null) {
                     open = pattern[i];
                 }
-            } else if (open === null && pattern[i] == searchedCharacter && pattern[i - 1] != ESCAPE_CHARACTER) {
+            } else if (open === null && pattern[i] === searchedCharacter && pattern[i - 1] !== ESCAPE_CHARACTER) {
                 return i;
             }
         }
@@ -170,21 +172,20 @@ export class StringUtils {
         pattern: string,
         searchedCharacter: string,
         start = 0,
-        escapeCharacter = ESCAPE_CHARACTER
+        escapeCharacter = ESCAPE_CHARACTER,
     ) {
         let openQuote: string | null = null;
 
-        for (let i = start; i < pattern.length; i++) {
+        for (let i = start; i < pattern.length; i += 1) {
             // Unescaped ' or "
             if (
-                (pattern[i] == SINGLE_QUOTE_MARKER || pattern[i] == DOUBLE_QUOTE_MARKER) &&
-                pattern[i - 1] != escapeCharacter
+                (pattern[i] === SINGLE_QUOTE_MARKER || pattern[i] === DOUBLE_QUOTE_MARKER)
+                && pattern[i - 1] !== escapeCharacter
             ) {
                 if (!openQuote) openQuote = pattern[i];
-                else if (openQuote == pattern[i]) openQuote = null;
-            }
-            // Unescaped character
-            else if (pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
+                else if (openQuote === pattern[i]) openQuote = null;
+            } else if (pattern[i] === searchedCharacter && pattern[i - 1] !== escapeCharacter) {
+                // Unescaped character
                 if (!openQuote) {
                     return i;
                 }
@@ -212,21 +213,21 @@ export class StringUtils {
         searchedCharacter: string,
         start = 0,
         escapeCharacter = ESCAPE_CHARACTER,
-        openBracket = "(",
-        closeBracket = ")"
+        openBracket = '(',
+        closeBracket = ')',
     ): number {
-        if (openBracket == closeBracket) {
-            throw new Error("Open and close bracket cannot be the same");
+        if (openBracket === closeBracket) {
+            throw new Error('Open and close bracket cannot be the same');
         }
 
         let depth = 0;
 
-        for (let i = start; i < pattern.length; i++) {
-            if (pattern[i] == openBracket) {
-                depth++;
-            } else if (pattern[i] == closeBracket) {
-                depth--;
-            } else if (depth < 1 && pattern[i] == searchedCharacter && pattern[i - 1] != escapeCharacter) {
+        for (let i = start; i < pattern.length; i += 1) {
+            if (pattern[i] === openBracket) {
+                depth += 1;
+            } else if (pattern[i] === closeBracket) {
+                depth -= 1;
+            } else if (depth < 1 && pattern[i] === searchedCharacter && pattern[i - 1] !== escapeCharacter) {
                 return i;
             }
         }
@@ -251,14 +252,14 @@ export class StringUtils {
             delimeterIndex = StringUtils.findNextUnquotedUnescapedCharacter(
                 pattern,
                 delimeterCharacter,
-                delimeterIndex + 1
+                delimeterIndex + 1,
             );
-            if (delimeterIndex != -1) {
+            if (delimeterIndex !== -1) {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, delimeterIndex));
             } else {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, pattern.length));
             }
-        } while (delimeterIndex != -1);
+        } while (delimeterIndex !== -1);
         return parts;
     }
 
@@ -280,14 +281,14 @@ export class StringUtils {
             delimeterIndex = StringUtils.findUnescapedNonStringNonRegexChar(
                 pattern,
                 delimeterCharacter,
-                delimeterIndex + 1
+                delimeterIndex + 1,
             );
-            if (delimeterIndex != -1) {
+            if (delimeterIndex !== -1) {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, delimeterIndex));
             } else {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, pattern.length));
             }
-        } while (delimeterIndex != -1);
+        } while (delimeterIndex !== -1);
         return parts;
     }
 
@@ -305,12 +306,12 @@ export class StringUtils {
         do {
             const prevDelimeterIndex = delimeterIndex;
             delimeterIndex = StringUtils.findNextUnescapedCharacter(pattern, delimeterCharacter, delimeterIndex + 1);
-            if (delimeterIndex != -1) {
+            if (delimeterIndex !== -1) {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, delimeterIndex));
             } else {
                 parts.push(pattern.substring(prevDelimeterIndex + 1, pattern.length));
             }
-        } while (delimeterIndex != -1);
+        } while (delimeterIndex !== -1);
         return parts;
     }
 
@@ -321,7 +322,7 @@ export class StringUtils {
      * @returns true if the given character is a space or tab character, false otherwise.
      */
     public static isWhitespace(char: string): boolean {
-        return char == SPACE || char == TAB;
+        return char === SPACE || char === TAB;
     }
 
     /**
@@ -332,7 +333,7 @@ export class StringUtils {
      * @returns Index or -1 if the character not found
      */
     public static findFirstNonWhitespaceCharacter(pattern: string, start = 0): number {
-        for (let i = start; i < pattern.length; i++) {
+        for (let i = start; i < pattern.length; i += 1) {
             if (!StringUtils.isWhitespace(pattern[i])) {
                 return i;
             }
@@ -347,7 +348,7 @@ export class StringUtils {
      * @returns Index or -1 if the character not found
      */
     public static findLastNonWhitespaceCharacter(pattern: string): number {
-        for (let i = pattern.length - 1; i >= 0; i--) {
+        for (let i = pattern.length - 1; i >= 0; i -= 1) {
             if (!StringUtils.isWhitespace(pattern[i])) {
                 return i;
             }
@@ -364,9 +365,9 @@ export class StringUtils {
     public static isRegexPattern(pattern: string): boolean {
         const trimmedPattern = pattern.trim();
         const lastIndex = trimmedPattern.length - 1;
-        if (trimmedPattern.length > 2 && trimmedPattern[0] == REGEX_MARKER) {
+        if (trimmedPattern.length > 2 && trimmedPattern[0] === REGEX_MARKER) {
             const last = StringUtils.findNextUnescapedCharacter(trimmedPattern, REGEX_MARKER, 1);
-            return last == lastIndex;
+            return last === lastIndex;
         }
         return false;
     }
@@ -382,8 +383,8 @@ export class StringUtils {
     public static escapeCharacter(pattern: string, character: string, escapeCharacter = ESCAPE_CHARACTER): string {
         let result = EMPTY;
 
-        for (let i = 0; i < pattern.length; i++) {
-            if (pattern[i] == character && pattern[i - 1] != escapeCharacter) {
+        for (let i = 0; i < pattern.length; i += 1) {
+            if (pattern[i] === character && pattern[i - 1] !== escapeCharacter) {
                 result += escapeCharacter;
             }
             result += pattern[i];
@@ -416,22 +417,22 @@ export class StringUtils {
         let newLineType: NewLineType | null = null;
 
         // Iterate over each character in the input string
-        for (let i = 0; i < input.length; i++) {
+        for (let i = 0; i < input.length; i += 1) {
             const char = input[i];
 
-            if (char === "\r") {
-                if (input[i + 1] === "\n") {
-                    newLineType = "crlf";
-                    i++;
+            if (char === '\r') {
+                if (input[i + 1] === '\n') {
+                    newLineType = 'crlf';
+                    i += 1;
                 } else {
-                    newLineType = "cr";
+                    newLineType = 'cr';
                 }
 
                 result.push([currentLine, newLineType]);
                 currentLine = EMPTY;
                 newLineType = null;
-            } else if (char === "\n") {
-                newLineType = "lf";
+            } else if (char === '\n') {
+                newLineType = 'lf';
                 result.push([currentLine, newLineType]);
                 currentLine = EMPTY;
                 newLineType = null;
@@ -440,7 +441,7 @@ export class StringUtils {
             }
         }
 
-        if (result.length == 0 || currentLine !== EMPTY) {
+        if (result.length === 0 || currentLine !== EMPTY) {
             result.push([currentLine, newLineType]);
         }
 
@@ -457,19 +458,19 @@ export class StringUtils {
         let result = EMPTY;
 
         // Iterate over each tuple in the input array
-        for (let i = 0; i < input.length; i++) {
+        for (let i = 0; i < input.length; i += 1) {
             const [line, newLineType] = input[i];
             // Add the line to the result string
             result += line;
 
             // Add the appropriate new line character based on the newLineType
             if (newLineType !== null) {
-                if (newLineType === "crlf") {
-                    result += "\r\n";
-                } else if (newLineType === "cr") {
-                    result += "\r";
+                if (newLineType === 'crlf') {
+                    result += '\r\n';
+                } else if (newLineType === 'cr') {
+                    result += '\r';
                 } else {
-                    result += "\n";
+                    result += '\n';
                 }
             }
         }

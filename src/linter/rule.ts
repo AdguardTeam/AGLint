@@ -1,6 +1,8 @@
-import { Struct, define, is, union } from "superstruct";
-import { GenericRuleContext } from ".";
-import { AnySeverity, severity } from "./severity";
+import {
+    Struct, define, is, union,
+} from 'superstruct';
+import { GenericRuleContext } from '.';
+import { AnySeverity, severity } from './severity';
 
 /**
  * Type definition for the linter rule config, which can be:
@@ -24,18 +26,16 @@ export type LinterRuleConfigArray = [AnySeverity, ...unknown[]];
  * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
  */
 function configArray(): Struct<LinterRuleConfigArray, null> {
-    return define("configArray", (value) => {
+    return define('configArray', (value) => {
         if (Array.isArray(value)) {
             // First element should be severity, the rest can be anything,
             // we don't know anything about them at this point
             if (is(value[0], severity())) {
                 return true;
-            } else {
-                return `Expected a severity as first element, but received ${typeof value[0]}`;
             }
-        } else {
-            return `Expected an array, but received ${typeof value}`;
+            return `Expected a severity as first element, but received ${typeof value[0]}`;
         }
+        return `Expected an array, but received ${typeof value}`;
     });
 }
 

@@ -1,16 +1,16 @@
 // Linter stuff
-import { GenericRuleContext, LinterPosition } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext, LinterPosition } from '..';
+import { LinterRule } from '../rule';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CommentRuleType } from "../../parser/comment/types";
-import { PreProcessor } from "../../parser/comment/preprocessor";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/categories';
+import { CommentRuleType } from '../../parser/comment/types';
+import { PreProcessor } from '../../parser/comment/preprocessor';
 
-const IF_DIRECTIVE = "if";
-const ENDIF_DIRECTIVE = "endif";
+const IF_DIRECTIVE = 'if';
+const ENDIF_DIRECTIVE = 'endif';
 
 /**
  * Concreting the storage type definition (the linter only provides a general
@@ -65,9 +65,9 @@ export const IfClosed = <LinterRule>{
             const line = context.getActualLine();
 
             // Check adblock rule category and type
-            if (ast.category == RuleCategory.Comment && ast.type == CommentRuleType.PreProcessor) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessor) {
                 // Check for "if" and "endif" directives
-                if (ast.name == IF_DIRECTIVE) {
+                if (ast.name === IF_DIRECTIVE) {
                     // Collect open "if"
                     context.storage.openIfs.push({
                         position: {
@@ -78,8 +78,8 @@ export const IfClosed = <LinterRule>{
                         },
                         rule: ast,
                     });
-                } else if (ast.name == ENDIF_DIRECTIVE) {
-                    if (context.storage.openIfs.length == 0) {
+                } else if (ast.name === ENDIF_DIRECTIVE) {
+                    if (context.storage.openIfs.length === 0) {
                         context.report({
                             // eslint-disable-next-line max-len
                             message: `Using an "${ENDIF_DIRECTIVE}" directive without an opening "${IF_DIRECTIVE}" directive`,

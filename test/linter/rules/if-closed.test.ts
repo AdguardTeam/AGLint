@@ -1,29 +1,29 @@
-import { Linter } from "../../../src/linter";
-import { IfClosed } from "../../../src/linter/rules/if-closed";
-import { NEWLINE } from "../../../src/utils/constants";
+import { Linter } from '../../../src/linter';
+import { IfClosed } from '../../../src/linter/rules/if-closed';
+import { NEWLINE } from '../../../src/utils/constants';
 
 let linter: Linter;
 
-describe("if-closed", () => {
+describe('if-closed', () => {
     beforeAll(() => {
         // Configure linter with the rule
         linter = new Linter(false);
-        linter.addRule("if-closed", IfClosed);
+        linter.addRule('if-closed', IfClosed);
     });
 
-    test("should ignore non-problematic cases", () => {
+    test('should ignore non-problematic cases', () => {
         // if is closed properly
         expect(
             linter.lint(
                 [
                     // Rules:
-                    "rule",
-                    "!#if (condition1)",
-                    "rule",
-                    "!#endif",
-                    "rule",
-                ].join(NEWLINE)
-            )
+                    'rule',
+                    '!#if (condition1)',
+                    'rule',
+                    '!#endif',
+                    'rule',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [],
         });
@@ -33,16 +33,16 @@ describe("if-closed", () => {
             linter.lint(
                 [
                     // Rules:
-                    "rule",
-                    "!#if (condition1)",
-                    "!#if (condition2)",
-                    "rule",
-                    "!#endif",
-                    "rule",
-                    "!#endif",
-                    "rule",
-                ].join(NEWLINE)
-            )
+                    'rule',
+                    '!#if (condition1)',
+                    '!#if (condition2)',
+                    'rule',
+                    '!#endif',
+                    'rule',
+                    '!#endif',
+                    'rule',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [],
             warningCount: 0,
@@ -51,24 +51,24 @@ describe("if-closed", () => {
         });
     });
 
-    test("should detect unclosed if-s", () => {
+    test('should detect unclosed if-s', () => {
         expect(
             linter.lint(
                 [
                     // Rules:
-                    "rule",
-                    "!#if (condition1)",
-                    "!#if (condition2)",
-                    "rule",
-                    "!#endif",
-                    "rule",
-                    "rule",
-                ].join(NEWLINE)
-            )
+                    'rule',
+                    '!#if (condition1)',
+                    '!#if (condition2)',
+                    'rule',
+                    '!#endif',
+                    'rule',
+                    'rule',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "if-closed",
+                    rule: 'if-closed',
                     severity: 2,
                     message: 'Unclosed "if" directive',
                     position: {
@@ -85,24 +85,24 @@ describe("if-closed", () => {
         });
     });
 
-    test("should detect unopened endif-s", () => {
+    test('should detect unopened endif-s', () => {
         expect(
             linter.lint(
                 [
                     // Rules:
-                    "rule",
-                    "!#if (condition1)",
-                    "rule",
-                    "!#endif",
-                    "!#endif",
-                    "rule",
-                    "rule",
-                ].join(NEWLINE)
-            )
+                    'rule',
+                    '!#if (condition1)',
+                    'rule',
+                    '!#endif',
+                    '!#endif',
+                    'rule',
+                    'rule',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "if-closed",
+                    rule: 'if-closed',
                     severity: 2,
                     message: 'Using an "endif" directive without an opening "if" directive',
                     position: {

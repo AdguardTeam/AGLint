@@ -5,18 +5,18 @@ export enum ConfigCommentType {
     /**
      * Main config comment with configuration object.
      */
-    Main = "aglint",
+    Main = 'aglint',
 
     /**
      * Disables AGLint. It will be enabled again if there is an `aglint-enable` comment.
      */
-    Disable = "aglint-disable",
+    Disable = 'aglint-disable',
 
     /**
      * Enables AGLint. It will be disabled again if there is an `aglint-disable` comment.
      * If AGLint is already enabled, this comment will be ignored.
      */
-    Enable = "aglint-enable",
+    Enable = 'aglint-enable',
 
     /**
      * Disables AGLint for next line. If you specify rule names as params, then only these rules will be disabled.
@@ -32,7 +32,7 @@ export enum ConfigCommentType {
      * ! aglint-disable-next-line
      * ```
      */
-    DisableNextLine = "aglint-disable-next-line",
+    DisableNextLine = 'aglint-disable-next-line',
 
     /**
      * Enables AGLint for next line. If you specify rule names as params, then only these rules will be enabled.
@@ -48,5 +48,5 @@ export enum ConfigCommentType {
      * ! aglint-enable-next-line
      * ```
      */
-    EnableNextLine = "aglint-enable-next-line",
+    EnableNextLine = 'aglint-enable-next-line',
 }

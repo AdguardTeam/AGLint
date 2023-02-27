@@ -1,26 +1,26 @@
-import { Linter } from "../../../src/linter";
-import { AdgScriptletQuotes } from "../../../src/linter/rules/adg-scriptlet-quotes";
-import { NEWLINE } from "../../../src/utils/constants";
+import { Linter } from '../../../src/linter';
+import { AdgScriptletQuotes } from '../../../src/linter/rules/adg-scriptlet-quotes';
+import { NEWLINE } from '../../../src/utils/constants';
 
-describe("adg-scriptlet-quotes", () => {
-    test("detects problematic scriptlets", () => {
+describe('adg-scriptlet-quotes', () => {
+    test('detects problematic scriptlets', () => {
         const linter = new Linter(false);
 
-        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+        linter.addRule('adg-scriptlet-quotes', AdgScriptletQuotes);
 
         // No problematic scriptlets
         expect(
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet('scriptlet0')`,
-                    `example.com#%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
-                    `example.com#@%#//scriptlet('scriptlet0')`,
-                    `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
-                ].join(NEWLINE)
-            )
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet(\'scriptlet0\')',
+                    'example.com#%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
+                    'example.com#@%#//scriptlet(\'scriptlet0\')',
+                    'example.com#@%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [],
             warningCount: 0,
@@ -30,7 +30,7 @@ describe("adg-scriptlet-quotes", () => {
 
         // Ignore "aa'aa" because it contains a single quote
         expect(
-            linter.lint([`example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/, "aa'aa")`].join(NEWLINE))
+            linter.lint(['example.com#@%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/, "aa\'aa")'].join(NEWLINE)),
         ).toMatchObject({
             problems: [],
             warningCount: 0,
@@ -43,21 +43,21 @@ describe("adg-scriptlet-quotes", () => {
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet('scriptlet0')`,
-                    `example.com#%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet(\'scriptlet0\')',
+                    'example.com#%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0")`,
-                    `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
-                ].join(NEWLINE)
-            )
+                    'example.com#@%#//scriptlet("scriptlet0")',
+                    'example.com#@%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Single quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Single quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -75,24 +75,24 @@ describe("adg-scriptlet-quotes", () => {
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet('scriptlet0')`,
-                    `example.com#%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet(\'scriptlet0\')',
+                    'example.com#%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0")`,
+                    'example.com#@%#//scriptlet("scriptlet0")',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                    'example.com#@%#//scriptlet("scriptlet0", \'arg0\', /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
-                ].join(NEWLINE)
-            )
+                    'example.com#@%#//scriptlet(\'scriptlet0\', "arg0", /arg1/)',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Single quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Single quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -101,9 +101,9 @@ describe("adg-scriptlet-quotes", () => {
                     },
                 },
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Single quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Single quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -112,9 +112,9 @@ describe("adg-scriptlet-quotes", () => {
                     },
                 },
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Single quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Single quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -129,27 +129,27 @@ describe("adg-scriptlet-quotes", () => {
         });
     });
 
-    test("detects problematic scriptlets with custom config", () => {
+    test('detects problematic scriptlets with custom config', () => {
         const linter = new Linter(false);
 
-        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+        linter.addRule('adg-scriptlet-quotes', AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "double"]);
+        linter.setRuleConfig('adg-scriptlet-quotes', ['warn', 'double']);
 
         // No problematic scriptlets
         expect(
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet("scriptlet0")`,
-                    `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
-                    `example.com#@%#//scriptlet("scriptlet0")`,
-                    `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
-                ].join(NEWLINE)
-            )
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet("scriptlet0")',
+                    'example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)',
+                    'example.com#@%#//scriptlet("scriptlet0")',
+                    'example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [],
             warningCount: 0,
@@ -162,21 +162,21 @@ describe("adg-scriptlet-quotes", () => {
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet("scriptlet0")`,
-                    `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet("scriptlet0")',
+                    'example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0')`,
-                    `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
-                ].join(NEWLINE)
-            )
+                    'example.com#@%#//scriptlet(\'scriptlet0\')',
+                    'example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Double quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Double quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -194,24 +194,24 @@ describe("adg-scriptlet-quotes", () => {
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet("scriptlet0")`,
-                    `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet("scriptlet0")',
+                    'example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0')`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\')',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\', "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
-                ].join(NEWLINE)
-            )
+                    'example.com#@%#//scriptlet("scriptlet0", \'arg0\', /arg1/)',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Double quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Double quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 5,
                         startColumn: 0,
@@ -220,9 +220,9 @@ describe("adg-scriptlet-quotes", () => {
                     },
                 },
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Double quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Double quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 6,
                         startColumn: 0,
@@ -231,9 +231,9 @@ describe("adg-scriptlet-quotes", () => {
                     },
                 },
                 {
-                    rule: "adg-scriptlet-quotes",
+                    rule: 'adg-scriptlet-quotes',
                     severity: 1,
-                    message: "Double quoted AdGuard scriptlet parameters are preferred",
+                    message: 'Double quoted AdGuard scriptlet parameters are preferred',
                     position: {
                         startLine: 7,
                         startColumn: 0,
@@ -248,129 +248,129 @@ describe("adg-scriptlet-quotes", () => {
         });
     });
 
-    test("suggest fix with default config", () => {
+    test('suggest fix with default config', () => {
         const linter = new Linter(false);
 
-        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+        linter.addRule('adg-scriptlet-quotes', AdgScriptletQuotes);
 
         expect(
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet('scriptlet0')`,
-                    `example.com#%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet(\'scriptlet0\')',
+                    'example.com#%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0")`,
+                    'example.com#@%#//scriptlet("scriptlet0")',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                    'example.com#@%#//scriptlet("scriptlet0", \'arg0\', /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\', "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `#%#//scriptlet("prevent-setTimeout", ".css('display','block');")`,
+                    '#%#//scriptlet("prevent-setTimeout", ".css(\'display\',\'block\');")',
                 ].join(NEWLINE),
-                true
-            )
+                true,
+            ),
         ).toMatchObject({
             fixed: [
                 // Rules:
-                `example.com##.ad1`,
-                `example.com##.ad2`,
-                `example.com#%#//scriptlet('scriptlet0')`,
-                `example.com#%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                'example.com##.ad1',
+                'example.com##.ad2',
+                'example.com#%#//scriptlet(\'scriptlet0\')',
+                'example.com#%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet('scriptlet0')`,
+                'example.com#@%#//scriptlet(\'scriptlet0\')',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                'example.com#@%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet('scriptlet0', 'arg0', /arg1/)`,
+                'example.com#@%#//scriptlet(\'scriptlet0\', \'arg0\', /arg1/)',
                 // Problematic scriptlet
-                `#%#//scriptlet('prevent-setTimeout', ".css('display','block');")`,
+                '#%#//scriptlet(\'prevent-setTimeout\', ".css(\'display\',\'block\');")',
             ].join(NEWLINE),
         });
     });
 
-    test("suggest fix with double quotes config", () => {
+    test('suggest fix with double quotes config', () => {
         const linter = new Linter(false);
 
-        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+        linter.addRule('adg-scriptlet-quotes', AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "double"]);
+        linter.setRuleConfig('adg-scriptlet-quotes', ['warn', 'double']);
 
         expect(
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet("scriptlet0")`,
-                    `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet("scriptlet0")',
+                    'example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0')`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\')',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\', "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                    'example.com#@%#//scriptlet("scriptlet0", \'arg0\', /arg1/)',
                 ].join(NEWLINE),
-                true
-            )
+                true,
+            ),
         ).toMatchObject({
             fixed: [
                 // Rules:
-                `example.com##.ad1`,
-                `example.com##.ad2`,
-                `example.com#%#//scriptlet("scriptlet0")`,
-                `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                'example.com##.ad1',
+                'example.com##.ad2',
+                'example.com#%#//scriptlet("scriptlet0")',
+                'example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet("scriptlet0")`,
+                'example.com#@%#//scriptlet("scriptlet0")',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                'example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                'example.com#@%#//scriptlet("scriptlet0", "arg0", /arg1/)',
             ].join(NEWLINE),
         });
     });
 
-    test("suggest fix with no-quotes config", () => {
+    test('suggest fix with no-quotes config', () => {
         const linter = new Linter(false);
 
-        linter.addRule("adg-scriptlet-quotes", AdgScriptletQuotes);
+        linter.addRule('adg-scriptlet-quotes', AdgScriptletQuotes);
 
         // Prefer DoubleQuoted quotes
-        linter.setRuleConfig("adg-scriptlet-quotes", ["warn", "none"]);
+        linter.setRuleConfig('adg-scriptlet-quotes', ['warn', 'none']);
 
         expect(
             linter.lint(
                 [
                     // Rules:
-                    `example.com##.ad1`,
-                    `example.com##.ad2`,
-                    `example.com#%#//scriptlet("scriptlet0")`,
-                    `example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)`,
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com#%#//scriptlet("scriptlet0")',
+                    'example.com#%#//scriptlet("scriptlet0", "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0')`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\')',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet('scriptlet0', "arg0", /arg1/)`,
+                    'example.com#@%#//scriptlet(\'scriptlet0\', "arg0", /arg1/)',
                     // Problematic scriptlet
-                    `example.com#@%#//scriptlet("scriptlet0", 'arg0', /arg1/)`,
+                    'example.com#@%#//scriptlet("scriptlet0", \'arg0\', /arg1/)',
                 ].join(NEWLINE),
-                true
-            )
+                true,
+            ),
         ).toMatchObject({
             fixed: [
                 // Rules:
-                `example.com##.ad1`,
-                `example.com##.ad2`,
-                `example.com#%#//scriptlet(scriptlet0)`,
-                `example.com#%#//scriptlet(scriptlet0, arg0, /arg1/)`,
+                'example.com##.ad1',
+                'example.com##.ad2',
+                'example.com#%#//scriptlet(scriptlet0)',
+                'example.com#%#//scriptlet(scriptlet0, arg0, /arg1/)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet(scriptlet0)`,
+                'example.com#@%#//scriptlet(scriptlet0)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet(scriptlet0, arg0, /arg1/)`,
+                'example.com#@%#//scriptlet(scriptlet0, arg0, /arg1/)',
                 // Problematic scriptlet
-                `example.com#@%#//scriptlet(scriptlet0, arg0, /arg1/)`,
+                'example.com#@%#//scriptlet(scriptlet0, arg0, /arg1/)',
             ].join(NEWLINE),
         });
     });

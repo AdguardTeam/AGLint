@@ -1,70 +1,70 @@
-import { SPACE } from "./constants";
+import { SPACE } from './constants';
 
 /** Represents possible cosmetic rule separators */
 export enum CosmeticRuleSeparator {
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpCssElemhide = "##",
+    AbpCssElemhide = '##',
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpCssElemhideException = "#@#",
+    AbpCssElemhideException = '#@#',
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpExtCssElemHide = "#?#",
+    AbpExtCssElemHide = '#?#',
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpExtCssElemHideException = "#@?#",
+    AbpExtCssElemHideException = '#@?#',
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpSnippet = "#$#",
+    AbpSnippet = '#$#',
 
     /** @see {@link https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide_basic} */
-    AbpSnippetException = "#@$#",
+    AbpSnippetException = '#@$#',
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection} */
-    UboScriptlet = "##+js",
+    UboScriptlet = '##+js',
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection} */
-    UboScriptletException = "#@#+js",
+    UboScriptletException = '#@#+js',
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    UboHtml = "##^",
+    UboHtml = '##^',
 
     /** @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#html-filters} */
-    UboHtmlException = "#@#^",
+    UboHtmlException = '#@#^',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
-    AdgCssInject = "#$#",
+    AdgCssInject = '#$#',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#cosmetic-css-rules} */
-    AdgCssInjectException = "#@$#",
+    AdgCssInjectException = '#@$#',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#extended-css-selectors} */
-    AdgExtCssInject = "#$?#",
+    AdgExtCssInject = '#$?#',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#extended-css-selectors} */
-    AdgExtCssInjectException = "#@$?#",
+    AdgExtCssInjectException = '#@$?#',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#javascript-rules} */
-    AdgJsInject = "#%#",
+    AdgJsInject = '#%#',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#javascript-rules} */
-    AdgJsInjectException = "#@%#",
+    AdgJsInjectException = '#@%#',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#scriptlets} */
-    AdgScriptlet = "#%#//scriptlet",
+    AdgScriptlet = '#%#//scriptlet',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#scriptlets} */
-    AdgScriptletException = "#@%#//scriptlet",
+    AdgScriptletException = '#@%#//scriptlet',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#html-filtering-rules} */
-    AdgHtml = "$$",
+    AdgHtml = '$$',
 
     /** @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#html-filtering-rules} */
-    AdgHtmlException = "$@$",
+    AdgHtmlException = '$@$',
 }
 
 /** In all cases, this means that the separator marks an exception. */
-export const EXCEPTION_MARKER = "@";
+export const EXCEPTION_MARKER = '@';
 
 /** Represents the result of the separator finder */
 export type CosmeticRuleSeparatorResult = [
@@ -86,7 +86,7 @@ export type CosmeticRuleSeparatorResult = [
     /**
      * Is exception separator
      */
-    boolean | null
+    boolean | null,
 ];
 
 /**
@@ -103,10 +103,10 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isElementHiding(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.AbpCssElemhide ||
-            separator == CosmeticRuleSeparator.AbpCssElemhideException ||
-            separator == CosmeticRuleSeparator.AbpExtCssElemHide ||
-            separator == CosmeticRuleSeparator.AbpExtCssElemHideException
+            separator === CosmeticRuleSeparator.AbpCssElemhide
+            || separator === CosmeticRuleSeparator.AbpCssElemhideException
+            || separator === CosmeticRuleSeparator.AbpExtCssElemHide
+            || separator === CosmeticRuleSeparator.AbpExtCssElemHideException
         );
     }
 
@@ -118,10 +118,10 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isAdgCss(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.AdgCssInject ||
-            separator == CosmeticRuleSeparator.AdgCssInjectException ||
-            separator == CosmeticRuleSeparator.AdgExtCssInject ||
-            separator == CosmeticRuleSeparator.AdgExtCssInjectException
+            separator === CosmeticRuleSeparator.AdgCssInject
+            || separator === CosmeticRuleSeparator.AdgCssInjectException
+            || separator === CosmeticRuleSeparator.AdgExtCssInject
+            || separator === CosmeticRuleSeparator.AdgExtCssInjectException
         );
     }
 
@@ -132,7 +132,8 @@ export class CosmeticRuleSeparatorUtils {
      * @returns `true` if the specified separator is an Adblock Plus snippet separator, `false` otherwise
      */
     public static isAbpSnippet(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.AbpSnippet || separator == CosmeticRuleSeparator.AbpSnippetException;
+        // eslint-disable-next-line max-len
+        return separator === CosmeticRuleSeparator.AbpSnippet || separator === CosmeticRuleSeparator.AbpSnippetException;
     }
 
     /**
@@ -143,7 +144,8 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isUboScriptlet(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.UboScriptlet || separator == CosmeticRuleSeparator.UboScriptletException
+            // eslint-disable-next-line max-len
+            separator === CosmeticRuleSeparator.UboScriptlet || separator === CosmeticRuleSeparator.UboScriptletException
         );
     }
 
@@ -155,7 +157,8 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isAdgScriptlet(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.AdgScriptlet || separator == CosmeticRuleSeparator.AdgScriptletException
+            // eslint-disable-next-line max-len
+            separator === CosmeticRuleSeparator.AdgScriptlet || separator === CosmeticRuleSeparator.AdgScriptletException
         );
     }
 
@@ -167,7 +170,7 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isAdgJs(separator: string): boolean {
         return (
-            separator == CosmeticRuleSeparator.AdgJsInject || separator == CosmeticRuleSeparator.AdgJsInjectException
+            separator === CosmeticRuleSeparator.AdgJsInject || separator === CosmeticRuleSeparator.AdgJsInjectException
         );
     }
 
@@ -178,7 +181,7 @@ export class CosmeticRuleSeparatorUtils {
      * @returns `true` if the specified separator is a uBlock HTML separator, `false` otherwise
      */
     public static isUboHtml(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.UboHtml || separator == CosmeticRuleSeparator.UboHtmlException;
+        return separator === CosmeticRuleSeparator.UboHtml || separator === CosmeticRuleSeparator.UboHtmlException;
     }
 
     /**
@@ -188,7 +191,7 @@ export class CosmeticRuleSeparatorUtils {
      * @returns `true` if the specified separator is an AdGuard HTML separator, `false` otherwise
      */
     public static isAdgHtml(separator: string): boolean {
-        return separator == CosmeticRuleSeparator.AdgHtml || separator == CosmeticRuleSeparator.AdgHtmlException;
+        return separator === CosmeticRuleSeparator.AdgHtml || separator === CosmeticRuleSeparator.AdgHtmlException;
     }
 
     /**
@@ -199,9 +202,9 @@ export class CosmeticRuleSeparatorUtils {
      */
     public static isScriptlet(separator: string): boolean {
         return (
-            CosmeticRuleSeparatorUtils.isAbpSnippet(separator) ||
-            CosmeticRuleSeparatorUtils.isUboScriptlet(separator) ||
-            CosmeticRuleSeparatorUtils.isAdgScriptlet(separator)
+            CosmeticRuleSeparatorUtils.isAbpSnippet(separator)
+            || CosmeticRuleSeparatorUtils.isUboScriptlet(separator)
+            || CosmeticRuleSeparatorUtils.isAdgScriptlet(separator)
         );
     }
 
@@ -249,119 +252,119 @@ export class CosmeticRuleSeparatorUtils {
         hashMarkPos = -1,
         dollarSignPos = -1,
         noHashMark = false,
-        noDollarSign = false
+        noDollarSign = false,
     ): CosmeticRuleSeparatorResult {
         // Using -2 instead of -1 in order to provide proper recursion,
         // think `example.com$$script[tag-content="#example"]`.
         // h means hashmark (#), d means dollar sign ($).
-        let h = -2,
-            d = -2;
+        let h = -2;
+        let d = -2;
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        !noHashMark && (h = rule.indexOf("#", hashMarkPos + 1));
+        !noHashMark && (h = rule.indexOf('#', hashMarkPos + 1));
 
         if (h > -1) {
             // Filter out comments, think 127.0.0.1 localhost ## comment
             // ##
-            if (rule[h + 1] == "#" && (h == 0 || rule[h - 1] != SPACE)) {
+            if (rule[h + 1] === '#' && (h === 0 || rule[h - 1] !== SPACE)) {
                 // ##+js
-                if (rule[h + 2] == "+" && rule[h + 3] == "j" && rule[h + 4] == "s") {
+                if (rule[h + 2] === '+' && rule[h + 3] === 'j' && rule[h + 4] === 's') {
                     return [h, h + 5, CosmeticRuleSeparator.UboScriptlet, false];
                 }
                 // ##^
-                else if (rule[h + 2] == "^") {
+                if (rule[h + 2] === '^') {
                     return [h, h + 3, CosmeticRuleSeparator.UboHtml, false];
                 }
                 // ##
                 return [h, h + 2, CosmeticRuleSeparator.AbpCssElemhide, false];
             }
             // #%#
-            else if (rule[h + 1] == "%" && rule[h + 2] == "#") {
+            if (rule[h + 1] === '%' && rule[h + 2] === '#') {
                 // #%#//scriptlet
                 if (
-                    rule[h + 3] == "/" &&
-                    rule[h + 4] == "/" &&
-                    rule[h + 5] == "s" &&
-                    rule[h + 6] == "c" &&
-                    rule[h + 7] == "r" &&
-                    rule[h + 8] == "i" &&
-                    rule[h + 9] == "p" &&
-                    rule[h + 10] == "t" &&
-                    rule[h + 11] == "l" &&
-                    rule[h + 12] == "e" &&
-                    rule[h + 13] == "t"
+                    rule[h + 3] === '/'
+                    && rule[h + 4] === '/'
+                    && rule[h + 5] === 's'
+                    && rule[h + 6] === 'c'
+                    && rule[h + 7] === 'r'
+                    && rule[h + 8] === 'i'
+                    && rule[h + 9] === 'p'
+                    && rule[h + 10] === 't'
+                    && rule[h + 11] === 'l'
+                    && rule[h + 12] === 'e'
+                    && rule[h + 13] === 't'
                 ) {
                     return [h, h + 14, CosmeticRuleSeparator.AdgScriptlet, false];
                 }
                 return [h, h + 3, CosmeticRuleSeparator.AdgJsInject, false];
             }
             // #$#
-            else if (rule[h + 1] == "$" && rule[h + 2] == "#") {
+            if (rule[h + 1] === '$' && rule[h + 2] === '#') {
                 return [h, h + 3, CosmeticRuleSeparator.AdgCssInject, false];
             }
             // #?#
-            else if (rule[h + 1] == "?" && rule[h + 2] == "#") {
+            if (rule[h + 1] === '?' && rule[h + 2] === '#') {
                 return [h, h + 3, CosmeticRuleSeparator.AbpExtCssElemHide, false];
             }
             // #$?#
-            else if (rule[h + 1] == "$" && rule[h + 2] == "?" && rule[h + 3] == "#") {
+            if (rule[h + 1] === '$' && rule[h + 2] === '?' && rule[h + 3] === '#') {
                 return [h, h + 4, CosmeticRuleSeparator.AdgExtCssInject, false];
-            } else if (rule[h + 1] == "@") {
+            } if (rule[h + 1] === '@') {
                 // #@#
-                if (rule[h + 2] == "#") {
+                if (rule[h + 2] === '#') {
                     // #@#+js
-                    if (rule[h + 3] == "+" && rule[h + 4] == "j" && rule[h + 5] == "s") {
+                    if (rule[h + 3] === '+' && rule[h + 4] === 'j' && rule[h + 5] === 's') {
                         return [h, h + 6, CosmeticRuleSeparator.UboScriptletException, true];
                     }
                     // #@#^
-                    else if (rule[h + 3] == "^") {
+                    if (rule[h + 3] === '^') {
                         return [h, h + 4, CosmeticRuleSeparator.UboHtmlException, true];
                     }
                     return [h, h + 3, CosmeticRuleSeparator.AbpCssElemhideException, true];
                 }
                 // #@%#
-                else if (rule[h + 2] == "%" && rule[h + 3] == "#") {
+                if (rule[h + 2] === '%' && rule[h + 3] === '#') {
                     // #%#//scriptlet
                     if (
-                        rule[h + 4] == "/" &&
-                        rule[h + 5] == "/" &&
-                        rule[h + 6] == "s" &&
-                        rule[h + 7] == "c" &&
-                        rule[h + 8] == "r" &&
-                        rule[h + 9] == "i" &&
-                        rule[h + 10] == "p" &&
-                        rule[h + 11] == "t" &&
-                        rule[h + 12] == "l" &&
-                        rule[h + 13] == "e" &&
-                        rule[h + 14] == "t"
+                        rule[h + 4] === '/'
+                        && rule[h + 5] === '/'
+                        && rule[h + 6] === 's'
+                        && rule[h + 7] === 'c'
+                        && rule[h + 8] === 'r'
+                        && rule[h + 9] === 'i'
+                        && rule[h + 10] === 'p'
+                        && rule[h + 11] === 't'
+                        && rule[h + 12] === 'l'
+                        && rule[h + 13] === 'e'
+                        && rule[h + 14] === 't'
                     ) {
                         return [h, h + 15, CosmeticRuleSeparator.AdgScriptletException, true];
                     }
                     return [h, h + 4, CosmeticRuleSeparator.AdgJsInjectException, true];
                 }
                 // #@?#
-                else if (rule[h + 2] == "?" && rule[h + 3] == "#") {
+                if (rule[h + 2] === '?' && rule[h + 3] === '#') {
                     return [h, h + 4, CosmeticRuleSeparator.AbpExtCssElemHideException, true];
                 }
                 // #@$#
-                else if (rule[h + 2] == "$" && rule[h + 3] == "#") {
+                if (rule[h + 2] === '$' && rule[h + 3] === '#') {
                     return [h, h + 4, CosmeticRuleSeparator.AdgCssInjectException, true];
                 }
                 // #@$?#
-                else if (rule[h + 2] == "$" && rule[h + 3] == "?" && rule[h + 4] == "#") {
+                if (rule[h + 2] === '$' && rule[h + 3] === '?' && rule[h + 4] === '#') {
                     return [h, h + 5, CosmeticRuleSeparator.AdgExtCssInjectException, true];
                 }
             }
         } else {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            !noDollarSign && (d = rule.indexOf("$", dollarSignPos + 1));
+            !noDollarSign && (d = rule.indexOf('$', dollarSignPos + 1));
 
             if (d > -1) {
                 // $$
-                if (rule[d + 1] == "$") {
+                if (rule[d + 1] === '$') {
                     return [d, d + 2, CosmeticRuleSeparator.AdgHtml, false];
                 }
                 // $@$
-                else if (rule[d + 1] == "@" && rule[d + 2] == "$") {
+                if (rule[d + 1] === '@' && rule[d + 2] === '$') {
                     return [d, d + 3, CosmeticRuleSeparator.AdgHtmlException, true];
                 }
             }
@@ -370,6 +373,6 @@ export class CosmeticRuleSeparatorUtils {
             return [-1, -1, null, null];
         }
 
-        return CosmeticRuleSeparatorUtils.findRecursively(rule, h, d, h == -1, d == -1);
+        return CosmeticRuleSeparatorUtils.findRecursively(rule, h, d, h === -1, d === -1);
     }
 }

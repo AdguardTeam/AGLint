@@ -1,10 +1,12 @@
-import { readFile } from "fs/promises";
-import { assert, StructError } from "superstruct";
-import { parse } from "path";
-import yaml from "js-yaml";
-import { LinterConfig, linterConfigSchema } from "../config";
-import { EMPTY } from "../../utils/constants";
-import { EXT_JSON, EXT_YAML, EXT_YML, RC_CONFIG_FILE } from "./constants";
+import { readFile } from 'fs/promises';
+import { assert, StructError } from 'superstruct';
+import { parse } from 'path';
+import yaml from 'js-yaml';
+import { LinterConfig, linterConfigSchema } from '../config';
+import { EMPTY } from '../../utils/constants';
+import {
+    EXT_JSON, EXT_YAML, EXT_YML, RC_CONFIG_FILE,
+} from './constants';
 
 /**
  * Reads and parses supported configuration files.
@@ -21,7 +23,7 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
         const parsedFilePath = parse(filePath);
 
         // Read the file contents
-        const contents = await readFile(filePath, "utf8");
+        const contents = await readFile(filePath, 'utf8');
 
         // At this point, we don't know exactly what the file contains, so simply mark
         // it as unknown, later we validate it anyway
@@ -68,7 +70,7 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
 
                 if (value === undefined) {
                     message = `"${key}" is required, but it was not provided`;
-                } else if (type === "never") {
+                } else if (type === 'never') {
                     message = `"${key}" is unknown in the config schema, please remove it`;
                 } else {
                     message = `Value "${value}" for "${key}" is not a valid "${type}" type`;

@@ -1,12 +1,12 @@
 // Linter stuff
-import { GenericRuleContext } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext } from '..';
+import { LinterRule } from '../rule';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { NetworkRuleType } from "../../parser/network/types";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/categories';
+import { NetworkRuleType } from '../../parser/network/types';
 
 /**
  * Rule that checks if a network rule contains multiple same modifiers
@@ -23,7 +23,7 @@ export const DuplicatedModifiers = <LinterRule>{
             const line = context.getActualLine();
 
             // Check if the rule is a basic network rule
-            if (ast.category == RuleCategory.Network && ast.type === NetworkRuleType.BasicNetworkRule) {
+            if (ast.category === RuleCategory.Network && ast.type === NetworkRuleType.BasicNetworkRule) {
                 // Count the number of each modifier
                 const stat: { [key: string]: number } = {};
 

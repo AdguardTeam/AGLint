@@ -1,65 +1,65 @@
-import { Linter } from "../../../src/linter";
-import { UnknownHintsAndPlatforms } from "../../../src/linter/rules/unknown-hints-and-platforms";
+import { Linter } from '../../../src/linter';
+import { UnknownHintsAndPlatforms } from '../../../src/linter/rules/unknown-hints-and-platforms';
 
 let linter: Linter;
 
-describe("unknown-preprocessor-directives", () => {
+describe('unknown-preprocessor-directives', () => {
     beforeAll(() => {
         // Configure linter with the rule
         linter = new Linter(false);
-        linter.addRule("unknown-hints-and-platforms", UnknownHintsAndPlatforms);
+        linter.addRule('unknown-hints-and-platforms', UnknownHintsAndPlatforms);
     });
 
-    test("should ignore non-problematic cases", () => {
+    test('should ignore non-problematic cases', () => {
         // NOT_OPTIMIZED
-        expect(linter.lint(`!+ NOT_OPTIMIZED`)).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_OPTIMIZED')).toMatchObject({ problems: [] });
 
         // PLATFORM single
-        expect(linter.lint(`!+ PLATFORM(windows)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(mac)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(android)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ios)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_chromium)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_ff)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_edge)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_opera)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_safari)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_android_cb)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ PLATFORM(ext_ublock)`)).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(windows)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(mac)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(android)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ios)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_chromium)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_ff)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_edge)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_opera)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_safari)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_android_cb)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(ext_ublock)')).toMatchObject({ problems: [] });
 
         // PLATFORM mixed
         expect(
             linter.lint(
                 // eslint-disable-next-line max-len
-                `!+ PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)`
-            )
+                '!+ PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
+            ),
         ).toMatchObject({ problems: [] });
 
         // NOT_PLATFORM single
-        expect(linter.lint(`!+ NOT_PLATFORM(windows)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(mac)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(android)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ios)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_chromium)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_ff)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_edge)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_opera)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_safari)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_android_cb)`)).toMatchObject({ problems: [] });
-        expect(linter.lint(`!+ NOT_PLATFORM(ext_ublock)`)).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(windows)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(mac)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(android)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ios)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_chromium)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_ff)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_edge)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_opera)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_safari)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_android_cb)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(ext_ublock)')).toMatchObject({ problems: [] });
 
         // NOT_PLATFORM mixed
         expect(
             linter.lint(
                 // eslint-disable-next-line max-len
-                `!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)`
-            )
+                '!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
+            ),
         ).toMatchObject({ problems: [] });
     });
 
-    it("should detect problematic cases", () => {
+    it('should detect problematic cases', () => {
         // syntax error
-        expect(linter.lint(`!+ NOT_OPTIMIZED(`)).toMatchObject({
+        expect(linter.lint('!+ NOT_OPTIMIZED(')).toMatchObject({
             problems: [
                 {
                     severity: 3,
@@ -73,10 +73,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // NOT_OPTIMIZED should not have parameters
-        expect(linter.lint(`!+ NOT_OPTIMIZED()`)).toMatchObject({
+        expect(linter.lint('!+ NOT_OPTIMIZED()')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
                     position: {
@@ -88,10 +88,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // NOT_OPTIMIZED should not have parameters
-        expect(linter.lint(`!+ NOT_OPTIMIZED(aa)`)).toMatchObject({
+        expect(linter.lint('!+ NOT_OPTIMIZED(aa)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
                     position: {
@@ -103,10 +103,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // NOT_OPTIMIZED should not have parameters
-        expect(linter.lint(`!+ NOT_OPTIMIZED(aa, bb)`)).toMatchObject({
+        expect(linter.lint('!+ NOT_OPTIMIZED(aa, bb)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
                     position: {
@@ -118,10 +118,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Hint name is case-sensitive
-        expect(linter.lint(`!+ not_optimized`)).toMatchObject({
+        expect(linter.lint('!+ not_optimized')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "not_optimized"',
                     position: {
@@ -133,7 +133,7 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Syntax error
-        expect(linter.lint(`!+ PLATFORM(`)).toMatchObject({
+        expect(linter.lint('!+ PLATFORM(')).toMatchObject({
             problems: [
                 {
                     severity: 3,
@@ -147,10 +147,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // PLATFORM should have valid parameters
-        expect(linter.lint(`!+ PLATFORM()`)).toMatchObject({
+        expect(linter.lint('!+ PLATFORM()')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Hint "PLATFORM" must have at least one platform specified',
                     position: {
@@ -162,10 +162,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // PLATFORM should have valid parameters
-        expect(linter.lint(`!+ PLATFORM(aa)`)).toMatchObject({
+        expect(linter.lint('!+ PLATFORM(aa)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "PLATFORM"',
                     position: {
@@ -177,10 +177,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // PLATFORM should have valid parameters
-        expect(linter.lint(`!+ PLATFORM(aa, bb)`)).toMatchObject({
+        expect(linter.lint('!+ PLATFORM(aa, bb)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "PLATFORM"',
                     position: {
@@ -189,7 +189,7 @@ describe("unknown-preprocessor-directives", () => {
                     },
                 },
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown platform "bb" in hint "PLATFORM"',
                     position: {
@@ -201,10 +201,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Platform name is case-sensitive, even if it has a valid parameter
-        expect(linter.lint(`!+ platform(windows)`)).toMatchObject({
+        expect(linter.lint('!+ platform(windows)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "platform"',
                     position: {
@@ -216,7 +216,7 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Syntax error
-        expect(linter.lint(`!+ NOT_PLATFORM(`)).toMatchObject({
+        expect(linter.lint('!+ NOT_PLATFORM(')).toMatchObject({
             problems: [
                 {
                     severity: 3,
@@ -230,10 +230,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // PLATFORM should have valid parameters
-        expect(linter.lint(`!+ NOT_PLATFORM()`)).toMatchObject({
+        expect(linter.lint('!+ NOT_PLATFORM()')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Hint "NOT_PLATFORM" must have at least one platform specified',
                     position: {
@@ -245,10 +245,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // PLATFORM should have valid parameters
-        expect(linter.lint(`!+ NOT_PLATFORM(aa)`)).toMatchObject({
+        expect(linter.lint('!+ NOT_PLATFORM(aa)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "NOT_PLATFORM"',
                     position: {
@@ -260,10 +260,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // PLATFORM should have valid parameters
-        expect(linter.lint(`!+ NOT_PLATFORM(aa, bb)`)).toMatchObject({
+        expect(linter.lint('!+ NOT_PLATFORM(aa, bb)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "NOT_PLATFORM"',
                     position: {
@@ -272,7 +272,7 @@ describe("unknown-preprocessor-directives", () => {
                     },
                 },
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown platform "bb" in hint "NOT_PLATFORM"',
                     position: {
@@ -284,10 +284,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Platform name is case-sensitive, even if it has a valid parameter
-        expect(linter.lint(`!+ not_platform(windows)`)).toMatchObject({
+        expect(linter.lint('!+ not_platform(windows)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "not_platform"',
                     position: {
@@ -299,7 +299,7 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Syntax error
-        expect(linter.lint(`!+ HINT(`)).toMatchObject({
+        expect(linter.lint('!+ HINT(')).toMatchObject({
             problems: [
                 {
                     severity: 3,
@@ -313,10 +313,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Unknown hint name
-        expect(linter.lint(`!+ HINT`)).toMatchObject({
+        expect(linter.lint('!+ HINT')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "HINT"',
                     position: {
@@ -328,10 +328,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Unknown hint name
-        expect(linter.lint(`!+ HINT(aa)`)).toMatchObject({
+        expect(linter.lint('!+ HINT(aa)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "HINT"',
                     position: {
@@ -343,10 +343,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Unknown hint name
-        expect(linter.lint(`!+ HINT(aa, bb)`)).toMatchObject({
+        expect(linter.lint('!+ HINT(aa, bb)')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "HINT"',
                     position: {
@@ -358,10 +358,10 @@ describe("unknown-preprocessor-directives", () => {
         });
 
         // Unknown hint name
-        expect(linter.lint(`!+ NOT_HINT`)).toMatchObject({
+        expect(linter.lint('!+ NOT_HINT')).toMatchObject({
             problems: [
                 {
-                    rule: "unknown-hints-and-platforms",
+                    rule: 'unknown-hints-and-platforms',
                     severity: 2,
                     message: 'Unknown hint name "NOT_HINT"',
                     position: {

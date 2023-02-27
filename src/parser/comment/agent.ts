@@ -1,16 +1,16 @@
-import { AdblockSyntax } from "../../utils/adblockers";
-import { SPACE } from "../../utils/constants";
-import { StringUtils } from "../../utils/string";
-import { RuleCategory } from "../categories";
-import { CommentRuleType } from "./types";
-import { CommentMarker } from "./marker";
-import { Comment } from ".";
+import { AdblockSyntax } from '../../utils/adblockers';
+import { SPACE } from '../../utils/constants';
+import { StringUtils } from '../../utils/string';
+import { RuleCategory } from '../categories';
+import { CommentRuleType } from './types';
+import { CommentMarker } from './marker';
+import { Comment } from '.';
 
 // Agent list is started with `[` and ended with `]`, and agents are separated by `;`.
 // For example, `[Adblock Plus 2.0; AdGuard]`.
-const AGENT_LIST_OPEN = "[";
-const AGENT_LIST_CLOSE = "]";
-const AGENT_SEPARATOR = ";";
+const AGENT_LIST_OPEN = '[';
+const AGENT_LIST_CLOSE = ']';
+const AGENT_SEPARATOR = ';';
 
 /**
  * Represents an agent (eg `Adblock Plus 2.0`, where adblock is `Adblock Plus` and version is `2.0`).
@@ -86,8 +86,8 @@ export class AgentParser {
     public static isAgent(raw: string): boolean {
         const trimmed = raw.trim();
 
-        if (trimmed[0] == AGENT_LIST_OPEN) {
-            if (trimmed[trimmed.length - 1] == AGENT_LIST_CLOSE) {
+        if (trimmed[0] === AGENT_LIST_OPEN) {
+            if (trimmed[trimmed.length - 1] === AGENT_LIST_CLOSE) {
                 return true;
             }
         }
@@ -110,11 +110,11 @@ export class AgentParser {
         const trimmed = raw.trim();
         const splitted = trimmed.split(SPACE);
 
-        for (let i = 0; i < splitted.length; i++) {
+        for (let i = 0; i < splitted.length; i += 1) {
             // Part contains dot or number
-            if (splitted[i].indexOf(".") > -1 || (splitted[i] >= "0" && splitted[i] <= "9")) {
+            if (splitted[i].indexOf('.') > -1 || (splitted[i] >= '0' && splitted[i] <= '9')) {
                 // Missing adblock name
-                if (i == 0) {
+                if (i === 0) {
                     break;
                 }
 
@@ -143,17 +143,17 @@ export class AgentParser {
         let openingBracketIndex = -1;
         const ruleLength = trimmed.length;
 
-        if (ruleLength > 1 && trimmed[ruleLength - 1] == AGENT_LIST_CLOSE) {
-            if (trimmed[0] == AGENT_LIST_OPEN) {
+        if (ruleLength > 1 && trimmed[ruleLength - 1] === AGENT_LIST_CLOSE) {
+            if (trimmed[0] === AGENT_LIST_OPEN) {
                 openingBracketIndex = 0;
-            } else if (trimmed[0] == CommentMarker.Regular || trimmed[0] == CommentMarker.Hashmark) {
-                if (trimmed[1] == AGENT_LIST_OPEN) {
+            } else if (trimmed[0] === CommentMarker.Regular || trimmed[0] === CommentMarker.Hashmark) {
+                if (trimmed[1] === AGENT_LIST_OPEN) {
                     openingBracketIndex = 1;
                 } else {
                     // Skip comment marker
                     const shift = 1;
                     const firstNonWhitespaceIndex = StringUtils.findFirstNonWhitespaceCharacter(trimmed.slice(shift));
-                    if (trimmed[firstNonWhitespaceIndex + shift] == AGENT_LIST_OPEN) {
+                    if (trimmed[firstNonWhitespaceIndex + shift] === AGENT_LIST_OPEN) {
                         openingBracketIndex = firstNonWhitespaceIndex + shift;
                     }
                 }
@@ -161,7 +161,7 @@ export class AgentParser {
         }
 
         // Parse content between brackets
-        if (openingBracketIndex != -1) {
+        if (openingBracketIndex !== -1) {
             const collectedAgents: AgentMember[] = [];
             const rawAgents = trimmed.slice(openingBracketIndex + 1, -1);
             const agents = rawAgents.split(AGENT_SEPARATOR);

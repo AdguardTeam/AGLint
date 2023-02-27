@@ -1,26 +1,26 @@
-import { Struct, enums } from "superstruct";
-import cloneDeep from "clone-deep";
+import { Struct, enums } from 'superstruct';
+import cloneDeep from 'clone-deep';
 
 // Linter stuff
-import { GenericRuleContext, LinterProblemReport } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext, LinterProblemReport } from '..';
+import { LinterRule } from '../rule';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CosmeticRuleType } from "../../parser/cosmetic/types";
-import { ScriptletParameter, ScriptletParameterType } from "../../parser/cosmetic/body/scriptlet";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/categories';
+import { CosmeticRuleType } from '../../parser/cosmetic/types';
+import { ScriptletParameter, ScriptletParameterType } from '../../parser/cosmetic/body/scriptlet';
 
 // Utils
-import { AdblockSyntax } from "../../utils/adblockers";
-import { StringUtils } from "../../utils/string";
-import { EMPTY, SPACE } from "../../utils/constants";
+import { AdblockSyntax } from '../../utils/adblockers';
+import { StringUtils } from '../../utils/string';
+import { EMPTY, SPACE } from '../../utils/constants';
 
 /**
  * Possible quote types
  */
-type QuoteType = "none" | "single" | "double";
+type QuoteType = 'none' | 'single' | 'double';
 
 /**
  * Inserting the storage type definition into the context
@@ -38,9 +38,9 @@ type RuleContext = GenericRuleContext & {
  */
 function convertQuoteType(preferred: QuoteType): ScriptletParameterType {
     switch (preferred) {
-        case "single":
+        case 'single':
             return ScriptletParameterType.SingleQuoted;
-        case "double":
+        case 'double':
             return ScriptletParameterType.DoubleQuoted;
         default:
             return ScriptletParameterType.Unquoted;
@@ -83,8 +83,8 @@ export const AdgScriptletQuotes = <LinterRule>{
     meta: {
         severity: SEVERITY.warn,
         config: {
-            default: "single",
-            schema: enums(["none", "single", "double"]) as Struct,
+            default: 'single',
+            schema: enums(['none', 'single', 'double']) as Struct,
         },
     },
     events: {
@@ -99,9 +99,9 @@ export const AdgScriptletQuotes = <LinterRule>{
 
             // Check if a rule is an AdGuard scriptlet rule
             if (
-                ast.syntax == AdblockSyntax.Adg &&
-                ast.category == RuleCategory.Cosmetic &&
-                ast.type == CosmeticRuleType.ScriptletRule
+                ast.syntax === AdblockSyntax.Adg
+                && ast.category === RuleCategory.Cosmetic
+                && ast.type === CosmeticRuleType.ScriptletRule
             ) {
                 // Any quote mismatch
                 let mismatch = false;
@@ -125,19 +125,19 @@ export const AdgScriptletQuotes = <LinterRule>{
                     let message = EMPTY;
 
                     switch (context.config) {
-                        case "single":
-                            message += "Single quoted";
+                        case 'single':
+                            message += 'Single quoted';
                             break;
-                        case "double":
-                            message += "Double quoted";
+                        case 'double':
+                            message += 'Double quoted';
                             break;
                         default:
-                            message += "Unquoted";
+                            message += 'Unquoted';
                             break;
                     }
 
                     message += SPACE;
-                    message += "AdGuard scriptlet parameters are preferred";
+                    message += 'AdGuard scriptlet parameters are preferred';
 
                     // Basic problem report
                     const report = <LinterProblemReport>{

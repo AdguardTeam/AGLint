@@ -14,8 +14,8 @@ import {
     Block,
     CssNodePlain,
     toPlainObject,
-} from "css-tree";
-import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from "../converter/pseudo";
+} from 'css-tree';
+import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from '../converter/pseudo';
 import {
     COMMA,
     CSS_ATTRIBUTE_SELECTOR_CLOSE,
@@ -30,8 +30,8 @@ import {
     CSS_PSEUDO_OPEN,
     EMPTY,
     SPACE,
-} from "./constants";
-import { CssTreeNodeType, CssTreeParserContext } from "./csstree-constants";
+} from './constants';
+import { CssTreeNodeType, CssTreeParserContext } from './csstree-constants';
 
 export interface ExtendedCssNodes {
     pseudos: PseudoClassSelector[];
@@ -55,7 +55,7 @@ export class CssTree {
                 parseValue: true,
                 parseCustomProperty: true,
                 // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
+                onParseError: (error: SyntaxParseError /* , fallbackNode: CssNode */) => {
                     throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.rawMessage || error.message}`);
                 },
             });
@@ -86,10 +86,10 @@ export class CssTree {
                     parseValue: true,
                     parseCustomProperty: true,
                     // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                    onParseError: (error: SyntaxParseError /*, fallbackNode: CssNode*/) => {
+                    onParseError: (error: SyntaxParseError /* , fallbackNode: CssNode */) => {
                         throw new SyntaxError(error.rawMessage);
                     },
-                })
+                }),
             );
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -115,10 +115,10 @@ export class CssTree {
                 type: CssTreeNodeType.Identifier,
                 name: attribute,
             },
-            matcher: "=",
+            matcher: '=',
             value: {
                 type: CssTreeNodeType.String,
-                value: value,
+                value,
             },
             flags: null,
         };
@@ -140,9 +140,8 @@ export class CssTree {
                 if (EXTCSS_PSEUDO_CLASSES.includes(node.name)) {
                     pseudos.push(node);
                 }
-            }
-            // Attribute selectors
-            else if (node.type === CssTreeNodeType.AttributeSelector) {
+            } else if (node.type === CssTreeNodeType.AttributeSelector) {
+                // Attribute selectors
                 if (EXTCSS_ATTRIBUTES.includes(node.name.name)) {
                     attributes.push(node);
                 }
@@ -172,7 +171,7 @@ export class CssTree {
 
         walk(ast, {
             enter: (node: CssNode) => {
-                depth++;
+                depth += 1;
 
                 // Skip attribute selector / selector list children
                 if (inAttributeSelector || selectorListDepth > -1) {
@@ -215,9 +214,10 @@ export class CssTree {
 
                         node.children.forEach((selector) => {
                             // Selector
-                            if (selector.type == CssTreeNodeType.Selector) {
+                            if (selector.type === CssTreeNodeType.Selector) {
                                 selectors.push(CssTree.generateSelector(selector));
                             }
+                            // TODO: Remove this case?
                             // Raw (theoretically, CSSTree only parses selectors in this case)
                             // else if (selector.type == CssTreeNodeType.Raw) {
                             //     selectors.push(selector.value);
@@ -232,7 +232,7 @@ export class CssTree {
                         break;
 
                     case CssTreeNodeType.Combinator:
-                        if (node.name == SPACE) {
+                        if (node.name === SPACE) {
                             result += node.name;
                             break;
                         }
@@ -261,11 +261,10 @@ export class CssTree {
                             // Value can be String, Identifier or null
                             if (node.value !== null) {
                                 // String node
-                                if (node.value.type == CssTreeNodeType.String) {
+                                if (node.value.type === CssTreeNodeType.String) {
                                     result += generate(node.value);
-                                }
-                                // Identifier node
-                                else if (node.value.type == CssTreeNodeType.Identifier) {
+                                } else if (node.value.type === CssTreeNodeType.Identifier) {
+                                    // Identifier node
                                     result += node.value.name;
                                 }
                             }
@@ -302,14 +301,17 @@ export class CssTree {
                             result += CSS_PSEUDO_OPEN;
                         }
                         break;
+
+                    default:
+                        break;
                 }
 
                 prevNode = node;
             },
             leave: (node: CssNode) => {
-                depth--;
+                depth -= 1;
 
-                if (node.type == CssTreeNodeType.SelectorList && depth + 1 == selectorListDepth) {
+                if (node.type === CssTreeNodeType.SelectorList && depth + 1 === selectorListDepth) {
                     selectorListDepth = -1;
                 }
 
@@ -317,7 +319,7 @@ export class CssTree {
                     return;
                 }
 
-                if (node.type == CssTreeNodeType.AttributeSelector) {
+                if (node.type === CssTreeNodeType.AttributeSelector) {
                     inAttributeSelector = false;
                 }
 
@@ -331,6 +333,9 @@ export class CssTree {
                         if (node.children !== null) {
                             result += CSS_PSEUDO_CLOSE;
                         }
+                        break;
+
+                    default:
                         break;
                 }
             },
@@ -371,6 +376,9 @@ export class CssTree {
 
                         break;
                     }
+
+                    default:
+                        break;
                 }
             },
             leave: (node: CssNode) => {
@@ -380,6 +388,9 @@ export class CssTree {
                         result += SPACE;
                         break;
                     }
+
+                    default:
+                        break;
                 }
             },
         });

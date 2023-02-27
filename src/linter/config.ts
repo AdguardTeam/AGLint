@@ -2,9 +2,11 @@
  * Linter configuration
  */
 
-import merge from "deepmerge";
-import { boolean, object, optional, record, string } from "superstruct";
-import { LinterRuleConfig, linterRuleConfigSchema } from "./rule";
+import merge from 'deepmerge';
+import {
+    boolean, object, optional, record, string,
+} from 'superstruct';
+import { LinterRuleConfig, linterRuleConfigSchema } from './rule';
 
 /**
  * Type for rule configuration object

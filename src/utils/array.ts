@@ -15,7 +15,7 @@ export class ArrayUtils {
         }
 
         // Check if every element in the array is a string
-        return value.every((element) => typeof element === "string");
+        return value.every((element) => typeof element === 'string');
     }
 
     /**

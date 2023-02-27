@@ -1,18 +1,22 @@
 // Linter stuff
-import { GenericRuleContext } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext } from '..';
+import { LinterRule } from '../rule';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CommentRuleType } from "../../parser/comment/types";
-import { CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/categories';
+import { CommentRuleType } from '../../parser/comment/types';
+import { CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from '../../utils/constants';
 
-const COMMON_PREPROCESSOR_DIRECTIVES = ["if", "endif", "include"];
+const COMMON_PREPROCESSOR_DIRECTIVES = [
+    'if',
+    'endif',
+    'include',
+];
 
 // Special case: Safari Content Blocker Affinity
-const SAFARI_CB_AFFINITY = "safari_cb_affinity";
+const SAFARI_CB_AFFINITY = 'safari_cb_affinity';
 
 /**
  * Checks if a preprocessor directive is known
@@ -49,7 +53,7 @@ export const UnknownPreProcessorDirectives = <LinterRule>{
             const line = context.getActualLine();
 
             // Check if the rule is a preprocessor comment
-            if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.PreProcessor) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessor) {
                 if (!isKnownPreProcessorDirective(ast.name)) {
                     context.report({
                         message: `Unknown preprocessor directive "${ast.name}"`,

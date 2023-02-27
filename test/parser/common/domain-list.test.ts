@@ -3,125 +3,125 @@ import {
     DomainListSeparator,
     DOMAIN_LIST_TYPE,
     DomainList,
-} from "../../../src/parser/common/domain-list";
-import { COMMA, EMPTY } from "../../../src/utils/constants";
+} from '../../../src/parser/common/domain-list';
+import { COMMA, EMPTY } from '../../../src/utils/constants';
 
-describe("DomainListParser", () => {
-    test("parse", () => {
+describe('DomainListParser', () => {
+    test('parse', () => {
         // Single domain
-        expect(DomainListParser.parse("example.com")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('example.com')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
-            domains: [{ domain: "example.com", exception: false }],
+            domains: [{ domain: 'example.com', exception: false }],
         });
 
         // Multiple domains
-        expect(DomainListParser.parse("example.com,example.net")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('example.com,example.net')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
             domains: [
-                { domain: "example.com", exception: false },
-                { domain: "example.net", exception: false },
+                { domain: 'example.com', exception: false },
+                { domain: 'example.net', exception: false },
             ],
         });
 
-        expect(DomainListParser.parse("example.com,example.net,example.org")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('example.com,example.net,example.org')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
             domains: [
-                { domain: "example.com", exception: false },
-                { domain: "example.net", exception: false },
-                { domain: "example.org", exception: false },
+                { domain: 'example.com', exception: false },
+                { domain: 'example.net', exception: false },
+                { domain: 'example.org', exception: false },
             ],
         });
 
         // Exception - single domain
-        expect(DomainListParser.parse("~example.com")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('~example.com')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
-            domains: [{ domain: "example.com", exception: true }],
+            domains: [{ domain: 'example.com', exception: true }],
         });
 
         // Exception - multiple domains
-        expect(DomainListParser.parse("~example.com,~example.net")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('~example.com,~example.net')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
             domains: [
-                { domain: "example.com", exception: true },
-                { domain: "example.net", exception: true },
+                { domain: 'example.com', exception: true },
+                { domain: 'example.net', exception: true },
             ],
         });
 
-        expect(DomainListParser.parse("~example.com,~example.net,~example.org")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('~example.com,~example.net,~example.org')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
             domains: [
-                { domain: "example.com", exception: true },
-                { domain: "example.net", exception: true },
-                { domain: "example.org", exception: true },
+                { domain: 'example.com', exception: true },
+                { domain: 'example.net', exception: true },
+                { domain: 'example.org', exception: true },
             ],
         });
 
         // Mixed - multiple domains
-        expect(DomainListParser.parse("~example.com,~example.net,example.eu,~example.org")).toEqual(<DomainList>{
+        expect(DomainListParser.parse('~example.com,~example.net,example.eu,~example.org')).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
             domains: [
-                { domain: "example.com", exception: true },
-                { domain: "example.net", exception: true },
-                { domain: "example.eu", exception: false },
-                { domain: "example.org", exception: true },
+                { domain: 'example.com', exception: true },
+                { domain: 'example.net', exception: true },
+                { domain: 'example.eu', exception: false },
+                { domain: 'example.org', exception: true },
             ],
         });
 
         // Mixed - spaces (trim)
-        expect(DomainListParser.parse("~example.com,  example.net    ,   example.eu ,        ~example.org")).toEqual(<
+        expect(DomainListParser.parse('~example.com,  example.net    ,   example.eu ,        ~example.org')).toEqual(<
             DomainList
         >{
             type: DOMAIN_LIST_TYPE,
             separator: COMMA,
             domains: [
-                { domain: "example.com", exception: true },
-                { domain: "example.net", exception: false },
-                { domain: "example.eu", exception: false },
-                { domain: "example.org", exception: true },
+                { domain: 'example.com', exception: true },
+                { domain: 'example.net', exception: false },
+                { domain: 'example.eu', exception: false },
+                { domain: 'example.org', exception: true },
             ],
         });
 
         expect(
-            DomainListParser.parse("~example.com|  example.net    |   example.eu |        ~example.org", "|")
+            DomainListParser.parse('~example.com|  example.net    |   example.eu |        ~example.org', '|'),
         ).toEqual(<DomainList>{
             type: DOMAIN_LIST_TYPE,
-            separator: "|",
+            separator: '|',
             domains: [
-                { domain: "example.com", exception: true },
-                { domain: "example.net", exception: false },
-                { domain: "example.eu", exception: false },
-                { domain: "example.org", exception: true },
+                { domain: 'example.com', exception: true },
+                { domain: 'example.net', exception: false },
+                { domain: 'example.eu', exception: false },
+                { domain: 'example.org', exception: true },
             ],
         });
 
         // Invalid cases
         expect(() => DomainListParser.parse(EMPTY)).toThrowError(/^Empty domain specified in domain list/);
 
-        expect(() => DomainListParser.parse("~")).toThrowError(/^Empty domain specified in domain list/);
+        expect(() => DomainListParser.parse('~')).toThrowError(/^Empty domain specified in domain list/);
 
-        expect(() => DomainListParser.parse("~~~")).toThrowError(
-            "Exception marker is followed by another exception marker"
+        expect(() => DomainListParser.parse('~~~')).toThrowError(
+            'Exception marker is followed by another exception marker',
         );
 
-        expect(() => DomainListParser.parse(" ~ ~ ~ ")).toThrowError(
-            "Exception marker is followed by a whitespace character"
+        expect(() => DomainListParser.parse(' ~ ~ ~ ')).toThrowError(
+            'Exception marker is followed by a whitespace character',
         );
 
-        expect(() => DomainListParser.parse("~,~,~")).toThrowError(/^Empty domain specified in domain list/);
+        expect(() => DomainListParser.parse('~,~,~')).toThrowError(/^Empty domain specified in domain list/);
 
-        expect(() => DomainListParser.parse("~  example.com")).toThrowError(
-            "Exception marker is followed by a whitespace character"
+        expect(() => DomainListParser.parse('~  example.com')).toThrowError(
+            'Exception marker is followed by a whitespace character',
         );
     });
 
-    test("generate", () => {
+    test('generate', () => {
         const parseAndGenerate = (raw: string, separator: DomainListSeparator = COMMA) => {
             const ast = DomainListParser.parse(raw, separator);
 
@@ -132,16 +132,16 @@ describe("DomainListParser", () => {
             return null;
         };
 
-        expect(parseAndGenerate("example.com")).toEqual("example.com");
-        expect(parseAndGenerate("~example.com")).toEqual("~example.com");
-        expect(parseAndGenerate("example.com,example.org")).toEqual("example.com,example.org");
-        expect(parseAndGenerate("example.com,~example.org")).toEqual("example.com,~example.org");
-        expect(parseAndGenerate("~example.com,~example.org")).toEqual("~example.com,~example.org");
-        expect(parseAndGenerate("~example.com,example.org,example.net")).toEqual(
-            "~example.com,example.org,example.net"
+        expect(parseAndGenerate('example.com')).toEqual('example.com');
+        expect(parseAndGenerate('~example.com')).toEqual('~example.com');
+        expect(parseAndGenerate('example.com,example.org')).toEqual('example.com,example.org');
+        expect(parseAndGenerate('example.com,~example.org')).toEqual('example.com,~example.org');
+        expect(parseAndGenerate('~example.com,~example.org')).toEqual('~example.com,~example.org');
+        expect(parseAndGenerate('~example.com,example.org,example.net')).toEqual(
+            '~example.com,example.org,example.net',
         );
-        expect(parseAndGenerate("~example.com|example.org|example.net", "|")).toEqual(
-            "~example.com|example.org|example.net"
+        expect(parseAndGenerate('~example.com|example.org|example.net', '|')).toEqual(
+            '~example.com|example.org|example.net',
         );
     });
 });

@@ -5,16 +5,16 @@
  * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives}
  */
 
-import { AdblockSyntax } from "../../utils/adblockers";
-import { EMPTY, HASHMARK } from "../../utils/constants";
-import { StringUtils } from "../../utils/string";
-import { RuleCategory } from "../categories";
-import { CommentRuleType } from "./types";
-import { Comment } from ".";
+import { AdblockSyntax } from '../../utils/adblockers';
+import { EMPTY, HASHMARK } from '../../utils/constants';
+import { StringUtils } from '../../utils/string';
+import { RuleCategory } from '../categories';
+import { CommentRuleType } from './types';
+import { Comment } from '.';
 
-const PREPROCESSOR_MARKER = "!#";
+const PREPROCESSOR_MARKER = '!#';
 const PREPROCESSOR_MARKER_LEN = PREPROCESSOR_MARKER.length;
-const PREPROCESSOR_SEPARATOR = " ";
+const PREPROCESSOR_SEPARATOR = ' ';
 
 /**
  * Represents a preprocessor comment.
@@ -71,7 +71,7 @@ export class PreProcessorParser {
         const trimmed = raw.trim();
 
         // The following (typically occurring) rule is not a pre-processor comment: !#####
-        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[PREPROCESSOR_MARKER_LEN] != HASHMARK;
+        return trimmed.startsWith(PREPROCESSOR_MARKER) && trimmed[PREPROCESSOR_MARKER_LEN] !== HASHMARK;
     }
 
     /**
@@ -98,10 +98,10 @@ export class PreProcessorParser {
         const spaceIndex = StringUtils.findNextNotBracketedUnescapedCharacter(
             trimmed,
             PREPROCESSOR_SEPARATOR,
-            PREPROCESSOR_MARKER_LEN
+            PREPROCESSOR_MARKER_LEN,
         );
 
-        if (spaceIndex == -1) {
+        if (spaceIndex === -1) {
             result.name = trimmed.substring(PREPROCESSOR_MARKER_LEN);
         } else {
             result.name = trimmed.substring(PREPROCESSOR_MARKER_LEN, spaceIndex);

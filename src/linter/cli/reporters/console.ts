@@ -1,11 +1,9 @@
-import chalk, { Chalk, Options as ChalkOptions } from "chalk";
-import terminalLink from "terminal-link";
-import stripAnsi from "strip-ansi";
-import table from "text-table";
-import { inflect } from "inflection";
-import { LinterProblem, LinterResult } from "../../index";
-import { LinterCliReporter } from "../reporter";
-import path, { ParsedPath } from "path";
+import chalk, { Chalk, Options as ChalkOptions } from 'chalk';
+import terminalLink from 'terminal-link';
+import stripAnsi from 'strip-ansi';
+import table from 'text-table';
+import { inflect } from 'inflection';
+import path, { ParsedPath } from 'path';
 import {
     CLOSE_PARENTHESIS,
     COMMA,
@@ -17,10 +15,12 @@ import {
     OPEN_PARENTHESIS,
     REPO_URL,
     SPACE,
-} from "src/utils/constants";
+} from 'src/utils/constants';
+import { LinterProblem, LinterResult } from '../../index';
+import { LinterCliReporter } from '../reporter';
 
-const ALIGN_LEFT = "l";
-const ALIGN_CENTER = "c";
+const ALIGN_LEFT = 'l';
+const ALIGN_CENTER = 'c';
 
 /**
  * Type for the collected problems, where the key is the file path and the value
@@ -100,8 +100,8 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
     onLintEnd = () => {
         // Calculate the linting time
-        const lintTime =
-            Math.round(((this.startTime ? performance.now() - this.startTime : 0) + Number.EPSILON) * 100) / 100;
+        // eslint-disable-next-line max-len
+        const lintTime = Math.round(((this.startTime ? performance.now() - this.startTime : 0) + Number.EPSILON) * 100) / 100;
 
         let output = EMPTY;
         let timeOutput = EMPTY;
@@ -109,15 +109,16 @@ export class LinterConsoleReporter implements LinterCliReporter {
         if (lintTime > 0) {
             timeOutput += `Linting took ${this.chalk.dim(lintTime)} ms.`;
         } else {
-            timeOutput += this.chalk.red("Error: Could not calculate linting time.");
+            timeOutput += this.chalk.red('Error: Could not calculate linting time.');
         }
 
         // If there are no problems, log that there are no problems
         if (this.warnings === 0 && this.errors === 0 && this.fatals === 0) {
-            output += this.chalk.green("No problems found!");
+            output += this.chalk.green('No problems found!');
             output += DOUBLE_NEWLINE;
             output += timeOutput;
 
+            // eslint-disable-next-line no-console
             console.log(output);
             return;
         }
@@ -144,25 +145,25 @@ export class LinterConsoleReporter implements LinterCliReporter {
                 row.push(
                     `${problem.position.startLine}:${
                         problem.position.startColumn !== undefined ? problem.position.startColumn : 0
-                    }`
+                    }`,
                 );
 
                 // Column 3: Problem type
                 switch (problem.severity) {
                     case 1: {
-                        row.push(this.chalk.yellow("warn"));
+                        row.push(this.chalk.yellow('warn'));
                         break;
                     }
                     case 2: {
-                        row.push(this.chalk.red("error"));
+                        row.push(this.chalk.red('error'));
                         break;
                     }
                     case 3: {
-                        row.push(this.chalk.red("fatal"));
+                        row.push(this.chalk.red('fatal'));
                         break;
                     }
                     default: {
-                        row.push(this.chalk.red("error"));
+                        row.push(this.chalk.red('error'));
                     }
                 }
 
@@ -201,34 +202,35 @@ export class LinterConsoleReporter implements LinterCliReporter {
         const total = this.warnings + this.errors + this.fatals;
 
         // Stats
-        output += "Found";
+        output += 'Found';
         output += SPACE;
-        output += this.chalk[anyErrors ? "red" : "yellow"](total);
+        output += this.chalk[anyErrors ? 'red' : 'yellow'](total);
         output += SPACE;
-        output += inflect("problem", total);
+        output += inflect('problem', total);
 
         output += SPACE + OPEN_PARENTHESIS;
 
         // Warnings
-        output += this.chalk.yellow(`${this.warnings} ${inflect("warning", this.warnings)}`);
+        output += this.chalk.yellow(`${this.warnings} ${inflect('warning', this.warnings)}`);
 
         output += COMMA + SPACE;
 
         // Errors
-        output += this.chalk.red(`${this.errors} ${inflect("error", this.errors)}`);
+        output += this.chalk.red(`${this.errors} ${inflect('error', this.errors)}`);
 
         output += SPACE;
-        output += "and";
+        output += 'and';
         output += SPACE;
 
         // Fatal errors
-        output += this.chalk.red(`${this.fatals} fatal ${inflect("error", this.fatals)}`);
+        output += this.chalk.red(`${this.fatals} fatal ${inflect('error', this.fatals)}`);
 
         output += CLOSE_PARENTHESIS + DOT + DOUBLE_NEWLINE;
 
         // Linting time
         output += timeOutput;
 
-        console[anyErrors ? "error" : "warn"](output);
+        // eslint-disable-next-line no-console
+        console[anyErrors ? 'error' : 'warn'](output);
     };
 }

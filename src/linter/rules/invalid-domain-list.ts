@@ -1,12 +1,12 @@
 // Linter stuff
-import { GenericRuleContext } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext } from '..';
+import { LinterRule } from '../rule';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { DomainUtils } from "../../utils/domain";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/categories';
+import { DomainUtils } from '../../utils/domain';
 
 /**
  * Rule that checks if a preprocessor directive is known
