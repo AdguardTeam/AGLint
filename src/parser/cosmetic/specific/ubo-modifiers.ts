@@ -16,7 +16,7 @@ import {
     SPACE,
 } from '../../../utils/constants';
 import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
-import { RuleModifier } from '../../common/modifier-list';
+import { RuleModifier } from '../../misc/modifier-list';
 
 export const UBO_MODIFIER_LIST_TYPE = 'UboModifierList';
 

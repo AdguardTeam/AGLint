@@ -1,4 +1,4 @@
-import { ModifierList, ModifierListParser, MODIFIER_LIST_TYPE } from '../../../src/parser/common/modifier-list';
+import { ModifierList, ModifierListParser, MODIFIER_LIST_TYPE } from '../../../src/parser/misc/modifier-list';
 import { EMPTY, SPACE } from '../../../src/utils/constants';
 
 describe('ModifierListParser', () => {

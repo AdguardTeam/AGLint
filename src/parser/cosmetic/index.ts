@@ -8,9 +8,9 @@ import { CssInjectionBodyParser, CssRuleBody } from './body/css';
 import { ElementHidingBodyParser, ElementHidingRuleBody } from './body/elementhiding';
 import { ScriptletBodyParser, ScriptletRuleBody } from './body/scriptlet';
 import { HtmlBodyParser, HtmlRuleBody } from './body/html';
-import { DomainListParser, DOMAIN_LIST_TYPE, Domain } from '../common/domain-list';
+import { DomainListParser, DOMAIN_LIST_TYPE, Domain } from '../misc/domain-list';
 import { AdgModifierListParser, ADG_MODIFIER_LIST_TYPE } from './specific/adg-modifiers';
-import { RuleModifier } from '../common/modifier-list';
+import { RuleModifier } from '../misc/modifier-list';
 import { UboModifier, UboModifierListParser, UBO_MODIFIER_LIST_TYPE } from './specific/ubo-modifiers';
 import { CosmeticRuleType } from './types';
 import {

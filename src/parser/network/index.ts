@@ -1,6 +1,6 @@
 import { AdblockSyntax } from '../../utils/adblockers';
 import { REGEX_MARKER } from '../../utils/string';
-import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from '../common/modifier-list';
+import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from '../misc/modifier-list';
 import { NetworkRuleType } from './types';
 import {
     ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, ESCAPE_CHARACTER, OPEN_PARENTHESIS,

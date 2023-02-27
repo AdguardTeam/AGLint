@@ -1,4 +1,4 @@
-import { DomainListParser } from '../../../src/parser/common/domain-list';
+import { DomainListParser } from '../../../src/parser/misc/domain-list';
 import { CssInjectionBodyParser } from '../../../src/parser/cosmetic/body/css';
 import { ElementHidingBodyParser } from '../../../src/parser/cosmetic/body/elementhiding';
 import { HtmlBodyParser } from '../../../src/parser/cosmetic/body/html';

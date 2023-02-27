@@ -3,7 +3,7 @@ import {
     DomainListSeparator,
     DOMAIN_LIST_TYPE,
     DomainList,
-} from '../../../src/parser/common/domain-list';
+} from '../../../src/parser/misc/domain-list';
 import { COMMA, EMPTY } from '../../../src/utils/constants';
 
 describe('DomainListParser', () => {

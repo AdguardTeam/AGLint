@@ -1,6 +1,6 @@
 import { EMPTY } from '../../../utils/constants';
 import { StringUtils } from '../../../utils/string';
-import { ModifierListParser, RuleModifier, MODIFIER_LIST_TYPE } from '../../common/modifier-list';
+import { ModifierListParser, RuleModifier, MODIFIER_LIST_TYPE } from '../../misc/modifier-list';
 
 const MODIFIER_LIST_OPEN = '[';
 const MODIFIER_LIST_CLOSE = ']';
