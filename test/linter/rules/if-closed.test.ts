@@ -16,7 +16,6 @@ describe('if-closed', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'rule',
                     '!#if (condition1)',
                     'rule',
@@ -32,7 +31,6 @@ describe('if-closed', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'rule',
                     '!#if (condition1)',
                     '!#if (condition2)',
@@ -55,7 +53,6 @@ describe('if-closed', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'rule',
                     '!#if (condition1)',
                     '!#if (condition2)',
@@ -89,7 +86,6 @@ describe('if-closed', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'rule',
                     '!#if (condition1)',
                     'rule',

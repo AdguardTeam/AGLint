@@ -13,7 +13,6 @@ describe('unknown-preprocessor-directives', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '!#include https://example.org/path/includedfile.txt',
                     '!#if (conditions)',
                     '!#if (conditions_2)',
@@ -36,7 +35,6 @@ describe('unknown-preprocessor-directives', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '!#incl2ude https://example.org/path/includedfile.txt',
                     '!#IF (conditions)',
                     '!#if2 (conditions_2)',

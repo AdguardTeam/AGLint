@@ -12,7 +12,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet(\'scriptlet0\')',
@@ -42,7 +41,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet(\'scriptlet0\')',
@@ -74,7 +72,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet(\'scriptlet0\')',
@@ -141,7 +138,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet("scriptlet0")',
@@ -161,7 +157,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet("scriptlet0")',
@@ -193,7 +188,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet("scriptlet0")',
@@ -256,7 +250,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet(\'scriptlet0\')',
@@ -274,7 +267,6 @@ describe('adg-scriptlet-quotes', () => {
             ),
         ).toMatchObject({
             fixed: [
-                // Rules:
                 'example.com##.ad1',
                 'example.com##.ad2',
                 'example.com#%#//scriptlet(\'scriptlet0\')',
@@ -302,7 +294,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet("scriptlet0")',
@@ -318,7 +309,6 @@ describe('adg-scriptlet-quotes', () => {
             ),
         ).toMatchObject({
             fixed: [
-                // Rules:
                 'example.com##.ad1',
                 'example.com##.ad2',
                 'example.com#%#//scriptlet("scriptlet0")',
@@ -344,7 +334,6 @@ describe('adg-scriptlet-quotes', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.com##.ad1',
                     'example.com##.ad2',
                     'example.com#%#//scriptlet("scriptlet0")',
@@ -360,7 +349,6 @@ describe('adg-scriptlet-quotes', () => {
             ),
         ).toMatchObject({
             fixed: [
-                // Rules:
                 'example.com##.ad1',
                 'example.com##.ad2',
                 'example.com#%#//scriptlet(scriptlet0)',

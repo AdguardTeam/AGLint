@@ -703,7 +703,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -735,7 +734,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[AdGuard; uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -798,7 +796,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -830,7 +827,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -867,7 +863,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -887,7 +882,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -906,7 +900,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -927,7 +920,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -974,7 +966,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '[uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
@@ -1042,7 +1033,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'example.org##.ad',
                     '@@||example.org^$generichide',
                     'example.com##+js(aopr, test)',
@@ -1111,7 +1101,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
                 ].join(NEWLINE),
@@ -1172,7 +1161,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable-next-line rule-1',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable-next-line rule-1',
@@ -1213,7 +1201,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable-next-line rule-2',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable-next-line rule-2',
@@ -1254,7 +1241,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable-next-line rule-1, rule-2',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1294,7 +1280,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable-next-line rule-1, rule-2',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable-next-line rule-1, rule-2',
@@ -1322,7 +1307,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
                 ].join(NEWLINE),
@@ -1338,7 +1322,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-enable-next-line rule-1',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-enable-next-line rule-1',
@@ -1379,7 +1362,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-enable-next-line rule-2',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-enable-next-line rule-2',
@@ -1420,7 +1402,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-enable-next-line rule-1, rule-2',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1460,7 +1441,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-enable-next-line rule-1, rule-2',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-enable-next-line rule-1, rule-2',
@@ -1530,7 +1510,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1548,7 +1527,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1589,7 +1567,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable',
@@ -1652,7 +1629,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable rule-1',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1689,7 +1665,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable rule-1',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1728,7 +1703,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1770,7 +1744,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable',
                     '! aglint-enable',
                     '! aglint-disable',
@@ -1835,7 +1808,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint-disable',
                     '! aglint-enable',
                     '! aglint-disable',
@@ -1878,7 +1850,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint "rule-1": "off", "rule-2": "off"',
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
@@ -1920,7 +1891,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint "rule-1": "off", "rule-2": "off"',
                     '! aglint "rule-1": "warn", "rule-2": "warn"',
                     '! aglint "rule-1": "off", "rule-2": "off"',
@@ -1985,7 +1955,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     '! aglint "rule-1": "off", "rule-2": "off"',
                     '! aglint "rule-1": "warn", "rule-2": "warn"',
                     '! aglint "rule-1": "off", "rule-2": "off"',
@@ -2023,7 +1992,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     // eslint-disable-next-line max-len
                     '! aglint "rule-1": "off", "rule-2": "off", "rule-3": ["error", { message: "Custom message for rule-3" }]',
                     'abcdefghijklmnopqrstuvxyz',
@@ -2094,7 +2062,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable-next-line',
@@ -2183,7 +2150,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz\n',
                     'abcdefghijklmnopqrstuvxyz\n',
                     '! aglint-disable-next-line\r\n',
@@ -2302,7 +2268,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                     'abcdefghijklmnopqrstuvxyz',
                     '! aglint-disable-next-line',
@@ -2395,7 +2360,6 @@ describe('Linter', () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
                     'abcdefghijklmnopqrstuvxyz',
                 ].join(NEWLINE),
             ),
