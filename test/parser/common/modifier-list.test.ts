@@ -114,7 +114,6 @@ describe("ModifierListParser", () => {
         });
 
         // Escaped separator comma
-        // eslint-disable-next-line prettier/prettier
         expect(ModifierListParser.parse("modifier1=a\\,b\\,c,modifier2=value2")).toEqual(<ModifierList>{
             type: MODIFIER_LIST_TYPE,
             modifiers: [

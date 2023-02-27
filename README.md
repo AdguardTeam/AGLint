@@ -624,7 +624,7 @@ Before opening a pull request, make sure that all tests pass and that the code i
 You can run the following commands while developing:
 
 - `yarn check-types`: Check types
-- `yarn lint`: Run ESLint and Prettier on all files
+- `yarn lint`: Run ESLint on all files
 - `yarn test`: Run all tests (Jest)
 - `yarn coverage`: Get test coverage report
 - `yarn build`: Build package (to `dist` folder) (Rollup)

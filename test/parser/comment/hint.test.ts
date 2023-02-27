@@ -135,7 +135,6 @@ describe("HintParser", () => {
         });
 
         expect(HintParser.parse("!+ HINT_NAME1(param0, param1) HINT_NAME2(param0)")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -155,7 +154,6 @@ describe("HintParser", () => {
 
         // Skipped parameters
         expect(HintParser.parse("!+ HINT_NAME(param0, , param1)")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -170,7 +168,6 @@ describe("HintParser", () => {
         );
 
         expect(HintParser.parse("!+ HINT_NAME(param0, , , )")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -185,7 +182,6 @@ describe("HintParser", () => {
         );
 
         expect(HintParser.parse("!+ HINT_NAME( , , , )")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -200,7 +196,6 @@ describe("HintParser", () => {
         );
 
         expect(HintParser.parse("!+ HINT_NAME(,,,)")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -216,7 +211,6 @@ describe("HintParser", () => {
 
         // Spaces
         expect(HintParser.parse("!+ HINT_NAME(    p0  ,   p1 ,   p2 ,     p3)")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -231,7 +225,6 @@ describe("HintParser", () => {
         );
 
         expect(HintParser.parse("!+ HINT_NAME(hello world, hello   world)")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
@@ -246,7 +239,6 @@ describe("HintParser", () => {
         );
 
         expect(HintParser.parse("!+ hint_name(hello world, hello   world)")).toEqual(
-            // eslint-disable-next-line prettier/prettier
             <Hint>{
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Adg,
