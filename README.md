@@ -56,7 +56,6 @@ Table of Contents:
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
-  - [Setting up the development environment](#setting-up-the-development-environment)
   - [Available commands](#available-commands)
 - [Ideas \& Questions](#ideas--questions)
 - [License](#license)
@@ -484,51 +483,31 @@ An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently
 For example, this code:
 
 ```typescript
-import { RuleParser } from "aglint";
+import { RuleParser } from 'aglint';
 
 // RuleParser automatically determines the rule type
-const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
+const ast = RuleParser.parse('/ads.js^$script,domain=example.com');
 ```
 will gives you this AST:
 
 ```json
 {
-    "category": "Cosmetic",
-    "type": "ScriptletRule",
-    "syntax": "AdGuard",
+    "category": "Network",
+    "type": "BasicNetworkRule",
+    "syntax": "Common",
     "exception": false,
-    "modifiers": [],
-    "domains": [
+    "pattern": "/ads.js^",
+    "modifiers": [
         {
-            "domain": "example.com",
+            "modifier": "script",
             "exception": false
         },
         {
-            "domain": "example.net",
-            "exception": true
+            "modifier": "domain",
+            "value": "example.com",
+            "exception": false
         }
-    ],
-    "separator": "#%#//scriptlet",
-    "body": {
-        "scriptlets": [
-            {
-                "scriptlet": {
-                    "type": "SingleQuoted",
-                    "value": "prevent-setInterval"
-                },
-                "parameters": [
-                    {
-                        "type": "SingleQuoted",
-                        "value": "check"
-                    },
-                    {
-                        "type": "SingleQuoted",
-                        "value": "!300"
-                    }
-                ]
-            }
-        ]
-    }
+    ]
 }
 ```
 
@@ -539,14 +518,10 @@ RuleParser.generate(ast);
 
 Which returns the rule as string (this is not the same as the original rule, it is generated from the AST, and not related to the original rule):
 ```adblock
-example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
+/ads.js^$script,domain=example.com
 ```
 
-Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same.
-
-You can pass any rule to the parser, it automatically determines the type and category of the rule.
-
-If the rule is syntactically incorrect, the parser will throw an error.
+Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same. You can pass any rule to the parser, it automatically determines the type and category of the rule. If the rule is syntactically incorrect, the parser will throw an error.
 
 ### Linter
 
@@ -610,24 +585,29 @@ A small summary of what to expect:
 
 You can contribute to the project by opening a pull request. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
 
-Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. If you have Git hooks enabled, the tests will be run automatically before committing, thanks to Husky.
+Here is a short guide on how to set up the development environment and how to submit your changes:
 
-### Setting up the development environment
+- Pre-requisites: [Node.js](https://nodejs.org/en/) (v14 or higher), [Yarn](https://yarnpkg.com/) (v2 or higher), [Git](https://git-scm.com/), [VSCode](https://code.visualstudio.com/) (optional)
+- Clone the repository with `git clone`
+- Install dependencies with `yarn` (this will also initialize the Git hooks via Husky)
+- Create a new branch with `git checkout -b <branch-name>`. Example: `git checkout -b feature/add-some-feature`. Please add `feature/` or `fix/` prefix to your branch name, and refer to the issue number if there is one. Example: `fix/42`.
+- Make your changes in the `src` folder and make suitable tests for them in the `test` folder
+- Check code by running `yarn lint` and `yarn test` commands (during development, you can run only a specific test with `yarn test <test-name>`)
+- Build the library with `yarn build` and check the `dist` folder to make sure that the build is successful, then install the library locally with `yarn add <path-to-local-library>` and test it in your project
+- If everything is OK, commit your changes and push them to your forked repository. If Husky is set up correctly, it don't allow you to commit if the linter or tests fail.
+- Create a pull request to the main repository from your forked repository's branch.
 
-1. Install [Node.js](https://nodejs.org/en/), [Yarn](https://yarnpkg.com/) and [Git](https://git-scm.com/). We recommend using [Visual Studio Code](https://code.visualstudio.com/) as your IDE.
-2. Clone the repository
-3. Install dependencies by running `yarn` in the project directory
-4. Start developing!
+We would be happy to review your pull request and merge it if it is suitable for the project.
 
 ### Available commands
 
-You can run the following commands while developing:
+During development, you can use the following commands (listed in `package.json`):
 
-- `yarn check-types`: Check types
-- `yarn lint`: Run ESLint on all files
-- `yarn test`: Run all tests (Jest)
-- `yarn coverage`: Get test coverage report
-- `yarn build`: Build package (to `dist` folder) (Rollup)
+- `yarn check-types` - check types with [TypeScript](https://www.typescriptlang.org/)
+- `yarn lint` - lint the code with [ESLint](https://eslint.org/)
+- `yarn test` - run tests with [Jest](https://jestjs.io/) (you can also run a specific test with `yarn test <test-name>`)
+- `yarn coverage` - print test coverage report
+- `yarn build` - build the library to the `dist` folder by using [Rollup](https://rollupjs.org/)
 
 ## Ideas & Questions
 
