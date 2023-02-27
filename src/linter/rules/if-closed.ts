@@ -1,6 +1,5 @@
 // Linter stuff
-import { GenericRuleContext, LinterPosition } from '..';
-import { LinterRule } from '../rule';
+import { GenericRuleContext, LinterPosition, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 // Parser stuff

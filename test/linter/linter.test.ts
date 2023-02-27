@@ -1,11 +1,10 @@
 import ss, { Struct } from 'superstruct';
-import { GenericRuleContext, Linter, LinterRuleData } from '../../src/linter';
-import { LinterConfig } from '../../src/linter/config';
-import { LinterRule } from '../../src/linter/rule';
+import { Linter, LinterRuleData } from '../../src/linter';
 import { defaultLinterRules } from '../../src/linter/rules';
 import { SEVERITY, SeverityValue, SeverityName } from '../../src/linter/severity';
 import { AnyRule, RuleParser } from '../../src/parser';
 import { EMPTY, NEWLINE } from '../../src/utils/constants';
+import { GenericRuleContext, LinterConfig, LinterRule } from '../../src/linter/common';
 
 const demoRule: LinterRule = {
     meta: {

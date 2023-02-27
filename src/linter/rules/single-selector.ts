@@ -1,6 +1,5 @@
 // Linter stuff
-import { GenericRuleContext, LinterProblemReport } from '..';
-import { LinterRule } from '../rule';
+import { GenericRuleContext, LinterProblemReport, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 // Parser stuff

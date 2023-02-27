@@ -5,9 +5,8 @@
 // Linter stuff
 import { assert } from 'superstruct';
 import cloneDeep from 'clone-deep';
-import { LinterRule, LinterRuleConfig } from './rule';
 import {
-    LinterConfig, defaultLinterConfig, mergeConfigs, linterRulesSchema, LinterRuleConfigObject,
+    defaultLinterConfig, mergeConfigs, linterRulesSchema,
 } from './config';
 import { defaultLinterRules } from './rules';
 import { ConfigCommentType } from './inline-config';
@@ -22,51 +21,7 @@ import { AnyRule, RuleParser } from '../parser';
 
 import { NewLineSplit, StringUtils } from '../utils/string';
 import { ArrayUtils } from '../utils/array';
-
-/**
- * Represents the location of a problem that detected by the linter
- */
-export interface LinterPosition {
-    /**
-     * Start line number
-     */
-    startLine: number;
-
-    /**
-     * Start column position
-     */
-    startColumn?: number;
-
-    /**
-     * End line number
-     */
-    endLine: number;
-
-    /**
-     * End column position
-     */
-    endColumn?: number;
-}
-
-/**
- * Represents a problem report (this must be passed to context.report from the rules)
- */
-export interface LinterProblemReport {
-    /**
-     * Text description of the problem
-     */
-    message: string;
-
-    /**
-     * The location of the problem
-     */
-    position: LinterPosition;
-
-    /**
-     * Suggested fix for the problem
-     */
-    fix?: AnyRule | AnyRule[];
-}
+import { GenericRuleContext, LinterConfig, LinterPosition, LinterProblemReport, LinterRule, LinterRuleConfig, LinterRuleConfigObject, LinterRuleStorage } from './common';
 
 /**
  * Represents a linter result that is returned by the `lint` method
@@ -127,84 +82,6 @@ export interface LinterProblem {
      */
     fix?: AnyRule | AnyRule[];
 }
-
-/**
- * Represents a linter context that is passed to the rules when their events are triggered
- */
-export interface GenericRuleContext {
-    /**
-     * Returns the clone of the shared linter configuration.
-     *
-     * @returns The shared linter configuration
-     */
-    getLinterConfig: () => LinterConfig;
-
-    /**
-     * Returns the raw content of the adblock filter list currently processed by the linter.
-     *
-     * @returns The raw adblock filter list content
-     */
-    getFilterListContent: () => string;
-
-    /**
-     * Returns the AST of the adblock rule currently being iterated by the linter.
-     *
-     * @returns The actual adblock rule as AST
-     */
-    getActualAdblockRuleAst: () => AnyRule | undefined;
-
-    /**
-     * Returns the raw version of the adblock rule currently being iterated by the linter.
-     *
-     * @returns The actual adblock rule as original string
-     */
-    getActualAdblockRuleRaw: () => string | undefined;
-
-    /**
-     * Returns the line number that the linter is currently iterating.
-     *
-     * @returns The actual line number
-     */
-    getActualLine: () => number;
-
-    /**
-     * Returns whether a fix was requested from the linter. This is an optimization
-     * for the linter, so it doesn't have to run the fixer if it's not needed.
-     *
-     * @returns `true` if fix is needed, `false` otherwise
-     */
-    fixingEnabled: () => boolean;
-
-    /**
-     * Storage for storing data between events. This storage is only visible to the rule.
-     */
-    storage: LinterRuleStorage;
-
-    /**
-     * Additional config for the rule. This is unknown at this point, but the concrete
-     * type is defined by the rule.
-     */
-    config: unknown;
-
-    /**
-     * Function for reporting problems to the linter.
-     *
-     * @param problem - The problem to report
-     */
-    report: (problem: LinterProblemReport) => void;
-}
-
-/**
- * Represents a linter rule storage object that is passed as reference to
- * the rules when their events are triggered.
- *
- * Basically used internally by the linter, so no need to export this.
- */
-type LinterRuleStorage = {
-    // The key is some string, the value is unknown at this point.
-    // The concrete value type is defined by the rule.
-    [key: string]: unknown;
-};
 
 /**
  * Represents a linter rule data object. Basically used internally by the linter,

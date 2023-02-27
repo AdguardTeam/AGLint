@@ -1,7 +1,7 @@
 import { join, parse, ParsedPath } from 'path';
 import { walk } from '../../../src/linter/cli/walk';
 import { scan } from '../../../src/linter/cli/scan';
-import { LinterConfig } from '../../../src/linter/config';
+import { LinterConfig } from '../../../src/linter/common';
 
 /**
  * Represents an event that is emitted by the walk function,

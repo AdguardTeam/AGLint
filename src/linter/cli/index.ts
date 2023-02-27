@@ -3,12 +3,13 @@ import { readFile, readdir, writeFile } from 'fs/promises';
 import { pathExists } from 'fs-extra';
 import cloneDeep from 'clone-deep';
 import { Linter } from '../index';
-import { mergeConfigs, LinterConfig, defaultLinterConfig } from '../config';
+import { mergeConfigs, defaultLinterConfig } from '../config';
 import { walk } from './walk';
 import { scan } from './scan';
 import { LinterCliReporter } from './reporter';
 import { CONFIG_FILE_NAMES } from './constants';
 import { parseConfigFile } from './config-reader';
+import { LinterConfig } from '../common';
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.

@@ -2,11 +2,12 @@ import { readFile } from 'fs/promises';
 import { assert, StructError } from 'superstruct';
 import { parse } from 'path';
 import yaml from 'js-yaml';
-import { LinterConfig, linterConfigSchema } from '../config';
+import { linterConfigSchema } from '../config';
 import { EMPTY } from '../../utils/constants';
 import {
     EXT_JSON, EXT_YAML, EXT_YML, RC_CONFIG_FILE,
 } from './constants';
+import { LinterConfig } from '../common';
 
 /**
  * Reads and parses supported configuration files.

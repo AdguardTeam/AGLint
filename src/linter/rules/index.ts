@@ -1,4 +1,4 @@
-import { LinterRule } from '../rule';
+import { LinterRule } from '../common';
 import { AdgScriptletQuotes } from './adg-scriptlet-quotes';
 import { DuplicatedHintPlatforms } from './duplicated-hint-platforms';
 import { DuplicatedHints } from './duplicated-hints';

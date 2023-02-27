@@ -2,7 +2,8 @@ import path, { ParsedPath } from 'path';
 import cloneDeep from 'clone-deep';
 import { ScannedDirectory } from './scan';
 import { parseConfigFile } from './config-reader';
-import { LinterConfig, defaultLinterConfig, mergeConfigs } from '../config';
+import { defaultLinterConfig, mergeConfigs } from '../config';
+import { LinterConfig } from '../common';
 
 /**
  * An event that is performed on a file or directory.

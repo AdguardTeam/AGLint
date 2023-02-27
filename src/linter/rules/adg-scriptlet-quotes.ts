@@ -2,8 +2,6 @@ import { Struct, enums } from 'superstruct';
 import cloneDeep from 'clone-deep';
 
 // Linter stuff
-import { GenericRuleContext, LinterProblemReport } from '..';
-import { LinterRule } from '../rule';
 import { SEVERITY } from '../severity';
 
 // Parser stuff
@@ -16,6 +14,7 @@ import { ScriptletParameter, ScriptletParameterType } from '../../parser/cosmeti
 import { AdblockSyntax } from '../../utils/adblockers';
 import { StringUtils } from '../../utils/string';
 import { EMPTY, SPACE } from '../../utils/constants';
+import { GenericRuleContext, LinterProblemReport, LinterRule } from '../common';
 
 /**
  * Possible quote types

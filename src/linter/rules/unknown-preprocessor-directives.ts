@@ -1,6 +1,4 @@
 // Linter stuff
-import { GenericRuleContext } from '..';
-import { LinterRule } from '../rule';
 import { SEVERITY } from '../severity';
 
 // Parser stuff
@@ -8,6 +6,7 @@ import { AnyRule } from '../../parser';
 import { RuleCategory } from '../../parser/categories';
 import { CommentRuleType } from '../../parser/comment/types';
 import { CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from '../../utils/constants';
+import { GenericRuleContext, LinterRule } from '../common';
 
 const COMMON_PREPROCESSOR_DIRECTIVES = [
     'if',

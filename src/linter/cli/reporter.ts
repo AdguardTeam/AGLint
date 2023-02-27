@@ -1,6 +1,6 @@
 import { ParsedPath } from 'path';
 import { LinterResult } from '../index';
-import { LinterConfig } from '../config';
+import { LinterConfig } from '../common';
 
 /**
  * Represents a reporter skeleton for the linter.
