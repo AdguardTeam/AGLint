@@ -314,161 +314,268 @@ So the hierarchy is the following:
 
 The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
 
+The linter rules documentation is written in the following schema:
+- *Short description of the rule in the first paragraph.*
+- **Severity:** Severity of the rule, it can be `warn` (1), `error` (2), `fatal` (3).
+- **Options:** Configuration options for the rule (if any).
+- **Options schema:** Validation schema for the rule options (if any).
+- **Fixable:** Describes if the rule can fix the detected problem automatically.
+- **Example:** A simple example of the rule violation and how it will be reported.
+- **Example for fixing:** A simple example of the rule violation and how it will be fixed (if the problem is fixable).
+
 Currently, the following linter rules are available (we will add more rules in the future):
 
 ### `adg-scriptlet-quotes`
 
-Check if the scriptlet parameters are wrapped in the expected quotes. For example
-```adblock
-example.com#%#//scriptlet("abort-on-property-read", "window.open")
-```
-will be reported as warning:
-```
- 1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
-```
-since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+Check if the scriptlet parameters are wrapped in the expected quotes.
 
-But you can specify the expected quotes in the configuration file. If you want to use double quotes, you can add the following configuration:
-```json
-{
-    "rules": {
-        "adg-scriptlet-quotes": ["warn", "double"]
+- **Severity:** `warn` (1)
+- **Options:** `single` (default), `double`, `none`
+- **Options schema:** `enum` with the following values: `single`, `double`, `none`
+- **Fixable:** yes, quotes will be replaced with the expected quotes
+- **Example:**
+  ```adblock
+  example.com#%#//scriptlet("abort-on-property-read", "window.open")
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
+  ```
+  since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+- **Example for fixing:**
+  ```adblock
+  example.com#%#//scriptlet("abort-on-property-read", "window.open")
+  ```
+  will be fixed to:
+  ```adblock
+  example.com#%#//scriptlet('abort-on-property-read', 'window.open')
+  ```
+- **Additional information:**
+  - If you want to change the default quotes, you can use the `adg-scriptlet-quotes` rule in your configuration file:
+    ```yaml
+    rules:
+      # We want to use double quotes instead of single quotes
+      adg-scriptlet-quotes:
+        - warn
+        - double
+    ```
+    or
+    ```json
+    {
+        "rules": {
+            "adg-scriptlet-quotes": ["warn", "double"]
+        }
     }
-}
-```
-
-Possible config values are `none`, `single` and `double`. The default value is `single`.
+    ```
+    This will change the default quotes to double quotes.
 
 ### `if-closed`
 
 Checks if the `if` statement is closed and no unclosed `endif` statements are present.
 
-For example, in the following case, the first `endif` are unnecessary, and the last `if` statement is not closed:
-    
-```adblock
-!#endif
-!#if (adguard_app_android)
-example.com##.ad
-!#endif
-!#if (adguard_ext_firefox)
-example.org##.something
-```
-
-so the linter will give you the following errors:
-
-```
- 1:0  error  Using an "endif" directive without an opening "if" directive
- 5:0  error  Unclosed "if" directive
-```
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !#endif
+  !#if (adguard_app_android)
+  example.com##.ad
+  !#endif
+  !#if (adguard_ext_firefox)
+  example.org##.something
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Using an "endif" directive without an opening "if" directive
+    5:0  error  Unclosed "if" directive
+  ```
+  since the first `endif` are unnecessary, and the last `if` statement is not closed.
 
 ### `single-selector`
 
-Checks if the CSS selector contains multiple selectors. For example, `example.com##.ad, .something` will be reported as warning, since it is a bad practice to use multiple selectors in a single rule.
+Checks element hiding rules to make sure that they contain only one selector.
 
-For example, in the following case, the first rule is bad, and the second rule is good:
-    
-```adblock
-example.com##.ad, .something
-example.org##.ad
-```
-
-so the linter will give you the following warning:
-
-```
- 1:0  warn  An element hiding rule should contain only one selector
-```
-
-It will also suggest a fix for the first rule:
-
-```adblock
-example.com##.ad
-example.com##.something
-example.org##.ad
-```
+- **Severity:** `warn` (1)
+- **Options:** none
+- **Fixable:** yes, the rule will be split into multiple rules, each with a single selector
+- **Example:**
+  ```adblock
+  example.com##.ad, .something
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  An element hiding rule should contain only one selector
+  ```
+  since the rule contains two selectors.
+- **Example for fixing:**
+  ```adblock
+  example.com##.ad, .something
+  ```
+  will be fixed to:
+  ```adblock
+  example.com##.ad
+  example.com##.something
+  ```
+  (two separate rules with a single selector each).
 
 ### `duplicated-modifiers`
 
-Checks if the same modifier is used multiple times in a single network rule. For example, `example.com$important,important` will be reported as error, since the `important` modifier is used twice.
+Checks if the same modifier is used multiple times in a single network rule.
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** planned
+- **Example:**
+  ```adblock
+  example.com$important,important
+  ```
+  will be reported as error:
+  ```
+    1:0  error  The "important" modifier is used multiple times
+  ```
+  since the `important` modifier is used twice.
 
 ### `unknown-preprocessor-directives`
 
-Checks if the preprocessor directives are known. For example, `!#unknown` will be reported as error, since `unknown` is not a known preprocessor directive.
+Checks if the used preprocessor directives are known.
 
-Currently, the following preprocessor directives are supported:
-- `if`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
-- `endif`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
-- `include`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#include-directive)
-- `safari_cb_affinity`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
-
-For more information about preprocessor directives, please visit https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !#unknown
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Unknown preprocessor directive: "unknown"
+  ```
+  since `unknown` is not a known preprocessor directive.
+- **Additional information:**
+  - Currently, the following preprocessor directives are supported:
+    - `if`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
+    - `endif`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
+    - `include`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#include-directive)
+    - `safari_cb_affinity`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
+  - For more information about preprocessor directives, please visit
+    - https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or
+    - https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
 
 ### `duplicated-hint-platforms`
 
-Checks if the same platform is used multiple times in a single hint. For example, if you have the following hint:
-```adblock
-!+ PLATFORM(ios, android, ios)
-```
-then the linter will report a warning, since the `ios` platform is used twice, and it is not necessary.
+Checks if the same platform is used multiple times in a single hint.
 
-In this case, the correct way to remove the duplicated platform is to use the following hint:
-```adblock
-!+ PLATFORM(ios, android)
-```
+- **Severity:** `warn` (1)
+- **Options:** none
+- **Fixable:** planned
+- **Example:**
+  ```adblock
+  !+ PLATFORM(ios, android, ios)
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  The "ios" platform is used multiple times
+  ```
+  since the `ios` platform is used twice. In this case, you'll need to remove the unnecessary `ios` platform.
 
 ### `duplicated-hints`
 
-Checks if the same hint is used multiple times within a single comment. For example, if you have the following hint comment:
-```adblock
-!+ PLATFORM(ios, ext_android_cb) PLATFORM(ext_ff) NOT_OPTIMIZED
-```
-then the linter will report a warning, since the `PLATFORM` hint is used twice in the same comment, which is unnecessary.
+Checks if the same hint is used multiple times within a single comment.
 
-In this case, the proper way is:
-```adblock
-!+ PLATFORM(ios, ext_android_cb, ext_ff) NOT_OPTIMIZED
-```
-with using single `PLATFORM` hint.
+- **Severity:** `warn` (1)
+- **Options:** none
+- **Fixable:** planned
+- **Example:**
+  ```adblock
+  !+ PLATFORM(ios, ext_android_cb) PLATFORM(ext_ff) NOT_OPTIMIZED
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  The "PLATFORM" hint is used multiple times
+  ```
+  since the `PLATFORM` hint is used twice in the same comment. In this case, you'll need to concatenate the platforms into a single `PLATFORM` hint.
 
 ### `unknown-hints-and-platforms`
 
-Checks if the hints and platforms are known. For example, `!+ HINT` or `!+ HINT(param)` will be reported as error, since `HINT` is not a known hint. Also, `!+ PLATFORM(something)` will be reported as error, since `something` is not a known platform (`PLATFORM` is a known hint, but in this case, it parameterized with an unknown platform).
+Checks if the hints and platforms are known.
 
-Currently, the following hints are supported:
-- `NOT_OPTIMIZED`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#not_optimized-hint)
-- `PLATFORM` / `NOT_PLATFORM`: [docs](https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints)
-
-Currently, the following platforms are supported:
-- windows
-- mac
-- android
-- ios
-- ext_chromium
-- ext_ff
-- ext_edge
-- ext_opera
-- ext_safari
-- ext_android_cb
-- ext_ublock
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !+ HINT
+  !+ HINT(param)
+  !+ PLATFORM(something)
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Unknown hint: "HINT"
+    2:0  error  Unknown hint: "HINT"
+    3:0  error  Unknown platform: "something"
+  ```
+  since `HINT` are an unknown hint, and `something` is an unknown platform.
+- **Additional information:**
+  - Currently, the following hints are supported:
+    - `NOT_OPTIMIZED`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#not_optimized-hint)
+    - `PLATFORM` / `NOT_PLATFORM`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints)
+  - Currently, the following platforms are supported:
+    - `windows`
+    - `mac`
+    - `android`
+    - `ios`
+    - `ext_chromium`
+    - `ext_ff`
+    - `ext_edge`
+    - `ext_opera`
+    - `ext_safari`
+    - `ext_android_cb`
+    - `ext_ublock`
 
 ### `invalid-domain-list`
 
-Checks for invalid domains in cosmetic rules. For example, `example.##.ad` will be reported as error, since `example.` is not a valid domain, because it's TLD is empty.
+Checks for invalid domains in cosmetic rules.
 
-Accepted values are:
-- Domains: `example.com`, `example.org`, `example.net`, etc.
-- Domains with wildcards: `*.example.com`, `*.example.org`, `*.example.net`, etc.
-- Wildcard-only domain: `*`
-- Hostnames: `example`, `example-2`, `example-3`, etc.
-- IP addresses: `127.0.0.1`
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  example.##.ad
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Invalid domain: "example."
+  ```
+  since `example.` is not a valid domain, because it's TLD is empty. In this case, you'll need to specify TLD for the domain, for example, `example.com`, or use a wildcard as TLD: `example.*`.
+- **Additional information:**
+    - Accepted values are:
+      - Regular domains: `example.com`, `example.org`, `example.net`, etc.
+      - Domains with wildcards: `*.example.com`, `*.example.org`, `*.example.net`, etc.
+      - Wildcard-only domain: `*`
+      - IDN domains: `xn--e1afmkfd.xn--p1ai`, etc.
+      - Unicode domains: `пример.рф`, etc.
+      - Hostnames: `example`, `example-2`, `example-3`, etc.
+      - IP addresses: `127.0.0.1`
 
 ### `inconsistent-hint-platforms`
 
-Check if the hint platforms are targeted inconsistently. For example, if you have the following hint:
-```adblock
-!+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
-example.com##.ad
-```
-then the linter will report an error, since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded.
+Check if the hint platforms are targeted inconsistently.
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
+  example.com##.ad
+  ```
+  will be reported as error:
+  ```
+    1:0  error  The "ext_android_cb" platform is targeted inconsistently
+  ```
+  since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded. In this case, you'll need to remove the `ext_android_cb` platform from the `NOT_PLATFORM` hint, or add the `ext_android_cb` platform to the `PLATFORM` hint.
 
 ## Use programmatically
 
