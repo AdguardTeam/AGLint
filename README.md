@@ -561,7 +561,7 @@ Checks for invalid domains in cosmetic rules.
 
 ### `inconsistent-hint-platforms`
 
-Check if the hint platforms are targeted inconsistently.
+Check if the hint platforms are targeted inconsistently. This means that the same platform is targeted in the `PLATFORM` hint, but excluded in the `NOT_PLATFORM` hint at the same time (or vice versa).
 
 - **Severity:** `error` (2)
 - **Options:** none
@@ -575,7 +575,7 @@ Check if the hint platforms are targeted inconsistently.
   ```
     1:0  error  The "ext_android_cb" platform is targeted inconsistently
   ```
-  since the `ext_android_cb` platform is targeted inconsistently, because in the `PLATFORM` hint it is targeted, but in the `NOT_PLATFORM` hint it is excluded. In this case, you'll need to remove the `ext_android_cb` platform from the `NOT_PLATFORM` hint, or add the `ext_android_cb` platform to the `PLATFORM` hint.
+  since the `ext_android_cb` platform is targeted in the `PLATFORM` hint, but excluded in the `NOT_PLATFORM` hint at the same time. In this case, you'll need to remove the `ext_android_cb` platform from some of the hints to make it's targeting consistent.
 
 ## Use programmatically
 
@@ -590,7 +590,7 @@ An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently
 For example, this code:
 
 ```typescript
-import { RuleParser } from 'aglint';
+import { RuleParser } from '@adguard/aglint';
 
 // RuleParser automatically determines the rule type
 const ast = RuleParser.parse('/ads.js^$script,domain=example.com');
@@ -642,7 +642,7 @@ Please keep in mind that the CLI only can be used in Node.js (because it uses th
 Example usage:
 
 ```typescript
-import { Linter } from "aglint";
+import { Linter } from "@adguard/aglint";
 
 // Create a new linter instance and add default rules (make first parameter true to add default rules)
 const linter = new Linter(true);
@@ -654,7 +654,7 @@ const linter = new Linter(true);
 // If you want to enable the fixer, pass true as the second parameter
 const report = linter.lint("example.com##.ad, #ad");
 
-// Do something with the report :)
+// Do something with the report
 ```
 
 The `LinterRule` interface has the following structure:
