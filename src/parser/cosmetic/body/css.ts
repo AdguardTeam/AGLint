@@ -13,8 +13,8 @@ import {
     toPlainObject,
     fromPlainObject,
     MediaQueryListPlain,
-} from "@adguard/ecss-tree";
-import { AdblockSyntax } from "../../../utils/adblockers";
+} from '@adguard/ecss-tree';
+import { AdblockSyntax } from '../../../utils/adblockers';
 import {
     CSS_BLOCK_CLOSE,
     CSS_BLOCK_OPEN,
@@ -25,9 +25,9 @@ import {
     CSS_SELECTORS_SEPARATOR,
     EMPTY,
     SPACE,
-} from "../../../utils/constants";
-import { CssTree } from "../../../utils/csstree";
-import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
+} from '../../../utils/constants';
+import { CssTree } from '../../../utils/csstree';
+import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
 
 /**
  * `@media <mediaQueryList> { rule }` where rule is `selectorList { declarations block }`
@@ -36,19 +36,19 @@ import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-co
 const MEDIA_QUERY_PATTERN = /^(?:@media\s*(?<mediaQueryList>[^{]+))\s*{\s*(?<rule>.+)\s*}$/;
 
 /** selectorList:style(declarations) or selectorList:remove() */
-const UBO_CSS_INJECTION_PATTERN =
-    /^(?<selectors>.+)(?:(?<style>:style\()(?<declarations>.+)\)|(?<remove>:remove\(\)))$/;
+// eslint-disable-next-line max-len
+const UBO_CSS_INJECTION_PATTERN = /^(?<selectors>.+)(?:(?<style>:style\()(?<declarations>.+)\)|(?<remove>:remove\(\)))$/;
 
 /** selectorList { declarations } */
 const ADG_CSS_INJECTION_PATTERN = /^(?:.+){(?:.+)}$/;
 
-const REMOVE_BLOCK = "{ remove: true; }";
-const UBO_STYLE = "style";
-const UBO_REMOVE = "remove";
+const REMOVE_BLOCK = '{ remove: true; }';
+const UBO_STYLE = 'style';
+const UBO_REMOVE = 'remove';
 const UBO_STYLE_MARKER = CSS_PSEUDO_MARKER + UBO_STYLE + CSS_PSEUDO_OPEN;
 const UBO_REMOVE_MARKER = CSS_PSEUDO_MARKER + UBO_REMOVE + CSS_PSEUDO_OPEN;
 
-export const REMOVE_BLOCK_TYPE = "remove";
+export const REMOVE_BLOCK_TYPE = 'remove';
 
 /**
  * Represents the CSS rule body, which can be:
@@ -120,7 +120,7 @@ export class CssInjectionBodyParser {
 
         // Since it has to run for every elementhide rule, the regex would be slow,
         // so firstly we search for the keywords.
-        if (trimmed.indexOf(UBO_STYLE_MARKER) != -1 || trimmed.indexOf(UBO_REMOVE_MARKER) != -1) {
+        if (trimmed.indexOf(UBO_STYLE_MARKER) !== -1 || trimmed.indexOf(UBO_REMOVE_MARKER) !== -1) {
             return UBO_CSS_INJECTION_PATTERN.test(trimmed);
         }
 
@@ -157,7 +157,7 @@ export class CssInjectionBodyParser {
             return null;
         }
 
-        let mediaQueryList: MediaQueryListPlain | undefined = undefined;
+        let mediaQueryList: MediaQueryListPlain | undefined;
         const selectors: Selector[] = [];
         let rawRule = trimmed;
 
@@ -181,7 +181,7 @@ export class CssInjectionBodyParser {
         const selectorListAst = ruleAst.prelude;
 
         selectorListAst.children.forEach((node) => {
-            if (node.type == CssTreeNodeType.Selector) {
+            if (node.type === CssTreeNodeType.Selector) {
                 selectors.push(node);
             }
         });
@@ -194,7 +194,7 @@ export class CssInjectionBodyParser {
 
         ruleAst.block.children.forEach((node) => {
             if (node.type === CssTreeNodeType.Declaration) {
-                if (node.property == REMOVE_BLOCK_TYPE) {
+                if (node.property === REMOVE_BLOCK_TYPE) {
                     if (removeDeclFound) {
                         throw new Error(`Multiple remove property found in the following CSS injection body: "${raw}"`);
                     }
@@ -208,7 +208,7 @@ export class CssInjectionBodyParser {
         if (removeDeclFound && nonRemoveDeclFound) {
             throw new Error(
                 // eslint-disable-next-line max-len
-                `In addition to the remove property, the following CSS injection body also uses other properties: "${raw}"`
+                `In addition to the remove property, the following CSS injection body also uses other properties: "${raw}"`,
             );
         }
 
@@ -245,7 +245,7 @@ export class CssInjectionBodyParser {
         const selectorListAst = <SelectorList>CssTree.parse(rawSelectorList, CssTreeParserContext.selectorList);
 
         selectorListAst.children.forEach((node) => {
-            if (node.type == CssTreeNodeType.Selector) {
+            if (node.type === CssTreeNodeType.Selector) {
                 selectors.push(node);
             }
         });

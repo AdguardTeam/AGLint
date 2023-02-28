@@ -4,18 +4,18 @@
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints}
  */
 
-import { AdblockSyntax } from "../../utils/adblockers";
-import { EMPTY, SPACE, UNDERSCORE } from "../../utils/constants";
-import { StringUtils } from "../../utils/string";
-import { RuleCategory } from "../categories";
-import { CommentRuleType } from "./types";
-import { Comment } from ".";
+import { AdblockSyntax } from '../../utils/adblockers';
+import { EMPTY, SPACE, UNDERSCORE } from '../../utils/constants';
+import { StringUtils } from '../../utils/string';
+import { CommentRuleType } from './types';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
-const HINT_MARKER = "!+";
+const HINT_MARKER = '!+';
 const HINT_MARKER_LEN = HINT_MARKER.length;
-const HINT_PARAMS_OPEN = "(";
-const HINT_PARAMS_CLOSE = ")";
-const HINT_PARAMS_SEPARATOR = ",";
+const HINT_PARAMS_OPEN = '(';
+const HINT_PARAMS_CLOSE = ')';
+const HINT_PARAMS_SEPARATOR = ',';
 
 /**
  * Represents a hint member.
@@ -114,27 +114,25 @@ export class HintParser {
         let collectedHintName = EMPTY;
 
         // Skip !+ or #+, so start from index 2
-        for (let i = HINT_MARKER_LEN; i < trimmed.length; i++) {
-            // Bracket opening
-            if (trimmed[i] == HINT_PARAMS_OPEN) {
-                if (collectedHintName.length == 0) {
+        for (let i = HINT_MARKER_LEN; i < trimmed.length; i += 1) {
+            if (trimmed[i] === HINT_PARAMS_OPEN) {
+                // Bracket opening
+                if (collectedHintName.length === 0) {
                     throw new SyntaxError(
-                        `Missing hint name, invalid opening bracket found at position ${i} in comment "${trimmed}"`
+                        `Missing hint name, invalid opening bracket found at position ${i} in comment "${trimmed}"`,
                     );
-                } else if (openingBracketIndex != -1) {
+                } else if (openingBracketIndex !== -1) {
                     throw new SyntaxError(
                         // eslint-disable-next-line max-len
-                        `Nesting hints isn't supported, invalid opening bracket found at position ${i} in comment "${trimmed}"`
+                        `Nesting hints isn't supported, invalid opening bracket found at position ${i} in comment "${trimmed}"`,
                     );
                 }
                 openingBracketIndex = i;
-            }
-
-            // Bracket closing
-            else if (trimmed[i] == HINT_PARAMS_CLOSE) {
-                if (openingBracketIndex == -1) {
+            } else if (trimmed[i] === HINT_PARAMS_CLOSE) {
+                // Bracket closing
+                if (openingBracketIndex === -1) {
                     throw new SyntaxError(
-                        `No opening bracket found for closing bracket at position ${i} in comment "${trimmed}"`
+                        `No opening bracket found for closing bracket at position ${i} in comment "${trimmed}"`,
                     );
                 }
 
@@ -148,15 +146,13 @@ export class HintParser {
 
                 openingBracketIndex = -1;
                 collectedHintName = EMPTY;
-            }
-
-            // Spaces between hints
-            else if (openingBracketIndex == -1 && StringUtils.isWhitespace(trimmed[i])) {
+            } else if (openingBracketIndex === -1 && StringUtils.isWhitespace(trimmed[i])) {
+                // Spaces between hints
                 if (
-                    collectedHintName &&
-                    trimmed[i - 1] &&
-                    trimmed[i - 1] != "+" &&
-                    !StringUtils.isWhitespace(trimmed[i - 1])
+                    collectedHintName
+                    && trimmed[i - 1]
+                    && trimmed[i - 1] !== '+'
+                    && !StringUtils.isWhitespace(trimmed[i - 1])
                 ) {
                     // Store paramsless hints
                     collectedMembers.push({
@@ -166,30 +162,26 @@ export class HintParser {
 
                     collectedHintName = EMPTY;
                 }
-            }
-
-            // Anything else (typically hint name chars)
-            else {
-                if (openingBracketIndex == -1) {
-                    // Restrict to a-z, A-Z, 0-9 and _
-                    if (
-                        (trimmed[i] >= "a" && trimmed[i] <= "z") ||
-                        (trimmed[i] >= "A" && trimmed[i] <= "Z") ||
-                        (trimmed[i] >= "0" && trimmed[i] <= "9") ||
-                        trimmed[i] == UNDERSCORE
-                    ) {
-                        collectedHintName += trimmed[i];
-                    } else {
-                        throw new SyntaxError(
-                            `Invalid character ${trimmed[i]} in hint name at position ${i} in comment "${trimmed}"`
-                        );
-                    }
+            } else if (openingBracketIndex === -1) {
+                // Anything else (typically hint name chars)
+                // Restrict to a-z, A-Z, 0-9 and _
+                if (
+                    (trimmed[i] >= 'a' && trimmed[i] <= 'z')
+                        || (trimmed[i] >= 'A' && trimmed[i] <= 'Z')
+                        || (trimmed[i] >= '0' && trimmed[i] <= '9')
+                        || trimmed[i] === UNDERSCORE
+                ) {
+                    collectedHintName += trimmed[i];
+                } else {
+                    throw new SyntaxError(
+                        `Invalid character ${trimmed[i]} in hint name at position ${i} in comment "${trimmed}"`,
+                    );
                 }
             }
         }
 
         // Handle unclosed bracket
-        if (openingBracketIndex != -1) {
+        if (openingBracketIndex !== -1) {
             throw new SyntaxError(`Unclosed opening bracket at ${openingBracketIndex} in comment "${trimmed}"`);
         }
 

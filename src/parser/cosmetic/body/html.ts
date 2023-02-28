@@ -2,12 +2,16 @@
  * HTML filtering rule body parser
  */
 
-import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "@adguard/ecss-tree";
-import { AdblockSyntax } from "../../../utils/adblockers";
-import { CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE } from "../../../utils/constants";
-import { CssTree } from "../../../utils/csstree";
-import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
-import { DOUBLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
+import {
+    fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject,
+} from '@adguard/ecss-tree';
+import { AdblockSyntax } from '../../../utils/adblockers';
+import {
+    CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE,
+} from '../../../utils/constants';
+import { CssTree } from '../../../utils/csstree';
+import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
+import { DOUBLE_QUOTE_MARKER, StringUtils } from '../../../utils/string';
 
 /**
  * Represents an HTML filtering rule body.
@@ -41,14 +45,14 @@ export class HtmlBodyParser {
         let withinString = false;
         let result = EMPTY;
 
-        for (let i = 0; i < selector.length; i++) {
-            if (!withinString && selector[i] == DOUBLE_QUOTE_MARKER) {
+        for (let i = 0; i < selector.length; i += 1) {
+            if (!withinString && selector[i] === DOUBLE_QUOTE_MARKER) {
                 withinString = true;
                 result += selector[i];
-            } else if (withinString && selector[i] == DOUBLE_QUOTE_MARKER && selector[i + 1] == DOUBLE_QUOTE_MARKER) {
+            } else if (withinString && selector[i] === DOUBLE_QUOTE_MARKER && selector[i + 1] === DOUBLE_QUOTE_MARKER) {
                 result += ESCAPE_CHARACTER + DOUBLE_QUOTE_MARKER;
-                i++;
-            } else if (withinString && selector[i] == DOUBLE_QUOTE_MARKER && selector[i + 1] != DOUBLE_QUOTE_MARKER) {
+                i += 1;
+            } else if (withinString && selector[i] === DOUBLE_QUOTE_MARKER && selector[i + 1] !== DOUBLE_QUOTE_MARKER) {
                 result += DOUBLE_QUOTE_MARKER;
                 withinString = false;
             } else {
@@ -70,11 +74,11 @@ export class HtmlBodyParser {
         let withinString = false;
         let result = EMPTY;
 
-        for (let i = 0; i < selector.length; i++) {
-            if (selector[i] == DOUBLE_QUOTE_MARKER && selector[i - 1] != ESCAPE_CHARACTER) {
+        for (let i = 0; i < selector.length; i += 1) {
+            if (selector[i] === DOUBLE_QUOTE_MARKER && selector[i - 1] !== ESCAPE_CHARACTER) {
                 withinString = !withinString;
                 result += selector[i];
-            } else if (withinString && selector[i] == ESCAPE_CHARACTER && selector[i + 1] == DOUBLE_QUOTE_MARKER) {
+            } else if (withinString && selector[i] === ESCAPE_CHARACTER && selector[i + 1] === DOUBLE_QUOTE_MARKER) {
                 result += DOUBLE_QUOTE_MARKER;
             } else {
                 result += selector[i];
@@ -101,12 +105,10 @@ export class HtmlBodyParser {
         const escapedRawBody = HtmlBodyParser.escapeDoubleQuotes(trimmed);
 
         // Selector
-        if (StringUtils.findNextUnescapedCharacter(escapedRawBody, CSS_SELECTORS_SEPARATOR) == -1) {
+        if (StringUtils.findNextUnescapedCharacter(escapedRawBody, CSS_SELECTORS_SEPARATOR) === -1) {
             selectors.push(<SelectorPlain>CssTree.parsePlain(escapedRawBody, CssTreeParserContext.selector));
-        }
-
-        // SelectorList
-        else {
+        } else {
+            // SelectorList
             const selectorListAst = <SelectorList>CssTree.parse(escapedRawBody, CssTreeParserContext.selectorList);
             selectorListAst.children.forEach((child) => {
                 if (child.type === CssTreeNodeType.Selector) {
@@ -133,7 +135,7 @@ export class HtmlBodyParser {
             .join(CSS_SELECTORS_SEPARATOR + SPACE);
 
         // In the case of AdGuard syntax, the "" case must be handled
-        if (syntax == AdblockSyntax.Adg) {
+        if (syntax === AdblockSyntax.Adg) {
             result = HtmlBodyParser.unescapeDoubleQuotes(result);
         }
 

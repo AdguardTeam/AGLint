@@ -1,28 +1,20 @@
-import { StringUtils } from "../../utils/string";
-import { CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
-import { CommentRuleType } from "./types";
-import { CommentMarker } from "./marker";
-import { AgentParser, Agent } from "./agent";
-import { HintParser, Hint } from "./hint";
-import { Metadata, MetadataParser } from "./metadata";
-import { PreProcessor, PreProcessorParser } from "./preprocessor";
-import { AdblockSyntax } from "../../utils/adblockers";
-import { ConfigCommentParser, ConfigComment } from "./inline-config";
-import { RuleCategory } from "../categories";
-import { Rule } from "../rule";
+import { StringUtils } from '../../utils/string';
+import { CosmeticRuleSeparatorUtils } from '../../utils/cosmetic-rule-separator';
+import { CommentRuleType } from './types';
+import { CommentMarker } from './marker';
+import { AgentParser, Agent } from './agent';
+import { HintParser, Hint } from './hint';
+import { Metadata, MetadataParser } from './metadata';
+import { PreProcessor, PreProcessorParser } from './preprocessor';
+import { AdblockSyntax } from '../../utils/adblockers';
+import { ConfigCommentParser, ConfigComment } from './inline-config';
+import { RuleCategory } from '../common';
+import { Comment } from './common';
 
 /**
  * Represents any comment-like adblock rule.
  */
 export type AnyCommentRule = Agent | Hint | ConfigComment | Metadata | PreProcessor | SimpleComment;
-
-/**
- * Represents the basic comment rule interface.
- */
-export interface Comment extends Rule {
-    category: RuleCategory.Comment;
-    type: CommentRuleType;
-}
 
 /**
  * Represents a simple comment.
@@ -120,7 +112,7 @@ export class CommentParser {
      * @returns `true` if the rule is a regular comment, `false` otherwise
      */
     public static isRegularComment(raw: string): boolean {
-        return raw.trim()[0] == CommentMarker.Regular;
+        return raw.trim()[0] === CommentMarker.Regular;
     }
 
     /**
@@ -138,21 +130,20 @@ export class CommentParser {
         }
 
         // Hashmark based comments
-        else if (trimmed[0] == CommentMarker.Hashmark) {
+        if (trimmed[0] === CommentMarker.Hashmark) {
             const [start, end] = CosmeticRuleSeparatorUtils.find(trimmed);
 
             // No separator
-            if (start == -1) {
+            if (start === -1) {
                 return true;
-            } else {
-                // No valid selector
-                if (
-                    !trimmed[end + 1] ||
-                    StringUtils.isWhitespace(trimmed[end + 1]) ||
-                    (trimmed[end + 1] == CommentMarker.Hashmark && trimmed[end + 2] == CommentMarker.Hashmark)
-                ) {
-                    return true;
-                }
+            }
+            // No valid selector
+            if (
+                !trimmed[end + 1]
+                    || StringUtils.isWhitespace(trimmed[end + 1])
+                    || (trimmed[end + 1] === CommentMarker.Hashmark && trimmed[end + 2] === CommentMarker.Hashmark)
+            ) {
+                return true;
             }
         }
 
@@ -174,12 +165,12 @@ export class CommentParser {
         }
 
         return (
-            AgentParser.parse(trimmed) ||
-            HintParser.parse(trimmed) ||
-            PreProcessorParser.parse(trimmed) ||
-            MetadataParser.parse(trimmed) ||
-            ConfigCommentParser.parse(trimmed) ||
-            <SimpleComment>{
+            AgentParser.parse(trimmed)
+            || HintParser.parse(trimmed)
+            || PreProcessorParser.parse(trimmed)
+            || MetadataParser.parse(trimmed)
+            || ConfigCommentParser.parse(trimmed)
+            || <SimpleComment>{
                 category: RuleCategory.Comment,
                 type: CommentRuleType.SimpleComment,
                 syntax: AdblockSyntax.Common,
@@ -209,6 +200,8 @@ export class CommentParser {
                 return ConfigCommentParser.generate(<ConfigComment>ast);
             case CommentRuleType.SimpleComment:
                 return (<SimpleComment>ast).marker + (<SimpleComment>ast).text;
+            default:
+                throw new Error('Unknown comment type');
         }
     }
 }

@@ -4,17 +4,17 @@
  * @see {@link https://eslint.org/docs/latest/user-guide/configuring/rules#using-configuration-comments}
  */
 
-import { AdblockSyntax } from "../../utils/adblockers";
-import { COMMA, EMPTY, SPACE } from "../../utils/constants";
-import { RuleCategory } from "../categories";
-import { CommentRuleType } from "./types";
-import { CommentMarker } from "./marker";
-import { Comment } from ".";
-import JSON5 from "json5";
+import JSON5 from 'json5';
+import { AdblockSyntax } from '../../utils/adblockers';
+import { COMMA, EMPTY, SPACE } from '../../utils/constants';
+import { CommentRuleType } from './types';
+import { CommentMarker } from './marker';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
-const AGLINT_COMMAND_PREFIX = "aglint";
+const AGLINT_COMMAND_PREFIX = 'aglint';
 const PARAMS_SEPARATOR = COMMA;
-const CONFIG_COMMENT_MARKER = "--";
+const CONFIG_COMMENT_MARKER = '--';
 
 /**
  * Represents an inline linter configuration comment.
@@ -83,19 +83,19 @@ export class ConfigCommentParser {
     public static isConfigComment(raw: string): boolean {
         const trimmed = raw.trim();
 
-        if (trimmed[0] == CommentMarker.Regular || trimmed[0] == CommentMarker.Hashmark) {
+        if (trimmed[0] === CommentMarker.Regular || trimmed[0] === CommentMarker.Hashmark) {
             // Skip comment marker and trim comment text (it is necessary because of "!     something")
             const text = raw.slice(1).trim();
 
             // The code below is "not pretty", but it runs fast, which is necessary, since it will run on EVERY comment
             // The essence of the indicator is that the control comment always starts with the "aglint" prefix
             return (
-                (text[0] == "a" || text[0] == "A") &&
-                (text[1] == "g" || text[1] == "G") &&
-                (text[2] == "l" || text[2] == "L") &&
-                (text[3] == "i" || text[3] == "I") &&
-                (text[4] == "n" || text[4] == "N") &&
-                (text[5] == "t" || text[5] == "T")
+                (text[0] === 'a' || text[0] === 'A')
+                && (text[1] === 'g' || text[1] === 'G')
+                && (text[2] === 'l' || text[2] === 'L')
+                && (text[3] === 'i' || text[3] === 'I')
+                && (text[4] === 'n' || text[4] === 'N')
+                && (text[5] === 't' || text[5] === 'T')
             );
         }
 
@@ -122,7 +122,7 @@ export class ConfigCommentParser {
         // Remove comment part, for example: "! aglint rule1: "off" -- this is a comment"
         // Correct rules doesn't includes "--" inside
         const commentPos = text.indexOf(CONFIG_COMMENT_MARKER);
-        if (commentPos != -1) {
+        if (commentPos !== -1) {
             comment = text.substring(commentPos + 2).trim();
             text = text.substring(0, commentPos).trim();
         }
@@ -146,15 +146,15 @@ export class ConfigCommentParser {
         // ! aglint-disable something
         // then the command is "aglint-disable" and the parameter is "something".
         const firstSpaceIndex = text.indexOf(SPACE);
-        if (firstSpaceIndex != -1) {
+        if (firstSpaceIndex !== -1) {
             result.command = text.substring(0, firstSpaceIndex).trim().toLocaleLowerCase();
             rawParams = text.substring(firstSpaceIndex + 1).trim();
         }
 
         // If the command is simply "aglint", then it is a special case whose parameter is a rule configuration object
         if (result.command === AGLINT_COMMAND_PREFIX) {
-            if (!rawParams || rawParams.length == 0) {
-                throw new SyntaxError("Missing configuration object");
+            if (!rawParams || rawParams.length === 0) {
+                throw new SyntaxError('Missing configuration object');
             }
 
             // Delegate to JSON parser (JSON5 also supports unquoted properties)

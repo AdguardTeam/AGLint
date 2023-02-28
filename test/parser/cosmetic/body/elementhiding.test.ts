@@ -1,33 +1,33 @@
-import { ElementHidingBodyParser } from "../../../../src/parser/cosmetic/body/elementhiding";
-import { CssTree } from "../../../../src/utils/csstree";
-import { CssTreeParserContext } from "../../../../src/utils/csstree-constants";
+import { ElementHidingBodyParser } from '../../../../src/parser/cosmetic/body/elementhiding';
+import { CssTree } from '../../../../src/utils/csstree';
+import { CssTreeParserContext } from '../../../../src/utils/csstree-constants';
 
 // ! Please note that CSSTree is fully tested elsewhere
-describe("ElementHidingBodyParser", () => {
-    test("parse", () => {
+describe('ElementHidingBodyParser', () => {
+    test('parse', () => {
         // Single selector
-        expect(ElementHidingBodyParser.parse(".test")).toEqual({
-            selectors: [CssTree.parsePlain(".test", CssTreeParserContext.selector)],
+        expect(ElementHidingBodyParser.parse('.test')).toEqual({
+            selectors: [CssTree.parsePlain('.test', CssTreeParserContext.selector)],
         });
 
         // Multiple selectors
-        expect(ElementHidingBodyParser.parse(".test1, .test2")).toEqual({
+        expect(ElementHidingBodyParser.parse('.test1, .test2')).toEqual({
             selectors: [
-                CssTree.parsePlain(".test1", CssTreeParserContext.selector),
-                CssTree.parsePlain(".test2", CssTreeParserContext.selector),
+                CssTree.parsePlain('.test1', CssTreeParserContext.selector),
+                CssTree.parsePlain('.test2', CssTreeParserContext.selector),
             ],
         });
 
-        expect(ElementHidingBodyParser.parse(".test1, .test2, [ad-model]")).toEqual({
+        expect(ElementHidingBodyParser.parse('.test1, .test2, [ad-model]')).toEqual({
             selectors: [
-                CssTree.parsePlain(".test1", CssTreeParserContext.selector),
-                CssTree.parsePlain(".test2", CssTreeParserContext.selector),
-                CssTree.parsePlain("[ad-model]", CssTreeParserContext.selector),
+                CssTree.parsePlain('.test1', CssTreeParserContext.selector),
+                CssTree.parsePlain('.test2', CssTreeParserContext.selector),
+                CssTree.parsePlain('[ad-model]', CssTreeParserContext.selector),
             ],
         });
     });
 
-    test("generate", () => {
+    test('generate', () => {
         const parseAndGenerate = (raw: string) => {
             const ast = ElementHidingBodyParser.parse(raw);
 
@@ -38,6 +38,6 @@ describe("ElementHidingBodyParser", () => {
             return null;
         };
 
-        expect(parseAndGenerate(".test1, .test2")).toEqual(".test1, .test2");
+        expect(parseAndGenerate('.test1, .test2')).toEqual('.test1, .test2');
     });
 });

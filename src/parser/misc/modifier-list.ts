@@ -1,15 +1,15 @@
-import { EMPTY } from "../../utils/constants";
-import { StringUtils } from "../../utils/string";
+import { EMPTY } from '../../utils/constants';
+import { StringUtils } from '../../utils/string';
 
 // Modifiers are separated by ",". For example: "script,domain=example.com"
-const MODIFIERS_SEPARATOR = ",";
+const MODIFIERS_SEPARATOR = ',';
 
 // Modifiers can be assigned. For example: "domain=example.com"
-const MODIFIER_ASSIGN_OPERATOR = "=";
+const MODIFIER_ASSIGN_OPERATOR = '=';
 
-const MODIFIER_EXCEPTION_MARKER = "~";
+const MODIFIER_EXCEPTION_MARKER = '~';
 
-export const MODIFIER_LIST_TYPE = "ModifierList";
+export const MODIFIER_LIST_TYPE = 'ModifierList';
 
 /**
  * Represents a modifier list.
@@ -79,7 +79,7 @@ export class ModifierListParser {
         const rawModifiers = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
-        if (rawModifiers.length == 1 && rawModifiers[0].trim() == EMPTY) {
+        if (rawModifiers.length === 1 && rawModifiers[0].trim() === EMPTY) {
             return result;
         }
 
@@ -90,7 +90,7 @@ export class ModifierListParser {
             // Find the index of the first unescaped "=" character
             const assignmentOperatorIndex = StringUtils.findNextUnescapedCharacter(
                 trimmedRawModifier,
-                MODIFIER_ASSIGN_OPERATOR
+                MODIFIER_ASSIGN_OPERATOR,
             );
 
             const exception = trimmedRawModifier.startsWith(MODIFIER_EXCEPTION_MARKER);

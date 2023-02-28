@@ -1,15 +1,14 @@
 // Linter stuff
-import { GenericRuleContext } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext, LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CommentRuleType } from "../../parser/comment/types";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/common';
+import { CommentRuleType } from '../../parser/comment/types';
 
-const PLATFORM = "PLATFORM";
-const NOT_PLATFORM = "NOT_PLATFORM";
+const PLATFORM = 'PLATFORM';
+const NOT_PLATFORM = 'NOT_PLATFORM';
 
 /**
  * Rule that checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint.
@@ -26,7 +25,7 @@ export const DuplicatedHintPlatforms: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
                 // Iterate over all hints within the comment rule
                 for (const hint of ast.hints) {
                     // Only makes sense to check this, if the hint is a PLATFORM or NOT_PLATFORM hint
@@ -47,7 +46,7 @@ export const DuplicatedHintPlatforms: LinterRule = {
                             stats[platform] = 1;
                         } else {
                             // Increment the counter
-                            stats[platform]++;
+                            stats[platform] += 1;
                         }
                     }
 

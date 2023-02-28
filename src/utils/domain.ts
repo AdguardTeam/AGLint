@@ -1,7 +1,7 @@
-import { parse } from "tldts";
-import { DOT } from "./constants";
+import { parse } from 'tldts';
+import { DOT } from './constants';
 
-const WILDCARD = "*";
+const WILDCARD = '*';
 const WILDCARD_TLD = DOT + WILDCARD;
 const WILDCARD_SUBDOMAIN = WILDCARD + DOT;
 

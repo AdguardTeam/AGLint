@@ -1,17 +1,16 @@
 // Linter stuff
-import { GenericRuleContext } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext, LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CommentRuleType } from "../../parser/comment/types";
-import { EMPTY } from "../../utils/constants";
-import { ArrayUtils } from "../../utils/array";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/common';
+import { CommentRuleType } from '../../parser/comment/types';
+import { EMPTY } from '../../utils/constants';
+import { ArrayUtils } from '../../utils/array';
 
-const PLATFORM = "PLATFORM";
-const NOT_PLATFORM = "NOT_PLATFORM";
+const PLATFORM = 'PLATFORM';
+const NOT_PLATFORM = 'NOT_PLATFORM';
 
 /**
  * Rule that checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM()
@@ -29,7 +28,7 @@ export const InconsistentHintPlatforms: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
                 // Only makes sense to check this, if there are at least two hints within the comment
                 if (ast.hints.length < 2) {
                     return;

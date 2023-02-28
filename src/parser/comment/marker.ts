@@ -9,11 +9,11 @@ export enum CommentMarker {
     /**
      * Regular comment marker. It is supported by all ad blockers.
      */
-    Regular = "!",
+    Regular = '!',
 
     /**
      * Hashmark comment marker. It is supported by uBlock Origin and AdGuard,
      * and also used in hosts files.
      */
-    Hashmark = "#",
+    Hashmark = '#',
 }

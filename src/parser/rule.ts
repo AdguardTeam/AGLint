@@ -1,37 +1,16 @@
-import { RuleCategory } from "./categories";
-import { AnyCommentRule, CommentParser } from "./comment";
-import { AnyCosmeticRule, CosmeticRuleParser } from "./cosmetic";
-import { AnyNetworkRule, NetworkRuleParser } from "./network";
-import { AdblockSyntax } from "../utils/adblockers";
-import { EMPTY } from "../utils/constants";
+import { AnyCommentRule, CommentParser } from './comment';
+import { AnyCosmeticRule, CosmeticRuleParser } from './cosmetic';
+import { AnyNetworkRule, NetworkRuleParser } from './network';
+import { AdblockSyntax } from '../utils/adblockers';
+import { EMPTY } from '../utils/constants';
+import { Rule, RuleCategory } from './common';
 
-export const EMPTY_RULE_TYPE = "EmptyRule";
+export const EMPTY_RULE_TYPE = 'EmptyRule';
 
 /**
  * Represents any kind of adblock rule.
  */
 export type AnyRule = EmptyRule | AnyCommentRule | AnyCosmeticRule | AnyNetworkRule;
-
-/**
- * Specifies the general structure of an adblock rule. This information must
- * be included in all rules, regardless of category.
- */
-export interface Rule {
-    /**
-     * Syntax of the adblock rule (if cannot be clearly determined then the value is `Common`)
-     */
-    syntax: AdblockSyntax;
-
-    /**
-     * Category of the adblock rule (should be always present)
-     */
-    category: RuleCategory;
-
-    /**
-     * Type of the adblock rule (should be always present)
-     */
-    type: string;
-}
 
 /**
  * Represents an "empty rule" (practically an empty line)
@@ -111,7 +90,7 @@ export class RuleParser {
         const trimmed = raw.trim();
 
         // Empty lines / rules (handle it just for convenience)
-        if (trimmed.length == 0) {
+        if (trimmed.length === 0) {
             return {
                 syntax: AdblockSyntax.Common,
                 category: RuleCategory.Empty,
@@ -170,6 +149,9 @@ export class RuleParser {
             // Network / basic rules
             case RuleCategory.Network:
                 return NetworkRuleParser.generate(<AnyNetworkRule>ast);
+
+            default:
+                throw new Error('Unknown rule category');
         }
     }
 }
