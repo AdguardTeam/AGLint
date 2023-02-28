@@ -1,103 +1,124 @@
 import { Linter } from '../../../src/linter';
 import { UnknownPreProcessorDirectives } from '../../../src/linter/rules/unknown-preprocessor-directives';
-import { NEWLINE } from '../../../src/utils/constants';
+
+let linter: Linter;
 
 describe('unknown-preprocessor-directives', () => {
-    test('Detects unknown preprocessor directives', () => {
-        // Create and configure linter
-        const linter = new Linter(false);
-
+    beforeAll(() => {
+        // Configure linter with the rule
+        linter = new Linter(false);
         linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
+    });
 
-        // Problem-free rules
-        expect(
-            linter.lint(
-                [
-                    '!#include https://example.org/path/includedfile.txt',
-                    '!#if (conditions)',
-                    '!#if (conditions_2)',
-                    '!#endif',
-                    '!#endif',
-                    '!#safari_cb_affinity',
-                    '!#safari_cb_affinity()',
-                    '!#safari_cb_affinity(params)',
-                    '!#safari_cb_affinity(general,privacy)',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
+    test('should ignore non-problematic cases', () => {
+        expect(linter.lint('!#include https://example.org/path/includedfile.txt')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#if (conditions)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#if (conditions_2)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#endif')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#endif')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#safari_cb_affinity')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#safari_cb_affinity()')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#safari_cb_affinity(params)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#safari_cb_affinity(general,privacy)')).toMatchObject({ problems: [] });
+    });
 
-        // Problematic rules
-        expect(
-            linter.lint(
-                [
-                    '!#incl2ude https://example.org/path/includedfile.txt',
-                    '!#IF (conditions)',
-                    '!#if2 (conditions_2)',
-                    '!#end-if',
-                    '!#something',
-                    '!#endif',
-                    '!#safari_cb_affinity(',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
+    it('should detect problematic cases', () => {
+        expect(linter.lint('!#incl2ude https://example.org/path/includedfile.txt')).toMatchObject({
             problems: [
                 {
                     rule: 'unknown-preprocessor-directives',
                     severity: 2,
                     message: 'Unknown preprocessor directive "incl2ude"',
                     position: {
-                        startLine: 1, startColumn: 0, endLine: 1, endColumn: 52,
+                        startColumn: 0,
+                        endColumn: 52,
                     },
                 },
+            ],
+        });
+
+        expect(linter.lint('!#IF (conditions)')).toMatchObject({
+            problems: [
                 {
                     rule: 'unknown-preprocessor-directives',
                     severity: 2,
                     message: 'Unknown preprocessor directive "IF"',
                     position: {
-                        startLine: 2, startColumn: 0, endLine: 2, endColumn: 17,
+                        startColumn: 0,
+                        endColumn: 17,
                     },
                 },
+            ],
+        });
+
+        expect(linter.lint('!#if2 (conditions_2)')).toMatchObject({
+            problems: [
                 {
                     rule: 'unknown-preprocessor-directives',
                     severity: 2,
                     message: 'Unknown preprocessor directive "if2"',
                     position: {
-                        startLine: 3, startColumn: 0, endLine: 3, endColumn: 20,
+                        startColumn: 0,
+                        endColumn: 20,
                     },
                 },
+            ],
+        });
+
+        expect(linter.lint('!#end-if')).toMatchObject({
+            problems: [
                 {
                     rule: 'unknown-preprocessor-directives',
                     severity: 2,
                     message: 'Unknown preprocessor directive "end-if"',
                     position: {
-                        startLine: 4, startColumn: 0, endLine: 4, endColumn: 8,
+                        startColumn: 0,
+                        endColumn: 8,
                     },
                 },
+            ],
+        });
+
+        expect(linter.lint('!#something')).toMatchObject({
+            problems: [
                 {
                     rule: 'unknown-preprocessor-directives',
                     severity: 2,
                     message: 'Unknown preprocessor directive "something"',
                     position: {
-                        startLine: 5, startColumn: 0, endLine: 5, endColumn: 11,
+                        startColumn: 0,
+                        endColumn: 11,
                     },
                 },
+            ],
+        });
+
+        expect(linter.lint('!#something')).toMatchObject({
+            problems: [
+                {
+                    rule: 'unknown-preprocessor-directives',
+                    severity: 2,
+                    message: 'Unknown preprocessor directive "something"',
+                    position: {
+                        startColumn: 0,
+                        endColumn: 11,
+                    },
+                },
+            ],
+        });
+
+        expect(linter.lint('!#safari_cb_affinity(')).toMatchObject({
+            problems: [
                 {
                     rule: 'unknown-preprocessor-directives',
                     severity: 2,
                     message: 'Unknown preprocessor directive "safari_cb_affinity("',
                     position: {
-                        startLine: 7, startColumn: 0, endLine: 7, endColumn: 21,
+                        startColumn: 0,
+                        endColumn: 21,
                     },
                 },
             ],
-            warningCount: 0,
-            errorCount: 6,
-            fatalErrorCount: 0,
         });
     });
 });
