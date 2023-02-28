@@ -1,12 +1,11 @@
 // Linter stuff
-import { GenericRuleContext, LinterProblemReport } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext, LinterProblemReport, LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CosmeticRuleType } from "../../parser/cosmetic/types";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/common';
+import { CosmeticRuleType } from '../../parser/cosmetic/types';
 
 /**
  * Rule that checks if a cosmetic rule contains multiple selectors
@@ -23,12 +22,12 @@ export const SingleSelector = <LinterRule>{
             const line = context.getActualLine();
 
             // Check if the rule is an element hiding rule
-            if (ast.category == RuleCategory.Cosmetic && ast.type == CosmeticRuleType.ElementHidingRule) {
+            if (ast.category === RuleCategory.Cosmetic && ast.type === CosmeticRuleType.ElementHidingRule) {
                 // The parser separates the selectors, but it is not recommended to use multiple selectors within a rule
                 if (ast.body.selectors.length > 1) {
                     // Basic problem report
                     const report = <LinterProblemReport>{
-                        message: "An element hiding rule should contain only one selector",
+                        message: 'An element hiding rule should contain only one selector',
                         position: {
                             startLine: line,
                             startColumn: 0,

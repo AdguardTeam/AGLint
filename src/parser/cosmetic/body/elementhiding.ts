@@ -2,11 +2,13 @@
  * Elementhiding rule body parser
  */
 
-import { fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject } from "css-tree";
-import { CSS_SELECTORS_SEPARATOR, SPACE } from "../../../utils/constants";
-import { CssTree } from "../../../utils/csstree";
-import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
-import { StringUtils } from "../../../utils/string";
+import {
+    fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject,
+} from 'css-tree';
+import { CSS_SELECTORS_SEPARATOR, SPACE } from '../../../utils/constants';
+import { CssTree } from '../../../utils/csstree';
+import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
+import { StringUtils } from '../../../utils/string';
 
 /**
  * Represents an element hiding rule body. There can even be several selectors in a rule,
@@ -50,12 +52,10 @@ export class ElementHidingBodyParser {
         const selectors: SelectorPlain[] = [];
 
         // Selector
-        if (StringUtils.findNextUnescapedCharacter(trimmed, CSS_SELECTORS_SEPARATOR) == -1) {
+        if (StringUtils.findNextUnescapedCharacter(trimmed, CSS_SELECTORS_SEPARATOR) === -1) {
             selectors.push(<SelectorPlain>CssTree.parsePlain(trimmed, CssTreeParserContext.selector));
-        }
-
-        // SelectorList
-        else {
+        } else {
+            // SelectorList
             const selectorListAst = <SelectorList>CssTree.parse(trimmed, CssTreeParserContext.selectorList);
             selectorListAst.children.forEach((child) => {
                 if (child.type === CssTreeNodeType.Selector) {

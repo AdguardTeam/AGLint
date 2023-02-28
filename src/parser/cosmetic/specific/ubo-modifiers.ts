@@ -5,8 +5,8 @@ import {
     generate as generateCss,
     Selector,
     PseudoClassSelector,
-} from "css-tree";
-import { UBO_COSMETIC_MODIFIERS } from "../../../converter/cosmetic-modifiers";
+} from 'css-tree';
+import { UBO_COSMETIC_MODIFIERS } from '../../../converter/cosmetic-modifiers';
 import {
     CSS_NOT_PSEUDO,
     CSS_PSEUDO_CLOSE,
@@ -14,11 +14,11 @@ import {
     CSS_PSEUDO_OPEN,
     EMPTY,
     SPACE,
-} from "../../../utils/constants";
-import { CssTreeNodeType, CssTreeParserContext } from "../../../utils/csstree-constants";
-import { RuleModifier } from "../../common/modifier-list";
+} from '../../../utils/constants';
+import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
+import { RuleModifier } from '../../misc/modifier-list';
 
-export const UBO_MODIFIER_LIST_TYPE = "UboModifierList";
+export const UBO_MODIFIER_LIST_TYPE = 'UboModifierList';
 
 /**
  * Represents uBlock's cosmetic rule modifiers.
@@ -78,7 +78,7 @@ export class UboModifierListParser {
         return (
             UBO_COSMETIC_MODIFIERS.find(
                 // eslint-disable-next-line @typescript-eslint/no-loop-func
-                (m) => raw.indexOf(`${CSS_PSEUDO_MARKER}${m}${CSS_PSEUDO_OPEN}`) != -1
+                (m) => raw.indexOf(`${CSS_PSEUDO_MARKER}${m}${CSS_PSEUDO_OPEN}`) !== -1,
             ) !== undefined
         );
     }
@@ -129,7 +129,7 @@ export class UboModifierListParser {
         const trimmed = raw.trim();
 
         // Handle empty case (otherwise CSSTree throws error for the empty selector)
-        if (trimmed.length == 0) {
+        if (trimmed.length === 0) {
             return <UboModifierList>{
                 type: UBO_MODIFIER_LIST_TYPE,
                 modifiers: [],
@@ -151,7 +151,7 @@ export class UboModifierListParser {
 
         walkCss(ast, {
             enter: (node: CssNode) => {
-                if (node.type == CssTreeNodeType.PseudoClassSelector) {
+                if (node.type === CssTreeNodeType.PseudoClassSelector) {
                     if (UBO_COSMETIC_MODIFIERS.includes(node.name)) {
                         // If the previous pseudo selector was :not(), then the
                         // entire :not(:ubo-modifier(...)) must be omitted
@@ -163,7 +163,7 @@ export class UboModifierListParser {
                             value: node && node.children ? generateCss(<any>node.children.first) : EMPTY,
                         };
 
-                        if (prevPseudo && prevPseudo.name == CSS_NOT_PSEUDO) {
+                        if (prevPseudo && prevPseudo.name === CSS_NOT_PSEUDO) {
                             modifiers.push({
                                 ...common,
                                 not: true,
@@ -190,7 +190,7 @@ export class UboModifierListParser {
                 }
             },
             leave: (node: CssNode) => {
-                if (node.type == CssTreeNodeType.PseudoClassSelector) {
+                if (node.type === CssTreeNodeType.PseudoClassSelector) {
                     prevPseudo = null;
                 }
             },
@@ -199,7 +199,7 @@ export class UboModifierListParser {
         // Get rest
         let rest = EMPTY;
 
-        for (let i = 0; i < raw.length; i++) {
+        for (let i = 0; i < raw.length; i += 1) {
             if (keep[i]) {
                 rest += raw[i];
             }

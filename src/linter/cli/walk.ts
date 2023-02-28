@@ -1,8 +1,9 @@
-import path, { ParsedPath } from "path";
-import cloneDeep from "clone-deep";
-import { ScannedDirectory } from "./scan";
-import { parseConfigFile } from "./config-reader";
-import { LinterConfig, defaultLinterConfig, mergeConfigs } from "../config";
+import path, { ParsedPath } from 'path';
+import cloneDeep from 'clone-deep';
+import { ScannedDirectory } from './scan';
+import { parseConfigFile } from './config-reader';
+import { defaultLinterConfig, mergeConfigs } from '../config';
+import { LinterConfig } from '../common';
 
 /**
  * An event that is performed on a file or directory.
@@ -34,7 +35,7 @@ export async function walk(
     scannedDirectory: ScannedDirectory,
     events: WalkEvents,
     config: LinterConfig = defaultLinterConfig,
-    fix = false
+    fix = false,
 ) {
     // Initially use the given config
     let usedConfig = config;

@@ -1,34 +1,33 @@
 // Linter stuff
-import { GenericRuleContext } from "..";
-import { LinterRule } from "../rule";
-import { SEVERITY } from "../severity";
+import { GenericRuleContext, LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
 // Parser stuff
-import { AnyRule } from "../../parser";
-import { RuleCategory } from "../../parser/categories";
-import { CommentRuleType } from "../../parser/comment/types";
-import { EMPTY } from "../../utils/constants";
+import { AnyRule } from '../../parser';
+import { RuleCategory } from '../../parser/common';
+import { CommentRuleType } from '../../parser/comment/types';
+import { EMPTY } from '../../utils/constants';
 
-const NOT_OPTIMIZED = "NOT_OPTIMIZED";
-const PLATFORM = "PLATFORM";
-const NOT_PLATFORM = "NOT_PLATFORM";
+const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
+const PLATFORM = 'PLATFORM';
+const NOT_PLATFORM = 'NOT_PLATFORM';
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#hints
 const KNOWN_HINTS = [NOT_OPTIMIZED, PLATFORM, NOT_PLATFORM];
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints
 const KNOWN_PLATFORMS = [
-    "windows",
-    "mac",
-    "android",
-    "ios",
-    "ext_chromium",
-    "ext_ff",
-    "ext_edge",
-    "ext_opera",
-    "ext_safari",
-    "ext_android_cb",
-    "ext_ublock",
+    'windows',
+    'mac',
+    'android',
+    'ios',
+    'ext_chromium',
+    'ext_ff',
+    'ext_edge',
+    'ext_opera',
+    'ext_safari',
+    'ext_android_cb',
+    'ext_ublock',
 ];
 
 /**
@@ -46,7 +45,7 @@ export const UnknownHintsAndPlatforms: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category == RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
                 for (const hint of ast.hints) {
                     // Check if the hint name is known (case-sensitive)
                     if (!KNOWN_HINTS.includes(hint.name)) {

@@ -1,7 +1,7 @@
-import { EMPTY } from "../../utils/constants";
-import { StringUtils } from "../../utils/string";
+import { EMPTY } from '../../utils/constants';
+import { StringUtils } from '../../utils/string';
 
-const DOMAIN_EXCEPTION_MARKER = "~";
+const DOMAIN_EXCEPTION_MARKER = '~';
 
 /**
  * Classic domain separator.
@@ -12,7 +12,7 @@ const DOMAIN_EXCEPTION_MARKER = "~";
  * example.com,~example.org##.ads
  * ```
  */
-const CLASSIC_DOMAIN_SEPARATOR = ",";
+const CLASSIC_DOMAIN_SEPARATOR = ',';
 
 /**
  * Modifier domain separator.
@@ -23,9 +23,9 @@ const CLASSIC_DOMAIN_SEPARATOR = ",";
  * ads.js^$script,domains=example.com|~example.org
  * ```
  */
-const MODIFIER_DOMAIN_SEPARATOR = "|";
+const MODIFIER_DOMAIN_SEPARATOR = '|';
 
-export const DOMAIN_LIST_TYPE = "DomainList";
+export const DOMAIN_LIST_TYPE = 'DomainList';
 
 /**
  * Represents the separator used in a domain list.
@@ -100,16 +100,16 @@ export class DomainListParser {
             const trimmedRawDomain = rawDomain.trim();
 
             // Handle empty parts
-            if (trimmedRawDomain.length < 1 || trimmedRawDomain == DOMAIN_EXCEPTION_MARKER) {
+            if (trimmedRawDomain.length < 1 || trimmedRawDomain === DOMAIN_EXCEPTION_MARKER) {
                 throw new SyntaxError(`Empty domain specified in domain list "${raw}"`);
             }
 
             // Handle exceptions
-            if (trimmedRawDomain[0] == DOMAIN_EXCEPTION_MARKER) {
+            if (trimmedRawDomain[0] === DOMAIN_EXCEPTION_MARKER) {
                 if (StringUtils.isWhitespace(trimmedRawDomain[1])) {
-                    throw new Error("Exception marker is followed by a whitespace character");
-                } else if (trimmedRawDomain[1] == DOMAIN_EXCEPTION_MARKER) {
-                    throw new Error("Exception marker is followed by another exception marker");
+                    throw new Error('Exception marker is followed by a whitespace character');
+                } else if (trimmedRawDomain[1] === DOMAIN_EXCEPTION_MARKER) {
+                    throw new Error('Exception marker is followed by another exception marker');
                 }
 
                 domains.push({ domain: trimmedRawDomain.slice(1), exception: true });

@@ -1,26 +1,25 @@
-import { Linter } from "../../../src/linter";
-import { SingleSelector } from "../../../src/linter/rules/single-selector";
-import { NEWLINE } from "../../../src/utils/constants";
+import { Linter } from '../../../src/linter';
+import { SingleSelector } from '../../../src/linter/rules/single-selector';
+import { NEWLINE } from '../../../src/utils/constants';
 
-describe("single-selector", () => {
-    test("Detects multiple selectors", () => {
+describe('single-selector', () => {
+    test('Detects multiple selectors', () => {
         // Create and configure linter
         const linter = new Linter(false);
 
-        linter.addRule("single-selector", SingleSelector);
+        linter.addRule('single-selector', SingleSelector);
 
         // Problem-free rules
         expect(
             linter.lint(
                 [
-                    // Rules:
-                    "example.com##.ad1",
-                    "example.com##.ad2",
-                    "example.com##.ad3",
-                    "example.com##.ad4",
-                    "example.com##.ad5",
-                ].join(NEWLINE)
-            )
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com##.ad3',
+                    'example.com##.ad4',
+                    'example.com##.ad5',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [],
             warningCount: 0,
@@ -32,20 +31,19 @@ describe("single-selector", () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
-                    "example.com##.ad1",
-                    "example.com##.ad2,.ad3", // multiple selectors
-                    "example.com##.ad4",
-                    "example.com##.ad5, .ad6,.ad7", //  multiple selectors
-                    "example.com##.ad8",
-                ].join(NEWLINE)
-            )
+                    'example.com##.ad1',
+                    'example.com##.ad2,.ad3', // multiple selectors
+                    'example.com##.ad4',
+                    'example.com##.ad5, .ad6,.ad7', //  multiple selectors
+                    'example.com##.ad8',
+                ].join(NEWLINE),
+            ),
         ).toMatchObject({
             problems: [
                 {
-                    rule: "single-selector",
+                    rule: 'single-selector',
                     severity: 1,
-                    message: "An element hiding rule should contain only one selector",
+                    message: 'An element hiding rule should contain only one selector',
                     position: {
                         startLine: 2,
                         startColumn: 0,
@@ -54,9 +52,9 @@ describe("single-selector", () => {
                     },
                 },
                 {
-                    rule: "single-selector",
+                    rule: 'single-selector',
                     severity: 1,
-                    message: "An element hiding rule should contain only one selector",
+                    message: 'An element hiding rule should contain only one selector',
                     position: {
                         startLine: 4,
                         startColumn: 0,
@@ -71,33 +69,31 @@ describe("single-selector", () => {
         });
     });
 
-    test("Suggest fix", () => {
+    test('Suggest fix', () => {
         const linter = new Linter(false);
 
         // Add single-selector rule
-        linter.addRule("single-selector", SingleSelector);
+        linter.addRule('single-selector', SingleSelector);
 
         // No multiple selectors
         expect(
             linter.lint(
                 [
-                    // Rules:
-                    "example.com##.ad1",
-                    "example.com##.ad2",
-                    "example.com##.ad3",
-                    "example.com##.ad4",
-                    "example.com##.ad5",
+                    'example.com##.ad1',
+                    'example.com##.ad2',
+                    'example.com##.ad3',
+                    'example.com##.ad4',
+                    'example.com##.ad5',
                 ].join(NEWLINE),
-                true
-            )
+                true,
+            ),
         ).toMatchObject({
             fixed: [
-                // Rules:
-                "example.com##.ad1",
-                "example.com##.ad2",
-                "example.com##.ad3",
-                "example.com##.ad4",
-                "example.com##.ad5",
+                'example.com##.ad1',
+                'example.com##.ad2',
+                'example.com##.ad3',
+                'example.com##.ad4',
+                'example.com##.ad5',
             ].join(NEWLINE),
         });
 
@@ -105,26 +101,24 @@ describe("single-selector", () => {
         expect(
             linter.lint(
                 [
-                    // Rules:
-                    "example.com##.ad1",
-                    "example.com##.ad2,.ad3", // multiple selectors
-                    "example.com##.ad4",
-                    "example.com##.ad5, .ad6,.ad7", //  multiple selectors
-                    "example.com##.ad8",
+                    'example.com##.ad1',
+                    'example.com##.ad2,.ad3', // multiple selectors
+                    'example.com##.ad4',
+                    'example.com##.ad5, .ad6,.ad7', //  multiple selectors
+                    'example.com##.ad8',
                 ].join(NEWLINE),
-                true
-            )
+                true,
+            ),
         ).toMatchObject({
             fixed: [
-                // Rules:
-                "example.com##.ad1",
-                "example.com##.ad2",
-                "example.com##.ad3",
-                "example.com##.ad4",
-                "example.com##.ad5",
-                "example.com##.ad6",
-                "example.com##.ad7",
-                "example.com##.ad8",
+                'example.com##.ad1',
+                'example.com##.ad2',
+                'example.com##.ad3',
+                'example.com##.ad4',
+                'example.com##.ad5',
+                'example.com##.ad6',
+                'example.com##.ad7',
+                'example.com##.ad8',
             ].join(NEWLINE),
         });
     });

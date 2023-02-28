@@ -1,12 +1,12 @@
-import { EMPTY } from "../../../utils/constants";
-import { StringUtils } from "../../../utils/string";
-import { ModifierListParser, RuleModifier, MODIFIER_LIST_TYPE } from "../../common/modifier-list";
+import { EMPTY } from '../../../utils/constants';
+import { StringUtils } from '../../../utils/string';
+import { ModifierListParser, RuleModifier, MODIFIER_LIST_TYPE } from '../../misc/modifier-list';
 
-const MODIFIER_LIST_OPEN = "[";
-const MODIFIER_LIST_CLOSE = "]";
-const MODIFIERS_MARKER = "$";
+const MODIFIER_LIST_OPEN = '[';
+const MODIFIER_LIST_CLOSE = ']';
+const MODIFIERS_MARKER = '$';
 
-export const ADG_MODIFIER_LIST_TYPE = "AdgModifierList";
+export const ADG_MODIFIER_LIST_TYPE = 'AdgModifierList';
 
 /**
  * Represents AdGuard's cosmetic rule modifiers.
@@ -54,8 +54,8 @@ export class AdgModifierListParser {
 
         let closeIndex = -1;
 
-        if (trimmed[0] == MODIFIER_LIST_OPEN) {
-            if (trimmed[1] != MODIFIERS_MARKER) {
+        if (trimmed[0] === MODIFIER_LIST_OPEN) {
+            if (trimmed[1] !== MODIFIERS_MARKER) {
                 throw new SyntaxError(`Missing modifier marker "${MODIFIERS_MARKER}" at pattern "${raw}"`);
             }
 
@@ -63,13 +63,13 @@ export class AdgModifierListParser {
             closeIndex = StringUtils.findNextUnescapedCharacter(trimmed, MODIFIER_LIST_CLOSE);
 
             // Handle missing closing case
-            if (closeIndex == -1) {
+            if (closeIndex === -1) {
                 throw new SyntaxError(`Missing closing bracket "${MODIFIER_LIST_CLOSE}" at pattern "${raw}"`);
             }
 
             // Parse modifiers: [$<modifiers>]
             const rawModifiers = trimmed.substring(2, closeIndex).trim();
-            if (rawModifiers.length == 0) {
+            if (rawModifiers.length === 0) {
                 throw new SyntaxError(`No modifiers specified at pattern "${raw}"`);
             }
 

@@ -1,7 +1,9 @@
-import { readFile, readdir, stat } from "fs/promises";
-import path, { ParsedPath } from "path";
-import ignore, { Ignore } from "ignore";
-import { CONFIG_FILE_NAMES, IGNORE_FILE_NAME, PROBLEMATIC_PATHS, SUPPORTED_EXTENSIONS } from "./constants";
+import { readFile, readdir, stat } from 'fs/promises';
+import path, { ParsedPath } from 'path';
+import ignore, { Ignore } from 'ignore';
+import {
+    CONFIG_FILE_NAMES, IGNORE_FILE_NAME, PROBLEMATIC_PATHS, SUPPORTED_EXTENSIONS,
+} from './constants';
 
 /**
  * Ignore instance for the default ignores
@@ -62,7 +64,7 @@ export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles =
     // First of all, let's parse the ignore file in the current directory if ignore files are
     // enabled and the ignore file exists
     if (useIgnoreFiles && items.includes(IGNORE_FILE_NAME)) {
-        const content = await readFile(path.join(dir, IGNORE_FILE_NAME), "utf8");
+        const content = await readFile(path.join(dir, IGNORE_FILE_NAME), 'utf8');
         ignores.push(ignore().add(content));
     }
 
@@ -94,8 +96,8 @@ export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles =
                     throw new Error(
                         `Multiple config files found in the same directory: "${path.join(
                             result.configFile.dir,
-                            result.configFile.base
-                        )}" and "${itemPath}"`
+                            result.configFile.base,
+                        )}" and "${itemPath}"`,
                     );
                 }
 

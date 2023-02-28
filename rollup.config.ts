@@ -4,27 +4,27 @@
  * ! Please ALWAYS use the "yarn build" command for building!
  */
 
-import typescript from "@rollup/plugin-typescript";
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import externals from "rollup-plugin-node-externals";
-import dts from "rollup-plugin-dts";
-import shebang from "rollup-plugin-add-shebang";
-import nodePolyfills from "rollup-plugin-polyfill-node";
-import alias from "@rollup/plugin-alias";
-import { getBabelOutputPlugin } from "@rollup/plugin-babel";
-import json from "@rollup/plugin-json";
+import typescript from '@rollup/plugin-typescript';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import externals from 'rollup-plugin-node-externals';
+import dts from 'rollup-plugin-dts';
+import shebang from 'rollup-plugin-add-shebang';
+import nodePolyfills from 'rollup-plugin-polyfill-node';
+import alias from '@rollup/plugin-alias';
+import { getBabelOutputPlugin } from '@rollup/plugin-babel';
+import json from '@rollup/plugin-json';
 
 const commonPlugins = [externals(), commonjs({ sourceMap: false }), resolve({ preferBuiltins: false })];
 
 // CommonJS build
 const aglintCjs = {
-    input: "./src/index.ts",
+    input: './src/index.ts',
     output: [
         {
-            file: `./dist/aglint.cjs`,
-            format: "cjs",
-            exports: "auto",
+            file: './dist/aglint.cjs',
+            format: 'cjs',
+            exports: 'auto',
             sourcemap: false,
         },
     ],
@@ -33,11 +33,11 @@ const aglintCjs = {
 
 // ECMAScript build
 const aglintEsm = {
-    input: "./src/index.ts",
+    input: './src/index.ts',
     output: [
         {
-            file: `./dist/aglint.esm.js`,
-            format: "esm",
+            file: './dist/aglint.esm.js',
+            format: 'esm',
             sourcemap: false,
         },
     ],
@@ -45,7 +45,7 @@ const aglintEsm = {
         typescript({
             declaration: false,
             compilerOptions: {
-                moduleResolution: "node16",
+                moduleResolution: 'node16',
             },
         }),
         ...commonPlugins,
@@ -54,19 +54,19 @@ const aglintEsm = {
 
 // CLI tool build
 const aglintCli = {
-    input: "./src/cli.ts",
+    input: './src/cli.ts',
     // Since the library is built elsewhere, we do not bundle it again in the CLI,
     // so we mark it as an external package here.
     // This path had to be named in tsconfig, as "." or "./something" didn't work here
-    external: ["@aglint"],
+    external: ['@aglint'],
     output: [
         {
-            file: `./dist/cli.js`,
-            format: "esm",
+            file: './dist/cli.js',
+            format: 'esm',
             sourcemap: false,
             paths: {
                 // The CLI is placed in the same folder as the library, so we simply rewrite the path
-                "@aglint": "./aglint.esm.js",
+                '@aglint': './aglint.esm.js',
             },
         },
     ],
@@ -75,7 +75,7 @@ const aglintCli = {
         typescript({
             declaration: false,
             compilerOptions: {
-                moduleResolution: "node16",
+                moduleResolution: 'node16',
             },
         }),
         /**
@@ -83,7 +83,7 @@ const aglintCli = {
          *
          * @see {@link https://en.wikipedia.org/wiki/Shebang_(Unix)}
          */
-        shebang({ include: "./dist/cli.js" }),
+        shebang({ include: './dist/cli.js' }),
         ...commonPlugins,
     ],
 };
@@ -99,14 +99,14 @@ const browserPlugins = [
     // The build of CSSTree is a bit complicated (patches, require "emulation", etc.),
     // so here we only specify the pre-built version by an alias
     alias({
-        entries: [{ find: "css-tree", replacement: "node_modules/css-tree/dist/csstree.esm.js" }],
+        entries: [{ find: 'css-tree', replacement: 'node_modules/css-tree/dist/csstree.esm.js' }],
     }),
     getBabelOutputPlugin({
         presets: [
             [
-                "@babel/preset-env",
+                '@babel/preset-env',
                 {
-                    targets: ["> 1%", "not dead"],
+                    targets: ['> 1%', 'not dead'],
                 },
             ],
         ],
@@ -117,12 +117,12 @@ const browserPlugins = [
 
 // Browser-friendly UMD build
 const aglintUmd = {
-    input: "./src/index.browser.ts",
+    input: './src/index.browser.ts',
     output: [
         {
-            file: "./dist/aglint.umd.js",
-            name: "AGLint",
-            format: "umd",
+            file: './dist/aglint.umd.js',
+            name: 'AGLint',
+            format: 'umd',
             sourcemap: false,
         },
     ],
@@ -131,12 +131,12 @@ const aglintUmd = {
 
 // Browser-friendly IIFE build
 const aglintIife = {
-    input: "./src/index.browser.ts",
+    input: './src/index.browser.ts',
     output: [
         {
-            file: "./dist/aglint.iife.js",
-            name: "AGLint",
-            format: "iife",
+            file: './dist/aglint.iife.js',
+            name: 'AGLint',
+            format: 'iife',
             sourcemap: false,
         },
     ],
@@ -145,8 +145,8 @@ const aglintIife = {
 
 // Merge .d.ts files
 const aglintDts = {
-    input: "./dist/types/index.d.ts",
-    output: [{ file: "dist/aglint.d.ts", format: "es" }],
+    input: './dist/types/index.d.ts',
+    output: [{ file: 'dist/aglint.d.ts', format: 'es' }],
     plugins: [externals(), dts()],
 };
 

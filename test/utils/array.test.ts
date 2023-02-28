@@ -1,18 +1,18 @@
-import { ArrayUtils } from "../../src/utils/array";
+import { ArrayUtils } from '../../src/utils/array';
 
-describe("Array utils", () => {
-    test("isArrayOfStrings", () => {
+describe('Array utils', () => {
+    test('isArrayOfStrings', () => {
         expect(ArrayUtils.isArrayOfStrings([1, 2, 3])).toBeFalsy();
-        expect(ArrayUtils.isArrayOfStrings([1, "2", 3])).toBeFalsy();
+        expect(ArrayUtils.isArrayOfStrings([1, '2', 3])).toBeFalsy();
         expect(ArrayUtils.isArrayOfStrings([null])).toBeFalsy();
         expect(ArrayUtils.isArrayOfStrings({})).toBeFalsy();
         expect(ArrayUtils.isArrayOfStrings(null)).toBeFalsy();
 
-        expect(ArrayUtils.isArrayOfStrings(["a"])).toBeTruthy();
-        expect(ArrayUtils.isArrayOfStrings(["a", "b", "c"])).toBeTruthy();
+        expect(ArrayUtils.isArrayOfStrings(['a'])).toBeTruthy();
+        expect(ArrayUtils.isArrayOfStrings(['a', 'b', 'c'])).toBeTruthy();
     });
 
-    test("getIntersection", () => {
+    test('getIntersection', () => {
         // No intersection
         expect(ArrayUtils.getIntersection([1, 2], [3, 4])).toEqual([]);
 
@@ -33,7 +33,7 @@ describe("Array utils", () => {
         expect(ArrayUtils.getIntersection([], [1, 2, 3])).toEqual([]);
 
         // Non-numeric arrays
-        expect(ArrayUtils.getIntersection(["a", "b", "c"], ["b", "c", "d"])).toEqual(["b", "c"]);
-        expect(ArrayUtils.getIntersection(["a", "b", "c"], ["b", "c", "d", "e"])).toEqual(["b", "c"]);
+        expect(ArrayUtils.getIntersection(['a', 'b', 'c'], ['b', 'c', 'd'])).toEqual(['b', 'c']);
+        expect(ArrayUtils.getIntersection(['a', 'b', 'c'], ['b', 'c', 'd', 'e'])).toEqual(['b', 'c']);
     });
 });
