@@ -5,7 +5,7 @@ import {
     generate as generateCss,
     Selector,
     PseudoClassSelector,
-} from 'css-tree';
+} from '@adguard/ecss-tree';
 import { UBO_COSMETIC_MODIFIERS } from '../../../converter/cosmetic-modifiers';
 import {
     CSS_NOT_PSEUDO,

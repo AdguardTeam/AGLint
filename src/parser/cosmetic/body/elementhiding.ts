@@ -4,7 +4,7 @@
 
 import {
     fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject,
-} from 'css-tree';
+} from '@adguard/ecss-tree';
 import { CSS_SELECTORS_SEPARATOR, SPACE } from '../../../utils/constants';
 import { CssTree } from '../../../utils/csstree';
 import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';

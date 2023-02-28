@@ -1,4 +1,4 @@
-import { MediaQueryListPlain, SelectorPlain } from 'css-tree';
+import { MediaQueryListPlain, SelectorPlain } from '@adguard/ecss-tree';
 import { CssInjectionBodyParser, CssRuleBody, REMOVE_BLOCK_TYPE } from '../../../../src/parser/cosmetic/body/css';
 import { AdblockSyntax } from '../../../../src/utils/adblockers';
 import { EMPTY, SPACE } from '../../../../src/utils/constants';

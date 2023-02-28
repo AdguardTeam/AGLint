@@ -14,6 +14,7 @@ import nodePolyfills from 'rollup-plugin-polyfill-node';
 import alias from '@rollup/plugin-alias';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
+import terser from '@rollup/plugin-terser';
 
 const commonPlugins = [externals(), commonjs({ sourceMap: false }), resolve({ preferBuiltins: false })];
 
@@ -99,7 +100,9 @@ const browserPlugins = [
     // The build of CSSTree is a bit complicated (patches, require "emulation", etc.),
     // so here we only specify the pre-built version by an alias
     alias({
-        entries: [{ find: 'css-tree', replacement: 'node_modules/css-tree/dist/csstree.esm.js' }],
+        entries: [
+            { find: '@adguard/ecss-tree', replacement: 'node_modules/@adguard/ecss-tree/dist/ecsstree.umd.min.js' },
+        ],
     }),
     getBabelOutputPlugin({
         presets: [
@@ -112,7 +115,7 @@ const browserPlugins = [
         ],
         allowAllFormats: true,
     }),
-    // TODO: Terser plugin https://github.com/rollup/plugins/issues/1366
+    terser(),
 ];
 
 // Browser-friendly UMD build
@@ -120,7 +123,7 @@ const aglintUmd = {
     input: './src/index.browser.ts',
     output: [
         {
-            file: './dist/aglint.umd.js',
+            file: './dist/aglint.umd.min.js',
             name: 'AGLint',
             format: 'umd',
             sourcemap: false,
@@ -134,7 +137,7 @@ const aglintIife = {
     input: './src/index.browser.ts',
     output: [
         {
-            file: './dist/aglint.iife.js',
+            file: './dist/aglint.iife.min.js',
             name: 'AGLint',
             format: 'iife',
             sourcemap: false,
