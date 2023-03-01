@@ -4,7 +4,7 @@
 
 import {
     fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject,
-} from 'css-tree';
+} from '@adguard/ecss-tree';
 import { AdblockSyntax } from '../../../utils/adblockers';
 import {
     CSS_SELECTORS_SEPARATOR, EMPTY, ESCAPE_CHARACTER, SPACE,

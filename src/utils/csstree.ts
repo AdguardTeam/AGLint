@@ -14,7 +14,7 @@ import {
     Block,
     CssNodePlain,
     toPlainObject,
-} from 'css-tree';
+} from '@adguard/ecss-tree';
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from '../converter/pseudo';
 import {
     COMMA,
