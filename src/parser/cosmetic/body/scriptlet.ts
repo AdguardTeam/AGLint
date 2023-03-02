@@ -2,15 +2,17 @@
  * Scriptlet injection rule body parser
  */
 
-import { AdblockSyntax } from "../../../utils/adblockers";
-import { EMPTY, SPACE } from "../../../utils/constants";
-import { DOUBLE_QUOTE_MARKER, REGEX_MARKER, SINGLE_QUOTE_MARKER, StringUtils } from "../../../utils/string";
+import { AdblockSyntax } from '../../../utils/adblockers';
+import { EMPTY, SPACE } from '../../../utils/constants';
+import {
+    DOUBLE_QUOTE_MARKER, REGEX_MARKER, SINGLE_QUOTE_MARKER, StringUtils,
+} from '../../../utils/string';
 
-const ADG_UBO_CALL_OPEN = "(";
-const ADG_UBO_CALL_CLOSE = ")";
-const ADG_UBO_PARAM_SEPARATOR = ",";
-const ABP_SNIPPETS_SEPARATOR = ";";
-const ABP_PARAM_SEPARATOR = " ";
+const ADG_UBO_CALL_OPEN = '(';
+const ADG_UBO_CALL_CLOSE = ')';
+const ADG_UBO_PARAM_SEPARATOR = ',';
+const ABP_SNIPPETS_SEPARATOR = ';';
+const ABP_PARAM_SEPARATOR = ' ';
 
 /**
  * Represents the body of an scriptlet injection rule.
@@ -67,28 +69,28 @@ export enum ScriptletParameterType {
      *
      * @example `value`
      */
-    Unquoted = "Unquoted",
+    Unquoted = 'Unquoted',
 
     /**
      * Single-quoted parameter.
      *
      * @example `'value'`
      */
-    SingleQuoted = "SingleQuoted",
+    SingleQuoted = 'SingleQuoted',
 
     /**
      * Double-quoted parameter.
      *
      * @example `"value"`
      */
-    DoubleQuoted = "DoubleQuoted",
+    DoubleQuoted = 'DoubleQuoted',
 
     /**
      * Regular expression parameter.
      *
      * @example `/value/`
      */
-    RegExp = "RegExp",
+    RegExp = 'RegExp',
 }
 
 /**
@@ -118,14 +120,15 @@ export class ScriptletBodyParser {
         const trimmed = raw.trim();
 
         // Call should contain: (arg0, arg1,...)
-        if (trimmed[0] != ADG_UBO_CALL_OPEN) {
+        if (trimmed[0] !== ADG_UBO_CALL_OPEN) {
             throw new Error(
-                `Invalid uBlock/AdGuard scriptlet call, no opening parentheses "${ADG_UBO_CALL_OPEN}" at call: "${raw}"`
+                // eslint-disable-next-line max-len
+                `Invalid uBlock/AdGuard scriptlet call, no opening parentheses "${ADG_UBO_CALL_OPEN}" at call: "${raw}"`,
             );
         } else if (!trimmed.endsWith(ADG_UBO_CALL_CLOSE)) {
             throw new Error(
                 // eslint-disable-next-line max-len
-                `Invalid uBlock/AdGuard scriptlet call, no closing parentheses "${ADG_UBO_CALL_CLOSE}" at call: "${raw}"`
+                `Invalid uBlock/AdGuard scriptlet call, no closing parentheses "${ADG_UBO_CALL_CLOSE}" at call: "${raw}"`,
             );
         }
 
@@ -134,11 +137,11 @@ export class ScriptletBodyParser {
 
         const splittedRawParameterList = StringUtils.splitStringByUnquotedUnescapedCharacter(
             rawParameterList,
-            ADG_UBO_PARAM_SEPARATOR
+            ADG_UBO_PARAM_SEPARATOR,
         ).map((param) => param.trim());
 
         // Empty case
-        if (splittedRawParameterList[0] == EMPTY) {
+        if (splittedRawParameterList[0] === EMPTY) {
             return {
                 scriptlets: [],
             };
@@ -177,17 +180,17 @@ export class ScriptletBodyParser {
         // It can contain multiple scriptlet calls delimeted by semicolon
         const rawScriptletCalls = StringUtils.splitStringByUnescapedNonStringNonRegexChar(
             trimmed,
-            ABP_SNIPPETS_SEPARATOR
+            ABP_SNIPPETS_SEPARATOR,
         );
 
         for (const rawScriptletCall of rawScriptletCalls) {
             const splittedRawParameterList = StringUtils.splitStringByUnescapedNonStringNonRegexChar(
                 rawScriptletCall.trim(),
-                ABP_PARAM_SEPARATOR
+                ABP_PARAM_SEPARATOR,
             ).map((param) => param.trim());
 
             // The scriptlet must be specified (parameters are optional)
-            if (!splittedRawParameterList[0] || splittedRawParameterList[0] == EMPTY) {
+            if (!splittedRawParameterList[0] || splittedRawParameterList[0] === EMPTY) {
                 throw new SyntaxError(`No scriptlet specified at the following scriptlet call: "${raw}"`);
             }
 
@@ -215,11 +218,11 @@ export class ScriptletBodyParser {
         return params.map((param) => {
             let type: ScriptletParameterType = ScriptletParameterType.Unquoted;
 
-            if (param[0] == SINGLE_QUOTE_MARKER && param.endsWith(SINGLE_QUOTE_MARKER)) {
+            if (param[0] === SINGLE_QUOTE_MARKER && param.endsWith(SINGLE_QUOTE_MARKER)) {
                 type = ScriptletParameterType.SingleQuoted;
-            } else if (param[0] == DOUBLE_QUOTE_MARKER && param.endsWith(DOUBLE_QUOTE_MARKER)) {
+            } else if (param[0] === DOUBLE_QUOTE_MARKER && param.endsWith(DOUBLE_QUOTE_MARKER)) {
                 type = ScriptletParameterType.DoubleQuoted;
-            } else if (param[0] == REGEX_MARKER && param.endsWith(REGEX_MARKER)) {
+            } else if (param[0] === REGEX_MARKER && param.endsWith(REGEX_MARKER)) {
                 type = ScriptletParameterType.RegExp;
             }
 
@@ -227,7 +230,7 @@ export class ScriptletBodyParser {
                 type,
 
                 // If it is not unquoted, the boundaries should be removed:
-                value: type != ScriptletParameterType.Unquoted ? param.slice(1, -1) : param,
+                value: type !== ScriptletParameterType.Unquoted ? param.slice(1, -1) : param,
             };
         });
     }
@@ -243,23 +246,24 @@ export class ScriptletBodyParser {
             switch (type) {
                 case ScriptletParameterType.SingleQuoted:
                     return (
-                        SINGLE_QUOTE_MARKER +
-                        StringUtils.escapeCharacter(value, SINGLE_QUOTE_MARKER) +
                         SINGLE_QUOTE_MARKER
+                        + StringUtils.escapeCharacter(value, SINGLE_QUOTE_MARKER)
+                        + SINGLE_QUOTE_MARKER
                     );
 
                 case ScriptletParameterType.DoubleQuoted:
                     return (
-                        DOUBLE_QUOTE_MARKER +
-                        StringUtils.escapeCharacter(value, DOUBLE_QUOTE_MARKER) +
                         DOUBLE_QUOTE_MARKER
+                        + StringUtils.escapeCharacter(value, DOUBLE_QUOTE_MARKER)
+                        + DOUBLE_QUOTE_MARKER
                     );
 
                 case ScriptletParameterType.RegExp:
                     return REGEX_MARKER + StringUtils.escapeCharacter(value, REGEX_MARKER) + REGEX_MARKER;
-            }
 
-            return value;
+                default:
+                    return value;
+            }
         });
     }
 
@@ -273,7 +277,7 @@ export class ScriptletBodyParser {
         const trimmed = raw.trim();
 
         // ADG and uBO calls always begins with parenthesis
-        if (trimmed[0] == ADG_UBO_CALL_OPEN) {
+        if (trimmed[0] === ADG_UBO_CALL_OPEN) {
             return ScriptletBodyParser.parseAdgAndUboScriptletCall(trimmed);
         }
 
@@ -292,7 +296,7 @@ export class ScriptletBodyParser {
             return ScriptletBodyParser.encodeParameters([scriptlet, ...(parameters || [])]);
         });
 
-        if (syntax == AdblockSyntax.Adg || syntax == AdblockSyntax.Ubo) {
+        if (syntax === AdblockSyntax.Adg || syntax === AdblockSyntax.Ubo) {
             return scriptlets.map((scriptlet) => `(${scriptlet.join(ADG_UBO_PARAM_SEPARATOR + SPACE)})`);
         }
 

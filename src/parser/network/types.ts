@@ -15,7 +15,7 @@ export enum NetworkRuleType {
      *   ```
      * - etc.
      */
-    BasicNetworkRule = "BasicNetworkRule",
+    BasicNetworkRule = 'BasicNetworkRule',
 
     /**
      * Represents a header remover network rule.
@@ -31,7 +31,7 @@ export enum NetworkRuleType {
      *   example.org##^responseheader(header-name)
      *   ```
      */
-    RemoveHeaderNetworkRule = "RemoveHeaderNetworkRule",
+    RemoveHeaderNetworkRule = 'RemoveHeaderNetworkRule',
 
     // TODO: In the future, it will probably be necessary to refine the network rule parser with categories like these:
     // - RedirectNetworkRule,

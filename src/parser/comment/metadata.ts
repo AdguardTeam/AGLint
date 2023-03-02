@@ -2,15 +2,15 @@
  * Metadata comments
  */
 
-import { METADATA_HEADERS } from "../../converter/metadata";
-import { AdblockSyntax } from "../../utils/adblockers";
-import { SPACE } from "../../utils/constants";
-import { RuleCategory } from "../categories";
-import { CommentRuleType } from "./types";
-import { CommentMarker } from "./marker";
-import { Comment } from ".";
+import { METADATA_HEADERS } from '../../converter/metadata';
+import { AdblockSyntax } from '../../utils/adblockers';
+import { SPACE } from '../../utils/constants';
+import { CommentRuleType } from './types';
+import { CommentMarker } from './marker';
+import { Comment } from './common';
+import { RuleCategory } from '../common';
 
-const METADATA_SEPARATOR = ":";
+const METADATA_SEPARATOR = ':';
 
 /**
  * Represents a metadata comment rule. This is a special comment that specifies
@@ -66,14 +66,14 @@ export class MetadataParser {
     public static parse(raw: string): Metadata | null {
         const trimmed = raw.trim();
 
-        if (trimmed[0] == CommentMarker.Regular || trimmed[0] == CommentMarker.Hashmark) {
+        if (trimmed[0] === CommentMarker.Regular || trimmed[0] === CommentMarker.Hashmark) {
             const commentText = trimmed.substring(1);
             const separatorIndex = commentText.indexOf(METADATA_SEPARATOR);
 
-            if (separatorIndex != -1) {
+            if (separatorIndex !== -1) {
                 const header = commentText.substring(0, separatorIndex).trim();
                 const headerLower = header.toLocaleLowerCase();
-                for (let i = 0; i < METADATA_HEADERS.length; i++) {
+                for (let i = 0; i < METADATA_HEADERS.length; i += 1) {
                     if (headerLower === METADATA_HEADERS[i].toLocaleLowerCase()) {
                         return {
                             category: RuleCategory.Comment,

@@ -1,18 +1,19 @@
-import { AdblockSyntax } from "../../utils/adblockers";
-import { REGEX_MARKER, StringUtils } from "../../utils/string";
-import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from "../common/modifier-list";
-import { RuleCategory } from "../categories";
-import { NetworkRuleType } from "./types";
-import { ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from "../../utils/constants";
-import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from "../../utils/cosmetic-rule-separator";
-import { Rule } from "../rule";
+import { AdblockSyntax } from '../../utils/adblockers';
+import { REGEX_MARKER } from '../../utils/string';
+import { RuleModifier, ModifierListParser, MODIFIER_LIST_TYPE } from '../misc/modifier-list';
+import { NetworkRuleType } from './types';
+import {
+    ASSIGN_OPERATOR, CLOSE_PARENTHESIS, EMPTY, ESCAPE_CHARACTER, OPEN_PARENTHESIS,
+} from '../../utils/constants';
+import { CosmeticRuleSeparator, CosmeticRuleSeparatorUtils } from '../../utils/cosmetic-rule-separator';
+import { Rule, RuleCategory } from '../common';
 
-const NETWORK_RULE_EXCEPTION_MARKER = "@@";
+const NETWORK_RULE_EXCEPTION_MARKER = '@@';
 const NETWORK_RULE_EXCEPTION_MARKER_LEN = NETWORK_RULE_EXCEPTION_MARKER.length;
-const NETWORK_RULE_SEPARATOR = "$";
+const NETWORK_RULE_SEPARATOR = '$';
 
-const UBO_RESPONSEHEADER = "responseheader";
-const ADG_REMOVEHEADER = "removeheader";
+const UBO_RESPONSEHEADER = 'responseheader';
+const ADG_REMOVEHEADER = 'removeheader';
 export const UBO_RESPONSEHEADER_INDICATOR = UBO_RESPONSEHEADER + OPEN_PARENTHESIS;
 const UBO_RESPONSEHEADER_INDICATOR_LEN = UBO_RESPONSEHEADER_INDICATOR.length;
 
@@ -154,36 +155,28 @@ export class NetworkRuleParser {
         };
 
         // Rule starts with exception marker, eg @@||example.com
-        if (rule.indexOf(NETWORK_RULE_EXCEPTION_MARKER) == 0) {
+        if (rule.indexOf(NETWORK_RULE_EXCEPTION_MARKER) === 0) {
             common.exception = true;
             rule = rule.substring(NETWORK_RULE_EXCEPTION_MARKER_LEN);
             common.pattern = rule;
         }
 
         // Find corresponding (last) separator
-        // Handle these issues:
-        //  /ad.js$m1=/v1/
-        //  example.com$m1,m2=/^regex$/
-        const separatorIndex = StringUtils.findNextUnescapedCharacterThatNotFollowedBy(
-            rule,
-            0,
-            NETWORK_RULE_SEPARATOR,
-            REGEX_MARKER
-        );
+        const separatorIndex = NetworkRuleParser.findNetworkRuleSeparatorIndex(rule);
 
         // Get rule parts
         const modifiers: RuleModifier[] = [];
 
-        if (separatorIndex != -1) {
+        if (separatorIndex !== -1) {
             common.pattern = rule.substring(0, separatorIndex);
 
             modifiers.push(...ModifierListParser.parse(rule.substring(separatorIndex + 1)).modifiers);
 
             // Special network rules
-            if (modifiers.length == 1 && modifiers[0].modifier == ADG_REMOVEHEADER) {
+            if (modifiers.length === 1 && modifiers[0].modifier === ADG_REMOVEHEADER) {
                 const header = modifiers[0].value;
 
-                if (!header || header.length == 0) {
+                if (!header || header.length === 0) {
                     throw new SyntaxError(`No header name specified in rule "${raw}"`);
                 }
 
@@ -204,6 +197,27 @@ export class NetworkRuleParser {
     }
 
     /**
+     * Finds the index of the separator character in a network rule.
+     *
+     * @param rule Network rule to check
+     * @returns The index of the separator character, or -1 if there is no separator
+     */
+    private static findNetworkRuleSeparatorIndex(rule: string): number {
+        // As we are looking for the last separator, we start from the end of the string
+        for (let i = rule.length - 1; i >= 0; i -= 1) {
+            // If we find a potential separator, we should check
+            // - if it's not escaped
+            // - if it's not followed by a regex marker, for example: `example.org^$removeparam=/regex$/`
+            // eslint-disable-next-line max-len
+            if (rule[i] === NETWORK_RULE_SEPARATOR && rule[i + 1] !== REGEX_MARKER && rule[i - 1] !== ESCAPE_CHARACTER) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * Parses a uBlock Origin response header filtering rule.
      *
      * uBO calls this rule a "special case of HTML filtering", so this follows uBO's HTML filtering
@@ -219,7 +233,7 @@ export class NetworkRuleParser {
         const trimmed = raw.trim();
 
         // In order to operate quickly, we only check the presence of the indicator at first
-        if (trimmed.indexOf(UBO_RESPONSEHEADER_INDICATOR) == -1) {
+        if (trimmed.indexOf(UBO_RESPONSEHEADER_INDICATOR) === -1) {
             return null;
         }
 
@@ -227,17 +241,17 @@ export class NetworkRuleParser {
         const [start, end, separator, exception] = CosmeticRuleSeparatorUtils.find(trimmed);
 
         if (
-            start == -1 ||
-            !(separator == CosmeticRuleSeparator.UboHtml || separator == CosmeticRuleSeparator.UboHtmlException)
+            start === -1
+            || !(separator === CosmeticRuleSeparator.UboHtml || separator === CosmeticRuleSeparator.UboHtmlException)
         ) {
-            throw new SyntaxError(`uBO responseheader filtering requires a valid uBO HTML rule separator`);
+            throw new SyntaxError('uBO responseheader filtering requires a valid uBO HTML rule separator');
         }
 
         const body = trimmed.substring(end).trim();
 
         if (!body.startsWith(UBO_RESPONSEHEADER_INDICATOR)) {
             throw new SyntaxError(
-                `uBO responseheader filtering rule body must be start with "${UBO_RESPONSEHEADER_INDICATOR}"`
+                `uBO responseheader filtering rule body must be start with "${UBO_RESPONSEHEADER_INDICATOR}"`,
             );
         }
 
@@ -247,7 +261,7 @@ export class NetworkRuleParser {
 
         const header = body.slice(UBO_RESPONSEHEADER_INDICATOR_LEN, -1).trim();
 
-        if (header.length == 0) {
+        if (header.length === 0) {
             throw new SyntaxError(`No header name specified in rule "${trimmed}"`);
         }
 
@@ -289,7 +303,7 @@ export class NetworkRuleParser {
         let result = EMPTY;
 
         // Special case
-        if (ast.type == NetworkRuleType.RemoveHeaderNetworkRule && ast.syntax == AdblockSyntax.Ubo) {
+        if (ast.type === NetworkRuleType.RemoveHeaderNetworkRule && ast.syntax === AdblockSyntax.Ubo) {
             return NetworkRuleParser.generateUboResponseHeader(<RemoveHeaderNetworkRule>ast);
         }
 
@@ -320,6 +334,9 @@ export class NetworkRuleParser {
                 }
                 break;
             }
+
+            default:
+                throw new Error('Unknown network rule type');
         }
 
         return result;

@@ -17,7 +17,8 @@
 
 <p align="center">
     <a href="https://www.npmjs.com/package/@adguard/aglint"><img src="https://img.shields.io/npm/v/@adguard/aglint" alt="NPM version" /></a>
-    <a href="https://github.com/AdguardTeam/AGLint/blob/master/LICENSE"><img src="https://img.shields.io/badge/GPL-3.0-only" alt="License: GPL-3.0-only" /></a>
+    <a href="https://www.npmjs.com/package/@adguard/aglint"><img src="https://img.shields.io/npm/dm/@adguard/aglint" alt="NPM Downloads" /></a>
+    <a href="https://github.com/AdguardTeam/AGLint/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/@adguard/aglint" alt="License" /></a>
 </p>
 
 Table of Contents:
@@ -43,12 +44,18 @@ Table of Contents:
   - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
+  - [`duplicated-modifiers`](#duplicated-modifiers)
+  - [`unknown-preprocessor-directives`](#unknown-preprocessor-directives)
+  - [`duplicated-hint-platforms`](#duplicated-hint-platforms)
+  - [`duplicated-hints`](#duplicated-hints)
+  - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
+  - [`invalid-domain-list`](#invalid-domain-list)
+  - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
-  - [Setting up the development environment](#setting-up-the-development-environment)
   - [Available commands](#available-commands)
 - [Ideas \& Questions](#ideas--questions)
 - [License](#license)
@@ -307,77 +314,268 @@ So the hierarchy is the following:
 
 The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
 
+The linter rules documentation is written in the following schema:
+- *Short description of the rule in the first paragraph.*
+- **Severity:** Severity of the rule, it can be `warn` (1), `error` (2), `fatal` (3).
+- **Options:** Configuration options for the rule (if any).
+- **Options schema:** Validation schema for the rule options (if any).
+- **Fixable:** Describes if the rule can fix the detected problem automatically.
+- **Example:** A simple example of the rule violation and how it will be reported.
+- **Example for fixing:** A simple example of the rule violation and how it will be fixed (if the problem is fixable).
+
 Currently, the following linter rules are available (we will add more rules in the future):
 
 ### `adg-scriptlet-quotes`
 
-Check if the scriptlet parameters are wrapped in the expected quotes. For example
-```adblock
-example.com#%#//scriptlet("abort-on-property-read", "window.open")
-```
-will be reported as warning:
-```
- 1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
-```
-since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+Check if the scriptlet parameters are wrapped in the expected quotes.
 
-But you can specify the expected quotes in the configuration file. If you want to use double quotes, you can add the following configuration:
-```json
-{
-    "rules": {
-        "adg-scriptlet-quotes": ["warn", "double"]
+- **Severity:** `warn` (1)
+- **Options:** `single` (default), `double`, `none`
+- **Options schema:** `enum` with the following values: `single`, `double`, `none`
+- **Fixable:** yes, quotes will be replaced with the expected quotes
+- **Example:**
+  ```adblock
+  example.com#%#//scriptlet("abort-on-property-read", "window.open")
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
+  ```
+  since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
+- **Example for fixing:**
+  ```adblock
+  example.com#%#//scriptlet("abort-on-property-read", "window.open")
+  ```
+  will be fixed to:
+  ```adblock
+  example.com#%#//scriptlet('abort-on-property-read', 'window.open')
+  ```
+- **Additional information:**
+  - If you want to change the default quotes, you can use the `adg-scriptlet-quotes` rule in your configuration file:
+    ```yaml
+    rules:
+      # We want to use double quotes instead of single quotes
+      adg-scriptlet-quotes:
+        - warn
+        - double
+    ```
+    or
+    ```json
+    {
+        "rules": {
+            "adg-scriptlet-quotes": ["warn", "double"]
+        }
     }
-}
-```
-
-Possible config values are `none`, `single` and `double`. The default value is `single`.
+    ```
+    This will change the default quotes to double quotes.
 
 ### `if-closed`
 
 Checks if the `if` statement is closed and no unclosed `endif` statements are present.
 
-For example, in the following case, the first `endif` are unnecessary, and the last `if` statement is not closed:
-    
-```adblock
-!#endif
-!#if (adguard_app_android)
-example.com##.ad
-!#endif
-!#if (adguard_ext_firefox)
-example.org##.something
-```
-
-so the linter will give you the following errors:
-
-```
- 1:0  error  Using an "endif" directive without an opening "if" directive
- 5:0  error  Unclosed "if" directive
-```
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !#endif
+  !#if (adguard_app_android)
+  example.com##.ad
+  !#endif
+  !#if (adguard_ext_firefox)
+  example.org##.something
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Using an "endif" directive without an opening "if" directive
+    5:0  error  Unclosed "if" directive
+  ```
+  since the first `endif` are unnecessary, and the last `if` statement is not closed.
 
 ### `single-selector`
 
-Checks if the CSS selector contains multiple selectors. For example, `example.com##.ad, .something` will be reported as warning, since it is a bad practice to use multiple selectors in a single rule.
+Checks element hiding rules to make sure that they contain only one selector.
 
-For example, in the following case, the first rule is bad, and the second rule is good:
-    
-```adblock
-example.com##.ad, .something
-example.org##.ad
-```
+- **Severity:** `warn` (1)
+- **Options:** none
+- **Fixable:** yes, the rule will be split into multiple rules, each with a single selector
+- **Example:**
+  ```adblock
+  example.com##.ad, .something
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  An element hiding rule should contain only one selector
+  ```
+  since the rule contains two selectors.
+- **Example for fixing:**
+  ```adblock
+  example.com##.ad, .something
+  ```
+  will be fixed to:
+  ```adblock
+  example.com##.ad
+  example.com##.something
+  ```
+  (two separate rules with a single selector each).
 
-so the linter will give you the following warning:
+### `duplicated-modifiers`
 
-```
- 1:0  warn  An element hiding rule should contain only one selector
-```
+Checks if the same modifier is used multiple times in a single network rule.
 
-It will also suggest a fix for the first rule:
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** planned
+- **Example:**
+  ```adblock
+  example.com$important,important
+  ```
+  will be reported as error:
+  ```
+    1:0  error  The "important" modifier is used multiple times
+  ```
+  since the `important` modifier is used twice.
 
-```adblock
-example.com##.ad
-example.com##.something
-example.org##.ad
-```
+### `unknown-preprocessor-directives`
+
+Checks if the used preprocessor directives are known.
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !#unknown
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Unknown preprocessor directive: "unknown"
+  ```
+  since `unknown` is not a known preprocessor directive.
+- **Additional information:**
+  - Currently, the following preprocessor directives are supported:
+    - `if`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
+    - `endif`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#conditions-directive)
+    - `include`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#include-directive)
+    - `safari_cb_affinity`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive)
+  - For more information about preprocessor directives, please visit
+    - https://adguard.com/kb/general/ad-filtering/create-own-filters/#preprocessor-directives or
+    - https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#pre-parsing-directives
+
+### `duplicated-hint-platforms`
+
+Checks if the same platform is used multiple times in a single hint.
+
+- **Severity:** `warn` (1)
+- **Options:** none
+- **Fixable:** planned
+- **Example:**
+  ```adblock
+  !+ PLATFORM(ios, android, ios)
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  The "ios" platform is used multiple times
+  ```
+  since the `ios` platform is used twice. In this case, you'll need to remove the unnecessary `ios` platform.
+
+### `duplicated-hints`
+
+Checks if the same hint is used multiple times within a single comment.
+
+- **Severity:** `warn` (1)
+- **Options:** none
+- **Fixable:** planned
+- **Example:**
+  ```adblock
+  !+ PLATFORM(ios, ext_android_cb) PLATFORM(ext_ff) NOT_OPTIMIZED
+  ```
+  will be reported as warning:
+  ```
+    1:0  warn  The "PLATFORM" hint is used multiple times
+  ```
+  since the `PLATFORM` hint is used twice in the same comment. In this case, you'll need to concatenate the platforms into a single `PLATFORM` hint.
+
+### `unknown-hints-and-platforms`
+
+Checks if the hints and platforms are known.
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !+ HINT
+  !+ HINT(param)
+  !+ PLATFORM(something)
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Unknown hint: "HINT"
+    2:0  error  Unknown hint: "HINT"
+    3:0  error  Unknown platform: "something"
+  ```
+  since `HINT` are an unknown hint, and `something` is an unknown platform.
+- **Additional information:**
+  - Currently, the following hints are supported:
+    - `NOT_OPTIMIZED`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#not_optimized-hint)
+    - `PLATFORM` / `NOT_PLATFORM`: [documentation](https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints)
+  - Currently, the following platforms are supported:
+    - `windows`
+    - `mac`
+    - `android`
+    - `ios`
+    - `ext_chromium`
+    - `ext_ff`
+    - `ext_edge`
+    - `ext_opera`
+    - `ext_safari`
+    - `ext_android_cb`
+    - `ext_ublock`
+
+### `invalid-domain-list`
+
+Checks for invalid domains in cosmetic rules.
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  example.##.ad
+  ```
+  will be reported as error:
+  ```
+    1:0  error  Invalid domain: "example."
+  ```
+  since `example.` is not a valid domain, because it's TLD is empty. In this case, you'll need to specify TLD for the domain, for example, `example.com`, or use a wildcard as TLD: `example.*`.
+- **Additional information:**
+    - Accepted values are:
+      - Regular domains: `example.com`, `example.org`, `example.net`, etc.
+      - Domains with wildcards: `*.example.com`, `*.example.org`, `*.example.net`, etc.
+      - Wildcard-only domain: `*`
+      - IDN domains: `xn--e1afmkfd.xn--p1ai`, etc.
+      - Unicode domains: `пример.рф`, etc.
+      - Hostnames: `example`, `example-2`, `example-3`, etc.
+      - IP addresses: `127.0.0.1`
+
+### `inconsistent-hint-platforms`
+
+Check if the hint platforms are targeted inconsistently. This means that the same platform is targeted in the `PLATFORM` hint, but excluded in the `NOT_PLATFORM` hint at the same time (or vice versa).
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+  ```adblock
+  !+ PLATFORM(ios, ext_android_cb) NOT_PLATFORM(ext_android_cb)
+  example.com##.ad
+  ```
+  will be reported as error:
+  ```
+    1:0  error  The "ext_android_cb" platform is targeted inconsistently
+  ```
+  since the `ext_android_cb` platform is targeted in the `PLATFORM` hint, but excluded in the `NOT_PLATFORM` hint at the same time. In this case, you'll need to remove the `ext_android_cb` platform from some of the hints to make it's targeting consistent.
 
 ## Use programmatically
 
@@ -392,51 +590,31 @@ An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently
 For example, this code:
 
 ```typescript
-import { RuleParser } from "aglint";
+import { RuleParser } from '@adguard/aglint';
 
 // RuleParser automatically determines the rule type
-const ast = RuleParser.parse("example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')");
+const ast = RuleParser.parse('/ads.js^$script,domain=example.com');
 ```
 will gives you this AST:
 
 ```json
 {
-    "category": "Cosmetic",
-    "type": "ScriptletRule",
-    "syntax": "AdGuard",
+    "category": "Network",
+    "type": "BasicNetworkRule",
+    "syntax": "Common",
     "exception": false,
-    "modifiers": [],
-    "domains": [
+    "pattern": "/ads.js^",
+    "modifiers": [
         {
-            "domain": "example.com",
+            "modifier": "script",
             "exception": false
         },
         {
-            "domain": "example.net",
-            "exception": true
+            "modifier": "domain",
+            "value": "example.com",
+            "exception": false
         }
-    ],
-    "separator": "#%#//scriptlet",
-    "body": {
-        "scriptlets": [
-            {
-                "scriptlet": {
-                    "type": "SingleQuoted",
-                    "value": "prevent-setInterval"
-                },
-                "parameters": [
-                    {
-                        "type": "SingleQuoted",
-                        "value": "check"
-                    },
-                    {
-                        "type": "SingleQuoted",
-                        "value": "!300"
-                    }
-                ]
-            }
-        ]
-    }
+    ]
 }
 ```
 
@@ -447,14 +625,10 @@ RuleParser.generate(ast);
 
 Which returns the rule as string (this is not the same as the original rule, it is generated from the AST, and not related to the original rule):
 ```adblock
-example.com,~example.net#%#//scriptlet('prevent-setInterval', 'check', '!300')
+/ads.js^$script,domain=example.com
 ```
 
-Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same.
-
-You can pass any rule to the parser, it automatically determines the type and category of the rule.
-
-If the rule is syntactically incorrect, the parser will throw an error.
+Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same. You can pass any rule to the parser, it automatically determines the type and category of the rule. If the rule is syntactically incorrect, the parser will throw an error.
 
 ### Linter
 
@@ -468,7 +642,7 @@ Please keep in mind that the CLI only can be used in Node.js (because it uses th
 Example usage:
 
 ```typescript
-import { Linter } from "aglint";
+import { Linter } from "@adguard/aglint";
 
 // Create a new linter instance and add default rules (make first parameter true to add default rules)
 const linter = new Linter(true);
@@ -480,7 +654,7 @@ const linter = new Linter(true);
 // If you want to enable the fixer, pass true as the second parameter
 const report = linter.lint("example.com##.ad, #ad");
 
-// Do something with the report :)
+// Do something with the report
 ```
 
 The `LinterRule` interface has the following structure:
@@ -518,24 +692,29 @@ A small summary of what to expect:
 
 You can contribute to the project by opening a pull request. People who contribute to AdGuard projects can receive various rewards, see [this page](https://adguard.com/contribute.html) for details.
 
-Before opening a pull request, make sure that all tests pass and that the code is formatted correctly. If you have Git hooks enabled, the tests will be run automatically before committing, thanks to Husky.
+Here is a short guide on how to set up the development environment and how to submit your changes:
 
-### Setting up the development environment
+- Pre-requisites: [Node.js](https://nodejs.org/en/) (v14 or higher), [Yarn](https://yarnpkg.com/) (v2 or higher), [Git](https://git-scm.com/), [VSCode](https://code.visualstudio.com/) (optional)
+- Clone the repository with `git clone`
+- Install dependencies with `yarn` (this will also initialize the Git hooks via Husky)
+- Create a new branch with `git checkout -b <branch-name>`. Example: `git checkout -b feature/add-some-feature`. Please add `feature/` or `fix/` prefix to your branch name, and refer to the issue number if there is one. Example: `fix/42`.
+- Make your changes in the `src` folder and make suitable tests for them in the `test` folder
+- Check code by running `yarn lint` and `yarn test` commands (during development, you can run only a specific test with `yarn test <test-name>`)
+- Build the library with `yarn build` and check the `dist` folder to make sure that the build is successful, then install the library locally with `yarn add <path-to-local-library>` and test it in your project
+- If everything is OK, commit your changes and push them to your forked repository. If Husky is set up correctly, it don't allow you to commit if the linter or tests fail.
+- Create a pull request to the main repository from your forked repository's branch.
 
-1. Install [Node.js](https://nodejs.org/en/), [Yarn](https://yarnpkg.com/) and [Git](https://git-scm.com/). We recommend using [Visual Studio Code](https://code.visualstudio.com/) as your IDE.
-2. Clone the repository
-3. Install dependencies by running `yarn` in the project directory
-4. Start developing!
+We would be happy to review your pull request and merge it if it is suitable for the project.
 
 ### Available commands
 
-You can run the following commands while developing:
+During development, you can use the following commands (listed in `package.json`):
 
-- `yarn check-types`: Check types
-- `yarn lint`: Run ESLint and Prettier on all files
-- `yarn test`: Run all tests (Jest)
-- `yarn coverage`: Get test coverage report
-- `yarn build`: Build package (to `dist` folder) (Rollup)
+- `yarn check-types` - check types with [TypeScript](https://www.typescriptlang.org/)
+- `yarn lint` - lint the code with [ESLint](https://eslint.org/)
+- `yarn test` - run tests with [Jest](https://jestjs.io/) (you can also run a specific test with `yarn test <test-name>`)
+- `yarn coverage` - print test coverage report
+- `yarn build` - build the library to the `dist` folder by using [Rollup](https://rollupjs.org/)
 
 ## Ideas & Questions
 
@@ -543,7 +722,7 @@ If you have any questions or ideas for new features, please open an issue or a d
 
 ## License
 
-AGLint is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+AGLint is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## References
 

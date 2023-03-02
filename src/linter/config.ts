@@ -2,34 +2,12 @@
  * Linter configuration
  */
 
-import merge from "deepmerge";
-import { boolean, object, optional, record, string } from "superstruct";
-import { LinterRuleConfig, linterRuleConfigSchema } from "./rule";
-
-/**
- * Type for rule configuration object
- */
-export type LinterRuleConfigObject = { [key: string]: LinterRuleConfig };
-
-/**
- * Represents the core linter configuration
- */
-export interface LinterConfig {
-    /**
-     * Whether to allow inline configuration or not
-     *
-     * @example
-     * ```adblock
-     * ! aglint-disable-next-line
-     * ```
-     */
-    allowInlineConfig?: boolean;
-
-    /**
-     * A map of rule names to their configuration
-     */
-    rules?: LinterRuleConfigObject;
-}
+import merge from 'deepmerge';
+import {
+    boolean, object, optional, record, string,
+} from 'superstruct';
+import { linterRuleConfigSchema } from './rule';
+import { LinterConfig } from './common';
 
 /**
  * Superstruct schema for the linter rules config object

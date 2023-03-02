@@ -1,13 +1,15 @@
-import { EMPTY } from "../../utils/constants";
-import { StringUtils } from "../../utils/string";
+import { EMPTY } from '../../utils/constants';
+import { StringUtils } from '../../utils/string';
 
 // Modifiers are separated by ",". For example: "script,domain=example.com"
-const MODIFIERS_SEPARATOR = ",";
+const MODIFIERS_SEPARATOR = ',';
 
 // Modifiers can be assigned. For example: "domain=example.com"
-const MODIFIER_ASSIGN_OPERATOR = "=";
+const MODIFIER_ASSIGN_OPERATOR = '=';
 
-export const MODIFIER_LIST_TYPE = "ModifierList";
+const MODIFIER_EXCEPTION_MARKER = '~';
+
+export const MODIFIER_LIST_TYPE = 'ModifierList';
 
 /**
  * Represents a modifier list.
@@ -42,6 +44,11 @@ export interface RuleModifier {
     modifier: string;
 
     /**
+     * Is this modifier an exception? For example, `~third-party` is an exception
+     */
+    exception?: boolean;
+
+    /**
      * Modifier value (optional)
      */
     value?: string;
@@ -68,31 +75,45 @@ export class ModifierListParser {
             modifiers: [],
         };
 
-        const rawModifiersSplitted = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
+        // Split modifiers by unescaped commas
+        const rawModifiers = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
 
         // Skip empty modifiers
-        if (rawModifiersSplitted.length == 1 && rawModifiersSplitted[0].trim() == EMPTY) {
+        if (rawModifiers.length === 1 && rawModifiers[0].trim() === EMPTY) {
             return result;
         }
 
-        for (const rawModifier of rawModifiersSplitted) {
+        // Parse each modifier separately
+        for (const rawModifier of rawModifiers) {
+            const trimmedRawModifier = rawModifier.trim();
+
+            // Find the index of the first unescaped "=" character
             const assignmentOperatorIndex = StringUtils.findNextUnescapedCharacter(
-                rawModifier,
-                MODIFIER_ASSIGN_OPERATOR
+                trimmedRawModifier,
+                MODIFIER_ASSIGN_OPERATOR,
             );
 
-            // Modifier without value, eg simply `script`
-            if (assignmentOperatorIndex == -1) {
-                result.modifiers.push({ modifier: rawModifier.trim() });
+            const exception = trimmedRawModifier.startsWith(MODIFIER_EXCEPTION_MARKER);
+
+            let modifier;
+            let value;
+
+            if (assignmentOperatorIndex === -1) {
+                // Modifier without assigned value. For example: "third-party"
+                modifier = trimmedRawModifier.substring(exception ? MODIFIER_EXCEPTION_MARKER.length : 0);
+            } else {
+                // Modifier with assigned value. For example: "domain=example.com"
+                value = trimmedRawModifier.substring(assignmentOperatorIndex + MODIFIER_ASSIGN_OPERATOR.length).trim();
+                modifier = trimmedRawModifier
+                    .substring(exception ? MODIFIER_EXCEPTION_MARKER.length : 0, assignmentOperatorIndex)
+                    .trim();
             }
 
-            // Modifier with value assignment, eg `redirect=value...`
-            else {
-                result.modifiers.push({
-                    modifier: rawModifier.substring(0, assignmentOperatorIndex).trim(),
-                    value: rawModifier.substring(assignmentOperatorIndex + 1).trim(),
-                });
-            }
+            result.modifiers.push({
+                modifier,
+                value,
+                exception,
+            });
         }
 
         return result;
@@ -106,8 +127,14 @@ export class ModifierListParser {
      */
     public static generate(ast: ModifierList): string {
         const result = ast.modifiers
-            .map(({ modifier, value }) => {
-                let subresult = modifier.trim();
+            .map(({ modifier, exception, value }) => {
+                let subresult = EMPTY;
+
+                if (exception) {
+                    subresult += MODIFIER_EXCEPTION_MARKER;
+                }
+
+                subresult += modifier.trim();
 
                 if (value) {
                     subresult += MODIFIER_ASSIGN_OPERATOR;

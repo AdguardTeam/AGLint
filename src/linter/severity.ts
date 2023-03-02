@@ -1,4 +1,4 @@
-import { Struct, define } from "superstruct";
+import { Struct, define } from 'superstruct';
 
 /**
  * Represents the possible severities of a linter rule
@@ -49,7 +49,6 @@ export type SeverityName = keyof typeof SEVERITY;
 /**
  * Type for the possible severity values
  */
-// eslint-disable-next-line prettier/prettier
 export type SeverityValue = typeof SEVERITY[SeverityName];
 
 /**
@@ -64,11 +63,10 @@ export type AnySeverity = SeverityName | SeverityValue;
  * @returns The severity value
  */
 export function getSeverity(value: AnySeverity): SeverityValue {
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
         return SEVERITY[value];
-    } else {
-        return value;
     }
+    return value;
 }
 
 /**
@@ -78,9 +76,9 @@ export function getSeverity(value: AnySeverity): SeverityValue {
  * @returns Whether the value is a valid severity
  */
 export function isSeverity(value: unknown): value is AnySeverity {
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
         return SEVERITY_NAMES.includes(value);
-    } else if (typeof value === "number") {
+    } if (typeof value === 'number') {
         return (SEVERITY_VALUES as number[]).includes(value);
     }
 
@@ -97,16 +95,16 @@ export function severity(): Struct<AnySeverity, null> {
     // TODO: Fix possible type error
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore 2322
-    return define("severity", (value: unknown) => {
-        if (typeof value === "string") {
+    return define('severity', (value: unknown) => {
+        if (typeof value === 'string') {
             return (
-                SEVERITY_NAMES.includes(value) ||
-                `Expected a valid severity string (${SEVERITY_NAMES.join(", ")}), but received ${value}`
+                SEVERITY_NAMES.includes(value)
+                || `Expected a valid severity string (${SEVERITY_NAMES.join(', ')}), but received ${value}`
             );
-        } else if (typeof value === "number") {
+        } if (typeof value === 'number') {
             return (
-                (SEVERITY_VALUES as number[]).includes(value) ||
-                `Expected a valid severity number, but received ${value}`
+                (SEVERITY_VALUES as number[]).includes(value)
+                || `Expected a valid severity number, but received ${value}`
             );
         }
 
