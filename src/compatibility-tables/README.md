@@ -19,7 +19,7 @@ Currently we support the following adblockers:
 
 - AdGuard (`adg`)
 - uBlock Origin (`ubo`)
-- Adblock Plus (`abp`)
+- AdBlock / Adblock Plus (`abp`)
 
 However, there may also be compatibility differences within a brand due to the specificities and limitations of each platform. For example:
 
