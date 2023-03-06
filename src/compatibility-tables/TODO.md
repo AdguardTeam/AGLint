@@ -23,4 +23,4 @@ Here is the list of rules that we need to implement to take all the advantages o
   - [ ] `no-bad-modifier-exceptions`: report modifiers that cannot be used in exceptions. For example, `empty` cannot be used in exceptions, like `@@||example.org^$empty`.
   - [ ] `no-incompatible-modifier`: if `! PLATFORM` or adblock agent is specified before, report incompatible modifiers. If the adblocker version is specified in the agent, report incompatible modifiers for the specified version.
   - [ ] `no-deprecated-modifier`: report deprecated modifiers.
-  - [ ] `no-conflicting-modifier`: report conflicting modifiers. For example, `removeparam` should not be used with any other modifiers.
+  - [ ] `no-conflicting-modifier`: report conflicting modifiers (modifiers that cannot be used together).
