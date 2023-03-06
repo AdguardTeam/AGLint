@@ -61,9 +61,11 @@ For simplicity, the following shortcuts are also supported:
 - `any`: any adblocker
 - `adg_any`: any AdGuard adblocker
 - `adg_ext_any`: any AdGuard browser extension
-- `adg_ext_chromium`: AdGuard browser extension for Chromium-based browsers
+- `adg_ext_chromium`: AdGuard browser extension for Chromium-based browsers\*
 - `adg_cb_any`: any AdGuard content blocker
 - `ubo_ext_any`: any uBlock Origin browser extension
-- `ubo_ext_chromium`: uBlock Origin browser extension for Chromium-based browsers
+- `ubo_ext_chromium`: uBlock Origin browser extension for Chromium-based browsers\*
 - `abp_ext_any`: any Adblock Plus browser extension
-- `abp_ext_chromium`: Adblock Plus browser extension for Chromium-based browsers
+- `abp_ext_chromium`: Adblock Plus browser extension for Chromium-based browsers\*
+
+\* Chromium-based browsers include Google Chrome, Microsoft Edge, Opera, Brave, Vivaldi, etc. See more details [here](https://en.wikipedia.org/wiki/Chromium_(web_browser)).
