@@ -34,7 +34,6 @@ Therefore, we need to specify the platform for each adblocker to cover all the e
     - `adg_os_windows`
     - `adg_os_mac`
     - `adg_os_android`
-    - `adg_os_ios`
   - Browser extensions:
     - `adg_ext_chromium`
     - `adg_ext_firefox`
@@ -42,6 +41,7 @@ Therefore, we need to specify the platform for each adblocker to cover all the e
     - `adg_ext_edge`
   - Content blockers:
     - `adg_cb_android`
+    - `adg_cb_ios`
     - `adg_cb_safari`
 - uBlock Origin:
   - Browser extensions:
