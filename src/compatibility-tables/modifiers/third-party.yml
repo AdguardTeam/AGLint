@@ -1,5 +1,6 @@
 adg_any:
   modifier: third-party
+  aliases: ["3p"]
   assignable: false
   negatable: true
   version_added: "0.0.1"
