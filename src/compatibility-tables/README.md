@@ -17,9 +17,9 @@ Please note that certain things, such as syntax or rule categories, cannot be ha
 
 Currently we support the following adblockers:
 
-- AdGuard (`adg`)
-- uBlock Origin (`ubo`)
-- AdBlock / Adblock Plus (`abp`)
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard (`adg`)
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin (`ubo`)
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> AdBlock / Adblock Plus (`abp`)
 
 However, there may also be compatibility differences within a brand due to the specificities and limitations of each platform. For example:
 
@@ -29,7 +29,7 @@ However, there may also be compatibility differences within a brand due to the s
 
 Therefore, we need to specify the platform for each adblocker to cover all the edge cases. The following platforms are supported:
 
-- AdGuard:
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard:
   - OS-wide apps:
     - `adg_os_windows`
     - `adg_os_mac`
@@ -43,13 +43,13 @@ Therefore, we need to specify the platform for each adblocker to cover all the e
     - `adg_cb_android`
     - `adg_cb_ios`
     - `adg_cb_safari`
-- uBlock Origin:
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin:
   - Browser extensions:
     - `ubo_ext_chrome`
     - `ubo_ext_firefox`
     - `ubo_ext_opera`
     - `ubo_ext_edge`
-- Adblock Plus:
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus:
   - Browser extensions:
     - `abp_ext_chrome`
     - `abp_ext_firefox`
