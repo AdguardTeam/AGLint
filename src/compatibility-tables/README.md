@@ -58,16 +58,18 @@ Therefore, we need to specify the platform for each adblocker to cover all the e
 
 For simplicity, the following shortcuts are also supported:
 
-- `any`: any adblocker
-- `adg_any`: any AdGuard adblocker
-- `adg_os_any`: any AdGuard OS-wide app
-- `adg_ext_any`: any AdGuard browser extension
-- `adg_ext_chromium`: AdGuard browser extension for Chromium-based browsers\*
-- `adg_cb_any`: any AdGuard content blocker
-- `adg_any_not_cb`: any AdGuard adblocker except content blockers
-- `ubo_ext_any`: any uBlock Origin browser extension
-- `ubo_ext_chromium`: uBlock Origin browser extension for Chromium-based browsers\*
-- `abp_ext_any`: any Adblock Plus browser extension
-- `abp_ext_chromium`: Adblock Plus browser extension for Chromium-based browsers\*
+| Shortcut | Description | Equivalent to (shortcut or platform) |
+| --- | --- | --- |
+| `any` | Any adblocker, any platform | `adg_any`, `ubo_any`, `abp_any` |
+| `adg_any` | Any AdGuard adblocker | `adg_os_any`, `adg_ext_any`, `adg_cb_any` |
+| `adg_os_any` | Any AdGuard OS-wide app | `adg_os_windows`, `adg_os_mac`, `adg_os_android` |
+| `adg_ext_any` | Any AdGuard browser extension | `adg_ext_chromium`, `adg_ext_firefox`, `adg_ext_opera`, `adg_ext_edge` |
+| `adg_ext_chromium` | AdGuard browser extension for Chromium-based browsers\* | `adg_ext_chrome`, `adg_ext_opera`, `adg_ext_edge` |
+| `adg_cb_any` | Any AdGuard content blocker | `adg_cb_android`, `adg_cb_ios`, `adg_cb_safari` |
+| `adg_any_not_cb` | Any AdGuard adblocker except content blockers | `adg_os_any`, `adg_ext_any` |
+| `ubo_ext_any` | Any uBlock Origin browser extension | `ubo_ext_chromium`, `ubo_ext_firefox` |
+| `ubo_ext_chromium` | uBlock Origin browser extension for Chromium-based browsers\* | `ubo_ext_chrome`, `ubo_ext_opera`, `ubo_ext_edge` |
+| `abp_ext_any` | Any Adblock Plus browser extension | `abp_ext_chromium`, `abp_ext_firefox` |
+| `abp_ext_chromium` | Adblock Plus browser extension for Chromium-based browsers\* | `abp_ext_chrome`, `abp_ext_opera`, `abp_ext_edge` |
 
 \* Chromium-based browsers include Google Chrome, Microsoft Edge, Opera, Brave, Vivaldi, etc. See more details [here](https://en.wikipedia.org/wiki/Chromium_(web_browser)).
