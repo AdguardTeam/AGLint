@@ -63,6 +63,7 @@ For simplicity, the following shortcuts are also supported:
 - `adg_ext_any`: any AdGuard browser extension
 - `adg_ext_chromium`: AdGuard browser extension for Chromium-based browsers\*
 - `adg_cb_any`: any AdGuard content blocker
+- `adg_any_not_cb`: any AdGuard adblocker except content blockers
 - `ubo_ext_any`: any uBlock Origin browser extension
 - `ubo_ext_chromium`: uBlock Origin browser extension for Chromium-based browsers\*
 - `abp_ext_any`: any Adblock Plus browser extension
