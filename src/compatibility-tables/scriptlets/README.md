@@ -8,7 +8,7 @@ Each file contains an object, where the key is the [actual adblocker ID](../READ
 
 | Field | Description | Type | Default value |
 | --- | --- | --- | --- |
-| `scriptlet`\* | Name of the actual scriptlet. | `string` | |
+| `name`\* | Name of the actual scriptlet. | `string` | |
 | `aliases` | List of aliases for the scriptlet (if any). | `string[]` | `[]` (no aliases) |
 | `description` | Short description of the actual scriptlet. If not specified or it's value is `null`, then the description is not available. | `string\|null` | `null` |
 | `docs` | Link to the documentation. If not specified or it's value is `null`, then the documentation is not available. | `string\|null` | `null` |

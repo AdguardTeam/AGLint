@@ -1,16 +1,14 @@
 # AdGuard Content Blocker does not support scriptlets
 adg_any_not_cb:
-  scriptlet: abort-on-property-read
+  name: abort-on-property-read
   aliases:
-    [
-      "abort-on-property-read.js",
-      "ubo-abort-on-property-read.js",
-      "aopr.js",
-      "ubo-aopr.js",
-      "ubo-abort-on-property-read",
-      "ubo-aopr",
-      "abp-abort-on-property-read",
-    ]
+    - abort-on-property-read.js
+    - ubo-abort-on-property-read.js
+    - aopr.js
+    - ubo-aopr.js
+    - ubo-abort-on-property-read
+    - ubo-aopr
+    - abp-abort-on-property-read
   description: Aborts a script when it attempts to read the specified property.
   docs: https://github.com/AdguardTeam/Scriptlets/blob/master/wiki/about-scriptlets.md#abort-on-property-read
   parameters:
@@ -19,8 +17,11 @@ adg_any_not_cb:
       description: The name of the property to abort on. The property must be attached to window.
 
 ubo_any:
-  scriptlet: aopr
-  aliases: ["aopr.js", "abort-on-property-read.js", "abort-on-property-read"]
+  name: aopr
+  aliases:
+    - aopr.js
+    - abort-on-property-read.js
+    - abort-on-property-read
   description: Aborts a script when it attempts to read the specified property.
   docs: https://github.com/gorhill/uBlock/wiki/Resources-Library#aoprjs-
   parameters:
@@ -29,7 +30,7 @@ ubo_any:
       description: The name of the property to abort on. The property must be attached to window.
 
 abp_any:
-  scriptlet: abort-on-property-read
+  name: abort-on-property-read
   description: Aborts a script when it attempts to read the specified property.
   docs: https://help.adblockplus.org/hc/en-us/articles/1500002338501#snippets-ref
   version_added: "3.4.1"
