@@ -60,6 +60,7 @@ For simplicity, the following shortcuts are also supported:
 
 - `any`: any adblocker
 - `adg_any`: any AdGuard adblocker
+- `adg_os_any`: any AdGuard OS-wide app
 - `adg_ext_any`: any AdGuard browser extension
 - `adg_ext_chromium`: AdGuard browser extension for Chromium-based browsers\*
 - `adg_cb_any`: any AdGuard content blocker
