@@ -10,9 +10,10 @@
     Supported syntaxes:
 </p>
 <p align="center">
-    <a href="https://adguard.com/"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
+    <a href="https://adguard.com"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
     <a href="https://github.com/gorhill/uBlock"><img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin</a> |
-    <a href="https://adblockplus.org/"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
+    <a href="https://getadblock.com"><img src="https://cdn.adguard.com/website/github.com/AGLint/ab_logo.svg" width="14px"> AdBlock</a> |
+    <a href="https://adblockplus.org"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
 </p>
 
 <p align="center">
@@ -63,7 +64,7 @@ Table of Contents:
 
 ## Introduction
 
-`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
+`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists.
 
@@ -71,7 +72,7 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 
 ## Features
 
-- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus.
+- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus.
 - :white_check_mark: **Error-tolerant**: it can parse any filter list, even if it contains minor syntax errors.
 - :zap: **Fast**: made with performance in mind.
 - :thumbsup: **Easy to use**: it can be used as a CLI tool or programmatically.
