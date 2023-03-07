@@ -61,8 +61,10 @@ For simplicity, the following shortcuts are also supported:
 | `adg_ext_chromium` | AdGuard browser extension for Chromium-based browsers\* | `adg_ext_chrome`, `adg_ext_opera`, `adg_ext_edge` |
 | `adg_cb_any` | Any AdGuard content blocker | `adg_cb_android`, `adg_cb_ios`, `adg_cb_safari` |
 | `adg_any_not_cb` | Any AdGuard adblocker except content blockers | `adg_os_any`, `adg_ext_any` |
+| `ubo_any` | Any uBlock Origin browser extension | `ubo_ext_any` |
 | `ubo_ext_any` | Any uBlock Origin browser extension | `ubo_ext_chromium`, `ubo_ext_firefox` |
 | `ubo_ext_chromium` | uBlock Origin browser extension for Chromium-based browsers\* | `ubo_ext_chrome`, `ubo_ext_opera`, `ubo_ext_edge` |
+| `abp_any` | Any Adblock Plus browser extension | `abp_ext_any` |
 | `abp_ext_any` | Any Adblock Plus browser extension | `abp_ext_chromium`, `abp_ext_firefox` |
 | `abp_ext_chromium` | Adblock Plus browser extension for Chromium-based browsers\* | `abp_ext_chrome`, `abp_ext_opera`, `abp_ext_edge` |
 
