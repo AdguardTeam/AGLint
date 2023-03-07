@@ -18,7 +18,6 @@ Each file contains an object, where the key is the [actual adblocker ID](../READ
 | `deprecation_message` | Message that describes why the scriptlet is deprecated. If not specified or it's value is `null`, then the message is not available. It's value is omitted if the scriptlet is not marked as deprecated. | `string\|null` | `null` |
 | `conflicts` | List of modifiers that are incompatible with the actual one. | `string[]` | `[]` (no conflicts) |
 | `inverse_conflicts` | The actual modifier is incompatible with all other modifiers, except the ones listed in `conflicts`. | `boolean` | `false` |
-| `single` | The actual modifier can only be used alone, it cannot be combined with any other modifiers. | `boolean` | `false` |
 | `assignable` | Describes whether the actual modifier supports value assignment. For example, `domain` is assignable, so it can be used like this: `$domain=domain.com\|~subdomain.domain.com`, where `=` is the assignment operator and `domain.com\|~subdomain.domain.com` is the value. | `boolean` | `false` |
 | `value_format` | Regular expression that matches the value of the actual modifier. If it's value is `null`, then the modifier value is not checked. | `string\|null` | `null` |
 | `negatable` | Describes whether the actual modifier can be negated. For example, `third-party` is negatable, so it can be used like this: `~third-party`. | `boolean` | `true` |
