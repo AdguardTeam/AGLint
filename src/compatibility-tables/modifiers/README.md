@@ -19,9 +19,33 @@ Each file contains an object, where the key is the [actual adblocker ID](../READ
 | `conflicts` | List of modifiers that are incompatible with the actual one. | `string[]` | `[]` (no conflicts) |
 | `inverse_conflicts` | The actual modifier is incompatible with all other modifiers, except the ones listed in `conflicts`. | `boolean` | `false` |
 | `assignable` | Describes whether the actual modifier supports value assignment. For example, `domain` is assignable, so it can be used like this: `$domain=domain.com\|~subdomain.domain.com`, where `=` is the assignment operator and `domain.com\|~subdomain.domain.com` is the value. | `boolean` | `false` |
-| `value_format` | Regular expression that matches the value of the actual modifier. If it's value is `null`, then the modifier value is not checked. | `string\|null` | `null` |
+| `value_format` | Describes the format of the value. See [Value format](#value-format) for more details. | `string\|null` | `null` |
 | `negatable` | Describes whether the actual modifier can be negated. For example, `third-party` is negatable, so it can be used like this: `~third-party`. | `boolean` | `true` |
 | `block_only` | The actual modifier can only be used in blocking rules, it cannot be used in exceptions. If it's value is `true`, then the modifier can be used only in blocking rules. `exception_only` and `block_only` cannot be used together (they are mutually exclusive). | `boolean` | `false` |
 | `exception_only` | The actual modifier can only be used in exceptions, it cannot be used in blocking rules. If it's value is `true`, then the modifier can be used only in exceptions. `exception_only` and `block_only` cannot be used together (they are mutually exclusive). | `boolean` | `false` |
+
+### Value format
+
+The value format describes the format of the modifier value. It can be one of the following:
+- Null value:
+  - In this case, the value format isn't validated. The value is valid if it's not empty, because if you specify "assignable" as `true`, then the value is required, just the format is not validated.
+  - Example: `value_format: null`
+- Regular expression pattern:
+  - Validating the value is done by matching it against the regular expression you provide. The value is valid if it matches the regular expression.
+  - The regular expression should start with `/` and end with `/`. For example, `/^[a-z0-9]+$/`.
+  - Example:
+    - If you want to validate that the value is a number, you can use `value_format: /^[0-9]+$/`. It matches for `$modifier=1` (valid), but not for `$modifier=abc` (invalid).
+- Pre-defined validator name:
+  - Validating the value is done by using the pre-defined validator. The value is valid if it matches the validator.
+  - Currently available validators:
+    - `domain` - validates that the value is a valid domain name.
+    - `pipe_separated_domains` - validates that the value is a valid list of domains separated by `|` character.
+    - `url` - validates that the value is a valid URL.
+    - `regexp` - validates that the value is a valid regular expression.
+      > :warning: **This is not the same as when you assign a regular expression to value_format!**
+      > - If you specify `value_format: /^[0-9]+$/`, then the value is valid if it matches the regular expression (it is numeric, for example: `$modifier=1`, but not `$modifier=a`).
+      > - If you specify `value_format: regexp`, then the value is valid if it's a valid regular expression, for example: `$modifier=/^valid_regex_value$/`.
+  - Example:
+    - For validating `domain` modifier, you can use `value_format: pipe_separated_domains`.
 
 \*: The field is required.
