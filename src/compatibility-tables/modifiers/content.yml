@@ -1,5 +1,5 @@
 adg_os_any: 
-  modifier:	content
+  modifier: content
   aliases: []
   conflicts: []
   single: true
@@ -12,4 +12,3 @@ adg_os_any:
   version_removed: null
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#content-modifier
   description: Disables HTML filtering and $replace rules on the pages that match the rule.
-  

@@ -1,5 +1,5 @@
 ubo_ext_any: 
-  modifier:	cname
+  modifier: cname
   aliases: []
   conflicts: []
   single: true
@@ -12,4 +12,3 @@ ubo_ext_any:
   version_removed: null
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#cname
   description: When used in an exception filter, it will bypass blocking CNAME uncloaked requests for the current (specified) document.
-  
