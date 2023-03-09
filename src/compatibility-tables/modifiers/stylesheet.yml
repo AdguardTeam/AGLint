@@ -14,7 +14,8 @@ abp_any:
   description: The rule corresponds to CSS files requests.
 ubo_any: 
   name:	stylesheet
-  aliases: ["css"]
+  aliases:
+    - css
   assignable: false
   negatable: true
   version_added: "0.0.1"

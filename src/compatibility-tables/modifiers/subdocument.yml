@@ -14,7 +14,8 @@ abp_any:
   description: The rule corresponds to requests for built-in pages — HTML tags frame and iframe.
 ubo_any: 
   name:	subdocument
-  aliases: ["frame"]
+  aliases:
+    - frame
   assignable: false
   negatable: true
   version_added: "0.0.1"
