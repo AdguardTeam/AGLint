@@ -1,5 +1,5 @@
 adg_os_any: 
-  modifier:	jsonprune
+  name:	jsonprune
   assignable: true
   negatable: false
   version_added: "CoreLibs 1.11"
