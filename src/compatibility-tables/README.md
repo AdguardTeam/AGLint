@@ -56,7 +56,7 @@ For simplicity, the following shortcuts are also supported:
 | --- | --- | --- |
 | `any` | Any adblocker, any platform | `adg_any`, `ubo_any`, `abp_any` |
 | `adg_any` | Any AdGuard adblocker | `adg_os_any`, `adg_ext_any`, `adg_cb_any` |
-| `adg_os_any` | Any AdGuard OS-wide app | `adg_os_windows`, `adg_os_mac`, `adg_os_android` |
+| `adg_os_any` | Any AdGuard OS-wide app (using [CoreLibs](https://github.com/AdguardTeam/CoreLibs)) | `adg_os_windows`, `adg_os_mac`, `adg_os_android` |
 | `adg_ext_any` | Any AdGuard browser extension | `adg_ext_chromium`, `adg_ext_firefox` |
 | `adg_ext_chromium` | AdGuard browser extension for Chromium-based browsers\* | `adg_ext_chrome`, `adg_ext_opera`, `adg_ext_edge` |
 | `adg_cb_any` | Any AdGuard content blocker | `adg_cb_android`, `adg_cb_ios`, `adg_cb_safari` |
