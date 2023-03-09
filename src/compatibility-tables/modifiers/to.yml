@@ -1,0 +1,15 @@
+ubo_ext_any: 
+  modifier:	to
+  aliases: []
+  conflicts: []
+  single: true
+  assignable: true
+  value_format: null
+  negatable: false
+  block_only: false
+  exception_only: false
+  version_added: null
+  version_removed: null
+  docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#to
+  description: The main motivation of this option is to give static network filtering engine an equivalent of DNR's requestDomains and excludedRequestDomains.
+  
