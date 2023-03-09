@@ -29,30 +29,30 @@ However, there may also be compatibility differences within a brand due to the s
 
 Therefore, we need to specify the platform for each adblocker to cover all the edge cases. The following platforms are supported:
 
-| Brand | Platform | Category |
+| Platform (ID) | Brand | Category |
 | --- | --- | --- |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard for Windows](https://adguard.com/adguard-windows/overview.html) | `adg_os_windows` | System-wide ad blocker |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard for Mac](https://adguard.com/adguard-mac/overview.html) | `adg_os_mac` | System-wide ad blocker |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard for Android](https://adguard.com/adguard-android/overview.html) | `adg_os_android` | System-wide ad blocker |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Chrome](https://adguard.com/adguard-browser-extension/chrome/overview.html) | `adg_ext_chrome` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Opera](https://adguard.com/adguard-browser-extension/opera/overview.html) | `adg_ext_opera` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Edge](https://adguard.com/adguard-browser-extension/edge/overview.html) | `adg_ext_edge` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Firefox](https://adguard.com/adguard-browser-extension/firefox/overview.html) | `adg_ext_firefox` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard Content Blocker for Android](https://adguard.com/adguard-content-blocker/overview.html) | `adg_cb_android` | Content blocker |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard Content Blocker for iOS](https://adguard.com/adguard-ios/overview.html) | `adg_cb_ios` | Content blocker |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard Content Blocker for Safari](https://adguard.com/adguard-safari/overview.html) | `adg_cb_safari` | Content blocker |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Google Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm) | `ubo_ext_chrome` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Mozilla Firefox](https://addons.mozilla.org/addon/ublock-origin/) | `ubo_ext_firefox` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Opera](https://addons.opera.com/extensions/details/ublock/) | `ubo_ext_opera` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak) | `ubo_ext_edge` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Google Chrome](https://chrome.google.com/webstore/detail/cfhdojbkjhnklbpkdaibdccddilifddb) | `abp_ext_chrome` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Mozilla Firefox](https://eyeo.to/adblockplus/firefox_install/) | `abp_ext_firefox` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Opera](https://eyeo.to/adblockplus/opera_install/) | `abp_ext_opera` | Browser extension |
-| <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Microsoft Edge](https://eyeo.to/adblockplus/edge_install/) | `abp_ext_edge` | Browser extension |
+ `adg_os_windows` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard for Windows](https://adguard.com/adguard-windows/overview.html) | System-wide ad blocker |
+`adg_os_mac` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard for Mac](https://adguard.com/adguard-mac/overview.html) | System-wide ad blocker |
+`adg_os_android` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard for Android](https://adguard.com/adguard-android/overview.html) | System-wide ad blocker |
+`adg_ext_chrome` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Chrome](https://adguard.com/adguard-browser-extension/chrome/overview.html) | Browser extension |
+`adg_ext_opera` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Opera](https://adguard.com/adguard-browser-extension/opera/overview.html) | Browser extension |
+`adg_ext_edge` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Edge](https://adguard.com/adguard-browser-extension/edge/overview.html) | Browser extension |
+`adg_ext_firefox` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard extension for Firefox](https://adguard.com/adguard-browser-extension/firefox/overview.html) | Browser extension |
+`adg_cb_android` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard Content Blocker for Android](https://adguard.com/adguard-content-blocker/overview.html) | Content blocker |
+`adg_cb_ios` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard Content Blocker for iOS](https://adguard.com/adguard-ios/overview.html) | Content blocker |
+`adg_cb_safari` | <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard Content Blocker for Safari](https://adguard.com/adguard-safari/overview.html) | Content blocker |
+`ubo_ext_chrome` | <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Google Chrome](https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm) | Browser extension |
+`ubo_ext_firefox` | <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Mozilla Firefox](https://addons.mozilla.org/addon/ublock-origin/) | Browser extension |
+`ubo_ext_opera` | <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Opera](https://addons.opera.com/extensions/details/ublock/) | Browser extension |
+`ubo_ext_edge` | <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin for Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak) | Browser extension |
+`abp_ext_chrome` | <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Google Chrome](https://chrome.google.com/webstore/detail/cfhdojbkjhnklbpkdaibdccddilifddb) | Browser extension |
+`abp_ext_firefox` | <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Mozilla Firefox](https://eyeo.to/adblockplus/firefox_install/) | Browser extension |
+`abp_ext_opera` | <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Opera](https://eyeo.to/adblockplus/opera_install/) | Browser extension |
+`abp_ext_edge` | <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus for Microsoft Edge](https://eyeo.to/adblockplus/edge_install/) | Browser extension |
 
 For simplicity, the following shortcuts are also supported:
 
-| Shortcut | Description | Equivalent to (shortcut or platform) |
+| Shortcut (ID) | Description | Equivalent to (shortcut or platform) |
 | --- | --- | --- |
 | `any` | Any adblocker, any platform | `adg_any`, `ubo_any`, `abp_any` |
 | `adg_any` | Any AdGuard adblocker | `adg_os_any`, `adg_ext_any`, `adg_cb_any` |
