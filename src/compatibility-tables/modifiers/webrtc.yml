@@ -10,6 +10,6 @@ ubo_any:
 
 abp_any:
   modifier: webrtc
-  version_added: "Adblock Plus 1.13.3"
+  version_added: "1.13.3"
   docs: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#type-options
   description: The rule applies only to WebRTC connections.

@@ -1,5 +1,5 @@
 adg_any:
-  modifier:	generichide
+  modifier: generichide
   aliases:
    - ghide
   conflicts:
@@ -18,7 +18,7 @@ adg_any:
   description: Disables all generic cosmetic rules.
 
 ubo_any:
-  modifier:	generichide
+  modifier: generichide
   aliases:
     - ghide
   conflicts:
