@@ -1,14 +1,14 @@
 adg_any:
   modifier: urlblock
   conflicts:
-   - domain
-   - specifichide
-   - generichide
-   - elemhide
-   - extension
-   - jsinject
-   - content
-   - badfilter
+    - domain
+    - specifichide
+    - generichide
+    - elemhide
+    - extension
+    - jsinject
+    - content
+    - badfilter
   inverse_conflicts: true
   negatable: false
   exception_only: true

@@ -1,15 +1,15 @@
 adg_os_any:
   modifier: extension
   conflicts:
-   - domain
-   - specifichide
-   - generichide
-   - elemhide
-   - genericblock
-   - urlblock
-   - jsinject
-   - content
-   - badfilter
+    - domain
+    - specifichide
+    - generichide
+    - elemhide
+    - genericblock
+    - urlblock
+    - jsinject
+    - content
+    - badfilter
   inverse_conflicts: true
   exception_only: true
   version_added: "0.0.1"

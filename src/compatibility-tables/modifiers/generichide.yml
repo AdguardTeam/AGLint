@@ -1,15 +1,15 @@
 adg_any:
   modifier: generichide
   aliases:
-   - ghide
+    - ghide
   conflicts:
-   - domain
-   - genericblock
-   - urlblock
-   - extension
-   - jsinject
-   - content
-   - badfilter
+    - domain
+    - genericblock
+    - urlblock
+    - extension
+    - jsinject
+    - content
+    - badfilter
   inverse_conflicts: true
   negatable: false
   exception_only: true
@@ -22,8 +22,8 @@ ubo_any:
   aliases:
     - ghide
   conflicts:
-   - domain
-   - badfilter
+    - domain
+    - badfilter
   inverse_conflicts: true
   negatable: false
   exception_only: true
@@ -34,7 +34,7 @@ ubo_any:
 abp_any:
   modifier: generichide
   conflicts:
-   - domain
+    - domain
   inverse_conflicts: true
   negatable: false
   exception_only: true
