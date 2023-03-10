@@ -4,14 +4,18 @@ on:
   push:
     branches:
       - master
-    paths-ignore: ['*.md', 'docs/**']
+    paths-ignore:
+      - '**.md'
+      - compatibility-tables/**/*.yml
   pull_request:
     branches:
       - master
-    paths-ignore: ['*.md', 'docs/**']
+    paths-ignore:
+      - '**.md'
+      - compatibility-tables/**/*.yml
 
 jobs:
-  lint:
+  check_code:
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository
