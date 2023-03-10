@@ -1,4 +1,4 @@
-any:
+adg_any:
   name:	other
   description: The rule applies to requests for which the type has not been determined or does not match the types listed above.
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#other-modifier
