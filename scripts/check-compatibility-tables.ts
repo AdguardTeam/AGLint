@@ -97,8 +97,6 @@ for (const [globPattern, schema] of Object.entries(SCHEMA_MAP)) {
     // Get all files matching the glob pattern
     const files = globSync(globPattern);
 
-    console.log(files);
-
     for (const file of files) {
         // Get file contents
         const content = readFileSync(file, 'utf8');
