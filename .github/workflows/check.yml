@@ -6,13 +6,13 @@ on:
       - master
     paths-ignore:
       - '**.md'
-      - 'compatibility-tables/**.yml'
+      - 'src/compatibility-tables/**.yml'
   pull_request:
     branches:
       - master
     paths-ignore:
       - '**.md'
-      - 'compatibility-tables/**.yml'
+      - 'src/compatibility-tables/**.yml'
 
 jobs:
   check_code:
