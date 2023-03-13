@@ -11,7 +11,7 @@ on:
       - "src/compatibility-tables/**.yml"
 
 jobs:
-  check_code:
+  check_compatibility_tables:
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository
