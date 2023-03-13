@@ -1,5 +1,5 @@
-ubo_ext_any: 
-  modifier: to
+ubo_ext_any:
+  name: to
   assignable: true
   negatable: false
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#to

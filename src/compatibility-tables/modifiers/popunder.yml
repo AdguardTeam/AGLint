@@ -1,5 +1,5 @@
-ubo_ext_any: 
-  modifier: popunder
+ubo_ext_any:
+  name: popunder
   negatable: false
   block_only: true
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#popunder

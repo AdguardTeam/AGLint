@@ -1,5 +1,5 @@
-adg_os_any: 
-  modifier: content
+adg_os_any:
+  name: content
   negatable: false
   exception_only: true
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#content-modifier
