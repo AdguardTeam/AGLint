@@ -1,5 +1,5 @@
 adg_os_any:
-  modifier: extension
+  name: extension
   conflicts:
     - domain
     - specifichide

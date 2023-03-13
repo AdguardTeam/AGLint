@@ -1,5 +1,5 @@
 adg_any:
-  modifier: urlblock
+  name: urlblock
   conflicts:
     - domain
     - specifichide

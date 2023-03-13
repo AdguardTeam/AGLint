@@ -1,5 +1,5 @@
 adg_any:
-  modifier: generichide
+  name: generichide
   aliases:
     - ghide
   conflicts:
@@ -19,7 +19,7 @@ adg_any:
   description: Disables all generic cosmetic rules.
 
 ubo_any:
-  modifier: generichide
+  name: generichide
   aliases:
     - ghide
   conflicts:
@@ -33,7 +33,7 @@ ubo_any:
   description: Disables all generic cosmetic rules.
 
 abp_any:
-  modifier: generichide
+  name: generichide
   conflicts:
     - domain
   inverse_conflicts: true
