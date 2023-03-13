@@ -7,6 +7,8 @@ on:
     paths:
       - "src/compatibility-tables/**.yml"
   pull_request:
+    branches:
+      - master
     paths:
       - "src/compatibility-tables/**.yml"
 
