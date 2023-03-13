@@ -9,6 +9,7 @@ adg_any:
     - extension
     - jsinject
     - content
+    - xmlhttprequest
     - badfilter
   inverse_conflicts: true
   negatable: false

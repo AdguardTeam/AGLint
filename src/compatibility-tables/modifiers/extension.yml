@@ -9,6 +9,7 @@ adg_os_any:
     - urlblock
     - jsinject
     - content
+    - xmlhttprequest
     - badfilter
   inverse_conflicts: true
   exception_only: true
