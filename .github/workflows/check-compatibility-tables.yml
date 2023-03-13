@@ -1,0 +1,30 @@
+name: Check compatibility tables
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "src/compatibility-tables/**.yml"
+  pull_request:
+    paths:
+      - "src/compatibility-tables/**.yml"
+
+jobs:
+  check_code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out to repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check compatibility tables
+        run: yarn check-compatibility-tables
