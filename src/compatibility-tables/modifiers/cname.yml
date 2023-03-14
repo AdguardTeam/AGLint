@@ -1,5 +1,5 @@
-ubo_ext_any: 
-  modifier: cname
+ubo_ext_any:
+  name: cname
   negatable: false
   exception_only: true
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#cname

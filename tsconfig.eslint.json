@@ -3,6 +3,7 @@
     "include": [
       "src/**/*.ts",
       "test/**/*.ts",
+      "scripts/**/*.ts",
       ".eslintrc",
       "jest.config.ts",
       "rollup.config.ts",
