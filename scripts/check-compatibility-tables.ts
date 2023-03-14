@@ -61,7 +61,7 @@ const SCHEMA_MAP = {
         ss.object({
             name: ss.nonempty(ss.string()),
             aliases: ss.defaulted(ss.array(ss.nonempty(ss.string())), []),
-            description: ss.nullable(ss.string()),
+            description: ss.defaulted(ss.nullable(ss.string()), null),
             docs: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
             version_added: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
             version_removed: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
