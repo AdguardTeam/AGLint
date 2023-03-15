@@ -85,6 +85,21 @@ const SCHEMA_MAP = {
             return true;
         },
     )),
+
+    // https://github.com/AdguardTeam/AGLint/tree/master/src/compatibility-tables/redirects#file-structure
+    'src/compatibility-tables/redirects/**.yml': ss.record(
+        platforms,
+        ss.object({
+            name: ss.nonempty(ss.string()),
+            aliases: ss.defaulted(ss.array(ss.nonempty(ss.string())), []),
+            description: ss.defaulted(ss.nullable(ss.string()), null),
+            docs: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
+            version_added: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
+            version_removed: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
+            deprecated: ss.defaulted(ss.boolean(), false),
+            deprecation_message: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
+        }),
+    ),
 };
 
 /**
@@ -108,7 +123,11 @@ for (const [globPattern, schema] of Object.entries(SCHEMA_MAP)) {
             // Validate the object against the schema (throws if the object is invalid)
             // Needs to use 'create' instead of 'assert' because we want to set the
             // default values for optional properties.
-            ss.create(data, schema);
+
+            // In order to avoid type errors, we need to cast the schema to 'Struct<unknown>'.
+            // It is safe to do so because we don't use create()'s return value.
+            // TODO: Better way to do this? Is it necessary?
+            ss.create(data, schema as ss.Struct<unknown>);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 if (file in problems) {
