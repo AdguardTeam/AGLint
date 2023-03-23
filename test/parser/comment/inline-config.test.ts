@@ -1,241 +1,1060 @@
-import { CommentRuleType } from '../../../src/parser/comment/types';
-import { CommentMarker } from '../../../src/parser/comment/marker';
-import { ConfigComment, ConfigCommentParser } from '../../../src/parser/comment/inline-config';
-import { RuleCategory } from '../../../src/parser/common';
-import { AdblockSyntax } from '../../../src/utils/adblockers';
+import { ConfigCommentRuleParser } from '../../../src/parser/comment/inline-config';
 import { EMPTY, SPACE } from '../../../src/utils/constants';
 
-describe('PreProcessorParser', () => {
-    test('isComment', () => {
+describe('ConfigCommentRuleParser', () => {
+    test('isConfigComment', () => {
         // Empty
-        expect(ConfigCommentParser.isConfigComment(EMPTY)).toBe(false);
-        expect(ConfigCommentParser.isConfigComment(SPACE)).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment(EMPTY)).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment(SPACE)).toBe(false);
 
         // Begins with !
-        expect(ConfigCommentParser.isConfigComment('!')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!!')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('! comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!+comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!#comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!#########################')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('! #########################')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment(' !')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('  !')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!!')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('! comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!+comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!#comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!#########################')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('! #########################')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment(' !')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('  !')).toBe(false);
 
         // Begins with #
-        expect(ConfigCommentParser.isConfigComment('#')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('##')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('# #')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('# comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#+comment')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#########################')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('# ########################')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment(' #')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('  ##')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('##')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('# #')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('# comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#+comment')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#########################')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('# ########################')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment(' #')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('  ##')).toBe(false);
 
         // Not "aglint" prefix
-        expect(ConfigCommentParser.isConfigComment('!aaglint')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!aaglint-enable')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!aaglint-anything')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('! aaglint')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('! aaglint-enable')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('! aaglint-anything')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!   aaglint  ')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!   aaglint-enable  ')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('!   aaglint-anything  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!aaglint')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!aaglint-enable')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!aaglint-anything')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('! aaglint')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('! aaglint-enable')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('! aaglint-anything')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint-enable  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint-anything  ')).toBe(false);
 
-        expect(ConfigCommentParser.isConfigComment('#aaglint')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#aaglint-enable')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#aaglint-anything')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('# aaglint')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('# aaglint-enable')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('# aaglint-anything')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#   aaglint  ')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#   aaglint-enable  ')).toBe(false);
-        expect(ConfigCommentParser.isConfigComment('#   aaglint-anything  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#aaglint')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#aaglint-enable')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#aaglint-anything')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('# aaglint')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('# aaglint-enable')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('# aaglint-anything')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint-enable  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint-anything  ')).toBe(false);
 
         // Valid cases
-        expect(ConfigCommentParser.isConfigComment('!aglint')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('!aglint-enable')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('!aglint-anything')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('! aglint')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('! aglint-enable')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('! aglint-anything')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('!   aglint  ')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('!   aglint-enable  ')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('!   aglint-anything  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!aglint')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!aglint-enable')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!aglint-anything')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('! aglint')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('! aglint-enable')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('! aglint-anything')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!   aglint  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!   aglint-enable  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!   aglint-anything  ')).toBe(true);
 
-        expect(ConfigCommentParser.isConfigComment('#aglint')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('#aglint-enable')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('#aglint-anything')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('# aglint')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('# aglint-enable')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('# aglint-anything')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('#   aglint  ')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('#   aglint-enable  ')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('#   aglint-anything  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#aglint')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#aglint-enable')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#aglint-anything')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('# aglint')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('# aglint-enable')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('# aglint-anything')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#   aglint  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#   aglint-enable  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#   aglint-anything  ')).toBe(true);
 
-        expect(ConfigCommentParser.isConfigComment('!AGLINT')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('#AGLINT')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('! AGLINT')).toBe(true);
-        expect(ConfigCommentParser.isConfigComment('# AGLINT')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!AGLINT')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#AGLINT')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('! AGLINT')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('# AGLINT')).toBe(true);
     });
 
     test('parse', () => {
         // !
-        expect(ConfigCommentParser.parse('! aglint-disable')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-disable',
+        expect(ConfigCommentRuleParser.parse('! aglint-disable')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 16,
+                    line: 1,
+                    column: 17,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                },
+                value: 'aglint-disable',
+            },
         });
 
-        expect(ConfigCommentParser.parse('!aglint-disable')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-disable',
+        expect(ConfigCommentRuleParser.parse('!aglint-disable')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 15,
+                    line: 1,
+                    column: 16,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-disable',
+            },
         });
 
         // #
-        expect(ConfigCommentParser.parse('# aglint-disable')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Hashmark,
-            command: 'aglint-disable',
+        expect(ConfigCommentRuleParser.parse('# aglint-disable')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 16,
+                    line: 1,
+                    column: 17,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '#',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                },
+                value: 'aglint-disable',
+            },
         });
 
-        expect(ConfigCommentParser.parse('#aglint-disable')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Hashmark,
-            command: 'aglint-disable',
+        expect(ConfigCommentRuleParser.parse('#aglint-disable')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 15,
+                    line: 1,
+                    column: 16,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '#',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-disable',
+            },
         });
 
         // Different command
-        expect(ConfigCommentParser.parse('! aglint-enable')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-enable',
+        expect(ConfigCommentRuleParser.parse('! aglint-enable')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 15,
+                    line: 1,
+                    column: 16,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-enable',
+            },
         });
 
-        expect(ConfigCommentParser.parse('! aglint-enable rule1')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-enable',
-            params: ['rule1'],
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 21,
+                    line: 1,
+                    column: 22,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-enable',
+            },
+            params: {
+                type: 'ParameterList',
+                loc: {
+                    start: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                    end: {
+                        offset: 21,
+                        line: 1,
+                        column: 22,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 16,
+                                line: 1,
+                                column: 17,
+                            },
+                            end: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                        },
+                        value: 'rule1',
+                    },
+                ],
+            },
         });
 
-        expect(ConfigCommentParser.parse('! aglint-enable rule1,rule2')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-enable',
-            params: ['rule1', 'rule2'],
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1,rule2')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 27,
+                    line: 1,
+                    column: 28,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-enable',
+            },
+            params: {
+                type: 'ParameterList',
+                loc: {
+                    start: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                    end: {
+                        offset: 27,
+                        line: 1,
+                        column: 28,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 16,
+                                line: 1,
+                                column: 17,
+                            },
+                            end: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                        },
+                        value: 'rule1',
+                    },
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 22,
+                                line: 1,
+                                column: 23,
+                            },
+                            end: {
+                                offset: 27,
+                                line: 1,
+                                column: 28,
+                            },
+                        },
+                        value: 'rule2',
+                    },
+                ],
+            },
         });
 
-        expect(ConfigCommentParser.parse('! aglint-enable rule1, rule2')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-enable',
-            params: ['rule1', 'rule2'],
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1, rule2')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 28,
+                    line: 1,
+                    column: 29,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-enable',
+            },
+            params: {
+                type: 'ParameterList',
+                loc: {
+                    start: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                    end: {
+                        offset: 28,
+                        line: 1,
+                        column: 29,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 16,
+                                line: 1,
+                                column: 17,
+                            },
+                            end: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                        },
+                        value: 'rule1',
+                    },
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 23,
+                                line: 1,
+                                column: 24,
+                            },
+                            end: {
+                                offset: 28,
+                                line: 1,
+                                column: 29,
+                            },
+                        },
+                        value: 'rule2',
+                    },
+                ],
+            },
         });
 
         // Ignore comment
-        expect(ConfigCommentParser.parse('! aglint-enable rule1, rule2 -- comment')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint-enable',
-            params: ['rule1', 'rule2'],
-            comment: 'comment',
-        });
-
-        expect(ConfigCommentParser.parse('! aglint rule1: "off"')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint',
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1, rule2 -- comment')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 39,
+                    line: 1,
+                    column: 40,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'aglint-enable',
+            },
             params: {
-                rule1: 'off',
+                type: 'ParameterList',
+                loc: {
+                    start: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                    end: {
+                        offset: 28,
+                        line: 1,
+                        column: 29,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 16,
+                                line: 1,
+                                column: 17,
+                            },
+                            end: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                        },
+                        value: 'rule1',
+                    },
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 23,
+                                line: 1,
+                                column: 24,
+                            },
+                            end: {
+                                offset: 28,
+                                line: 1,
+                                column: 29,
+                            },
+                        },
+                        value: 'rule2',
+                    },
+                ],
+            },
+            comment: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 29,
+                        line: 1,
+                        column: 30,
+                    },
+                    end: {
+                        offset: 39,
+                        line: 1,
+                        column: 40,
+                    },
+                },
+                value: '-- comment',
             },
         });
 
-        expect(ConfigCommentParser.parse('! aglint rule1: 1')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint',
+        expect(ConfigCommentRuleParser.parse('! aglint rule1: "off"')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 21,
+                    line: 1,
+                    column: 22,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 8,
+                        line: 1,
+                        column: 9,
+                    },
+                },
+                value: 'aglint',
+            },
             params: {
-                rule1: 1,
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 21,
+                        line: 1,
+                        column: 22,
+                    },
+                },
+                value: {
+                    rule1: 'off',
+                },
             },
         });
 
-        expect(ConfigCommentParser.parse('! aglint rule1: ["error", "double"]')).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint',
+        expect(ConfigCommentRuleParser.parse('! aglint rule1: 1')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 17,
+                    line: 1,
+                    column: 18,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 8,
+                        line: 1,
+                        column: 9,
+                    },
+                },
+                value: 'aglint',
+            },
             params: {
-                rule1: ['error', 'double'],
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 17,
+                        line: 1,
+                        column: 18,
+                    },
+                },
+                value: {
+                    rule1: 1,
+                },
+            },
+        });
+
+        expect(ConfigCommentRuleParser.parse('! aglint rule1: ["error", "double"]')).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 35,
+                    line: 1,
+                    column: 36,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 8,
+                        line: 1,
+                        column: 9,
+                    },
+                },
+                value: 'aglint',
+            },
+            params: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 35,
+                        line: 1,
+                        column: 36,
+                    },
+                },
+                value: {
+                    rule1: [
+                        'error',
+                        'double',
+                    ],
+                },
             },
         });
 
         // Complicated case
         expect(
-            ConfigCommentParser.parse(
+            ConfigCommentRuleParser.parse(
                 // eslint-disable-next-line max-len
                 '! aglint rule1: "off", rule2: [1, 2], rule3: ["error", { "max": 100 }] -- this is a comment -- this doesn\'t matter',
             ),
-        ).toEqual(<ConfigComment>{
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: CommentMarker.Regular,
-            command: 'aglint',
-            params: {
-                rule1: 'off',
-                rule2: [1, 2],
-                rule3: ['error', { max: 100 }],
+        ).toEqual({
+            type: 'ConfigCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 114,
+                    line: 1,
+                    column: 115,
+                },
             },
-            comment: "this is a comment -- this doesn't matter",
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            command: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 8,
+                        line: 1,
+                        column: 9,
+                    },
+                },
+                value: 'aglint',
+            },
+            params: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 70,
+                        line: 1,
+                        column: 71,
+                    },
+                },
+                value: {
+                    rule1: 'off',
+                    rule2: [
+                        1,
+                        2,
+                    ],
+                    rule3: [
+                        'error',
+                        {
+                            max: 100,
+                        },
+                    ],
+                },
+            },
+            comment: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 71,
+                        line: 1,
+                        column: 72,
+                    },
+                    end: {
+                        offset: 114,
+                        line: 1,
+                        column: 115,
+                    },
+                },
+                value: "-- this is a comment -- this doesn't matter",
+            },
         });
 
         // Invalid cases
-        expect(() => ConfigCommentParser.parse('! aglint')).toThrowError('Missing configuration object');
-        expect(() => ConfigCommentParser.parse('! aglint rule1')).toThrowError();
-        expect(() => ConfigCommentParser.parse('! aglint rule1: ["error", "double"')).toThrowError();
-        expect(() => ConfigCommentParser.parse('! aglint rule1: () => 1')).toThrowError();
+        expect(() => ConfigCommentRuleParser.parse('! aglint')).toThrowError('Empty AGLint config');
+        expect(() => ConfigCommentRuleParser.parse('! aglint rule1')).toThrowError();
+        expect(() => ConfigCommentRuleParser.parse('! aglint rule1: ["error", "double"')).toThrowError();
+        expect(() => ConfigCommentRuleParser.parse('! aglint rule1: () => 1')).toThrowError();
 
-        expect(() => ConfigCommentParser.parse('# aglint')).toThrowError('Missing configuration object');
-        expect(() => ConfigCommentParser.parse('# aglint rule1')).toThrowError();
-        expect(() => ConfigCommentParser.parse('# aglint rule1: ["error", "double"')).toThrowError();
-        expect(() => ConfigCommentParser.parse('# aglint rule1: () => 1')).toThrowError();
+        expect(() => ConfigCommentRuleParser.parse('# aglint')).toThrowError('Empty AGLint config');
+        expect(() => ConfigCommentRuleParser.parse('# aglint rule1')).toThrowError();
+        expect(() => ConfigCommentRuleParser.parse('# aglint rule1: ["error", "double"')).toThrowError();
+        expect(() => ConfigCommentRuleParser.parse('# aglint rule1: () => 1')).toThrowError();
     });
 
     test('generate', () => {
         const parseAndGenerate = (raw: string) => {
-            const ast = ConfigCommentParser.parse(raw);
+            const ast = ConfigCommentRuleParser.parse(raw);
 
             if (ast) {
-                return ConfigCommentParser.generate(ast);
+                return ConfigCommentRuleParser.generate(ast);
             }
 
             return null;

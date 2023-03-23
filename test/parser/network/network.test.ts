@@ -1,417 +1,2152 @@
-import { RuleCategory } from '../../../src/parser/common';
-import { NetworkRuleType } from '../../../src/parser/network/types';
-import { RemoveHeaderNetworkRule, NetworkRuleParser, UBO_RESPONSEHEADER_INDICATOR } from '../../../src/parser/network';
+import { NetworkRuleParser } from '../../../src/parser/network';
 import { AdblockSyntax } from '../../../src/utils/adblockers';
-import { CLOSE_PARENTHESIS } from '../../../src/utils/constants';
+import { NetworkRule, RuleCategory } from '../../../src/parser/nodes';
 
 describe('NetworkRuleParser', () => {
     test('parse', () => {
-        expect(NetworkRuleParser.parse('||example.com')).toEqual({
+        expect(NetworkRuleParser.parse('||example.com')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 13,
+                    line: 1,
+                    column: 14,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: '||example.com',
-            modifiers: [],
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 13,
+                        line: 1,
+                        column: 14,
+                    },
+                },
+                value: '||example.com',
+            },
         });
 
-        expect(NetworkRuleParser.parse('@@||example.com')).toEqual({
+        expect(NetworkRuleParser.parse('@@||example.com')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 15,
+                    line: 1,
+                    column: 16,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '||example.com',
-            modifiers: [],
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: '||example.com',
+            },
         });
 
-        expect(NetworkRuleParser.parse('@@||example.com$m1,m2=v2')).toEqual({
+        expect(NetworkRuleParser.parse('@@||example.com$m1,m2=v2')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 24,
+                    line: 1,
+                    column: 25,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '||example.com',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: 'v2',
+                value: '||example.com',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
+                    end: {
+                        offset: 24,
+                        line: 1,
+                        column: 25,
+                    },
                 },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 16,
+                                line: 1,
+                                column: 17,
+                            },
+                            end: {
+                                offset: 18,
+                                line: 1,
+                                column: 19,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 16,
+                                    line: 1,
+                                    column: 17,
+                                },
+                                end: {
+                                    offset: 18,
+                                    line: 1,
+                                    column: 19,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 19,
+                                line: 1,
+                                column: 20,
+                            },
+                            end: {
+                                offset: 24,
+                                line: 1,
+                                column: 25,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 19,
+                                    line: 1,
+                                    column: 20,
+                                },
+                                end: {
+                                    offset: 21,
+                                    line: 1,
+                                    column: 22,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 22,
+                                    line: 1,
+                                    column: 23,
+                                },
+                                end: {
+                                    offset: 24,
+                                    line: 1,
+                                    column: 25,
+                                },
+                            },
+                            value: 'v2',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
-        expect(NetworkRuleParser.parse('/example/')).toEqual({
+        expect(NetworkRuleParser.parse('/example/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 9,
+                    line: 1,
+                    column: 10,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: '/example/',
-            modifiers: [],
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                },
+                value: '/example/',
+            },
         });
 
-        expect(NetworkRuleParser.parse('@@/example/')).toEqual({
+        expect(NetworkRuleParser.parse('@@/example/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 11,
+                    line: 1,
+                    column: 12,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '/example/',
-            modifiers: [],
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 11,
+                        line: 1,
+                        column: 12,
+                    },
+                },
+                value: '/example/',
+            },
         });
 
-        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2')).toEqual({
+        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 20,
+                    line: 1,
+                    column: 21,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '/example/',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 11,
+                        line: 1,
+                        column: 12,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: 'v2',
+                value: '/example/',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 12,
+                        line: 1,
+                        column: 13,
+                    },
+                    end: {
+                        offset: 20,
+                        line: 1,
+                        column: 21,
+                    },
                 },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 12,
+                                line: 1,
+                                column: 13,
+                            },
+                            end: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 12,
+                                    line: 1,
+                                    column: 13,
+                                },
+                                end: {
+                                    offset: 14,
+                                    line: 1,
+                                    column: 15,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 15,
+                                line: 1,
+                                column: 16,
+                            },
+                            end: {
+                                offset: 20,
+                                line: 1,
+                                column: 21,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 15,
+                                    line: 1,
+                                    column: 16,
+                                },
+                                end: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 18,
+                                    line: 1,
+                                    column: 19,
+                                },
+                                end: {
+                                    offset: 20,
+                                    line: 1,
+                                    column: 21,
+                                },
+                            },
+                            value: 'v2',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Last $ in regex pattern
-        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3$/')).toEqual({
+        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3$/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 30,
+                    line: 1,
+                    column: 31,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '/example/',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 11,
+                        line: 1,
+                        column: 12,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: 'v2',
+                value: '/example/',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 12,
+                        line: 1,
+                        column: 13,
+                    },
+                    end: {
+                        offset: 30,
+                        line: 1,
+                        column: 31,
+                    },
                 },
-                {
-                    modifier: 'm3',
-                    exception: false,
-                    value: '/^r3$/',
-                },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 12,
+                                line: 1,
+                                column: 13,
+                            },
+                            end: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 12,
+                                    line: 1,
+                                    column: 13,
+                                },
+                                end: {
+                                    offset: 14,
+                                    line: 1,
+                                    column: 15,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 15,
+                                line: 1,
+                                column: 16,
+                            },
+                            end: {
+                                offset: 20,
+                                line: 1,
+                                column: 21,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 15,
+                                    line: 1,
+                                    column: 16,
+                                },
+                                end: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 18,
+                                    line: 1,
+                                    column: 19,
+                                },
+                                end: {
+                                    offset: 20,
+                                    line: 1,
+                                    column: 21,
+                                },
+                            },
+                            value: 'v2',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                            end: {
+                                offset: 30,
+                                line: 1,
+                                column: 31,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 21,
+                                    line: 1,
+                                    column: 22,
+                                },
+                                end: {
+                                    offset: 23,
+                                    line: 1,
+                                    column: 24,
+                                },
+                            },
+                            value: 'm3',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 24,
+                                    line: 1,
+                                    column: 25,
+                                },
+                                end: {
+                                    offset: 30,
+                                    line: 1,
+                                    column: 31,
+                                },
+                            },
+                            value: '/^r3$/',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Escaped $ in regex
-        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3\\$/')).toEqual({
+        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3\\$/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 31,
+                    line: 1,
+                    column: 32,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '/example/',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 11,
+                        line: 1,
+                        column: 12,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: 'v2',
+                value: '/example/',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 12,
+                        line: 1,
+                        column: 13,
+                    },
+                    end: {
+                        offset: 31,
+                        line: 1,
+                        column: 32,
+                    },
                 },
-                {
-                    modifier: 'm3',
-                    exception: false,
-                    value: '/^r3\\$/',
-                },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 12,
+                                line: 1,
+                                column: 13,
+                            },
+                            end: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 12,
+                                    line: 1,
+                                    column: 13,
+                                },
+                                end: {
+                                    offset: 14,
+                                    line: 1,
+                                    column: 15,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 15,
+                                line: 1,
+                                column: 16,
+                            },
+                            end: {
+                                offset: 20,
+                                line: 1,
+                                column: 21,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 15,
+                                    line: 1,
+                                    column: 16,
+                                },
+                                end: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 18,
+                                    line: 1,
+                                    column: 19,
+                                },
+                                end: {
+                                    offset: 20,
+                                    line: 1,
+                                    column: 21,
+                                },
+                            },
+                            value: 'v2',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                            end: {
+                                offset: 31,
+                                line: 1,
+                                column: 32,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 21,
+                                    line: 1,
+                                    column: 22,
+                                },
+                                end: {
+                                    offset: 23,
+                                    line: 1,
+                                    column: 24,
+                                },
+                            },
+                            value: 'm3',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 24,
+                                    line: 1,
+                                    column: 25,
+                                },
+                                end: {
+                                    offset: 31,
+                                    line: 1,
+                                    column: 32,
+                                },
+                            },
+                            value: '/^r3\\$/',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Escaped separator
-        expect(NetworkRuleParser.parse('example.com\\$m1')).toEqual({
+        expect(NetworkRuleParser.parse('example.com\\$m1')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 15,
+                    line: 1,
+                    column: 16,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: 'example.com\\$m1',
-            modifiers: [],
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                },
+                value: 'example.com\\$m1',
+            },
         });
 
         // Multiple separators
-        expect(NetworkRuleParser.parse('example.com$m1$m2$m3$m4$m5')).toEqual({
+        expect(NetworkRuleParser.parse('example.com$m1$m2$m3$m4$m5')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 26,
+                    line: 1,
+                    column: 27,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: 'example.com$m1$m2$m3$m4',
-            modifiers: [
-                {
-                    modifier: 'm5',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 23,
+                        line: 1,
+                        column: 24,
+                    },
                 },
-            ],
+                value: 'example.com$m1$m2$m3$m4',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 24,
+                        line: 1,
+                        column: 25,
+                    },
+                    end: {
+                        offset: 26,
+                        line: 1,
+                        column: 27,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 24,
+                                line: 1,
+                                column: 25,
+                            },
+                            end: {
+                                offset: 26,
+                                line: 1,
+                                column: 27,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 24,
+                                    line: 1,
+                                    column: 25,
+                                },
+                                end: {
+                                    offset: 26,
+                                    line: 1,
+                                    column: 27,
+                                },
+                            },
+                            value: 'm5',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
-        expect(NetworkRuleParser.parse('example.com$m1=v1$m2$m3=v3$m4$m5=v5')).toEqual({
+        expect(NetworkRuleParser.parse('example.com$m1=v1$m2$m3=v3$m4$m5=v5')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 35,
+                    line: 1,
+                    column: 36,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: 'example.com$m1=v1$m2$m3=v3$m4',
-            modifiers: [
-                {
-                    modifier: 'm5',
-                    exception: false,
-                    value: 'v5',
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 29,
+                        line: 1,
+                        column: 30,
+                    },
                 },
-            ],
+                value: 'example.com$m1=v1$m2$m3=v3$m4',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 30,
+                        line: 1,
+                        column: 31,
+                    },
+                    end: {
+                        offset: 35,
+                        line: 1,
+                        column: 36,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 30,
+                                line: 1,
+                                column: 31,
+                            },
+                            end: {
+                                offset: 35,
+                                line: 1,
+                                column: 36,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 30,
+                                    line: 1,
+                                    column: 31,
+                                },
+                                end: {
+                                    offset: 32,
+                                    line: 1,
+                                    column: 33,
+                                },
+                            },
+                            value: 'm5',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 33,
+                                    line: 1,
+                                    column: 34,
+                                },
+                                end: {
+                                    offset: 35,
+                                    line: 1,
+                                    column: 36,
+                                },
+                            },
+                            value: 'v5',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Starts with "/"
-        expect(NetworkRuleParser.parse('/ad.js$m1=v1')).toEqual({
+        expect(NetworkRuleParser.parse('/ad.js$m1=v1')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 12,
+                    line: 1,
+                    column: 13,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: '/ad.js',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
-                    value: 'v1',
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 6,
+                        line: 1,
+                        column: 7,
+                    },
                 },
-            ],
+                value: '/ad.js',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 7,
+                        line: 1,
+                        column: 8,
+                    },
+                    end: {
+                        offset: 12,
+                        line: 1,
+                        column: 13,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 7,
+                                line: 1,
+                                column: 8,
+                            },
+                            end: {
+                                offset: 12,
+                                line: 1,
+                                column: 13,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 7,
+                                    line: 1,
+                                    column: 8,
+                                },
+                                end: {
+                                    offset: 9,
+                                    line: 1,
+                                    column: 10,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 10,
+                                    line: 1,
+                                    column: 11,
+                                },
+                                end: {
+                                    offset: 12,
+                                    line: 1,
+                                    column: 13,
+                                },
+                            },
+                            value: 'v1',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Pattern starts with / like regex patterns
-        expect(NetworkRuleParser.parse('/ad.js^$m1=v1')).toEqual({
+        expect(NetworkRuleParser.parse('/ad.js^$m1=v1')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 13,
+                    line: 1,
+                    column: 14,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: '/ad.js^',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
-                    value: 'v1',
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 7,
+                        line: 1,
+                        column: 8,
+                    },
                 },
-            ],
+                value: '/ad.js^',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 8,
+                        line: 1,
+                        column: 9,
+                    },
+                    end: {
+                        offset: 13,
+                        line: 1,
+                        column: 14,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 8,
+                                line: 1,
+                                column: 9,
+                            },
+                            end: {
+                                offset: 13,
+                                line: 1,
+                                column: 14,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 8,
+                                    line: 1,
+                                    column: 9,
+                                },
+                                end: {
+                                    offset: 10,
+                                    line: 1,
+                                    column: 11,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 11,
+                                    line: 1,
+                                    column: 12,
+                                },
+                                end: {
+                                    offset: 13,
+                                    line: 1,
+                                    column: 14,
+                                },
+                            },
+                            value: 'v1',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
-        expect(NetworkRuleParser.parse('/ad.js^$m1=/^v1$/')).toEqual({
+        expect(NetworkRuleParser.parse('/ad.js^$m1=/^v1$/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 17,
+                    line: 1,
+                    column: 18,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: '/ad.js^',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
-                    value: '/^v1$/',
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 7,
+                        line: 1,
+                        column: 8,
+                    },
                 },
-            ],
+                value: '/ad.js^',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 8,
+                        line: 1,
+                        column: 9,
+                    },
+                    end: {
+                        offset: 17,
+                        line: 1,
+                        column: 18,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 8,
+                                line: 1,
+                                column: 9,
+                            },
+                            end: {
+                                offset: 17,
+                                line: 1,
+                                column: 18,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 8,
+                                    line: 1,
+                                    column: 9,
+                                },
+                                end: {
+                                    offset: 10,
+                                    line: 1,
+                                    column: 11,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 11,
+                                    line: 1,
+                                    column: 12,
+                                },
+                                end: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                            },
+                            value: '/^v1$/',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Pattern contains an odd number of "/" characters
-        expect(NetworkRuleParser.parse('example.com/a/b/c$m1=v1')).toEqual({
+        expect(NetworkRuleParser.parse('example.com/a/b/c$m1=v1')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 23,
+                    line: 1,
+                    column: 24,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: 'example.com/a/b/c',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
-                    value: 'v1',
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 17,
+                        line: 1,
+                        column: 18,
+                    },
                 },
-            ],
+                value: 'example.com/a/b/c',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 18,
+                        line: 1,
+                        column: 19,
+                    },
+                    end: {
+                        offset: 23,
+                        line: 1,
+                        column: 24,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 18,
+                                line: 1,
+                                column: 19,
+                            },
+                            end: {
+                                offset: 23,
+                                line: 1,
+                                column: 24,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 18,
+                                    line: 1,
+                                    column: 19,
+                                },
+                                end: {
+                                    offset: 20,
+                                    line: 1,
+                                    column: 21,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 21,
+                                    line: 1,
+                                    column: 22,
+                                },
+                                end: {
+                                    offset: 23,
+                                    line: 1,
+                                    column: 24,
+                                },
+                            },
+                            value: 'v1',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
-        expect(NetworkRuleParser.parse('example.com$m1,m2=/^regex$/')).toEqual({
+        expect(NetworkRuleParser.parse('example.com$m1,m2=/^regex$/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 27,
+                    line: 1,
+                    column: 28,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: 'example.com',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 11,
+                        line: 1,
+                        column: 12,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: '/^regex$/',
+                value: 'example.com',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 12,
+                        line: 1,
+                        column: 13,
+                    },
+                    end: {
+                        offset: 27,
+                        line: 1,
+                        column: 28,
+                    },
                 },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 12,
+                                line: 1,
+                                column: 13,
+                            },
+                            end: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 12,
+                                    line: 1,
+                                    column: 13,
+                                },
+                                end: {
+                                    offset: 14,
+                                    line: 1,
+                                    column: 15,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 15,
+                                line: 1,
+                                column: 16,
+                            },
+                            end: {
+                                offset: 27,
+                                line: 1,
+                                column: 28,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 15,
+                                    line: 1,
+                                    column: 16,
+                                },
+                                end: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 18,
+                                    line: 1,
+                                    column: 19,
+                                },
+                                end: {
+                                    offset: 27,
+                                    line: 1,
+                                    column: 28,
+                                },
+                            },
+                            value: '/^regex$/',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // https://github.com/AdguardTeam/AGLint/issues/60
-        expect(NetworkRuleParser.parse('||example.com/$aa/bb^$m1,m2=/^regex$/')).toEqual({
+        expect(NetworkRuleParser.parse('||example.com/$aa/bb^$m1,m2=/^regex$/')).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 37,
+                    line: 1,
+                    column: 38,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: false,
-            pattern: '||example.com/$aa/bb^',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 21,
+                        line: 1,
+                        column: 22,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: '/^regex$/',
+                value: '||example.com/$aa/bb^',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 22,
+                        line: 1,
+                        column: 23,
+                    },
+                    end: {
+                        offset: 37,
+                        line: 1,
+                        column: 38,
+                    },
                 },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 22,
+                                line: 1,
+                                column: 23,
+                            },
+                            end: {
+                                offset: 24,
+                                line: 1,
+                                column: 25,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 22,
+                                    line: 1,
+                                    column: 23,
+                                },
+                                end: {
+                                    offset: 24,
+                                    line: 1,
+                                    column: 25,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 25,
+                                line: 1,
+                                column: 26,
+                            },
+                            end: {
+                                offset: 37,
+                                line: 1,
+                                column: 38,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 25,
+                                    line: 1,
+                                    column: 26,
+                                },
+                                end: {
+                                    offset: 27,
+                                    line: 1,
+                                    column: 28,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 28,
+                                    line: 1,
+                                    column: 29,
+                                },
+                                end: {
+                                    offset: 37,
+                                    line: 1,
+                                    column: 38,
+                                },
+                            },
+                            value: '/^regex$/',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         // Complicated case
         expect(
             NetworkRuleParser.parse('@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/'),
-        ).toEqual({
+        ).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 68,
+                    line: 1,
+                    column: 69,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '/example/scripts/ad.js',
-            modifiers: [
-                {
-                    modifier: 'm1',
-                    exception: false,
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 24,
+                        line: 1,
+                        column: 25,
+                    },
                 },
-                {
-                    modifier: 'm2',
-                    exception: false,
-                    value: 'v2',
+                value: '/example/scripts/ad.js',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 25,
+                        line: 1,
+                        column: 26,
+                    },
+                    end: {
+                        offset: 68,
+                        line: 1,
+                        column: 69,
+                    },
                 },
-                {
-                    modifier: 'm3',
-                    exception: false,
-                    value: '/^r3\\$/',
-                },
-                {
-                    modifier: 'm4',
-                    exception: false,
-                    value: '/r4\\/r4$/',
-                },
-                {
-                    modifier: 'm5',
-                    exception: false,
-                    value: '/^r5\\$/',
-                },
-            ],
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 25,
+                                line: 1,
+                                column: 26,
+                            },
+                            end: {
+                                offset: 27,
+                                line: 1,
+                                column: 28,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 25,
+                                    line: 1,
+                                    column: 26,
+                                },
+                                end: {
+                                    offset: 27,
+                                    line: 1,
+                                    column: 28,
+                                },
+                            },
+                            value: 'm1',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 28,
+                                line: 1,
+                                column: 29,
+                            },
+                            end: {
+                                offset: 33,
+                                line: 1,
+                                column: 34,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 28,
+                                    line: 1,
+                                    column: 29,
+                                },
+                                end: {
+                                    offset: 30,
+                                    line: 1,
+                                    column: 31,
+                                },
+                            },
+                            value: 'm2',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 31,
+                                    line: 1,
+                                    column: 32,
+                                },
+                                end: {
+                                    offset: 33,
+                                    line: 1,
+                                    column: 34,
+                                },
+                            },
+                            value: 'v2',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 34,
+                                line: 1,
+                                column: 35,
+                            },
+                            end: {
+                                offset: 44,
+                                line: 1,
+                                column: 45,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 34,
+                                    line: 1,
+                                    column: 35,
+                                },
+                                end: {
+                                    offset: 36,
+                                    line: 1,
+                                    column: 37,
+                                },
+                            },
+                            value: 'm3',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 37,
+                                    line: 1,
+                                    column: 38,
+                                },
+                                end: {
+                                    offset: 44,
+                                    line: 1,
+                                    column: 45,
+                                },
+                            },
+                            value: '/^r3\\$/',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 45,
+                                line: 1,
+                                column: 46,
+                            },
+                            end: {
+                                offset: 57,
+                                line: 1,
+                                column: 58,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 45,
+                                    line: 1,
+                                    column: 46,
+                                },
+                                end: {
+                                    offset: 47,
+                                    line: 1,
+                                    column: 48,
+                                },
+                            },
+                            value: 'm4',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 48,
+                                    line: 1,
+                                    column: 49,
+                                },
+                                end: {
+                                    offset: 57,
+                                    line: 1,
+                                    column: 58,
+                                },
+                            },
+                            value: '/r4\\/r4$/',
+                        },
+                        exception: false,
+                    },
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 58,
+                                line: 1,
+                                column: 59,
+                            },
+                            end: {
+                                offset: 68,
+                                line: 1,
+                                column: 69,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 58,
+                                    line: 1,
+                                    column: 59,
+                                },
+                                end: {
+                                    offset: 60,
+                                    line: 1,
+                                    column: 61,
+                                },
+                            },
+                            value: 'm5',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 61,
+                                    line: 1,
+                                    column: 62,
+                                },
+                                end: {
+                                    offset: 68,
+                                    line: 1,
+                                    column: 69,
+                                },
+                            },
+                            value: '/^r5\\$/',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
         expect(
             NetworkRuleParser.parse('@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i'),
-        ).toEqual({
+        ).toEqual<NetworkRule>({
+            type: 'NetworkRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 72,
+                    line: 1,
+                    column: 73,
+                },
+            },
             category: RuleCategory.Network,
-            type: NetworkRuleType.BasicNetworkRule,
             syntax: AdblockSyntax.Common,
             exception: true,
-            pattern: '||example.org^',
-            modifiers: [
-                {
-                    modifier: 'replace',
-                    exception: false,
-                    value: '/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i',
+            pattern: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 16,
+                        line: 1,
+                        column: 17,
+                    },
                 },
-            ],
+                value: '||example.org^',
+            },
+            modifiers: {
+                type: 'ModifierList',
+                loc: {
+                    start: {
+                        offset: 17,
+                        line: 1,
+                        column: 18,
+                    },
+                    end: {
+                        offset: 72,
+                        line: 1,
+                        column: 73,
+                    },
+                },
+                children: [
+                    {
+                        type: 'Modifier',
+                        loc: {
+                            start: {
+                                offset: 17,
+                                line: 1,
+                                column: 18,
+                            },
+                            end: {
+                                offset: 72,
+                                line: 1,
+                                column: 73,
+                            },
+                        },
+                        modifier: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                                end: {
+                                    offset: 24,
+                                    line: 1,
+                                    column: 25,
+                                },
+                            },
+                            value: 'replace',
+                        },
+                        value: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 25,
+                                    line: 1,
+                                    column: 26,
+                                },
+                                end: {
+                                    offset: 72,
+                                    line: 1,
+                                    column: 73,
+                                },
+                            },
+                            value: '/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i',
+                        },
+                        exception: false,
+                    },
+                ],
+            },
         });
 
-        // ADG removeheader
-        expect(NetworkRuleParser.parse('||example.org^$removeheader=header-name')).toEqual(<RemoveHeaderNetworkRule>{
-            category: RuleCategory.Network,
-            type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            pattern: '||example.org^',
-            header: 'header-name',
-        });
-
-        expect(NetworkRuleParser.parse('@@||example.org^$removeheader=header-name')).toEqual(<RemoveHeaderNetworkRule>{
-            category: RuleCategory.Network,
-            type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.Adg,
-            exception: true,
-            pattern: '||example.org^',
-            header: 'header-name',
-        });
-
-        expect(NetworkRuleParser.parse('||example.org^$removeheader=request:header-name')).toEqual(<
-            RemoveHeaderNetworkRule
-        >{
-            category: RuleCategory.Network,
-            type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            pattern: '||example.org^',
-            header: 'request:header-name',
-        });
-
-        expect(NetworkRuleParser.parse('@@||example.org^$removeheader=request:header-name')).toEqual(<
-            RemoveHeaderNetworkRule
-        >{
-            category: RuleCategory.Network,
-            type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.Adg,
-            exception: true,
-            pattern: '||example.org^',
-            header: 'request:header-name',
-        });
-
-        expect(() => NetworkRuleParser.parse('||example.org^$removeheader=')).toThrowError(
-            /^No header name specified in rule/,
+        expect(
+            NetworkRuleParser.parse('@@||example.org^$removeheader=request:header-name'),
+        ).toEqual<NetworkRule>(
+            {
+                type: 'NetworkRule',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 49,
+                        line: 1,
+                        column: 50,
+                    },
+                },
+                category: RuleCategory.Network,
+                syntax: AdblockSyntax.Common,
+                exception: true,
+                pattern: {
+                    type: 'Value',
+                    loc: {
+                        start: {
+                            offset: 2,
+                            line: 1,
+                            column: 3,
+                        },
+                        end: {
+                            offset: 16,
+                            line: 1,
+                            column: 17,
+                        },
+                    },
+                    value: '||example.org^',
+                },
+                modifiers: {
+                    type: 'ModifierList',
+                    loc: {
+                        start: {
+                            offset: 17,
+                            line: 1,
+                            column: 18,
+                        },
+                        end: {
+                            offset: 49,
+                            line: 1,
+                            column: 50,
+                        },
+                    },
+                    children: [
+                        {
+                            type: 'Modifier',
+                            loc: {
+                                start: {
+                                    offset: 17,
+                                    line: 1,
+                                    column: 18,
+                                },
+                                end: {
+                                    offset: 49,
+                                    line: 1,
+                                    column: 50,
+                                },
+                            },
+                            modifier: {
+                                type: 'Value',
+                                loc: {
+                                    start: {
+                                        offset: 17,
+                                        line: 1,
+                                        column: 18,
+                                    },
+                                    end: {
+                                        offset: 29,
+                                        line: 1,
+                                        column: 30,
+                                    },
+                                },
+                                value: 'removeheader',
+                            },
+                            value: {
+                                type: 'Value',
+                                loc: {
+                                    start: {
+                                        offset: 30,
+                                        line: 1,
+                                        column: 31,
+                                    },
+                                    end: {
+                                        offset: 49,
+                                        line: 1,
+                                        column: 50,
+                                    },
+                                },
+                                value: 'request:header-name',
+                            },
+                            exception: false,
+                        },
+                    ],
+                },
+            },
         );
 
-        // uBO responseheader
-        expect(NetworkRuleParser.parse('example.org##^responseheader(header-name)')).toEqual(<RemoveHeaderNetworkRule>{
-            category: RuleCategory.Network,
-            type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            pattern: 'example.org',
-            header: 'header-name',
-        });
-
-        expect(NetworkRuleParser.parse('example.org#@#^responseheader(header-name)')).toEqual(<RemoveHeaderNetworkRule>{
-            category: RuleCategory.Network,
-            type: NetworkRuleType.RemoveHeaderNetworkRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            pattern: 'example.org',
-            header: 'header-name',
-        });
-
-        expect(() => NetworkRuleParser.parse('responseheader()')).toThrowError(
-            'uBO responseheader filtering requires a valid uBO HTML rule separator',
-        );
-
-        expect(() => NetworkRuleParser.parse('example.org#@#^responseheader()')).toThrowError(
-            /^No header name specified in rule/,
-        );
-
-        expect(() => NetworkRuleParser.parse('example.org#@#^responseheader(  )')).toThrowError(
-            /^No header name specified in rule/,
-        );
-
-        expect(() => NetworkRuleParser.parse('example.org#@#^responseheader(')).toThrowError(
-            `uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`,
-        );
-
-        expect(() => NetworkRuleParser.parse('example.org#@#^responseheader(header-name')).toThrowError(
-            `uBO responseheader filtering rule body must be end with "${CLOSE_PARENTHESIS}"`,
-        );
-
-        expect(() => NetworkRuleParser.parse('example.org#@#^div + responseheader(header-name)')).toThrowError(
-            `uBO responseheader filtering rule body must be start with "${UBO_RESPONSEHEADER_INDICATOR}"`,
+        // Invalid rules
+        expect(() => NetworkRuleParser.parse('')).toThrowError(
+            'Network rule must have a pattern or modifiers',
         );
     });
 
@@ -446,27 +2181,6 @@ describe('NetworkRuleParser', () => {
 
         expect(parseAndGenerate('@@||example.org^$removeheader=header-name')).toEqual(
             '@@||example.org^$removeheader=header-name',
-        );
-
-        expect(parseAndGenerate('||example.org^$removeheader=request:header-name')).toEqual(
-            '||example.org^$removeheader=request:header-name',
-        );
-
-        expect(parseAndGenerate('@@||example.org^$removeheader=request:header-name')).toEqual(
-            '@@||example.org^$removeheader=request:header-name',
-        );
-
-        // uBO responseheader
-        expect(parseAndGenerate('example.org##^responseheader(header-name)')).toEqual(
-            'example.org##^responseheader(header-name)',
-        );
-
-        expect(parseAndGenerate('example.org##^responseheader( header-name )')).toEqual(
-            'example.org##^responseheader(header-name)',
-        );
-
-        expect(parseAndGenerate('example.org#@#^responseheader(header-name)')).toEqual(
-            'example.org#@#^responseheader(header-name)',
         );
     });
 });

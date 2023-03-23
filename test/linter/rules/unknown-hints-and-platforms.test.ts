@@ -63,7 +63,7 @@ describe('unknown-preprocessor-directives', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Unclosed opening bracket at 16 in comment "!+ NOT_OPTIMIZED("',
+                    message: 'AGLint parsing error: Missing closing parenthesis for hint "NOT_OPTIMIZED"',
                     position: {
                         startColumn: 0,
                         endColumn: 17,
@@ -137,7 +137,7 @@ describe('unknown-preprocessor-directives', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Unclosed opening bracket at 11 in comment "!+ PLATFORM("',
+                    message: 'AGLint parsing error: Missing closing parenthesis for hint "PLATFORM"',
                     position: {
                         startColumn: 0,
                         endColumn: 12,
@@ -220,7 +220,7 @@ describe('unknown-preprocessor-directives', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Unclosed opening bracket at 15 in comment "!+ NOT_PLATFORM("',
+                    message: 'AGLint parsing error: Missing closing parenthesis for hint "NOT_PLATFORM"',
                     position: {
                         startColumn: 0,
                         endColumn: 16,
@@ -303,7 +303,7 @@ describe('unknown-preprocessor-directives', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Unclosed opening bracket at 7 in comment "!+ HINT("',
+                    message: 'AGLint parsing error: Missing closing parenthesis for hint "HINT"',
                     position: {
                         startColumn: 0,
                         endColumn: 8,

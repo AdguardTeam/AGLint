@@ -1,797 +1,1822 @@
+/* eslint-disable max-len */
 import { DomainListParser } from '../../../src/parser/misc/domain-list';
 import { CssInjectionBodyParser } from '../../../src/parser/cosmetic/body/css';
 import { ElementHidingBodyParser } from '../../../src/parser/cosmetic/body/elementhiding';
-import { HtmlBodyParser } from '../../../src/parser/cosmetic/body/html';
-import { ScriptletBodyParser } from '../../../src/parser/cosmetic/body/scriptlet';
-import { CosmeticRuleType } from '../../../src/parser/cosmetic/types';
 import { CosmeticRuleParser } from '../../../src/parser/cosmetic';
-import { AdgModifierListParser } from '../../../src/parser/cosmetic/specific/adg-modifiers';
-import { UboModifierListParser } from '../../../src/parser/cosmetic/specific/ubo-modifiers';
-import { AdblockSyntax } from '../../../src/utils/adblockers';
 import { EMPTY, SPACE } from '../../../src/utils/constants';
+import { defaultLocation } from '../../../src/parser/nodes';
+import { locRange, shiftLoc } from '../../../src/utils/location';
+import { ScriptletInjectionBodyParser } from '../../../src/parser/cosmetic/body/scriptlet';
+import { HtmlFilteringBodyParser } from '../../../src/parser/cosmetic/body/html';
+import { ModifierListParser } from '../../../src/parser/misc/modifier-list';
 
 describe('CosmeticRuleParser', () => {
     test('isCosmetic', async () => {
         // Invalid
-        expect(CosmeticRuleParser.isCosmetic(EMPTY)).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic(SPACE)).toBe(false);
+        expect(CosmeticRuleParser.isCosmeticRule(EMPTY)).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule(SPACE)).toBeFalsy();
 
-        expect(CosmeticRuleParser.isCosmetic('! This is just a comment')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('# This is just a comment')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('! Title: Something')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('! example.com##.ad')).toBe(false);
+        expect(CosmeticRuleParser.isCosmeticRule('! This is just a comment')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('# This is just a comment')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('! Title: Something')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('! example.com##.ad')).toBeFalsy();
 
-        expect(CosmeticRuleParser.isCosmetic('example.com')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('||example.com')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('||example.com^$third-party')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('/ad.js^$script')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('/^regexp$/')).toBe(false);
-        expect(CosmeticRuleParser.isCosmetic('@@/^regexp$/')).toBe(false);
+        expect(CosmeticRuleParser.isCosmeticRule('example.com')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('||example.com')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('||example.com^$third-party')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('/ad.js^$script')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('/^regexp$/')).toBeFalsy();
+        expect(CosmeticRuleParser.isCosmeticRule('@@/^regexp$/')).toBeFalsy();
 
         // Valid
-        expect(CosmeticRuleParser.isCosmetic('##.ad')).toBe(true);
-        expect(CosmeticRuleParser.isCosmetic('#@#.ad')).toBe(true);
-        expect(CosmeticRuleParser.isCosmetic('##+js(something)')).toBe(true);
-        expect(CosmeticRuleParser.isCosmetic('#@#+js(something)')).toBe(true);
-        expect(CosmeticRuleParser.isCosmetic('##^script:has-text(antiadblock)')).toBe(true);
-        expect(CosmeticRuleParser.isCosmetic('$$script[tag-content="antiadblock"]')).toBe(true);
+        expect(CosmeticRuleParser.isCosmeticRule('##.ad')).toBeTruthy();
+        expect(CosmeticRuleParser.isCosmeticRule('#@#.ad')).toBeTruthy();
+        expect(CosmeticRuleParser.isCosmeticRule('##+js(something)')).toBeTruthy();
+        expect(CosmeticRuleParser.isCosmeticRule('#@#+js(something)')).toBeTruthy();
+        expect(CosmeticRuleParser.isCosmeticRule('##^script:has-text(antiadblock)')).toBeTruthy();
+        expect(CosmeticRuleParser.isCosmeticRule('$$script[tag-content="antiadblock"]')).toBeTruthy();
     });
 
     test('parse', async () => {
         // Valid elemhide
         expect(CosmeticRuleParser.parse('##.ad')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, '##.ad'.length),
+            syntax: 'Common',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '##',
-            body: ElementHidingBodyParser.parse('.ad'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '##'.length,
+                ),
+                value: '##',
+            },
+            body: ElementHidingBodyParser.parse('.ad', shiftLoc(defaultLocation, '##'.length)),
         });
 
         expect(CosmeticRuleParser.parse('example.com,~example.net##.ad')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##.ad'.length),
+            syntax: 'Common',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##',
-            body: ElementHidingBodyParser.parse('.ad'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net##'.length,
+                ),
+                value: '##',
+            },
+            body: ElementHidingBodyParser.parse('.ad', shiftLoc(defaultLocation, 'example.com,~example.net##'.length)),
         });
 
         expect(CosmeticRuleParser.parse('#@#.ad')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, '#@#.ad'.length),
+            syntax: 'Common',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@#',
-            body: ElementHidingBodyParser.parse('.ad'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@#'.length,
+                ),
+                value: '#@#',
+            },
+            body: ElementHidingBodyParser.parse('.ad', shiftLoc(defaultLocation, '#@#'.length)),
         });
 
         expect(CosmeticRuleParser.parse('example.com,~example.net#@#.ad')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@#.ad'.length),
+            syntax: 'Common',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@#',
-            body: ElementHidingBodyParser.parse('.ad'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@#'.length,
+                ),
+                value: '#@#',
+            },
+            body: ElementHidingBodyParser.parse('.ad', shiftLoc(defaultLocation, 'example.com,~example.net#@#'.length)),
         });
 
         // Valid elemhide (extended)
         expect(CosmeticRuleParser.parse('#?#.ad:-abp-has(.ad)')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, '#?#.ad:-abp-has(.ad)'.length),
+            syntax: 'Common',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#?#',
-            body: ElementHidingBodyParser.parse('.ad:-abp-has(.ad)'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#?#'.length,
+                ),
+                value: '#?#',
+            },
+            body: ElementHidingBodyParser.parse(
+                '.ad:-abp-has(.ad)',
+                shiftLoc(defaultLocation, '#?#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('example.com,~example.net#?#.ad:-abp-has(.ad)')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#?#.ad:-abp-has(.ad)'.length),
+            syntax: 'Common',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#?#',
-            body: ElementHidingBodyParser.parse('.ad:-abp-has(.ad)'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#?#'.length,
+                ),
+                value: '#?#',
+            },
+            body: ElementHidingBodyParser.parse(
+                '.ad:-abp-has(.ad)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#?#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('#@?#.ad:-abp-has(.ad)')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, '#@?#.ad:-abp-has(.ad)'.length),
+            syntax: 'Common',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@?#',
-            body: ElementHidingBodyParser.parse('.ad:-abp-has(.ad)'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@?#'.length,
+                ),
+                value: '#@?#',
+            },
+            body: ElementHidingBodyParser.parse(
+                '.ad:-abp-has(.ad)',
+                shiftLoc(defaultLocation, '#@?#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('example.com,~example.net#@?#.ad:-abp-has(.ad)')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Common,
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@?#.ad:-abp-has(.ad)'.length),
+            syntax: 'Common',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@?#',
-            body: ElementHidingBodyParser.parse('.ad:-abp-has(.ad)'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@?#'.length,
+                ),
+                value: '#@?#',
+            },
+            body: ElementHidingBodyParser.parse(
+                '.ad:-abp-has(.ad)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@?#'.length),
+            ),
         });
 
-        // Valid CSS inject (AdGuard)
+        // CSS injections (AdGuard)
         expect(CosmeticRuleParser.parse('#$#body { padding: 0; }')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$#body { padding: 0; }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$#',
-            body: CssInjectionBodyParser.parse('body { padding: 0; }'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body { padding: 0; }',
+                shiftLoc(defaultLocation, '#$#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('example.com,~example.net#$#body { padding: 0; }')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$#body { padding: 0; }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#$#',
-            body: CssInjectionBodyParser.parse('body { padding: 0; }'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body { padding: 0; }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('#@$#body { padding: 0; }')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@$#body { padding: 0; }'.length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@$#',
-            body: CssInjectionBodyParser.parse('body { padding: 0; }'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body { padding: 0; }',
+                shiftLoc(defaultLocation, '#@$#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('example.com,~example.net#@$#body { padding: 0; }')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$#body { padding: 0; }'.length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@$#',
-            body: CssInjectionBodyParser.parse('body { padding: 0; }'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body { padding: 0; }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
+            ),
         });
 
-        // Media queries
+        // CSS injections with media queries (AdGuard)
         expect(
-            // eslint-disable-next-line max-len
             CosmeticRuleParser.parse('#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }'),
         ).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$#',
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$#'.length,
+                ),
+                value: '#$#',
+            },
             body: CssInjectionBodyParser.parse(
                 '@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }',
+                shiftLoc(defaultLocation, '#$#'.length),
             ),
         });
 
         expect(
             CosmeticRuleParser.parse('#$#@media(min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }'),
         ).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$#@media(min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$#',
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$#'.length,
+                ),
+                value: '#$#',
+            },
             body: CssInjectionBodyParser.parse(
                 '@media(min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }',
+                shiftLoc(defaultLocation, '#$#'.length),
             ),
         });
 
         expect(
             CosmeticRuleParser.parse(
-                // eslint-disable-next-line max-len
                 'example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }',
             ),
         ).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#$#',
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$#'.length,
+                ),
+                value: '#$#',
+            },
             body: CssInjectionBodyParser.parse(
                 '@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
             ),
         });
 
-        // Valid ExtendedCSS inject (AdGuard)
-        expect(CosmeticRuleParser.parse('#$?#body:-abp-has(.ad) { padding: 0; }')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$?#',
-            body: CssInjectionBodyParser.parse('body:-abp-has(.ad) { padding: 0; }'),
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$#@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }'.length),
+            syntax: 'AdGuard',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: CssInjectionBodyParser.parse(
+                '@media (min-height: 1024px) and (max-height: 1920px) { body { padding: 0; } }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
+            ),
         });
 
-        expect(
-            CosmeticRuleParser.parse('example.com,~example.net#$?#body:-abp-has(.ad) { padding: 0; }'),
-        ).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+        // CSS injections with Extended CSS (AdGuard)
+        expect(CosmeticRuleParser.parse('#$?#body:-abp-has(.ad) { padding: 0; }')).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$?#body:-abp-has(.ad) { padding: 0; }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#$?#',
-            body: CssInjectionBodyParser.parse('body:-abp-has(.ad) { padding: 0; }'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$?#'.length,
+                ),
+                value: '#$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:-abp-has(.ad) { padding: 0; }',
+                shiftLoc(defaultLocation, '#$?#'.length),
+            ),
+        });
+
+        expect(CosmeticRuleParser.parse('example.com,~example.net#$?#body:-abp-has(.ad) { padding: 0; }')).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$?#body:-abp-has(.ad) { padding: 0; }'.length),
+            syntax: 'AdGuard',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$?#'.length,
+                ),
+                value: '#$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:-abp-has(.ad) { padding: 0; }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$?#'.length),
+            ),
         });
 
         expect(CosmeticRuleParser.parse('#@$?#body:-abp-has(.ad) { padding: 0; }')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@$?#body:-abp-has(.ad) { padding: 0; }'.length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@$?#',
-            body: CssInjectionBodyParser.parse('body:-abp-has(.ad) { padding: 0; }'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@$?#'.length,
+                ),
+                value: '#@$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:-abp-has(.ad) { padding: 0; }',
+                shiftLoc(defaultLocation, '#@$?#'.length),
+            ),
+        });
+
+        expect(CosmeticRuleParser.parse('example.com,~example.net#@$?#body:-abp-has(.ad) { padding: 0; }')).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$?#body:-abp-has(.ad) { padding: 0; }'.length),
+            syntax: 'AdGuard',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$?#'.length,
+                ),
+                value: '#@$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:-abp-has(.ad) { padding: 0; }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$?#'.length),
+            ),
+        });
+
+        // CSS injections with Extended CSS and media queries (AdGuard)
+        expect(
+            CosmeticRuleParser.parse(
+                '#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }'.length),
+            syntax: 'AdGuard',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$?#'.length,
+                ),
+                value: '#$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                '@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+                shiftLoc(defaultLocation, '#$?#'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net#@$?#body:-abp-has(.ad) { padding: 0; }'),
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Adg,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@$?#',
-            body: CssInjectionBodyParser.parse('body:-abp-has(.ad) { padding: 0; }'),
-        });
-
-        // Valid CSS inject (uBlock)
-        expect(CosmeticRuleParser.parse('##body:style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '##',
-            body: CssInjectionBodyParser.parse('body:style(padding: 0;)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net##body:style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##',
-            body: CssInjectionBodyParser.parse('body:style(padding: 0;)'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@#body:style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@#',
-            body: CssInjectionBodyParser.parse('body:style(padding: 0;)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net#@#body:style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@#',
-            body: CssInjectionBodyParser.parse('body:style(padding: 0;)'),
-        });
-
-        // Valid ExtendedCSS inject (uBlock)
-        expect(CosmeticRuleParser.parse('##body:has(.ad):style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '##',
-            body: CssInjectionBodyParser.parse('body:has(.ad):style(padding: 0;)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net##body:has(.ad):style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##',
-            body: CssInjectionBodyParser.parse('body:has(.ad):style(padding: 0;)'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@#body:has(.ad):style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@#',
-            body: CssInjectionBodyParser.parse('body:has(.ad):style(padding: 0;)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net#@#body:has(.ad):style(padding: 0;)')).toMatchObject({
-            type: CosmeticRuleType.CssRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@#',
-            body: CssInjectionBodyParser.parse('body:has(.ad):style(padding: 0;)'),
-        });
-
-        // Valid scriptlet inject (AdGuard)
-        expect(CosmeticRuleParser.parse("#%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#%#//scriptlet',
-            body: ScriptletBodyParser.parse("('scriptlet0', 'arg0', 'arg1')"),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$?#'.length,
+                ),
+                value: '#$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                '@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$?#'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse("example.com,~example.net#%#//scriptlet('scriptlet0', 'arg0', 'arg1')"),
+            CosmeticRuleParser.parse(
+                '#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#%#//scriptlet',
-            body: ScriptletBodyParser.parse("('scriptlet0', 'arg0', 'arg1')"),
-        });
-
-        expect(CosmeticRuleParser.parse("#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }'.length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@%#//scriptlet',
-            body: ScriptletBodyParser.parse("('scriptlet0', 'arg0', 'arg1')"),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@$?#'.length,
+                ),
+                value: '#@$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                '@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+                shiftLoc(defaultLocation, '#@$?#'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse("example.com,~example.net#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')"),
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$?#@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }'.length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@%#//scriptlet',
-            body: ScriptletBodyParser.parse("('scriptlet0', 'arg0', 'arg1')"),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$?#'.length,
+                ),
+                value: '#@$?#',
+            },
+            body: CssInjectionBodyParser.parse(
+                '@media (min-height: 1024px) and (max-height: 1920px) { body:-abp-has(.ad) { padding: 0 !important; } }',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$?#'.length),
+            ),
         });
 
-        // Valid scriptlet inject (uBlock)
-        expect(CosmeticRuleParser.parse('##+js(scriptlet0, arg0, arg1)')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Ubo,
+        // CSS injection (uBlock Origin)
+        expect(
+            CosmeticRuleParser.parse(
+                '##body:style(padding: 0;)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '##body:style(padding: 0;)'.length),
+            syntax: 'UblockOrigin',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '##+js',
-            body: ScriptletBodyParser.parse('(scriptlet0, arg0, arg1)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net##+js(scriptlet0, arg0, arg1)')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##+js',
-            body: ScriptletBodyParser.parse('(scriptlet0, arg0, arg1)'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@#+js(scriptlet0, arg0, arg1)')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@#+js',
-            body: ScriptletBodyParser.parse('(scriptlet0, arg0, arg1)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net#@#+js(scriptlet0, arg0, arg1)')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@#+js',
-            body: ScriptletBodyParser.parse('(scriptlet0, arg0, arg1)'),
-        });
-
-        // Valid scriptlet inject (ABP)
-        expect(CosmeticRuleParser.parse('#$#scriptlet0 arg0 arg1')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg0 arg1'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net#$#scriptlet0 arg0 arg1')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg0 arg1'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@$#scriptlet0 arg0 arg1')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg0 arg1'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net#@$#scriptlet0 arg0 arg1')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg0 arg1'),
-        });
-
-        expect(CosmeticRuleParser.parse('#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '##'.length,
+                ),
+                value: '##',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:style(padding: 0;)',
+                shiftLoc(defaultLocation, '##'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'),
+            CosmeticRuleParser.parse(
+                'example.com,~example.net##body:style(padding: 0;)',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##body:style(padding: 0;)'.length),
+            syntax: 'UblockOrigin',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net##'.length,
+                ),
+                value: '##',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:style(padding: 0;)',
+                shiftLoc(defaultLocation, 'example.com,~example.net##'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
+            CosmeticRuleParser.parse(
+                '#@#body:style(padding: 0;)',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@#body:style(padding: 0;)'.length),
+            syntax: 'UblockOrigin',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
-        });
-
-        expect(CosmeticRuleParser.parse('#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@#'.length,
+                ),
+                value: '#@#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:style(padding: 0;)',
+                shiftLoc(defaultLocation, '#@#'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@#body:style(padding: 0;)',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@#body:style(padding: 0;)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@#'.length,
+                ),
+                value: '#@#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body:style(padding: 0;)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@#'.length),
+            ),
         });
 
-        expect(CosmeticRuleParser.parse('#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;')).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
+        // CSS injection with ExtendedCSS and media queries (uBlock Origin)
+        expect(
+            CosmeticRuleParser.parse(
+                '##body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '##body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '##'.length,
+                ),
+                value: '##',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+                shiftLoc(defaultLocation, '##'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
+            CosmeticRuleParser.parse(
+                'example.com,~example.net##body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.ScriptletRule,
-            syntax: AdblockSyntax.Abp,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@$#',
-            body: ScriptletBodyParser.parse('scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'),
-        });
-
-        // Valid HTML filters (AdGuard)
-        expect(CosmeticRuleParser.parse('$$script[tag-content="adblock"]')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Adg,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)'.length),
+            syntax: 'UblockOrigin',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '$$',
-            body: HtmlBodyParser.parse('script[tag-content="adblock"]'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net$$script[tag-content="adblock"]')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '$$',
-            body: HtmlBodyParser.parse('script[tag-content="adblock"]'),
-        });
-
-        expect(CosmeticRuleParser.parse('$@$script[tag-content="adblock"]')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Adg,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '$@$',
-            body: HtmlBodyParser.parse('script[tag-content="adblock"]'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net$@$script[tag-content="adblock"]')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Adg,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '$@$',
-            body: HtmlBodyParser.parse('script[tag-content="adblock"]'),
-        });
-
-        // Valid HTML filters (uBlock)
-        expect(CosmeticRuleParser.parse('##^script:has-text(adblock)')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '##^',
-            body: HtmlBodyParser.parse('script:has-text(adblock)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net##^script:has-text(adblock)')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##^',
-            body: HtmlBodyParser.parse('script:has-text(adblock)'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@#^script:has-text(adblock)')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@#^',
-            body: HtmlBodyParser.parse('script:has-text(adblock)'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net#@#^script:has-text(adblock)')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@#^',
-            body: HtmlBodyParser.parse('script:has-text(adblock)'),
-        });
-
-        expect(CosmeticRuleParser.parse('##^script:has-text(adblock), script:has-text(detector)')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '##^',
-            body: HtmlBodyParser.parse('script:has-text(adblock), script:has-text(detector)'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net##'.length,
+                ),
+                value: '##',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+                shiftLoc(defaultLocation, 'example.com,~example.net##'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net##^script:has-text(adblock), script:has-text(detector)'),
+            CosmeticRuleParser.parse(
+                '#@#body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##^',
-            body: HtmlBodyParser.parse('script:has-text(adblock), script:has-text(detector)'),
-        });
-
-        expect(CosmeticRuleParser.parse('#@#^script:has-text(adblock), script:has-text(detector)')).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@#body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)'.length),
+            syntax: 'UblockOrigin',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@#^',
-            body: HtmlBodyParser.parse('script:has-text(adblock), script:has-text(detector)'),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@#'.length,
+                ),
+                value: '#@#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+                shiftLoc(defaultLocation, '#@#'.length),
+            ),
         });
 
         expect(
-            CosmeticRuleParser.parse('example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)'),
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@#body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+            ),
         ).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
+            category: 'Cosmetic',
+            type: 'CssInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##@body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)'.length),
+            syntax: 'UblockOrigin',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@#^',
-            body: HtmlBodyParser.parse('script:has-text(adblock), script:has-text(detector)'),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@#'.length,
+                ),
+                value: '#@#',
+            },
+            body: CssInjectionBodyParser.parse(
+                'body > .container:has-text(/ad/):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0 !important;)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@#'.length),
+            ),
         });
 
-        // Valid JS injections (AdGuard)
-        expect(CosmeticRuleParser.parse('#%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
+        // Scriptlet injections (AdGuard)
+        expect(
+            CosmeticRuleParser.parse(
+                "#%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, "#%#//scriptlet('scriptlet0', 'arg0', 'arg1')".length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: [],
-            separator: '#%#',
-            body: 'const a = 2;',
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#%#'.length,
+                ),
+                value: '#%#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                shiftLoc(defaultLocation, '#%#'.length),
+            ),
         });
 
-        expect(CosmeticRuleParser.parse('example.com,~example.net#%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
+        expect(
+            CosmeticRuleParser.parse(
+                "example.com,~example.net#%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, "example.com,~example.net#%#//scriptlet('scriptlet0', 'arg0', 'arg1')".length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#%#',
-            body: 'const a = 2;',
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#%#'.length,
+                ),
+                value: '#%#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                shiftLoc(defaultLocation, 'example.com,~example.net#%#'.length),
+            ),
         });
 
-        expect(CosmeticRuleParser.parse('#@%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
+        expect(
+            CosmeticRuleParser.parse(
+                "#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, "#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')".length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: [],
-            separator: '#@%#',
-            body: 'const a = 2;',
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@%#'.length,
+                ),
+                value: '#@%#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                shiftLoc(defaultLocation, '#@%#'.length),
+            ),
         });
 
-        expect(CosmeticRuleParser.parse('example.com,~example.net#@%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
+        expect(
+            CosmeticRuleParser.parse(
+                "example.com,~example.net#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, "example.com,~example.net#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')".length),
+            syntax: 'AdGuard',
             exception: true,
-            modifiers: [],
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#@%#',
-            body: 'const a = 2;',
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@%#'.length,
+                ),
+                value: '#@%#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                shiftLoc(defaultLocation, 'example.com,~example.net#@%#'.length),
+            ),
+        });
+
+        // Scriptlet injections (uBlock Origin)
+        expect(
+            CosmeticRuleParser.parse(
+                '##+js(scriptlet0, arg0, arg1)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '##+js(scriptlet0, arg0, arg1)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '##+'.length,
+                ),
+                value: '##+',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'js(scriptlet0, arg0, arg1)',
+                shiftLoc(defaultLocation, '##+'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net##+js(scriptlet0, arg0, arg1)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##+js(scriptlet0, arg0, arg1)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net##+'.length,
+                ),
+                value: '##+',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'js(scriptlet0, arg0, arg1)',
+                shiftLoc(defaultLocation, 'example.com,~example.net##+'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '#@#+js(scriptlet0, arg0, arg1)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@#+js(scriptlet0, arg0, arg1)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@#+'.length,
+                ),
+                value: '#@#+',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'js(scriptlet0, arg0, arg1)',
+                shiftLoc(defaultLocation, '#@#+'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@#+js(scriptlet0, arg0, arg1)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@#+js(scriptlet0, arg0, arg1)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@#+'.length,
+                ),
+                value: '#@#+',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'js(scriptlet0, arg0, arg1)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@#+'.length),
+            ),
+        });
+
+        // Scriptlet injections (Adblack Plus)
+        expect(
+            CosmeticRuleParser.parse(
+                '#$#scriptlet0 arg0 arg1',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$#scriptlet0 arg0 arg1'.length),
+            syntax: 'AdblockPlus',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg0 arg1',
+                shiftLoc(defaultLocation, '#$#'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#$#scriptlet0 arg0 arg1',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$#scriptlet0 arg0 arg1'.length),
+            syntax: 'AdblockPlus',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg0 arg1',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '#@$#scriptlet0 arg0 arg1',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@$#scriptlet0 arg0 arg1'.length),
+            syntax: 'AdblockPlus',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg0 arg1',
+                shiftLoc(defaultLocation, '#@$#'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@$#scriptlet0 arg0 arg1',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$#scriptlet0 arg0 arg1'.length),
+            syntax: 'AdblockPlus',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg0 arg1',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
+            ),
+        });
+
+        // Scriptlet injections (Adblock Syntax) - multiple scriptlets in one rule
+        expect(
+            CosmeticRuleParser.parse(
+                '#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'.length),
+            syntax: 'AdblockPlus',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                shiftLoc(defaultLocation, '#$#'.length),
+            ),
+        });
+
+        // Redundant ; at the end of the rule
+        expect(
+            CosmeticRuleParser.parse(
+                '#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'.length),
+            syntax: 'AdblockPlus',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                shiftLoc(defaultLocation, '#$#'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'.length),
+            syntax: 'AdblockPlus',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
+            ),
+        });
+
+        // Redundant ; at the end of the rule
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'.length),
+            syntax: 'AdblockPlus',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#$#'.length,
+                ),
+                value: '#$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'.length),
+            syntax: 'AdblockPlus',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                shiftLoc(defaultLocation, '#@$#'.length),
+            ),
+        });
+
+        // Redundant ; at the end of the rule
+        expect(
+            CosmeticRuleParser.parse(
+                '#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'.length),
+            syntax: 'AdblockPlus',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                shiftLoc(defaultLocation, '#@$#'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11'.length),
+            syntax: 'AdblockPlus',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
+            ),
+        });
+
+        // Redundant ; at the end of the rule
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ScriptletInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@$#scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;'.length),
+            syntax: 'AdblockPlus',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@$#'.length,
+                ),
+                value: '#@$#',
+            },
+            body: ScriptletInjectionBodyParser.parse(
+                'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
+            ),
+        });
+
+        // HTML filtering rules (AdGuard)
+        expect(
+            CosmeticRuleParser.parse(
+                '$$script[tag-content="adblock"]',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, '$$script[tag-content="adblock"]'.length),
+            syntax: 'AdGuard',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '$$'.length,
+                ),
+                value: '$$',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script[tag-content="adblock"]',
+                shiftLoc(defaultLocation, '$$'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net$$script[tag-content="adblock"]',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net$$script[tag-content="adblock"]'.length),
+            syntax: 'AdGuard',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net$$'.length,
+                ),
+                value: '$$',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script[tag-content="adblock"]',
+                shiftLoc(defaultLocation, 'example.com,~example.net$$'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '$@$script[tag-content="adblock"]',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, '$@$script[tag-content="adblock"]'.length),
+            syntax: 'AdGuard',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '$@$'.length,
+                ),
+                value: '$@$',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script[tag-content="adblock"]',
+                shiftLoc(defaultLocation, '$@$'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net$@$script[tag-content="adblock"]',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net$@$script[tag-content="adblock"]'.length),
+            syntax: 'AdGuard',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net$@$'.length,
+                ),
+                value: '$@$',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script[tag-content="adblock"]',
+                shiftLoc(defaultLocation, 'example.com,~example.net$@$'.length),
+            ),
+        });
+
+        // HTML filtering rules (uBlock Origin)
+        expect(
+            CosmeticRuleParser.parse(
+                '##^script:has-text(adblock)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, '##^script:has-text(adblock)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '##^'.length,
+                ),
+                value: '##^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock)',
+                shiftLoc(defaultLocation, '##^'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net##^script:has-text(adblock)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##^script:has-text(adblock)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net##^'.length,
+                ),
+                value: '##^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock)',
+                shiftLoc(defaultLocation, 'example.com,~example.net##^'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '#@#^script:has-text(adblock)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, '#@#^script:has-text(adblock)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@#^'.length,
+                ),
+                value: '#@#^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock)',
+                shiftLoc(defaultLocation, '#@#^'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@#^script:has-text(adblock)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@#^script:has-text(adblock)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@#^'.length,
+                ),
+                value: '#@#^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@#^'.length),
+            ),
+        });
+
+        // HTML filtering rules (uBlock Origin) - multiple selectors
+        expect(
+            CosmeticRuleParser.parse(
+                '##^script:has-text(adblock), script:has-text(detector)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, '##^script:has-text(adblock), script:has-text(detector)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '##^'.length,
+                ),
+                value: '##^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock), script:has-text(detector)',
+                shiftLoc(defaultLocation, '##^'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net##^script:has-text(adblock), script:has-text(detector)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net##^script:has-text(adblock), script:has-text(detector)'.length),
+            syntax: 'UblockOrigin',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net##^'.length,
+                ),
+                value: '##^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock), script:has-text(detector)',
+                shiftLoc(defaultLocation, 'example.com,~example.net##^'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '#@#^script:has-text(adblock), script:has-text(detector)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, '#@#^script:has-text(adblock), script:has-text(detector)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@#^'.length,
+                ),
+                value: '#@#^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock), script:has-text(detector)',
+                shiftLoc(defaultLocation, '#@#^'.length),
+            ),
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'HtmlFilteringRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)'.length),
+            syntax: 'UblockOrigin',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@#^'.length,
+                ),
+                value: '#@#^',
+            },
+            body: HtmlFilteringBodyParser.parse(
+                'script:has-text(adblock), script:has-text(detector)',
+                shiftLoc(defaultLocation, 'example.com,~example.net#@#^'.length),
+            ),
+        });
+
+        // JS injections (AdGuard)
+        expect(
+            CosmeticRuleParser.parse(
+                '#%#const a = 2;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'JsInjectionRule',
+            loc: locRange(defaultLocation, 0, '#%#const a = 2;'.length),
+            syntax: 'AdGuard',
+            exception: false,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#%#'.length,
+                ),
+                value: '#%#',
+            },
+            body: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    '#%#'.length,
+                    '#%#const a = 2;'.length,
+                ),
+                value: 'const a = 2;',
+            },
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#%#const a = 2;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'JsInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#%#const a = 2;'.length),
+            syntax: 'AdGuard',
+            exception: false,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#%#'.length,
+                ),
+                value: '#%#',
+            },
+            body: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net#%#'.length,
+                    'example.com,~example.net#%#const a = 2;'.length,
+                ),
+                value: 'const a = 2;',
+            },
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                '#@%#const a = 2;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'JsInjectionRule',
+            loc: locRange(defaultLocation, 0, '#@%#const a = 2;'.length),
+            syntax: 'AdGuard',
+            exception: true,
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    ''.length,
+                    '#@%#'.length,
+                ),
+                value: '#@%#',
+            },
+            body: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    '#@%#'.length,
+                    '#@%#const a = 2;'.length,
+                ),
+                value: 'const a = 2;',
+            },
+        });
+
+        expect(
+            CosmeticRuleParser.parse(
+                'example.com,~example.net#@%#const a = 2;',
+            ),
+        ).toMatchObject({
+            category: 'Cosmetic',
+            type: 'JsInjectionRule',
+            loc: locRange(defaultLocation, 0, 'example.com,~example.net#@%#const a = 2;'.length),
+            syntax: 'AdGuard',
+            exception: true,
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net'.length,
+                    'example.com,~example.net#@%#'.length,
+                ),
+                value: '#@%#',
+            },
+            body: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    'example.com,~example.net#@%#'.length,
+                    'example.com,~example.net#@%#const a = 2;'.length,
+                ),
+                value: 'const a = 2;',
+            },
         });
 
         // AdGuard modifiers/options
-        // ! At this point, we aren't yet testing the conflict between the domain modifier and the classic domain list
-        expect(CosmeticRuleParser.parse('[$app=com.something]#%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
+        expect(CosmeticRuleParser.parse('[$app=com.something]##.ad')).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, '[$app=com.something]##.ad'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: AdgModifierListParser.parse('[$app=com.something]').modifiers,
-            domains: [],
-            separator: '#%#',
-            body: 'const a = 2;',
+            modifiers: ModifierListParser.parse(
+                'app=com.something',
+                shiftLoc(defaultLocation, 2), // shift [$
+            ),
+            domains: DomainListParser.parse('', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    '[$app=com.something]'.length,
+                    '[$app=com.something]##'.length,
+                ),
+                value: '##',
+            },
+            body: ElementHidingBodyParser.parse(
+                '.ad',
+                shiftLoc(defaultLocation, '[$app=com.something]##'.length),
+            ),
         });
 
-        expect(CosmeticRuleParser.parse('[$app=com.something,anything=123]#%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
+        expect(CosmeticRuleParser.parse('[$app=com.something,b=c]example.com,~example.net##.ad')).toMatchObject({
+            category: 'Cosmetic',
+            type: 'ElementHidingRule',
+            loc: locRange(defaultLocation, 0, '[$app=com.something,b=c]example.com,~example.net##.ad'.length),
+            syntax: 'AdGuard',
             exception: false,
-            modifiers: AdgModifierListParser.parse('[$app=com.something,anything=123]').modifiers,
-            domains: [],
-            separator: '#%#',
-            body: 'const a = 2;',
-        });
-
-        expect(CosmeticRuleParser.parse('[$app=com.something]example.com,~example.net#%#const a = 2;')).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            modifiers: AdgModifierListParser.parse('[$app=com.something]').modifiers,
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#%#',
-            body: 'const a = 2;',
-        });
-
-        expect(
-            CosmeticRuleParser.parse('[$app=com.something,anything=123]example.com,~example.net#%#const a = 2;'),
-        ).toMatchObject({
-            type: CosmeticRuleType.JsRule,
-            syntax: AdblockSyntax.Adg,
-            exception: false,
-            modifiers: AdgModifierListParser.parse('[$app=com.something,anything=123]').modifiers,
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '#%#',
-            body: 'const a = 2;',
-        });
-
-        // uBlock modifiers/options
-        expect(CosmeticRuleParser.parse('##:matches-path(/path) .ad')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: UboModifierListParser.parse(':matches-path(/path)').modifiers,
-            domains: [],
-            separator: '##',
-            body: ElementHidingBodyParser.parse('.ad'),
-        });
-
-        expect(CosmeticRuleParser.parse('example.com,~example.net##:matches-path(/path) .ad')).toMatchObject({
-            type: CosmeticRuleType.ElementHidingRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: UboModifierListParser.parse(':matches-path(/path)').modifiers,
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##',
-            body: ElementHidingBodyParser.parse('.ad'),
-        });
-
-        expect(
-            CosmeticRuleParser.parse('example.com,~example.net##^:matches-path(/path) script:has-text(detect)'),
-        ).toMatchObject({
-            type: CosmeticRuleType.HtmlRule,
-            syntax: AdblockSyntax.Ubo,
-            exception: false,
-            modifiers: UboModifierListParser.parse(':matches-path(/path)').modifiers,
-            domains: DomainListParser.parse('example.com,~example.net').domains,
-            separator: '##^',
-            body: HtmlBodyParser.parse('script:has-text(detect)'),
+            modifiers: ModifierListParser.parse(
+                'app=com.something,b=c',
+                shiftLoc(defaultLocation, 2), // shift [$
+            ),
+            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            separator: {
+                type: 'Value',
+                loc: locRange(
+                    defaultLocation,
+                    '[$app=com.something,b=c]example.com,~example.net'.length,
+                    '[$app=com.something,b=c]example.com,~example.net##'.length,
+                ),
+                value: '##',
+            },
+            body: ElementHidingBodyParser.parse(
+                '.ad',
+                shiftLoc(defaultLocation, '[$app=com.something,b=c]example.com,~example.net##'.length),
+            ),
         });
 
         // Invalid
@@ -805,23 +1830,48 @@ describe('CosmeticRuleParser', () => {
         expect(CosmeticRuleParser.parse('! test')).toBeNull();
         expect(CosmeticRuleParser.parse('-ad-350px-')).toBeNull();
 
-        expect(CosmeticRuleParser.parse('##^responseheader(a)')).toBeNull();
-        expect(CosmeticRuleParser.parse('example.com,~example.net##^responseheader(a)')).toBeNull();
-
-        expect(() => CosmeticRuleParser.parse('[$a=b]##:matches-path(/c) .ad')).toThrowError(
-            'Cannot use AdGuard modifier list with uBO modifiers',
+        expect(() => CosmeticRuleParser.parse('#$?#scriptlet')).toThrowError(
+            'Separator \'#$?#\' is not supported for scriptlet injection',
         );
 
-        expect(() => CosmeticRuleParser.parse('$$:matches-path(/c).ad')).toThrowError(
-            'Cannot use uBO modifiers with ADG HTML filtering',
+        expect(() => CosmeticRuleParser.parse('#@$?#scriptlet')).toThrowError(
+            'Separator \'#@$?#\' is not supported for scriptlet injection',
         );
 
-        expect(() => CosmeticRuleParser.parse('[$a=b]##^:matches-path(/c) .ad')).toThrowError(
-            'Cannot use AdGuard modifier list with uBO modifiers',
+        expect(() => CosmeticRuleParser.parse('[a=b]#%#const a = 2;')).toThrowError(
+            /^Missing \$ at the beginning of the AdGuard modifier list in pattern/,
+        );
+
+        expect(() => CosmeticRuleParser.parse('[$a=b#%#const a = 2;')).toThrowError(
+            /^Missing \] at the end of the AdGuard modifier list in pattern/,
+        );
+
+        expect(() => CosmeticRuleParser.parse('[$a=b]#$#abp-snippet')).toThrowError(
+            'AdGuard modifier list is not supported in ABP snippet injection rules',
+        );
+
+        expect(() => CosmeticRuleParser.parse('[$a=b]##+js(scriptlet)')).toThrowError(
+            'AdGuard modifier list is not supported in uBO scriptlet injection rules',
         );
 
         expect(() => CosmeticRuleParser.parse('[$a=b]##body:style(padding:0)')).toThrowError(
-            "Cannot use AdGuard modifier list with uBO's CSS injection",
+            'AdGuard modifier list is not supported in uBO CSS injection rules',
+        );
+
+        expect(() => CosmeticRuleParser.parse('[$a=b]##^script:has-text(ads)')).toThrowError(
+            'AdGuard modifier list is not supported in uBO HTML filtering rules',
+        );
+
+        expect(() => CosmeticRuleParser.parse('$$responseheader(header-name)')).toThrowError(
+            'Functions are not supported in ADG HTML filtering rules',
+        );
+
+        expect(() => CosmeticRuleParser.parse('#%#')).toThrowError(
+            'Empty body in JS injection rule',
+        );
+
+        expect(() => CosmeticRuleParser.parse('example.com#%#')).toThrowError(
+            'Empty body in JS injection rule',
         );
     });
 
@@ -836,13 +1886,13 @@ describe('CosmeticRuleParser', () => {
             return null;
         };
 
-        // Valid elemhide
+        // Element hiding
         expect(parseAndGenerate('##.ad')).toEqual('##.ad');
         expect(parseAndGenerate('example.com,~example.net##.ad')).toEqual('example.com,~example.net##.ad');
         expect(parseAndGenerate('#@#.ad')).toEqual('#@#.ad');
         expect(parseAndGenerate('example.com,~example.net#@#.ad')).toEqual('example.com,~example.net#@#.ad');
 
-        // Valid elemhide (extended)
+        // Element hiding with Extended CSS
         expect(parseAndGenerate('#?#.ad:-abp-has(.ad)')).toEqual('#?#.ad:-abp-has(.ad)');
         expect(parseAndGenerate('example.com,~example.net#?#.ad:-abp-has(.ad)')).toEqual(
             'example.com,~example.net#?#.ad:-abp-has(.ad)',
@@ -852,7 +1902,7 @@ describe('CosmeticRuleParser', () => {
             'example.com,~example.net#@?#.ad:-abp-has(.ad)',
         );
 
-        // Valid CSS inject (AdGuard)
+        // AdGuard CSS injection
         expect(parseAndGenerate('#$#body { padding: 0; }')).toEqual('#$#body { padding: 0; }');
         expect(parseAndGenerate('example.com,~example.net#$#body { padding: 0; }')).toEqual(
             'example.com,~example.net#$#body { padding: 0; }',
@@ -862,7 +1912,7 @@ describe('CosmeticRuleParser', () => {
             'example.com,~example.net#@$#body { padding: 0; }',
         );
 
-        // Valid ExtendedCSS inject (AdGuard)
+        // AdGuard CSS injection with Extended CSS
         expect(parseAndGenerate('#$?#body:-abp-has(.ad) { padding: 0; }')).toEqual(
             '#$?#body:-abp-has(.ad) { padding: 0; }',
         );
@@ -876,31 +1926,31 @@ describe('CosmeticRuleParser', () => {
             'example.com,~example.net#@$?#body:-abp-has(.ad) { padding: 0; }',
         );
 
-        // Media queries
+        // AdGuard CSS injection with Extended CSS and media query
         expect(parseAndGenerate('#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }')).toEqual(
-            '#$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }',
+            '#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }',
         );
 
-        // Tolerant
+        // Tolerant (space missing after at-rule name)
         expect(parseAndGenerate('#$?#@media(min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }')).toEqual(
-            '#$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }',
+            '#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }',
         );
 
         expect(
             parseAndGenerate(
                 'example.com,~example.net#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }',
             ),
-        ).toEqual('example.com,~example.net#$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }');
+        ).toEqual('example.com,~example.net#$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }');
         expect(parseAndGenerate('#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }')).toEqual(
-            '#@$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }',
+            '#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }',
         );
         expect(
             parseAndGenerate(
                 'example.com,~example.net#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }',
             ),
-        ).toEqual('example.com,~example.net#@$?#@media (min-width:1024px) { body:-abp-has(.ad) { padding: 0; } }');
+        ).toEqual('example.com,~example.net#@$?#@media (min-width: 1024px) { body:-abp-has(.ad) { padding: 0; } }');
 
-        // Valid CSS inject (uBlock)
+        // uBlock CSS injection
         expect(parseAndGenerate('##body:style(padding: 0;)')).toEqual('##body:style(padding: 0;)');
         expect(parseAndGenerate('example.com,~example.net##body:style(padding: 0;)')).toEqual(
             'example.com,~example.net##body:style(padding: 0;)',
@@ -909,14 +1959,8 @@ describe('CosmeticRuleParser', () => {
         expect(parseAndGenerate('example.com,~example.net#@#body:style(padding: 0;)')).toEqual(
             'example.com,~example.net#@#body:style(padding: 0;)',
         );
-        expect(parseAndGenerate('#@#:matches-path(/path) body:style(padding: 0;)')).toEqual(
-            '#@#:matches-path(/path) body:style(padding: 0;)',
-        );
-        expect(parseAndGenerate('example.com,~example.net#@#:matches-path(/path) body:style(padding: 0;)')).toEqual(
-            'example.com,~example.net#@#:matches-path(/path) body:style(padding: 0;)',
-        );
 
-        // Valid ExtendedCSS inject (uBlock)
+        // uBlock CSS injection with Extended CSS and media query
         expect(parseAndGenerate('##body:has(.ad):style(padding: 0;)')).toEqual('##body:has(.ad):style(padding: 0;)');
         expect(parseAndGenerate('example.com,~example.net##body:has(.ad):style(padding: 0;)')).toEqual(
             'example.com,~example.net##body:has(.ad):style(padding: 0;)',
@@ -926,7 +1970,36 @@ describe('CosmeticRuleParser', () => {
             'example.com,~example.net#@#body:has(.ad):style(padding: 0;)',
         );
 
-        // Valid scriptlet inject (AdGuard)
+        expect(
+            parseAndGenerate(
+                '##body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+            ),
+        ).toEqual(
+            '##body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+        );
+        expect(
+            parseAndGenerate(
+                'example.com,~example.net##body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+            ),
+        ).toEqual(
+            'example.com,~example.net##body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+        );
+        expect(
+            parseAndGenerate(
+                '#@#body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+            ),
+        ).toEqual(
+            '#@#body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+        );
+        expect(
+            parseAndGenerate(
+                'example.com,~example.net#@#body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+            ),
+        ).toEqual(
+            'example.com,~example.net#@#body:has(.ad):matches-media((min-width: 1024px) and (max-width: 1920px)):style(padding: 0;)',
+        );
+
+        // AdGuard scriptlet injection
         expect(parseAndGenerate("#%#//scriptlet('scriptlet0', 'arg0', 'arg1')")).toEqual(
             "#%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
         );
@@ -940,7 +2013,7 @@ describe('CosmeticRuleParser', () => {
             "example.com,~example.net#@%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
         );
 
-        // Valid scriptlet inject (uBlock)
+        // uBlock Origin scriptlet injection
         expect(parseAndGenerate('##+js(scriptlet0, arg0, arg1)')).toEqual('##+js(scriptlet0, arg0, arg1)');
         expect(parseAndGenerate('example.com,~example.net##+js(scriptlet0, arg0, arg1)')).toEqual(
             'example.com,~example.net##+js(scriptlet0, arg0, arg1)',
@@ -950,7 +2023,7 @@ describe('CosmeticRuleParser', () => {
             'example.com,~example.net#@#+js(scriptlet0, arg0, arg1)',
         );
 
-        // Valid scriptlet inject (ABP)
+        // Adblock Plus scriptlet injection
         expect(parseAndGenerate('#$#scriptlet0 arg0 arg1')).toEqual('#$#scriptlet0 arg0 arg1');
         expect(parseAndGenerate('example.com,~example.net#$#scriptlet0 arg0 arg1')).toEqual(
             'example.com,~example.net#$#scriptlet0 arg0 arg1',
@@ -982,7 +2055,7 @@ describe('CosmeticRuleParser', () => {
             parseAndGenerate('example.com,~example.net#@$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21'),
         ).toEqual('example.com,~example.net#@$#scriptlet0 arg01 arg01; scriptlet1; scriptlet2 arg21');
 
-        // Valid HTML filters (AdGuard)
+        // AdGuard HTML filters
         expect(parseAndGenerate('$$script[tag-content="adblock"]')).toEqual('$$script[tag-content="adblock"]');
         expect(parseAndGenerate('example.com,~example.net$$script[tag-content="adblock"]')).toEqual(
             'example.com,~example.net$$script[tag-content="adblock"]',
@@ -992,7 +2065,7 @@ describe('CosmeticRuleParser', () => {
             'example.com,~example.net$@$script[tag-content="adblock"]',
         );
 
-        // Valid HTML filters (uBlock)
+        // uBlock Origin HTML filters
         expect(parseAndGenerate('##^script:has-text(adblock)')).toEqual('##^script:has-text(adblock)');
         expect(parseAndGenerate('example.com,~example.net##^script:has-text(adblock)')).toEqual(
             'example.com,~example.net##^script:has-text(adblock)',
@@ -1014,7 +2087,7 @@ describe('CosmeticRuleParser', () => {
             parseAndGenerate('example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)'),
         ).toEqual('example.com,~example.net#@#^script:has-text(adblock), script:has-text(detector)');
 
-        // Valid JS injections (AdGuard)
+        // AdGuard JS injections
         expect(parseAndGenerate('#%#const a = 2;')).toEqual('#%#const a = 2;');
         expect(parseAndGenerate('example.com,~example.net#%#const a = 2;')).toEqual(
             'example.com,~example.net#%#const a = 2;',
@@ -1031,15 +2104,6 @@ describe('CosmeticRuleParser', () => {
         );
         expect(parseAndGenerate('[$app=com.something,anything=123]example.com,~example.net#%#const a = 2;')).toEqual(
             '[$app=com.something,anything=123]example.com,~example.net#%#const a = 2;',
-        );
-
-        // uBlock modifiers/options
-        expect(parseAndGenerate('##:matches-path(/path) .ad')).toEqual('##:matches-path(/path) .ad');
-        expect(parseAndGenerate('example.com,~example.net##:matches-path(/path) .ad')).toEqual(
-            'example.com,~example.net##:matches-path(/path) .ad',
-        );
-        expect(parseAndGenerate('example.com,~example.net##^:matches-path(/path) script:has-text(detect)')).toEqual(
-            'example.com,~example.net##^:matches-path(/path) script:has-text(detect)',
         );
     });
 });

@@ -85,7 +85,8 @@ describe('CLI tests', () => {
                         problems: [
                             {
                                 severity: 3,
-                                message: 'AGLint parsing error: CSSTree failed to parse selector: Name is expected',
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,
@@ -198,7 +199,8 @@ describe('CLI tests', () => {
                         problems: [
                             {
                                 severity: 3,
-                                message: 'AGLint parsing error: CSSTree failed to parse selector: Name is expected',
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,
@@ -224,7 +226,7 @@ describe('CLI tests', () => {
                                 severity: 3,
                                 message:
                                     // eslint-disable-next-line max-len
-                                    'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no opening parentheses "(" at call: ""',
+                                    "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,
@@ -337,7 +339,8 @@ describe('CLI tests', () => {
                         problems: [
                             {
                                 severity: 3,
-                                message: 'AGLint parsing error: CSSTree failed to parse selector: Name is expected',
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
                                     startColumn: 0,

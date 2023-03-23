@@ -1,76 +1,360 @@
-import { CommentRuleType } from '../../../src/parser/comment/types';
-import { Metadata, MetadataParser } from '../../../src/parser/comment/metadata';
-import { RuleCategory } from '../../../src/parser/common';
-import { AdblockSyntax } from '../../../src/utils/adblockers';
+import { MetadataCommentRuleParser } from '../../../src/parser/comment/metadata';
 import { EMPTY, SPACE } from '../../../src/utils/constants';
 
-describe('MetadataParser', () => {
+describe('MetadataCommentRuleParser', () => {
     test('parse', () => {
-        expect(MetadataParser.parse(EMPTY)).toBe(null);
-        expect(MetadataParser.parse(SPACE)).toBe(null);
+        expect(MetadataCommentRuleParser.parse(EMPTY)).toBe(null);
+        expect(MetadataCommentRuleParser.parse(SPACE)).toBe(null);
 
-        expect(MetadataParser.parse('!')).toBe(null);
-        expect(MetadataParser.parse('!##')).toBe(null);
-        expect(MetadataParser.parse('##')).toBe(null);
-        expect(MetadataParser.parse('!aaa:bbb')).toBe(null);
-        expect(MetadataParser.parse('! aaa: bbb')).toBe(null);
-        expect(MetadataParser.parse('!aaa:bbb:ccc')).toBe(null);
-        expect(MetadataParser.parse('! aaa: bbb: ccc')).toBe(null);
-        expect(MetadataParser.parse('!:::')).toBe(null);
-        expect(MetadataParser.parse('! : : :')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('!')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('!##')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('##')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('!aaa:bbb')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('! aaa: bbb')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('!aaa:bbb:ccc')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('! aaa: bbb: ccc')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('!:::')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('! : : :')).toBe(null);
 
-        expect(MetadataParser.parse('! Title: Filter')).toEqual(<Metadata>{
-            category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Common,
-            type: CommentRuleType.Metadata,
-            marker: '!',
-            header: 'Title',
-            value: 'Filter',
+        expect(MetadataCommentRuleParser.parse('! Title: FilterList Title')).toEqual({
+            type: 'MetadataCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 25,
+                    line: 1,
+                    column: 26,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            header: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 7,
+                        line: 1,
+                        column: 8,
+                    },
+                },
+                value: 'Title',
+            },
+            value: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 25,
+                        line: 1,
+                        column: 26,
+                    },
+                },
+                value: 'FilterList Title',
+            },
         });
 
-        expect(MetadataParser.parse('# Title: Filter')).toEqual(<Metadata>{
-            category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Common,
-            type: CommentRuleType.Metadata,
-            marker: '#',
-            header: 'Title',
-            value: 'Filter',
+        expect(MetadataCommentRuleParser.parse('# Title: FilterList Title')).toEqual({
+            type: 'MetadataCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 25,
+                    line: 1,
+                    column: 26,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '#',
+            },
+            header: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 7,
+                        line: 1,
+                        column: 8,
+                    },
+                },
+                value: 'Title',
+            },
+            value: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 25,
+                        line: 1,
+                        column: 26,
+                    },
+                },
+                value: 'FilterList Title',
+            },
         });
 
-        expect(MetadataParser.parse('! title: Filter')).toEqual(<Metadata>{
-            category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Common,
-            type: CommentRuleType.Metadata,
-            marker: '!',
-            header: 'title',
-            value: 'Filter',
+        expect(MetadataCommentRuleParser.parse('! title: FilterList Title')).toEqual({
+            type: 'MetadataCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 25,
+                    line: 1,
+                    column: 26,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            header: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 7,
+                        line: 1,
+                        column: 8,
+                    },
+                },
+                value: 'title',
+            },
+            value: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 9,
+                        line: 1,
+                        column: 10,
+                    },
+                    end: {
+                        offset: 25,
+                        line: 1,
+                        column: 26,
+                    },
+                },
+                value: 'FilterList Title',
+            },
         });
 
-        expect(MetadataParser.parse('!    title:    Filter   ')).toEqual(<Metadata>{
-            category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Common,
-            type: CommentRuleType.Metadata,
-            marker: '!',
-            header: 'title',
-            value: 'Filter',
+        expect(MetadataCommentRuleParser.parse('!    title:    Filter   ')).toEqual({
+            type: 'MetadataCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 24,
+                    line: 1,
+                    column: 25,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            header: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 5,
+                        line: 1,
+                        column: 6,
+                    },
+                    end: {
+                        offset: 10,
+                        line: 1,
+                        column: 11,
+                    },
+                },
+                value: 'title',
+            },
+            value: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 15,
+                        line: 1,
+                        column: 16,
+                    },
+                    end: {
+                        offset: 21,
+                        line: 1,
+                        column: 22,
+                    },
+                },
+                value: 'Filter',
+            },
         });
 
-        expect(MetadataParser.parse('! Homepage: https://github.com/AdguardTeam/some-repo/wiki')).toEqual(<Metadata>{
-            category: RuleCategory.Comment,
-            syntax: AdblockSyntax.Common,
-            type: CommentRuleType.Metadata,
-            marker: '!',
-            header: 'Homepage',
-            value: 'https://github.com/AdguardTeam/some-repo/wiki',
+        expect(
+            MetadataCommentRuleParser.parse('! Homepage: https://github.com/AdguardTeam/some-repo/wiki'),
+        ).toEqual({
+            type: 'MetadataCommentRule',
+            loc: {
+                start: {
+                    offset: 0,
+                    line: 1,
+                    column: 1,
+                },
+                end: {
+                    offset: 57,
+                    line: 1,
+                    column: 58,
+                },
+            },
+            category: 'Comment',
+            syntax: 'Common',
+            marker: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 1,
+                        line: 1,
+                        column: 2,
+                    },
+                },
+                value: '!',
+            },
+            header: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 2,
+                        line: 1,
+                        column: 3,
+                    },
+                    end: {
+                        offset: 10,
+                        line: 1,
+                        column: 11,
+                    },
+                },
+                value: 'Homepage',
+            },
+            value: {
+                type: 'Value',
+                loc: {
+                    start: {
+                        offset: 12,
+                        line: 1,
+                        column: 13,
+                    },
+                    end: {
+                        offset: 57,
+                        line: 1,
+                        column: 58,
+                    },
+                },
+                value: 'https://github.com/AdguardTeam/some-repo/wiki',
+            },
         });
     });
 
     test('generate', () => {
         const parseAndGenerate = (raw: string) => {
-            const ast = MetadataParser.parse(raw);
+            const ast = MetadataCommentRuleParser.parse(raw);
 
             if (ast) {
-                return MetadataParser.generate(ast);
+                return MetadataCommentRuleParser.generate(ast);
             }
 
             return null;
