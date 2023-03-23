@@ -1,25 +1,14 @@
 /**
- * Elementhiding rule body parser
+ * @file Element hiding rule body parser
  */
 
 import {
-    fromPlainObject, Selector, SelectorList, SelectorPlain, toPlainObject,
+    fromPlainObject, SelectorList, SelectorListPlain,
 } from '@adguard/ecss-tree';
-import { CSS_SELECTORS_SEPARATOR, SPACE } from '../../../utils/constants';
 import { CssTree } from '../../../utils/csstree';
-import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
-import { StringUtils } from '../../../utils/string';
-
-/**
- * Represents an element hiding rule body. There can even be several selectors in a rule,
- * but the best practice is to place the selectors in separate rules.
- */
-export interface ElementHidingRuleBody {
-    /**
-     * Element hiding rule selector(s).
-     */
-    selectors: SelectorPlain[];
-}
+import { CssTreeParserContext } from '../../../utils/csstree-constants';
+import { defaultLocation, ElementHidingRuleBody } from '../../nodes';
+import { locRange } from '../../../utils/location';
 
 /**
  * `ElementHidingBodyParser` is responsible for parsing element hiding rule bodies.
@@ -41,43 +30,30 @@ export class ElementHidingBodyParser {
     /**
      * Parses a raw cosmetic rule body as an element hiding rule body.
      *
-     * @param raw - Raw body
+     * @param raw Raw body
+     * @param loc Location of the body
      * @returns Element hiding rule body AST
-     * @throws
-     *   - If the selector is invalid according to the CSS syntax
+     * @throws If the selector is invalid according to the CSS syntax
      */
-    public static parse(raw: string): ElementHidingRuleBody {
-        const trimmed = raw.trim();
-
-        const selectors: SelectorPlain[] = [];
-
-        // Selector
-        if (StringUtils.findNextUnescapedCharacter(trimmed, CSS_SELECTORS_SEPARATOR) === -1) {
-            selectors.push(<SelectorPlain>CssTree.parsePlain(trimmed, CssTreeParserContext.selector));
-        } else {
-            // SelectorList
-            const selectorListAst = <SelectorList>CssTree.parse(trimmed, CssTreeParserContext.selectorList);
-            selectorListAst.children.forEach((child) => {
-                if (child.type === CssTreeNodeType.Selector) {
-                    selectors.push(<SelectorPlain>toPlainObject(child));
-                }
-            });
-        }
+    public static parse(raw: string, loc = defaultLocation): ElementHidingRuleBody {
+        // eslint-disable-next-line max-len
+        const selectorList: SelectorListPlain = <SelectorListPlain>CssTree.parsePlain(raw, CssTreeParserContext.selectorList, loc);
 
         return {
-            selectors,
+            type: 'ElementHidingRuleBody',
+            loc: locRange(loc, 0, raw.length),
+            selectorList,
         };
     }
 
     /**
      * Converts an element hiding rule body AST to a string.
      *
-     * @param ast - Element hiding rule body AST
+     * @param ast Element hiding rule body AST
      * @returns Raw string
+     * @throws If the AST is invalid
      */
     public static generate(ast: ElementHidingRuleBody): string {
-        return ast.selectors
-            .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
-            .join(CSS_SELECTORS_SEPARATOR + SPACE);
+        return CssTree.generateSelectorList(<SelectorList>fromPlainObject(ast.selectorList));
     }
 }

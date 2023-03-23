@@ -1,229 +1,176 @@
 /**
- * AdGuard Hints
- *
+ * @file AdGuard Hints
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints}
  */
 
-import { AdblockSyntax } from '../../utils/adblockers';
-import { EMPTY, SPACE, UNDERSCORE } from '../../utils/constants';
+import { locRange, shiftLoc } from '../../utils/location';
+import {
+    CLOSE_PARENTHESIS, COMMA, EMPTY, OPEN_PARENTHESIS, SPACE, UNDERSCORE,
+} from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
-import { CommentRuleType } from './types';
-import { Comment } from './common';
-import { RuleCategory } from '../common';
-
-const HINT_MARKER = '!+';
-const HINT_MARKER_LEN = HINT_MARKER.length;
-const HINT_PARAMS_OPEN = '(';
-const HINT_PARAMS_CLOSE = ')';
-const HINT_PARAMS_SEPARATOR = ',';
-
-/**
- * Represents a hint member.
- *
- * @example
- * ```adblock
- * !+ PLATFORM(windows, mac)
- * ```
- * the name would be `PLATFORM` and the params would be `["windows", "mac"]`.
- */
-export interface HintMember {
-    /**
-     * Hint name.
-     *
-     * @example
-     * For `PLATFORM(windows, mac)` the name would be `PLATFORM`.
-     */
-    name: string;
-
-    /**
-     * Hint parameters.
-     *
-     * @example
-     * For `PLATFORM(windows, mac)` the params would be `["windows", "mac"]`.
-     */
-    params: string[];
-}
-
-/**
- * Represents a hint comment rule.
- *
- * There can be several hints in a hint rule.
- *
- * @example
- * If the rule is
- * ```adblock
- * !+ NOT_OPTIMIZED PLATFORM(windows)
- * ```
- * then there are two hint members: `NOT_OPTIMIZED` and `PLATFORM`.
- */
-export interface Hint extends Comment {
-    category: RuleCategory.Comment;
-    type: CommentRuleType.Hint;
-
-    /**
-     * Currently only AdGuard supports hints.
-     */
-    syntax: AdblockSyntax.Adg;
-
-    /**
-     * List of hints.
-     */
-    hints: HintMember[];
-}
+import {
+    Hint, Location, Value, defaultLocation,
+} from '../nodes';
+import { AdblockSyntaxError } from '../errors/syntax-error';
+import { ParameterListParser } from '../misc/parameter-list';
 
 /**
  * `HintParser` is responsible for parsing AdGuard hints.
  *
  * @example
+ * If the hint rule is
  * ```adblock
  * !+ NOT_OPTIMIZED PLATFORM(windows)
  * ```
- * the list will contain two hint members: `NOT_OPTIMIZED` and `PLATFORM`, and the params
- * for `PLATFORM` would be `["windows"]`.
- * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints}
+ * then the hints are `NOT_OPTIMIZED` and `PLATFORM(windows)`, and this
+ * class is responsible for parsing them. The rule itself is parsed by
+ * the `HintRuleParser`, which uses this class to parse single hints.
  */
 export class HintParser {
     /**
-     * Determines whether the rule is a hint rule.
+     * Parses a raw rule as a hint.
      *
-     * @param raw - Raw rule
-     * @returns `true` if the rule is a hint rule, `false` otherwise
+     * @param raw Raw rule
+     * @param loc Base location
+     * @returns Hint rule AST or null
+     * @throws If the syntax is invalid
      */
-    public static isHint(raw: string): boolean {
-        return raw.trim().startsWith(HINT_MARKER);
-    }
+    public static parse(raw: string, loc: Location = defaultLocation): Hint {
+        let offset = 0;
 
-    /**
-     * Parses a raw rule as a hint comment.
-     *
-     * @param raw - Raw rule
-     * @returns Hint AST or null (if the raw rule cannot be parsed as a hint comment)
-     * @throws If the input matches the HINT pattern but syntactically invalid
-     * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#hints-1}
-     */
-    public static parse(raw: string): Hint | null {
-        const trimmed = raw.trim();
+        // Skip whitespace characters before the hint
+        offset = StringUtils.skipWS(raw);
 
-        if (!HintParser.isHint(trimmed)) {
-            return null;
-        }
+        // Hint should start with the hint name in every case
 
-        const collectedMembers: HintMember[] = [];
+        // Save the start offset of the hint name
+        const nameStartIndex = offset;
 
-        let openingBracketIndex = -1;
-        let collectedHintName = EMPTY;
+        // Parse the hint name
+        for (; offset < raw.length; offset += 1) {
+            const char = raw[offset];
 
-        // Skip !+ or #+, so start from index 2
-        for (let i = HINT_MARKER_LEN; i < trimmed.length; i += 1) {
-            if (trimmed[i] === HINT_PARAMS_OPEN) {
-                // Bracket opening
-                if (collectedHintName.length === 0) {
-                    throw new SyntaxError(
-                        `Missing hint name, invalid opening bracket found at position ${i} in comment "${trimmed}"`,
-                    );
-                } else if (openingBracketIndex !== -1) {
-                    throw new SyntaxError(
-                        // eslint-disable-next-line max-len
-                        `Nesting hints isn't supported, invalid opening bracket found at position ${i} in comment "${trimmed}"`,
-                    );
-                }
-                openingBracketIndex = i;
-            } else if (trimmed[i] === HINT_PARAMS_CLOSE) {
-                // Bracket closing
-                if (openingBracketIndex === -1) {
-                    throw new SyntaxError(
-                        `No opening bracket found for closing bracket at position ${i} in comment "${trimmed}"`,
-                    );
-                }
+            // Abort consuming the hint name if we encounter a whitespace character
+            // or an opening parenthesis, which means 'HIT_NAME(' case
+            if (char === OPEN_PARENTHESIS || char === SPACE) {
+                break;
+            }
 
-                // Parameter list between ( and )
-                const rawParams = trimmed.substring(openingBracketIndex + 1, i);
-
-                collectedMembers.push({
-                    name: collectedHintName,
-                    params: rawParams.split(HINT_PARAMS_SEPARATOR).map((arg) => arg.trim()),
-                });
-
-                openingBracketIndex = -1;
-                collectedHintName = EMPTY;
-            } else if (openingBracketIndex === -1 && StringUtils.isWhitespace(trimmed[i])) {
-                // Spaces between hints
-                if (
-                    collectedHintName
-                    && trimmed[i - 1]
-                    && trimmed[i - 1] !== '+'
-                    && !StringUtils.isWhitespace(trimmed[i - 1])
-                ) {
-                    // Store paramsless hints
-                    collectedMembers.push({
-                        name: collectedHintName,
-                        params: [],
-                    });
-
-                    collectedHintName = EMPTY;
-                }
-            } else if (openingBracketIndex === -1) {
-                // Anything else (typically hint name chars)
-                // Restrict to a-z, A-Z, 0-9 and _
-                if (
-                    (trimmed[i] >= 'a' && trimmed[i] <= 'z')
-                        || (trimmed[i] >= 'A' && trimmed[i] <= 'Z')
-                        || (trimmed[i] >= '0' && trimmed[i] <= '9')
-                        || trimmed[i] === UNDERSCORE
-                ) {
-                    collectedHintName += trimmed[i];
-                } else {
-                    throw new SyntaxError(
-                        `Invalid character ${trimmed[i]} in hint name at position ${i} in comment "${trimmed}"`,
-                    );
-                }
+            // Hint name should only contain letters, digits, and underscores
+            if (!StringUtils.isAlphaNumeric(char) && char !== UNDERSCORE) {
+                // eslint-disable-next-line max-len
+                throw new AdblockSyntaxError(`Invalid character "${char}" in hint name: "${char}"`, locRange(loc, nameStartIndex, offset));
             }
         }
 
-        // Handle unclosed bracket
-        if (openingBracketIndex !== -1) {
-            throw new SyntaxError(`Unclosed opening bracket at ${openingBracketIndex} in comment "${trimmed}"`);
+        // Save the end offset of the hint name
+        const nameEndIndex = offset;
+
+        // Save the hint name token
+        const name = raw.substring(nameStartIndex, nameEndIndex);
+
+        // Hint name cannot be empty
+        if (name === EMPTY) {
+            throw new AdblockSyntaxError('Empty hint name', locRange(loc, 0, nameEndIndex));
         }
 
-        // Handle remaining single hint
-        if (collectedHintName.length > 0) {
-            collectedMembers.push({
-                name: collectedHintName,
-                params: [],
-            });
+        // Now we have two case:
+        //  1. We have HINT_NAME and should return it
+        //  2. We have HINT_NAME(PARAMS) and should continue parsing
+
+        // Skip whitespace characters after the hint name
+        offset = StringUtils.skipWS(raw, offset);
+
+        // Throw error for 'HINT_NAME (' case
+        if (offset > nameEndIndex && raw[offset] === OPEN_PARENTHESIS) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                'Unexpected whitespace(s) between hint name and opening parenthesis',
+                locRange(loc, nameEndIndex, offset),
+            );
         }
 
+        // Create the hint name node (we can reuse it in the 'HINT_NAME' case, if needed)
+        const nameNode: Value = {
+            type: 'Value',
+            loc: locRange(loc, nameStartIndex, nameEndIndex),
+            value: name,
+        };
+
+        // Just return the hint name if we have 'HINT_NAME' case (no params)
+        if (raw[offset] !== OPEN_PARENTHESIS) {
+            return {
+                type: 'Hint',
+                loc: locRange(loc, 0, offset),
+                name: nameNode,
+            };
+        }
+
+        // Skip the opening parenthesis
+        offset += 1;
+
+        // Find closing parenthesis
+        const closeParenthesisIndex = raw.lastIndexOf(CLOSE_PARENTHESIS);
+
+        // Throw error if we don't have closing parenthesis
+        if (closeParenthesisIndex === -1) {
+            throw new AdblockSyntaxError(
+                `Missing closing parenthesis for hint "${name}"`,
+                locRange(loc, nameStartIndex, raw.length),
+            );
+        }
+
+        // Save the start and end index of the params
+        const paramsStartIndex = offset;
+        const paramsEndIndex = closeParenthesisIndex;
+
+        // Parse the params
+        const params = ParameterListParser.parse(
+            raw.substring(paramsStartIndex, paramsEndIndex),
+            COMMA,
+            shiftLoc(loc, paramsStartIndex),
+        );
+
+        offset = closeParenthesisIndex + 1;
+
+        // Skip whitespace characters after the closing parenthesis
+        offset = StringUtils.skipWS(raw, offset);
+
+        // Throw error if we don't reach the end of the input
+        if (offset !== raw.length) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                `Unexpected input after closing parenthesis for hint "${name}": "${raw.substring(closeParenthesisIndex + 1, offset + 1)}"`,
+                locRange(loc, closeParenthesisIndex + 1, offset + 1),
+            );
+        }
+
+        // Return the HINT_NAME(PARAMS) case AST
         return {
-            category: RuleCategory.Comment,
-            type: CommentRuleType.Hint,
-            syntax: AdblockSyntax.Adg,
-            hints: collectedMembers,
+            type: 'Hint',
+            loc: locRange(loc, 0, offset),
+            name: nameNode,
+            params,
         };
     }
 
     /**
-     * Converts a hint AST to a string.
+     * Converts a single hint AST to a string.
      *
-     * @param ast - Hint AST
-     * @returns Raw string
+     * @param hint Hint AST
+     * @returns Hint string
      */
-    public static generate(ast: Hint): string {
-        let result = HINT_MARKER + SPACE;
+    public static generate(hint: Hint): string {
+        let result = EMPTY;
 
-        result += ast.hints
-            .map(({ name, params }) => {
-                let subresult = name;
+        result += hint.name.value;
 
-                if (params && params.length > 0) {
-                    subresult += HINT_PARAMS_OPEN;
-                    subresult += params.join(HINT_PARAMS_SEPARATOR + SPACE);
-                    subresult += HINT_PARAMS_CLOSE;
-                }
+        if (hint.params && hint.params.children.length > 0) {
+            result += OPEN_PARENTHESIS;
+            result += ParameterListParser.generate(hint.params, COMMA);
+            result += CLOSE_PARENTHESIS;
+        }
 
-                return subresult;
-            })
-            .join(SPACE);
-
-        return result.trim();
+        return result;
     }
 }

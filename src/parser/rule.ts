@@ -1,28 +1,10 @@
-import { AnyCommentRule, CommentParser } from './comment';
-import { AnyCosmeticRule, CosmeticRuleParser } from './cosmetic';
-import { AnyNetworkRule, NetworkRuleParser } from './network';
 import { AdblockSyntax } from '../utils/adblockers';
 import { EMPTY } from '../utils/constants';
-import { Rule, RuleCategory } from './common';
-
-export const EMPTY_RULE_TYPE = 'EmptyRule';
-
-/**
- * Represents any kind of adblock rule.
- */
-export type AnyRule = EmptyRule | AnyCommentRule | AnyCosmeticRule | AnyNetworkRule;
-
-/**
- * Represents an "empty rule" (practically an empty line)
- */
-export interface EmptyRule extends Rule {
-    category: RuleCategory.Empty;
-
-    /**
-     * Type of the adblock rule (should be always present)
-     */
-    type: typeof EMPTY_RULE_TYPE;
-}
+import { locRange } from '../utils/location';
+import { CommentRuleParser } from './comment';
+import { CosmeticRuleParser } from './cosmetic';
+import { NetworkRuleParser } from './network';
+import { AnyRule, RuleCategory, defaultLocation } from './nodes';
 
 /**
  * `RuleParser` is responsible for parsing the rules.
@@ -55,7 +37,8 @@ export class RuleParser {
      * scriptlet is supported by AdGuard or not. This is also the task of the "Compatibility table". Here, we simply
      * mark the rule with the `AdGuard` syntax in this case.
      *
-     * @param raw - Raw adblock rule
+     * @param raw Raw adblock rule
+     * @param loc Base location of the rule
      * @returns Adblock rule AST
      * @throws If the input matches a pattern but syntactically invalid
      * @example
@@ -86,32 +69,31 @@ export class RuleParser {
      * const ast7 = RuleParser.parse("!#if (adguard)");
      * ```
      */
-    public static parse(raw: string): AnyRule {
-        const trimmed = raw.trim();
-
+    public static parse(raw: string, loc = defaultLocation): AnyRule {
         // Empty lines / rules (handle it just for convenience)
-        if (trimmed.length === 0) {
+        if (raw.trim().length === 0) {
             return {
-                syntax: AdblockSyntax.Common,
+                type: 'EmptyRule',
+                loc: locRange(loc, 0, raw.length),
                 category: RuleCategory.Empty,
-                type: EMPTY_RULE_TYPE,
+                syntax: AdblockSyntax.Common,
             };
         }
 
         // Comment rules (agent / metadata / hint / pre-processor / comment)
-        const comment = CommentParser.parse(trimmed);
+        const comment = CommentRuleParser.parse(raw, loc);
         if (comment !== null) {
             return comment;
         }
 
         // Cosmetic rules / non-basic rules
-        const cosmetic = CosmeticRuleParser.parse(trimmed);
+        const cosmetic = CosmeticRuleParser.parse(raw, loc);
         if (cosmetic !== null) {
             return cosmetic;
         }
 
         // Network / basic rules
-        const network = NetworkRuleParser.parse(trimmed);
+        const network = NetworkRuleParser.parse(raw, loc);
 
         return network;
     }
@@ -140,15 +122,15 @@ export class RuleParser {
 
             // Comment rules
             case RuleCategory.Comment:
-                return CommentParser.generate(<AnyCommentRule>ast);
+                return CommentRuleParser.generate(ast);
 
             // Cosmetic / non-basic rules
             case RuleCategory.Cosmetic:
-                return CosmeticRuleParser.generate(<AnyCosmeticRule>ast);
+                return CosmeticRuleParser.generate(ast);
 
             // Network / basic rules
             case RuleCategory.Network:
-                return NetworkRuleParser.generate(<AnyNetworkRule>ast);
+                return NetworkRuleParser.generate(ast);
 
             default:
                 throw new Error('Unknown rule category');

@@ -1,97 +1,16 @@
 /**
- * Scriptlet injection rule body parser
+ * @file Scriptlet injection rule body parser
  */
 
 import { AdblockSyntax } from '../../../utils/adblockers';
-import { EMPTY, SPACE } from '../../../utils/constants';
 import {
-    DOUBLE_QUOTE_MARKER, REGEX_MARKER, SINGLE_QUOTE_MARKER, StringUtils,
-} from '../../../utils/string';
-
-const ADG_UBO_CALL_OPEN = '(';
-const ADG_UBO_CALL_CLOSE = ')';
-const ADG_UBO_PARAM_SEPARATOR = ',';
-const ABP_SNIPPETS_SEPARATOR = ';';
-const ABP_PARAM_SEPARATOR = ' ';
-
-/**
- * Represents the body of an scriptlet injection rule.
- *
- * Adblock Plus supports multiple scriptlets within a rule, so the data structure represents the
- * scriptlets as an array. AdGuard and uBlock Origin ONLY support one scriptlet per rule.
- */
-export interface ScriptletRuleBody {
-    /**
-     * Scriptlet(s) to inject.
-     */
-    scriptlets: Scriptlet[];
-}
-
-/**
- * Represents a specific scriptlet and its parameters.
- */
-export interface Scriptlet {
-    /**
-     * Scriptlet name. For example, if the rule is `example.com#%#//scriptlet('scriptlet0', 'arg0')`,
-     * then the name is `scriptlet0`.
-     */
-    scriptlet: ScriptletParameter;
-
-    /**
-     * Scriptlet parameters. For example, if the rule is `example.com#%#//scriptlet('scriptlet0', 'arg0')`,
-     * then the parameters are `[{type: 'SingleQuoted', value: 'arg0'}]`.
-     */
-    parameters?: ScriptletParameter[];
-}
-
-/** Represents a scriptlet parameter. */
-export interface ScriptletParameter {
-    /**
-     * Parameter type. For example, if the parameter is `'arg0'`, then its type is `SingleQuoted`.
-     */
-    type: ScriptletParameterType;
-
-    /**
-     * Parameter value. For example, if the parameter is `'arg0'`, then its value is `arg0`.
-     */
-    value: string;
-}
-
-/**
- * Represents a scriptlet parameter type.
- *
- * For example, let's have the following rule: `example.com#%#//scriptlet('scriptlet0', 'arg0')`
- * Then the value of `'arg0'` is `arg0` and its type is `SingleQuoted`.
- */
-export enum ScriptletParameterType {
-    /**
-     * Unquoted parameter.
-     *
-     * @example `value`
-     */
-    Unquoted = 'Unquoted',
-
-    /**
-     * Single-quoted parameter.
-     *
-     * @example `'value'`
-     */
-    SingleQuoted = 'SingleQuoted',
-
-    /**
-     * Double-quoted parameter.
-     *
-     * @example `"value"`
-     */
-    DoubleQuoted = 'DoubleQuoted',
-
-    /**
-     * Regular expression parameter.
-     *
-     * @example `/value/`
-     */
-    RegExp = 'RegExp',
-}
+    ADG_SCRIPTLET_MASK, CLOSE_PARENTHESIS, COMMA, EMPTY, OPEN_PARENTHESIS, SEMICOLON, SPACE, UBO_SCRIPTLET_MASK,
+} from '../../../utils/constants';
+import { locRange, shiftLoc } from '../../../utils/location';
+import { StringUtils } from '../../../utils/string';
+import { AdblockSyntaxError } from '../../errors/syntax-error';
+import { ParameterListParser } from '../../misc/parameter-list';
+import { ScriptletInjectionRuleBody, defaultLocation } from '../../nodes';
 
 /**
  * `ScriptletBodyParser` is responsible for parsing the body of a scriptlet rule.
@@ -108,199 +27,246 @@ export enum ScriptletParameterType {
  * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#scriptlet-injection}
  * @see {@link https://help.eyeo.com/adblockplus/snippet-filters-tutorial}
  */
-export class ScriptletBodyParser {
+export class ScriptletInjectionBodyParser {
     /**
      * Parses a raw ADG/uBO scriptlet call body.
      *
-     * @param raw - Raw body
+     * @param raw Raw scriptlet call body
+     * @param loc Location of the body
      * @returns Scriptlet rule body AST
-     * @throws If there is no opening/closing parenthesis
+     * @throws If the body is syntactically incorrect
+     * @example
+     * ```
+     * //scriptlet('scriptlet0', 'arg0')
+     * js(scriptlet0, arg0, arg1, arg2)
+     * ```
      */
-    public static parseAdgAndUboScriptletCall(raw: string): ScriptletRuleBody {
-        const trimmed = raw.trim();
+    public static parseAdgAndUboScriptletCall(raw: string, loc = defaultLocation): ScriptletInjectionRuleBody {
+        let offset = 0;
 
-        // Call should contain: (arg0, arg1,...)
-        if (trimmed[0] !== ADG_UBO_CALL_OPEN) {
-            throw new Error(
+        // Skip leading spaces
+        offset = StringUtils.skipWS(raw, offset);
+
+        // Scriptlet call should start with "js" or "//scriptlet"
+        if (raw.startsWith(ADG_SCRIPTLET_MASK, offset)) {
+            offset += ADG_SCRIPTLET_MASK.length;
+        } else if (raw.startsWith(UBO_SCRIPTLET_MASK, offset)) {
+            offset += UBO_SCRIPTLET_MASK.length;
+        } else {
+            throw new AdblockSyntaxError(
                 // eslint-disable-next-line max-len
-                `Invalid uBlock/AdGuard scriptlet call, no opening parentheses "${ADG_UBO_CALL_OPEN}" at call: "${raw}"`,
-            );
-        } else if (!trimmed.endsWith(ADG_UBO_CALL_CLOSE)) {
-            throw new Error(
-                // eslint-disable-next-line max-len
-                `Invalid uBlock/AdGuard scriptlet call, no closing parentheses "${ADG_UBO_CALL_CLOSE}" at call: "${raw}"`,
+                `Invalid AdGuard/uBlock scriptlet call, no scriptlet call mask '${ADG_SCRIPTLET_MASK}' or '${UBO_SCRIPTLET_MASK}' found`,
+                locRange(loc, offset, raw.length),
             );
         }
 
-        // Remove parentheses
-        const rawParameterList = trimmed.slice(1, -1);
-
-        const splittedRawParameterList = StringUtils.splitStringByUnquotedUnescapedCharacter(
-            rawParameterList,
-            ADG_UBO_PARAM_SEPARATOR,
-        ).map((param) => param.trim());
-
-        // Empty case
-        if (splittedRawParameterList[0] === EMPTY) {
-            return {
-                scriptlets: [],
-            };
+        // Whitespace is not allowed after the mask
+        if (raw[offset] === SPACE) {
+            throw new AdblockSyntaxError(
+                'Invalid AdGuard/uBlock scriptlet call, whitespace is not allowed after the scriptlet call mask',
+                locRange(loc, offset, offset + 1),
+            );
         }
 
-        const parameterList = ScriptletBodyParser.decodeParameters(splittedRawParameterList);
+        // Parameter list should be wrapped in parentheses
+        if (raw[offset] !== OPEN_PARENTHESIS) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                `Invalid AdGuard/uBlock scriptlet call, no opening parentheses '${OPEN_PARENTHESIS}' found`,
+                locRange(loc, offset, raw.length),
+            );
+        }
 
-        // Only one scriptlet is supported in AdGuard/uBlock Origin
+        // Save the offset of the opening parentheses
+        const openingParenthesesIndex = offset;
+
+        // Find closing parentheses
+        // eslint-disable-next-line max-len
+        const closingParenthesesIndex = StringUtils.skipWSBack(raw);
+
+        if (raw[closingParenthesesIndex] !== CLOSE_PARENTHESIS) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                `Invalid AdGuard/uBlock scriptlet call, no closing parentheses '${CLOSE_PARENTHESIS}' found`,
+                locRange(loc, offset, raw.length),
+            );
+        }
+
+        // No unexpected characters after the closing parentheses
+        if (StringUtils.skipWSBack(raw) !== closingParenthesesIndex) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                `Invalid AdGuard/uBlock scriptlet call, unexpected characters after the closing parentheses '${CLOSE_PARENTHESIS}'`,
+                locRange(loc, closingParenthesesIndex + 1, raw.length),
+            );
+        }
+
+        // Parse parameter list
+        const params = ParameterListParser.parse(
+            raw.substring(openingParenthesesIndex + 1, closingParenthesesIndex),
+            COMMA,
+            shiftLoc(loc, openingParenthesesIndex + 1),
+        );
+
+        // Check if the scriptlet name is specified
+        if (params.children.length === 0 || params.children[0].value.trim() === EMPTY) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                'Invalid AdGuard/uBlock scriptlet call, no scriptlet name specified',
+                locRange(loc, offset, raw.length),
+            );
+        }
+
         return {
+            type: 'ScriptletInjectionRuleBody',
+            loc: locRange(loc, 0, raw.length),
             scriptlets: [
-                {
-                    scriptlet: parameterList[0],
-                    parameters: parameterList.slice(1),
-                },
+                params,
             ],
         };
     }
 
     /**
-     * Parses a raw ABP snippet call body.
+     * Parses a raw ABP scriptlet call body.
      *
-     * @param raw - Raw body
-     * @returns Scriptlet rule body AST
-     * @throws If no scriptlet is specified
+     * @param raw Raw scriptlet call body
+     * @param loc Body location
+     * @returns Parsed scriptlet rule body
+     * @throws If the body is syntactically incorrect
+     * @example
+     * ```
+     * scriptlet0 arg0 arg1 arg2; scriptlet1 arg0 arg1 arg2
+     * ```
      */
-    public static parseAbpSnippetCall(raw: string): ScriptletRuleBody {
-        const scriptlets: Scriptlet[] = [];
-
-        let trimmed = raw.trim();
-
-        // Remove unnecessary ending semicolon (if present)
-        if (trimmed.endsWith(ABP_SNIPPETS_SEPARATOR)) {
-            trimmed = trimmed.slice(0, -1);
-        }
-
-        // It can contain multiple scriptlet calls delimeted by semicolon
-        const rawScriptletCalls = StringUtils.splitStringByUnescapedNonStringNonRegexChar(
-            trimmed,
-            ABP_SNIPPETS_SEPARATOR,
-        );
-
-        for (const rawScriptletCall of rawScriptletCalls) {
-            const splittedRawParameterList = StringUtils.splitStringByUnescapedNonStringNonRegexChar(
-                rawScriptletCall.trim(),
-                ABP_PARAM_SEPARATOR,
-            ).map((param) => param.trim());
-
-            // The scriptlet must be specified (parameters are optional)
-            if (!splittedRawParameterList[0] || splittedRawParameterList[0] === EMPTY) {
-                throw new SyntaxError(`No scriptlet specified at the following scriptlet call: "${raw}"`);
-            }
-
-            const parameterList = ScriptletBodyParser.decodeParameters(splittedRawParameterList);
-
-            scriptlets.push({
-                scriptlet: parameterList[0],
-                parameters: parameterList.slice(1),
-            });
-        }
-
-        // Adblock Plus snippet call can contain multiple scriptlets
-        return {
-            scriptlets,
+    public static parseAbpSnippetCall(raw: string, loc = defaultLocation): ScriptletInjectionRuleBody {
+        const result: ScriptletInjectionRuleBody = {
+            type: 'ScriptletInjectionRuleBody',
+            loc: locRange(loc, 0, raw.length),
+            scriptlets: [],
         };
-    }
 
-    /**
-     * Converts an array of strings into an array of parameter interfaces.
-     *
-     * @param params - Parameter list as array of strings
-     * @returns Parameter list as array of parameter interfaces
-     */
-    private static decodeParameters(params: string[]): ScriptletParameter[] {
-        return params.map((param) => {
-            let type: ScriptletParameterType = ScriptletParameterType.Unquoted;
+        let offset = 0;
 
-            if (param[0] === SINGLE_QUOTE_MARKER && param.endsWith(SINGLE_QUOTE_MARKER)) {
-                type = ScriptletParameterType.SingleQuoted;
-            } else if (param[0] === DOUBLE_QUOTE_MARKER && param.endsWith(DOUBLE_QUOTE_MARKER)) {
-                type = ScriptletParameterType.DoubleQuoted;
-            } else if (param[0] === REGEX_MARKER && param.endsWith(REGEX_MARKER)) {
-                type = ScriptletParameterType.RegExp;
+        // Skip leading spaces
+        offset = StringUtils.skipWS(raw, offset);
+
+        while (offset < raw.length) {
+            offset = StringUtils.skipWS(raw, offset);
+
+            const scriptletCallStart = offset;
+
+            // Find the next semicolon or the end of the string
+            let semicolonIndex = StringUtils.findUnescapedNonStringNonRegexChar(raw, SEMICOLON, offset);
+
+            if (semicolonIndex === -1) {
+                semicolonIndex = raw.length;
             }
 
-            return {
-                type,
+            const scriptletCallEnd = StringUtils.skipWSBack(raw, semicolonIndex - 1) + 1;
 
-                // If it is not unquoted, the boundaries should be removed:
-                value: type !== ScriptletParameterType.Unquoted ? param.slice(1, -1) : param,
-            };
-        });
-    }
-
-    /**
-     * Converts an array of parameter interfaces into an array of strings.
-     *
-     * @param params - Parameter list as array of parameter interfaces
-     * @returns Parameter list as array of strings
-     */
-    private static encodeParameters(params: ScriptletParameter[]): string[] {
-        return params.map(({ value, type }) => {
-            switch (type) {
-                case ScriptletParameterType.SingleQuoted:
-                    return (
-                        SINGLE_QUOTE_MARKER
-                        + StringUtils.escapeCharacter(value, SINGLE_QUOTE_MARKER)
-                        + SINGLE_QUOTE_MARKER
-                    );
-
-                case ScriptletParameterType.DoubleQuoted:
-                    return (
-                        DOUBLE_QUOTE_MARKER
-                        + StringUtils.escapeCharacter(value, DOUBLE_QUOTE_MARKER)
-                        + DOUBLE_QUOTE_MARKER
-                    );
-
-                case ScriptletParameterType.RegExp:
-                    return REGEX_MARKER + StringUtils.escapeCharacter(value, REGEX_MARKER) + REGEX_MARKER;
-
-                default:
-                    return value;
+            if (scriptletCallEnd <= scriptletCallStart) {
+                break;
             }
-        });
+
+            const params = ParameterListParser.parse(
+                raw.substring(scriptletCallStart, scriptletCallEnd),
+                SPACE,
+                shiftLoc(loc, scriptletCallStart),
+            );
+
+            // Check if the scriptlet name is specified
+            if (params.children.length === 0) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    'Invalid ABP snippet call, no scriptlet name specified',
+                    locRange(loc, offset, raw.length),
+                );
+            }
+
+            // Parse the scriptlet call
+            result.scriptlets.push(params);
+
+            // Skip the semicolon
+            offset = semicolonIndex + 1;
+        }
+
+        if (result.scriptlets.length === 0) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                'Invalid ABP snippet call, no scriptlets specified at all',
+                locRange(loc, 0, raw.length),
+            );
+        }
+
+        return result;
     }
 
     /**
-     * Parses a raw cosmetic rule body as a scriptlet injection rule body.
+     * Parses the specified scriptlet injection rule body into an AST.
      *
-     * @param raw - Raw body
-     * @returns Scriptlet injection rule body AST
+     * @param raw Raw rule body
+     * @param loc Rule body location
+     * @returns Parsed rule body
+     * @throws If the rule body is syntactically incorrect
      */
-    public static parse(raw: string): ScriptletRuleBody {
+    public static parse(raw: string, loc = defaultLocation): ScriptletInjectionRuleBody {
         const trimmed = raw.trim();
 
-        // ADG and uBO calls always begins with parenthesis
-        if (trimmed[0] === ADG_UBO_CALL_OPEN) {
-            return ScriptletBodyParser.parseAdgAndUboScriptletCall(trimmed);
+        if (trimmed.startsWith(ADG_SCRIPTLET_MASK) || trimmed.startsWith(UBO_SCRIPTLET_MASK)) {
+            return ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall(trimmed, loc);
         }
 
-        return ScriptletBodyParser.parseAbpSnippetCall(trimmed);
+        return ScriptletInjectionBodyParser.parseAbpSnippetCall(trimmed, loc);
     }
 
     /**
-     * Converts a scriptlet injection rule body AST to a string.
+     * Generates a string representation of the rule body for the specified syntax.
      *
-     * @param ast - Scriptlet injection rule body AST
-     * @param syntax - Desired syntax of the generated result
-     * @returns Raw string
+     * @param ast Scriptlet injection rule body
+     * @param syntax Syntax to use
+     * @returns String representation of the rule body
+     * @throws If the rule body is not supported by the specified syntax
+     * @throws If the AST is invalid
      */
-    public static generate(ast: ScriptletRuleBody, syntax: AdblockSyntax): string[] {
-        const scriptlets = ast.scriptlets.map(({ scriptlet, parameters }) => {
-            return ScriptletBodyParser.encodeParameters([scriptlet, ...(parameters || [])]);
-        });
+    public static generate(ast: ScriptletInjectionRuleBody, syntax: AdblockSyntax = AdblockSyntax.Adg): string {
+        let result = EMPTY;
 
+        // AdGuard and uBlock doesn't support multiple scriptlet calls in one rule
         if (syntax === AdblockSyntax.Adg || syntax === AdblockSyntax.Ubo) {
-            return scriptlets.map((scriptlet) => `(${scriptlet.join(ADG_UBO_PARAM_SEPARATOR + SPACE)})`);
+            if (ast.scriptlets.length > 1) {
+                throw new Error('AdGuard and uBlock syntaxes don\'t support multiple scriptlet calls in one rule');
+            }
+
+            const scriptletCall = ast.scriptlets[0];
+
+            if (scriptletCall.children.length === 0) {
+                throw new Error('Scriptlet name is not specified');
+            }
+
+            if (syntax === AdblockSyntax.Adg) {
+                result += ADG_SCRIPTLET_MASK;
+            } else {
+                result += UBO_SCRIPTLET_MASK;
+            }
+
+            result += OPEN_PARENTHESIS;
+            result += ParameterListParser.generate(scriptletCall);
+            result += CLOSE_PARENTHESIS;
+        } else {
+            // First generate a string representation of all scriptlet calls, then join them with semicolons
+            const scriptletCalls: string[] = [];
+
+            for (const scriptletCall of ast.scriptlets) {
+                if (scriptletCall.children.length === 0) {
+                    throw new Error('Scriptlet name is not specified');
+                }
+
+                scriptletCalls.push(ParameterListParser.generate(scriptletCall, SPACE));
+            }
+
+            result += scriptletCalls.join(SEMICOLON + SPACE);
         }
 
-        // ABP
-        return scriptlets.map((scriptlet) => scriptlet.join(ABP_PARAM_SEPARATOR));
+        return result;
     }
 }
