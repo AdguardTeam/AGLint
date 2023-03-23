@@ -41,6 +41,7 @@
         "lint": "eslint . --ext .ts",
         "test": "jest --runInBand .",
         "coverage": "jest --coverage",
+        "check-compatibility-tables": "node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node scripts/check-compatibility-tables.ts",
         "build": "yarn rimraf dist && tsc --declaration --emitDeclarationOnly --outdir dist/types && yarn rollup --config rollup.config.ts --configPlugin typescript && yarn rimraf dist/types"
     },
     "devDependencies": {

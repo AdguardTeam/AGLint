@@ -10,9 +10,10 @@
     Supported syntaxes:
 </p>
 <p align="center">
-    <a href="https://adguard.com/"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
+    <a href="https://adguard.com"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
     <a href="https://github.com/gorhill/uBlock"><img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin</a> |
-    <a href="https://adblockplus.org/"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
+    <a href="https://getadblock.com"><img src="https://cdn.adguard.com/website/github.com/AGLint/ab_logo.svg" width="14px"> AdBlock</a> |
+    <a href="https://adblockplus.org"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
 </p>
 
 <p align="center">
@@ -62,7 +63,7 @@ Table of Contents:
 
 ## Introduction
 
-`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
+`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists.
 
@@ -70,7 +71,7 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 
 ## Features
 
-- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus.
+- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus.
 - :white_check_mark: **Error-tolerant**: it can parse any filter list, even if it contains minor syntax errors.
 - :zap: **Fast**: made with performance in mind.
 - :thumbsup: **Easy to use**: it can be used as a CLI tool or programmatically.
@@ -635,13 +636,13 @@ You can find the detailed linter rule documentation [here](src/linter/rules/READ
 A tool for converting rules from one syntax to another. Sadly, this feature will only become available in a future version.
 
 A small summary of what to expect:
-- Compatibility tables for AdGuard, uBlock Origin and Adblock Plus
+- Compatibility tables for AdGuard, uBlock Origin and AdBlock / Adblock Plus
   - Extended CSS elements
   - Scriptlets
   - Redirects
   - etc. 
 - Rule converter (AST &#8594; AST)
-  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to Adblock Plus, since ABP simply doesn't support CSS injections.
+  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to AdBlock / Adblock Plus, since ABP simply doesn't support CSS injections.
 
 ## Development & Contribution
 
