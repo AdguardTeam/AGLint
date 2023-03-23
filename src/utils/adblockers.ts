@@ -1,4 +1,8 @@
 /**
+ * @file Possible adblock syntaxes are listed here.
+ */
+
+/**
  * Possible adblock syntaxes (supported by this library)
  */
 export enum AdblockSyntax {

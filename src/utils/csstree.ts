@@ -1,5 +1,5 @@
 /**
- * Additional / helper functions for CSSTree.
+ * @file Additional / helper functions for ECSSTree / CSSTree.
  */
 
 import {
@@ -11,57 +11,140 @@ import {
     PseudoClassSelector,
     Selector,
     generate,
-    Block,
     CssNodePlain,
     toPlainObject,
+    SelectorList,
+    DeclarationList,
+    MediaQueryList,
+    MediaQuery,
 } from '@adguard/ecss-tree';
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from '../converter/pseudo';
 import {
+    ASSIGN_OPERATOR,
+    CLOSE_PARENTHESIS,
+    CLOSE_SQUARE_BRACKET,
+    COLON,
     COMMA,
-    CSS_ATTRIBUTE_SELECTOR_CLOSE,
-    CSS_ATTRIBUTE_SELECTOR_OPEN,
-    CSS_CLASS_MARKER,
-    CSS_DECLARATION_END,
-    CSS_DECLARATION_SEPARATOR,
-    CSS_ID_MARKER,
     CSS_IMPORTANT,
-    CSS_PSEUDO_CLOSE,
-    CSS_PSEUDO_MARKER,
-    CSS_PSEUDO_OPEN,
+    DOT,
     EMPTY,
+    HASHMARK,
+    OPEN_PARENTHESIS,
+    OPEN_SQUARE_BRACKET,
+    SEMICOLON,
     SPACE,
 } from './constants';
 import { CssTreeNodeType, CssTreeParserContext } from './csstree-constants';
+import { AdblockSyntaxError } from '../parser/errors/syntax-error';
+import { defaultLocation } from '../parser/nodes';
+import { locRange } from './location';
 
+/**
+ * Common CSSTree parsing options.
+ */
+const commonCssTreeOptions = {
+    parseAtrulePrelude: true,
+    parseRulePrelude: true,
+    parseValue: true,
+    parseCustomProperty: true,
+    positions: true,
+};
+
+/**
+ * Result interface for ExtendedCSS finder.
+ */
 export interface ExtendedCssNodes {
+    /**
+     * ExtendedCSS pseudo classes.
+     */
     pseudos: PseudoClassSelector[];
+
+    /**
+     * ExtendedCSS attributes.
+     */
     attributes: AttributeSelector[];
 }
 
+/**
+ * Additional / helper functions for CSSTree.
+ */
 export class CssTree {
     /**
      * Helper function for parsing CSS parts.
      *
-     * @param raw - Raw CSS input
-     * @param context - CSSTree context
+     * @param raw Raw CSS input
+     * @param context CSSTree context
+     * @param loc Base location for the parsed node
      * @returns CSSTree node (AST)
      */
-    public static parse(raw: string, context: CssTreeParserContext): CssNode {
+    public static parse(raw: string, context: CssTreeParserContext, loc = defaultLocation): CssNode {
         try {
             return parse(raw, {
                 context,
-                parseAtrulePrelude: true,
-                parseRulePrelude: true,
-                parseValue: true,
-                parseCustomProperty: true,
+                ...commonCssTreeOptions,
+                ...loc,
                 // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                onParseError: (error: SyntaxParseError /* , fallbackNode: CssNode */) => {
-                    throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.rawMessage || error.message}`);
+                onParseError: (error: SyntaxParseError) => {
+                    throw new AdblockSyntaxError(
+                        // eslint-disable-next-line max-len
+                        `ECSSTree parsing error: '${error.rawMessage || error.message}'`,
+                        locRange(loc, error.offset, raw.length),
+                    );
                 },
+                // TODO: False positive alert for :xpath('//*[contains(text(),"a")]')
+                // // We don't need CSS comments
+                // onComment: (value: string, commentLoc: CssLocation) => {
+                //     throw new AdblockSyntaxError(
+                //         'ECSSTree parsing error: \'Unexpected comment\'',
+                //         locRange(loc, commentLoc.start.offset, commentLoc.end.offset),
+                //     );
+                // },
             });
         } catch (error: unknown) {
             if (error instanceof Error) {
-                throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.message}`);
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `ECSSTree parsing error: '${error.message}'`,
+                    locRange(loc, 0, raw.length),
+                );
+            }
+
+            // Pass through
+            throw error;
+        }
+    }
+
+    /**
+     * Helper function for parsing CSS parts. This function is tolerates CSSTree fallbacks
+     * (for example, fallback to Raw node if it can't parse the input).
+     *
+     * @param raw Raw CSS input
+     * @param context CSSTree context
+     * @param loc Base location for the parsed node
+     * @returns CSSTree node (AST)
+     */
+    public static parseTolerant(raw: string, context: CssTreeParserContext, loc = defaultLocation): CssNode {
+        try {
+            return parse(raw, {
+                context,
+                ...commonCssTreeOptions,
+                ...loc,
+                // TODO: False positive alert for :xpath('//*[contains(text(),"a")]')
+                // // We don't need CSS comments
+                // onComment: (value: string, commentLoc: CssLocation) => {
+                //     throw new AdblockSyntaxError(
+                //         'ECSSTree parsing error: \'Unexpected comment\'',
+                //         locRange(loc, commentLoc.start.offset, commentLoc.end.offset),
+                //     );
+                // },
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `ECSSTree parsing error: '${error.message}'`,
+                    locRange(loc, 0, raw.length),
+                );
             }
 
             // Pass through
@@ -72,28 +155,43 @@ export class CssTree {
     /**
      * Helper function for parsing CSS parts.
      *
-     * @param raw - Raw CSS input
-     * @param context - CSSTree context
+     * @param raw Raw CSS input
+     * @param context CSSTree context
+     * @param loc Base location for the parsed node
      * @returns CSSTree node (AST)
      */
-    public static parsePlain(raw: string, context: CssTreeParserContext): CssNodePlain {
+    public static parsePlain(raw: string, context: CssTreeParserContext, loc = defaultLocation): CssNodePlain {
         try {
             return toPlainObject(
                 parse(raw, {
                     context,
-                    parseAtrulePrelude: true,
-                    parseRulePrelude: true,
-                    parseValue: true,
-                    parseCustomProperty: true,
+                    ...commonCssTreeOptions,
+                    ...loc,
                     // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                    onParseError: (error: SyntaxParseError /* , fallbackNode: CssNode */) => {
-                        throw new SyntaxError(error.rawMessage);
+                    onParseError: (error: SyntaxParseError) => {
+                        throw new AdblockSyntaxError(
+                            // eslint-disable-next-line max-len
+                            `ECSSTree parsing error: '${error.rawMessage || error.message}'`,
+                            locRange(loc, error.offset, raw.length),
+                        );
                     },
+                    // TODO: False positive alert for :xpath('//*[contains(text(),"a")]')
+                    // We don't need CSS comments
+                    // onComment: (value: string, commentLoc: CssLocation) => {
+                    //     throw new AdblockSyntaxError(
+                    //         'ECSSTree parsing error: \'Unexpected comment\'',
+                    //         locRange(loc, commentLoc.start.offset, commentLoc.end.offset),
+                    //     );
+                    // },
                 }),
             );
         } catch (error: unknown) {
             if (error instanceof Error) {
-                throw new SyntaxError(`CSSTree failed to parse ${context}: ${error.message}`);
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `ECSSTree parsing error: '${error.message}'`,
+                    locRange(loc, 0, raw.length),
+                );
             }
 
             // Pass through
@@ -104,8 +202,8 @@ export class CssTree {
     /**
      * Helper function for creating attribute selectors.
      *
-     * @param attribute - Attribute name
-     * @param value - Attribute value
+     * @param attribute Attribute name
+     * @param value Attribute value
      * @returns Attribute selector AST
      */
     public static createAttributeSelector(attribute: string, value: string): AttributeSelector {
@@ -115,7 +213,7 @@ export class CssTree {
                 type: CssTreeNodeType.Identifier,
                 name: attribute,
             },
-            matcher: '=',
+            matcher: ASSIGN_OPERATOR,
             value: {
                 type: CssTreeNodeType.String,
                 value,
@@ -155,10 +253,108 @@ export class CssTree {
     }
 
     /**
+     * Generates string representation of the media query list.
+     *
+     * @param ast Media query list AST
+     * @returns String representation of the media query list
+     */
+    public static generateMediaQueryList(ast: MediaQueryList): string {
+        let result = EMPTY;
+
+        if (!ast.children || ast.children.size === 0) {
+            throw new Error('Media query list cannot be empty');
+        }
+
+        ast.children.forEach((mediaQuery: CssNode, listItem) => {
+            if (mediaQuery.type !== CssTreeNodeType.MediaQuery) {
+                throw new Error(`Unexpected node type: ${mediaQuery.type}`);
+            }
+
+            result += this.generateMediaQuery(mediaQuery);
+
+            if (listItem.next !== null) {
+                result += COMMA;
+                result += SPACE;
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Generates string representation of the media query.
+     *
+     * @param ast Media query AST
+     * @returns String representation of the media query
+     */
+    public static generateMediaQuery(ast: MediaQuery): string {
+        let result = EMPTY;
+
+        if (!ast.children || ast.children.size === 0) {
+            throw new Error('Media query cannot be empty');
+        }
+
+        ast.children.forEach((node: CssNode, listItem) => {
+            if (node.type === CssTreeNodeType.MediaFeature) {
+                result += OPEN_PARENTHESIS;
+                result += node.name;
+
+                if (node.value !== null) {
+                    result += COLON;
+                    result += SPACE;
+                    // Use default generator for media feature value
+                    result += generate(node.value);
+                }
+
+                result += CLOSE_PARENTHESIS;
+            } else if (node.type === CssTreeNodeType.Identifier) {
+                result += node.name;
+            } else {
+                throw new Error(`Unexpected node type: ${node.type}`);
+            }
+
+            if (listItem.next !== null) {
+                result += SPACE;
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Generates string representation of the selector list.
+     *
+     * @param ast SelectorList AST
+     * @returns String representation of the selector list
+     */
+    public static generateSelectorList(ast: SelectorList): string {
+        let result = EMPTY;
+
+        if (!ast.children || ast.children.size === 0) {
+            throw new Error('Selector list cannot be empty');
+        }
+
+        ast.children.forEach((selector: CssNode, listItem) => {
+            if (selector.type !== CssTreeNodeType.Selector) {
+                throw new Error(`Unexpected node type: ${selector.type}`);
+            }
+
+            result += this.generateSelector(selector);
+
+            if (listItem.next !== null) {
+                result += COMMA;
+                result += SPACE;
+            }
+        });
+
+        return result;
+    }
+
+    /**
      * Selector generation based on CSSTree's AST. This is necessary because CSSTree
      * only adds spaces in some edge cases.
      *
-     * @param ast - CSS Tree AST
+     * @param ast CSS Tree AST
      * @returns CSS selector as string
      */
     public static generateSelector(ast: Selector): string {
@@ -185,12 +381,12 @@ export class CssTree {
                         break;
 
                     case CssTreeNodeType.ClassSelector:
-                        result += CSS_CLASS_MARKER;
+                        result += DOT;
                         result += node.name;
                         break;
 
                     case CssTreeNodeType.IdSelector:
-                        result += CSS_ID_MARKER;
+                        result += HASHMARK;
                         result += node.name;
                         break;
 
@@ -204,6 +400,7 @@ export class CssTree {
 
                     // "Advanced" nodes
                     case CssTreeNodeType.Nth:
+                        // Default generation enough
                         result += generate(node);
                         break;
 
@@ -213,15 +410,11 @@ export class CssTree {
                         const selectors: string[] = [];
 
                         node.children.forEach((selector) => {
-                            // Selector
                             if (selector.type === CssTreeNodeType.Selector) {
                                 selectors.push(CssTree.generateSelector(selector));
+                            } else if (selector.type === CssTreeNodeType.Raw) {
+                                selectors.push(selector.value);
                             }
-                            // TODO: Remove this case?
-                            // Raw (theoretically, CSSTree only parses selectors in this case)
-                            // else if (selector.type == CssTreeNodeType.Raw) {
-                            //     selectors.push(selector.value);
-                            // }
                         });
 
                         // Join selector lists
@@ -247,7 +440,7 @@ export class CssTree {
                         break;
 
                     case CssTreeNodeType.AttributeSelector:
-                        result += CSS_ATTRIBUTE_SELECTOR_OPEN;
+                        result += OPEN_SQUARE_BRACKET;
 
                         // Identifier name
                         if (node.name) {
@@ -277,28 +470,28 @@ export class CssTree {
                             result += node.flags;
                         }
 
-                        result += CSS_ATTRIBUTE_SELECTOR_CLOSE;
+                        result += CLOSE_SQUARE_BRACKET;
 
                         inAttributeSelector = true;
                         break;
 
                     case CssTreeNodeType.PseudoElementSelector:
-                        result += CSS_PSEUDO_MARKER;
-                        result += CSS_PSEUDO_MARKER;
+                        result += COLON;
+                        result += COLON;
                         result += node.name;
 
                         if (node.children !== null) {
-                            result += CSS_PSEUDO_OPEN;
+                            result += OPEN_PARENTHESIS;
                         }
 
                         break;
 
                     case CssTreeNodeType.PseudoClassSelector:
-                        result += CSS_PSEUDO_MARKER;
+                        result += COLON;
                         result += node.name;
 
                         if (node.children !== null) {
-                            result += CSS_PSEUDO_OPEN;
+                            result += OPEN_PARENTHESIS;
                         }
                         break;
 
@@ -331,7 +524,7 @@ export class CssTree {
                     case CssTreeNodeType.PseudoElementSelector:
                     case CssTreeNodeType.PseudoClassSelector:
                         if (node.children !== null) {
-                            result += CSS_PSEUDO_CLOSE;
+                            result += CLOSE_PARENTHESIS;
                         }
                         break;
 
@@ -347,10 +540,10 @@ export class CssTree {
     /**
      * Block generation based on CSSTree's AST. This is necessary because CSSTree only adds spaces in some edge cases.
      *
-     * @param ast - CSS Tree AST
+     * @param ast CSS Tree AST
      * @returns CSS selector as string
      */
-    public static generateBlock(ast: Block): string {
+    public static generateDeclarationList(ast: DeclarationList): string {
         let result = EMPTY;
 
         walk(ast, {
@@ -360,7 +553,7 @@ export class CssTree {
                         result += node.property;
 
                         if (node.value) {
-                            result += CSS_DECLARATION_SEPARATOR;
+                            result += COLON;
                             result += SPACE;
 
                             // Fallback to CSSTree's default generate function for the value (enough at this point)
@@ -368,8 +561,6 @@ export class CssTree {
                         }
 
                         if (node.important) {
-                            // FIXME: Space before important?
-                            // See https://github.com/AdguardTeam/AdguardFilters/pull/132240#discussion_r996684483
                             result += SPACE;
                             result += CSS_IMPORTANT;
                         }
@@ -384,7 +575,7 @@ export class CssTree {
             leave: (node: CssNode) => {
                 switch (node.type) {
                     case CssTreeNodeType.Declaration: {
-                        result += CSS_DECLARATION_END;
+                        result += SEMICOLON;
                         result += SPACE;
                         break;
                     }

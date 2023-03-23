@@ -1,8 +1,5 @@
 /**
- * Helper file for CSSTree to provide better compatibility with TypeScript.
- *
- * CSSTree's typedef is outdated in some places:
- *
+ * @file Helper file for CSSTree to provide better compatibility with TypeScript.
  * @see {@link https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62536}
  */
 
