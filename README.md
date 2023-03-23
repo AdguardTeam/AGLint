@@ -10,10 +10,9 @@
     Supported syntaxes:
 </p>
 <p align="center">
-    <a href="https://adguard.com"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
+    <a href="https://adguard.com/"><img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> AdGuard</a> |
     <a href="https://github.com/gorhill/uBlock"><img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> uBlock Origin</a> |
-    <a href="https://getadblock.com"><img src="https://cdn.adguard.com/website/github.com/AGLint/ab_logo.svg" width="14px"> AdBlock</a> |
-    <a href="https://adblockplus.org"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
+    <a href="https://adblockplus.org/"><img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> Adblock Plus</a>
 </p>
 
 <p align="center">
@@ -42,7 +41,6 @@ Table of Contents:
   - [Configuration hierarchy](#configuration-hierarchy)
     - [Hierarchy](#hierarchy)
 - [Linter rules](#linter-rules)
-  - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
@@ -64,7 +62,7 @@ Table of Contents:
 
 ## Introduction
 
-`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
+`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists.
 
@@ -72,7 +70,7 @@ Generally the philosophy of `AGLint` are inspired by [ESLint](https://eslint.org
 
 ## Features
 
-- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus.
+- :earth_americas: **Universal**: supports all syntaxes currently in use: AdGuard, uBlock Origin and Adblock Plus.
 - :white_check_mark: **Error-tolerant**: it can parse any filter list, even if it contains minor syntax errors.
 - :zap: **Fast**: made with performance in mind.
 - :thumbsup: **Easy to use**: it can be used as a CLI tool or programmatically.
@@ -325,50 +323,6 @@ The linter rules documentation is written in the following schema:
 - **Example for fixing:** A simple example of the rule violation and how it will be fixed (if the problem is fixable).
 
 Currently, the following linter rules are available (we will add more rules in the future):
-
-### `adg-scriptlet-quotes`
-
-Check if the scriptlet parameters are wrapped in the expected quotes.
-
-- **Severity:** `warn` (1)
-- **Options:** `single` (default), `double`, `none`
-- **Options schema:** `enum` with the following values: `single`, `double`, `none`
-- **Fixable:** yes, quotes will be replaced with the expected quotes
-- **Example:**
-  ```adblock
-  example.com#%#//scriptlet("abort-on-property-read", "window.open")
-  ```
-  will be reported as warning:
-  ```
-    1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
-  ```
-  since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
-- **Example for fixing:**
-  ```adblock
-  example.com#%#//scriptlet("abort-on-property-read", "window.open")
-  ```
-  will be fixed to:
-  ```adblock
-  example.com#%#//scriptlet('abort-on-property-read', 'window.open')
-  ```
-- **Additional information:**
-  - If you want to change the default quotes, you can use the `adg-scriptlet-quotes` rule in your configuration file:
-    ```yaml
-    rules:
-      # We want to use double quotes instead of single quotes
-      adg-scriptlet-quotes:
-        - warn
-        - double
-    ```
-    or
-    ```json
-    {
-        "rules": {
-            "adg-scriptlet-quotes": ["warn", "double"]
-        }
-    }
-    ```
-    This will change the default quotes to double quotes.
 
 ### `if-closed`
 
