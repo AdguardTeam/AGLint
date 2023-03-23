@@ -1,12 +1,6 @@
-// Linter stuff
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-
-// Parser stuff
-import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/common';
-import { CommentRuleType } from '../../parser/comment/types';
-import { EMPTY } from '../../utils/constants';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/nodes';
 
 const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
 const PLATFORM = 'PLATFORM';
@@ -45,12 +39,12 @@ export const UnknownHintsAndPlatforms: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 for (const hint of ast.hints) {
                     // Check if the hint name is known (case-sensitive)
-                    if (!KNOWN_HINTS.includes(hint.name)) {
+                    if (!KNOWN_HINTS.includes(hint.name.value)) {
                         context.report({
-                            message: `Unknown hint name "${hint.name}"`,
+                            message: `Unknown hint name "${hint.name.value}"`,
                             position: {
                                 startLine: line,
                                 startColumn: 0,
@@ -58,12 +52,10 @@ export const UnknownHintsAndPlatforms: LinterRule = {
                                 endColumn: raw.length,
                             },
                         });
-                    } else if (hint.name === PLATFORM || hint.name === NOT_PLATFORM) {
-                        // No parameters means "PLATFORM", but if the first parameter is empty, it means "PLATFORM()"
-                        // Both are invalid, because they don't specify any platform
-                        if (hint.params.length === 0 || (hint.params.length === 1 && hint.params[0] === EMPTY)) {
+                    } else if (hint.name.value === PLATFORM || hint.name.value === NOT_PLATFORM) {
+                        if (!hint.params || hint.params.children.length === 0) {
                             context.report({
-                                message: `Hint "${hint.name}" must have at least one platform specified`,
+                                message: `Hint "${hint.name.value}" must have at least one platform specified`,
                                 position: {
                                     startLine: line,
                                     startColumn: 0,
@@ -72,11 +64,11 @@ export const UnknownHintsAndPlatforms: LinterRule = {
                                 },
                             });
                         } else {
-                            for (const param of hint.params) {
+                            for (const param of hint.params.children) {
                                 // Check if the platform is known (case sensitive)
-                                if (!KNOWN_PLATFORMS.includes(param)) {
+                                if (!KNOWN_PLATFORMS.includes(param.value)) {
                                     context.report({
-                                        message: `Unknown platform "${param}" in hint "${hint.name}"`,
+                                        message: `Unknown platform "${param.value}" in hint "${hint.name.value}"`,
                                         position: {
                                             startLine: line,
                                             startColumn: 0,
@@ -87,11 +79,11 @@ export const UnknownHintsAndPlatforms: LinterRule = {
                                 }
                             }
                         }
-                    } else if (hint.name === NOT_OPTIMIZED) {
+                    } else if (hint.name.value === NOT_OPTIMIZED) {
                         // If the hint has any parameters, it's invalid, including "NOT_OPTIMIZED()"
-                        if (hint.params.length !== 0) {
+                        if (hint.params) {
                             context.report({
-                                message: `Hint "${hint.name}" must not have any parameters`,
+                                message: `Hint "${hint.name.value}" must not have any parameters`,
                                 position: {
                                     startLine: line,
                                     startColumn: 0,

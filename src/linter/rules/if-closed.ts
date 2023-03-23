@@ -1,12 +1,11 @@
-// Linter stuff
+import {
+    AnyRule,
+    CommentRuleType,
+    PreProcessorCommentRule,
+    RuleCategory,
+} from '../../parser/nodes';
 import { GenericRuleContext, LinterPosition, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-
-// Parser stuff
-import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/common';
-import { CommentRuleType } from '../../parser/comment/types';
-import { PreProcessor } from '../../parser/comment/preprocessor';
 
 const IF_DIRECTIVE = 'if';
 const ENDIF_DIRECTIVE = 'endif';
@@ -34,7 +33,7 @@ interface StoredIf {
     /**
      * Collected if directive
      */
-    rule: PreProcessor;
+    rule: PreProcessorCommentRule;
 }
 
 /**
@@ -64,9 +63,9 @@ export const IfClosed = <LinterRule>{
             const line = context.getActualLine();
 
             // Check adblock rule category and type
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessor) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessorCommentRule) {
                 // Check for "if" and "endif" directives
-                if (ast.name === IF_DIRECTIVE) {
+                if (ast.name.value === IF_DIRECTIVE) {
                     // Collect open "if"
                     context.storage.openIfs.push({
                         position: {
@@ -77,7 +76,7 @@ export const IfClosed = <LinterRule>{
                         },
                         rule: ast,
                     });
-                } else if (ast.name === ENDIF_DIRECTIVE) {
+                } else if (ast.name.value === ENDIF_DIRECTIVE) {
                     if (context.storage.openIfs.length === 0) {
                         context.report({
                             // eslint-disable-next-line max-len

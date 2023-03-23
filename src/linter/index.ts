@@ -13,18 +13,19 @@ import { ConfigCommentType } from './inline-config';
 import {
     SEVERITY, getSeverity, AnySeverity, isSeverity,
 } from './severity';
-
-// Parser stuff
-import { RuleCategory } from '../parser/common';
-import { CommentRuleType } from '../parser/comment/types';
-import { AnyRule, RuleParser } from '../parser';
-
+import { RuleParser } from '../parser';
 import { NewLineSplit, StringUtils } from '../utils/string';
-import { ArrayUtils } from '../utils/array';
 import {
-    // eslint-disable-next-line max-len
-    GenericRuleContext, LinterConfig, LinterPosition, LinterProblemReport, LinterRule, LinterRuleConfig, LinterRuleConfigObject, LinterRuleStorage,
+    GenericRuleContext,
+    LinterConfig,
+    LinterPosition,
+    LinterProblemReport,
+    LinterRule,
+    LinterRuleConfig,
+    LinterRuleConfigObject,
+    LinterRuleStorage,
 } from './common';
+import { AnyRule, CommentRuleType, RuleCategory } from '../parser/nodes';
 
 /**
  * Represents a linter result that is returned by the `lint` method
@@ -605,7 +606,7 @@ export class Linter {
                     const ast = RuleParser.parse(rule[0]);
 
                     // Handle inline config comments
-                    if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.ConfigComment) {
+                    if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.ConfigCommentRule) {
                         // If inline config is not allowed in the linter configuration,
                         // simply skip the comment processing
                         if (!this.config.allowInlineConfig) {
@@ -613,24 +614,25 @@ export class Linter {
                         }
 
                         // Process the inline config comment
-                        switch (ast.command) {
+                        switch (ast.command.value) {
                             case ConfigCommentType.Main: {
-                                if (ast.params) {
-                                    assert(ast.params, linterRulesSchema);
+                                if (ast.params && ast.params.type === 'Value') {
+                                    assert(ast.params.value, linterRulesSchema);
 
                                     this.config = mergeConfigs(this.config, {
-                                        rules: ast.params,
+                                        rules: ast.params.value,
                                     });
 
-                                    this.applyRulesConfig(ast.params);
+                                    this.applyRulesConfig(ast.params.value);
                                 }
+
                                 break;
                             }
 
                             case ConfigCommentType.Disable: {
-                                if (ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        this.disableRule(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        this.disableRule(param.value);
                                     }
 
                                     break;
@@ -641,9 +643,9 @@ export class Linter {
                             }
 
                             case ConfigCommentType.Enable: {
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        this.enableRule(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        this.enableRule(param.value);
                                     }
 
                                     break;
@@ -655,9 +657,9 @@ export class Linter {
 
                             case ConfigCommentType.DisableNextLine: {
                                 // Disable specific rules for the next line
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        nextLineDisabled.add(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        nextLineDisabled.add(param.value);
                                     }
                                 } else {
                                     // Disable all rules for the next line
@@ -669,12 +671,12 @@ export class Linter {
 
                             case ConfigCommentType.EnableNextLine: {
                                 // Enable specific rules for the next line
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        nextLineEnabled.add(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        nextLineEnabled.add(param.value);
                                     }
                                 } else {
-                                    // Enable all rules for the next line
+                                    // Disable all rules for the next line
                                     isEnabledForNextLine = true;
                                 }
 

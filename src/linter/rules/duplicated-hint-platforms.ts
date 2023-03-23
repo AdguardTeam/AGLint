@@ -1,11 +1,6 @@
-// Linter stuff
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/nodes';
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-
-// Parser stuff
-import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/common';
-import { CommentRuleType } from '../../parser/comment/types';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
@@ -25,12 +20,15 @@ export const DuplicatedHintPlatforms: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Iterate over all hints within the comment rule
                 for (const hint of ast.hints) {
+                    const name = hint.name.value;
+                    const params = hint.params?.children.map((param) => param.value) ?? [];
+
                     // Only makes sense to check this, if the hint is a PLATFORM or NOT_PLATFORM hint
                     // and there are at least two platforms within the hint
-                    if ((hint.name !== PLATFORM && hint.name !== NOT_PLATFORM) || hint.params.length < 2) {
+                    if ((name !== PLATFORM && name !== NOT_PLATFORM) || params.length < 2) {
                         continue;
                     }
 
@@ -40,7 +38,7 @@ export const DuplicatedHintPlatforms: LinterRule = {
                     } = {};
 
                     // Iterate over all platforms within the hint
-                    for (const platform of hint.params) {
+                    for (const platform of params) {
                         // Add the platform to the stats if it's not already there
                         if (!(platform in stats)) {
                             stats[platform] = 1;
@@ -56,7 +54,7 @@ export const DuplicatedHintPlatforms: LinterRule = {
                         if (count > 1) {
                             context.report({
                                 // eslint-disable-next-line max-len
-                                message: `The platform "${platform}" is occurring more than once within the same "${hint.name}" hint`,
+                                message: `The platform "${platform}" is occurring more than once within the same "${hint.name.value}" hint`,
                                 position: {
                                     startLine: line,
                                     startColumn: 0,
