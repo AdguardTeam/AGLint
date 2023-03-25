@@ -5,7 +5,7 @@ import { StringUtils } from '../../utils/string';
 import {
     CommentRuleType,
     Hint, HintCommentRule, Location, RuleCategory, defaultLocation,
-} from '../nodes';
+} from '../common';
 import { HintParser } from './hint';
 import { locRange, shiftLoc } from '../../utils/location';
 import { AdblockSyntax } from '../../utils/adblockers';

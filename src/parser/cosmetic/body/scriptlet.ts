@@ -10,7 +10,7 @@ import { locRange, shiftLoc } from '../../../utils/location';
 import { StringUtils } from '../../../utils/string';
 import { AdblockSyntaxError } from '../../errors/syntax-error';
 import { ParameterListParser } from '../../misc/parameter-list';
-import { ScriptletInjectionRuleBody, defaultLocation } from '../../nodes';
+import { ScriptletInjectionRuleBody, defaultLocation } from '../../common';
 
 /**
  * `ScriptletBodyParser` is responsible for parsing the body of a scriptlet rule.

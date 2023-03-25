@@ -1,4 +1,4 @@
-import { AnyRule, CosmeticRuleType, RuleCategory } from '../../parser/nodes';
+import { AnyRule, CosmeticRuleType, RuleCategory } from '../../parser/common';
 import { GenericRuleContext, LinterProblemReport, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 

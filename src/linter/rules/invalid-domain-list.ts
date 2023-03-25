@@ -1,4 +1,4 @@
-import { AnyRule, RuleCategory } from '../../parser/nodes';
+import { AnyRule, RuleCategory } from '../../parser/common';
 import { DomainUtils } from '../../utils/domain';
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';

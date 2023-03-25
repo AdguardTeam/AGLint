@@ -55,7 +55,7 @@ export {
     HtmlFilteringRule,
     JsInjectionRule,
     NetworkRule,
-} from './parser/nodes';
+} from './parser/common';
 export { AgentCommentRuleParser } from './parser/comment/agent-rule';
 export { AgentParser } from './parser/comment/agent';
 export { HintParser } from './parser/comment/hint';

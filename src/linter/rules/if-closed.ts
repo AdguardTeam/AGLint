@@ -3,7 +3,7 @@ import {
     CommentRuleType,
     PreProcessorCommentRule,
     RuleCategory,
-} from '../../parser/nodes';
+} from '../../parser/common';
 import { GenericRuleContext, LinterPosition, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 

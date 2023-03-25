@@ -2,7 +2,7 @@ import { AdblockSyntax } from '../../utils/adblockers';
 import { AgentCommentRuleParser } from './agent-rule';
 import {
     AnyCommentRule, CommentMarker, CommentRuleType, Location, RuleCategory, Value, defaultLocation,
-} from '../nodes';
+} from '../common';
 import { ConfigCommentRuleParser } from './inline-config';
 import { CosmeticRuleSeparatorUtils } from '../../utils/cosmetic-rule-separator';
 import { HintCommentRuleParser } from './hint-rule';

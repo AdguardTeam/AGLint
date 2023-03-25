@@ -1,4 +1,4 @@
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/nodes';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 

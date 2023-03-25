@@ -21,7 +21,7 @@ import {
     RuleCategory,
     Value,
     defaultLocation,
-} from '../nodes';
+} from '../common';
 import { StringUtils } from '../../utils/string';
 import { locRange, shiftLoc } from '../../utils/location';
 import { ParameterListParser } from '../misc/parameter-list';

@@ -8,7 +8,7 @@ import { AdblockSyntax } from '../../utils/adblockers';
 import { COLON, EMPTY, SPACE } from '../../utils/constants';
 import {
     CommentMarker, CommentRuleType, Location, MetadataCommentRule, RuleCategory, Value, defaultLocation,
-} from '../nodes';
+} from '../common';
 import { locRange } from '../../utils/location';
 
 /**

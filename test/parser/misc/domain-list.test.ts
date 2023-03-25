@@ -1,5 +1,5 @@
 import { DomainListParser } from '../../../src/parser/misc/domain-list';
-import { DomainList, DomainListSeparator } from '../../../src/parser/nodes';
+import { DomainList, DomainListSeparator } from '../../../src/parser/common';
 import { COMMA, EMPTY } from '../../../src/utils/constants';
 
 describe('DomainListParser', () => {

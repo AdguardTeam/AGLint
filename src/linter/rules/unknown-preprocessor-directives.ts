@@ -1,6 +1,6 @@
 import { SEVERITY } from '../severity';
 import { GenericRuleContext, LinterRule } from '../common';
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/nodes';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 
 const COMMON_PREPROCESSOR_DIRECTIVES = [
     'if',

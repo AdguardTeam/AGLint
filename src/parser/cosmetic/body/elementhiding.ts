@@ -7,7 +7,7 @@ import {
 } from '@adguard/ecss-tree';
 import { CssTree } from '../../../utils/csstree';
 import { CssTreeParserContext } from '../../../utils/csstree-constants';
-import { defaultLocation, ElementHidingRuleBody } from '../../nodes';
+import { defaultLocation, ElementHidingRuleBody } from '../../common';
 import { locRange } from '../../../utils/location';
 
 /**

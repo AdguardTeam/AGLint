@@ -21,7 +21,7 @@ import {
 import { AdblockSyntax } from '../../../utils/adblockers';
 import { CssTree } from '../../../utils/csstree';
 import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
-import { CssInjectionRuleBody, defaultLocation } from '../../nodes';
+import { CssInjectionRuleBody, defaultLocation } from '../../common';
 import { AdblockSyntaxError } from '../../errors/syntax-error';
 import { locRange } from '../../../utils/location';
 import {

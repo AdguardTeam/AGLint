@@ -1,6 +1,6 @@
 import { Struct } from 'superstruct';
 import { AnySeverity } from './severity';
-import { AnyRule } from '../parser/nodes';
+import { AnyRule } from '../parser/common';
 
 /**
  * Type for rule configuration object

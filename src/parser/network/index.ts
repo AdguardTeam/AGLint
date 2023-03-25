@@ -14,7 +14,7 @@ import {
     RuleCategory,
     Value,
     defaultLocation,
-} from '../nodes';
+} from '../common';
 import { locRange, shiftLoc } from '../../utils/location';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 

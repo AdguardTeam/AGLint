@@ -6,7 +6,7 @@ import { StringUtils } from '../../utils/string';
 import {
     AgentList,
     AgentCommentRule, Location, defaultLocation, CommentRuleType, RuleCategory,
-} from '../nodes';
+} from '../common';
 import { AgentParser } from './agent';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 import { AdblockSyntax } from '../../utils/adblockers';

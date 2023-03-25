@@ -2,7 +2,7 @@
  * @file Customized syntax error class for Adblock Filter Parser.
  */
 
-import { LocationRange } from '../nodes';
+import { LocationRange } from '../common';
 
 /**
  * Customized syntax error class for Adblock Filter Parser,

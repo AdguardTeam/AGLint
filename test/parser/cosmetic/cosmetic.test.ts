@@ -4,7 +4,7 @@ import { CssInjectionBodyParser } from '../../../src/parser/cosmetic/body/css';
 import { ElementHidingBodyParser } from '../../../src/parser/cosmetic/body/elementhiding';
 import { CosmeticRuleParser } from '../../../src/parser/cosmetic';
 import { EMPTY, SPACE } from '../../../src/utils/constants';
-import { defaultLocation } from '../../../src/parser/nodes';
+import { defaultLocation } from '../../../src/parser/common';
 import { locRange, shiftLoc } from '../../../src/utils/location';
 import { ScriptletInjectionBodyParser } from '../../../src/parser/cosmetic/body/scriptlet';
 import { HtmlFilteringBodyParser } from '../../../src/parser/cosmetic/body/html';

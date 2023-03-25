@@ -1,6 +1,6 @@
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/nodes';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 
 const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
 const PLATFORM = 'PLATFORM';

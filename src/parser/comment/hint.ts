@@ -10,7 +10,7 @@ import {
 import { StringUtils } from '../../utils/string';
 import {
     Hint, Location, Value, defaultLocation,
-} from '../nodes';
+} from '../common';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 import { ParameterListParser } from '../misc/parameter-list';
 

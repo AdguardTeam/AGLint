@@ -23,7 +23,7 @@ import { StringUtils } from '../../utils/string';
 import {
     AnyExpressionNode,
     CommentRuleType, Location, PreProcessorCommentRule, RuleCategory, Value, defaultLocation,
-} from '../nodes';
+} from '../common';
 import { LogicalExpressionParser } from '../misc/logical-expression';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 

@@ -12,7 +12,7 @@ import {
 import { CssTree } from '../../../utils/csstree';
 import { CssTreeParserContext } from '../../../utils/csstree-constants';
 import { DOUBLE_QUOTE_MARKER } from '../../../utils/string';
-import { defaultLocation, HtmlFilteringRuleBody } from '../../nodes';
+import { defaultLocation, HtmlFilteringRuleBody } from '../../common';
 import { locRange } from '../../../utils/location';
 import { AdblockSyntaxError } from '../../errors/syntax-error';
 

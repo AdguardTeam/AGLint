@@ -24,7 +24,7 @@ import {
     LinterRuleConfigObject,
     LinterRuleStorage,
 } from './common';
-import { AnyRule, CommentRuleType, RuleCategory } from '../parser/nodes';
+import { AnyRule, CommentRuleType, RuleCategory } from '../parser/common';
 import { RuleParser } from '../parser/rule';
 
 /**

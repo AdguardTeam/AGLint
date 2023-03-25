@@ -2,7 +2,7 @@ import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 import { EMPTY } from '../../utils/constants';
 import { ArrayUtils } from '../../utils/array';
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/nodes';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';

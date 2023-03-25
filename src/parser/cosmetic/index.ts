@@ -22,7 +22,7 @@ import {
     ScriptletInjectionRule,
     Value,
     defaultLocation,
-} from '../nodes';
+} from '../common';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 import { StringUtils } from '../../utils/string';
 import { locRange, shiftLoc } from '../../utils/location';

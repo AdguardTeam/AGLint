@@ -4,7 +4,7 @@ import { locRange } from '../utils/location';
 import { CommentRuleParser } from './comment';
 import { CosmeticRuleParser } from './cosmetic';
 import { NetworkRuleParser } from './network';
-import { AnyRule, RuleCategory, defaultLocation } from './nodes';
+import { AnyRule, RuleCategory, defaultLocation } from './common';
 
 /**
  * `RuleParser` is responsible for parsing the rules.

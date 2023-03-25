@@ -1,4 +1,4 @@
-import { AnyRule, FilterList, defaultLocation } from './nodes';
+import { AnyRule, FilterList, defaultLocation } from './common';
 import { RuleParser } from './rule';
 import { LF } from '../utils/constants';
 import { StringUtils } from '../utils/string';

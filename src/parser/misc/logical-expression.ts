@@ -5,7 +5,7 @@ import {
     ExpressionParenthesisNode,
     ExpressionVariableNode,
     Location, LocationRange, defaultLocation,
-} from '../nodes';
+} from '../common';
 import {
     AMPERSAND, CLOSE_PARENTHESIS, EXCLAMATION_MARK, OPEN_PARENTHESIS, PIPE, UNDERSCORE,
 } from '../../utils/constants';

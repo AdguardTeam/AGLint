@@ -4,7 +4,7 @@ import { EMPTY, SPACE } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
 import {
     Agent, Location, Value, defaultLocation,
-} from '../nodes';
+} from '../common';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 
 /**

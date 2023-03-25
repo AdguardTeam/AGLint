@@ -5,7 +5,7 @@ import { SEVERITY, SeverityValue, SeverityName } from '../../src/linter/severity
 import { RuleParser } from '../../src/parser/rule';
 import { EMPTY, NEWLINE } from '../../src/utils/constants';
 import { GenericRuleContext, LinterConfig, LinterRule } from '../../src/linter/common';
-import { AnyRule } from '../../src/parser/nodes';
+import { AnyRule } from '../../src/parser/common';
 
 const demoRule: LinterRule = {
     meta: {

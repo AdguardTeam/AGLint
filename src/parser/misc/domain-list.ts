@@ -2,7 +2,7 @@ import {
     CLASSIC_DOMAIN_SEPARATOR, DOMAIN_EXCEPTION_MARKER, DOMAIN_LIST_TYPE, EMPTY,
 } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
-import { DomainList, DomainListSeparator, defaultLocation } from '../nodes';
+import { DomainList, DomainListSeparator, defaultLocation } from '../common';
 import { locRange } from '../../utils/location';
 import { AdblockSyntaxError } from '../errors/syntax-error';
 

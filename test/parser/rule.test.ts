@@ -1,4 +1,4 @@
-import { CommentRuleType, CosmeticRuleType, RuleCategory } from '../../src/parser/nodes';
+import { CommentRuleType, CosmeticRuleType, RuleCategory } from '../../src/parser/common';
 import { RuleParser } from '../../src/parser/rule';
 import { AdblockSyntax } from '../../src/utils/adblockers';
 
