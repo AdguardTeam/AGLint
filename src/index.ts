@@ -1,4 +1,6 @@
-/** AGLint package root */
+/**
+ * @file AGLint entry point
+ */
 
 // Parser
 export { RuleParser } from './parser/rule';

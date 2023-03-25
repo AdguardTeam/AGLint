@@ -1,3 +1,7 @@
+/**
+ * @file AGLint browser entry point
+ */
+
 // ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.)
 
 // Parser
