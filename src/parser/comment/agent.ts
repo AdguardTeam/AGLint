@@ -1,4 +1,5 @@
-import { coerce, valid } from 'semver';
+import coerce from 'semver/functions/coerce';
+import valid from 'semver/functions/valid';
 import { locRange } from '../../utils/location';
 import { EMPTY, SPACE } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';

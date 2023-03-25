@@ -114,6 +114,7 @@ const browserPlugins = [
             ],
         ],
         allowAllFormats: true,
+        compact: false,
     }),
     terser(),
 ];
