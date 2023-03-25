@@ -13,7 +13,6 @@ import { ConfigCommentType } from './inline-config';
 import {
     SEVERITY, getSeverity, AnySeverity, isSeverity,
 } from './severity';
-import { RuleParser } from '../parser';
 import { NewLineSplit, StringUtils } from '../utils/string';
 import {
     GenericRuleContext,
@@ -26,6 +25,7 @@ import {
     LinterRuleStorage,
 } from './common';
 import { AnyRule, CommentRuleType, RuleCategory } from '../parser/nodes';
+import { RuleParser } from '../parser/rule';
 
 /**
  * Represents a linter result that is returned by the `lint` method

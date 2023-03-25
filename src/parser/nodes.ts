@@ -11,10 +11,13 @@ import {
 } from '../utils/constants';
 
 /**
- * Logical expression operators.
+ * Represents possible logical expression operators.
  */
 export type AnyOperator = '&&' | '||' | '!';
 
+/**
+ * Represents any kind of logical expression node.
+ */
 export type AnyExpressionNode =
     | ExpressionVariableNode
     | ExpressionOperatorNode
