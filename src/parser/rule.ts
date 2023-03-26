@@ -4,7 +4,13 @@ import { locRange } from '../utils/location';
 import { CommentRuleParser } from './comment';
 import { CosmeticRuleParser } from './cosmetic';
 import { NetworkRuleParser } from './network';
-import { AnyRule, RuleCategory, defaultLocation } from './common';
+import {
+    AnyRule,
+    InvalidRule,
+    RuleCategory,
+    defaultLocation,
+} from './common';
+import { AdblockSyntaxError } from './errors/syntax-error';
 
 /**
  * `RuleParser` is responsible for parsing the rules.
@@ -103,7 +109,7 @@ export class RuleParser {
             }
 
             // Otherwise, return an invalid rule (tolerant mode)
-            return {
+            const result: InvalidRule = {
                 type: 'InvalidRule',
                 loc: locRange(loc, 0, raw.length),
                 raws: {
@@ -112,8 +118,19 @@ export class RuleParser {
                 category: RuleCategory.Invalid,
                 syntax: AdblockSyntax.Common,
                 raw,
-                error,
+                error: {
+                    name: error.name,
+                    message: error.message,
+                },
             };
+
+            // If the error is an AdblockSyntaxError, then we can add the
+            // location of the error to the result
+            if (error instanceof AdblockSyntaxError) {
+                result.error.loc = error.loc;
+            }
+
+            return result;
         }
     }
 

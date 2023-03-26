@@ -347,7 +347,22 @@ export interface InvalidRule extends RuleBase {
     /**
      * Error details
      */
-    error: Error;
+    error: {
+        /**
+         * Error name
+         */
+        name: string;
+
+        /**
+         * Error message
+         */
+        message: string;
+
+        /**
+         * Error location (if any)
+         */
+        loc?: LocationRange;
+    }
 }
 
 /**
