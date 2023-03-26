@@ -1,6 +1,16 @@
-import { AnyRule, FilterList, defaultLocation } from './common';
+import {
+    AnyRule,
+    FilterList,
+    NewLine,
+    defaultLocation,
+} from './common';
 import { RuleParser } from './rule';
-import { CR, LF } from '../utils/constants';
+import {
+    CR,
+    CRLF,
+    EMPTY,
+    LF,
+} from '../utils/constants';
 import { StringUtils } from '../utils/string';
 
 /**
@@ -43,17 +53,40 @@ export class FilterListParser {
         while (offset < raw.length) {
             // Check if we found a new line
             if (StringUtils.isEOL(raw[offset])) {
-                // New line found, parse the rule
-                rules.push(
-                    RuleParser.parse(raw.substring(lineStartOffset, offset), tolerant, {
-                        offset: lineStartOffset,
-                        line: rules.length + 1,
-                        column: 1,
-                    }),
-                );
+                // Rule text
+                const text = raw.substring(lineStartOffset, offset);
+
+                // Parse the rule
+                const rule = RuleParser.parse(text, tolerant, {
+                    offset: lineStartOffset,
+                    line: rules.length + 1,
+                    column: 1,
+                });
+
+                // Get newline type (possible values: 'crlf', 'lf', 'cr' or undefined if no newline found)
+                let nl: NewLine | undefined;
+
+                if (raw[offset] === CR) {
+                    if (raw[offset + 1] === LF) {
+                        nl = 'crlf';
+                    } else {
+                        nl = 'cr';
+                    }
+                } else if (raw[offset] === LF) {
+                    nl = 'lf';
+                }
+
+                // Add raw data to the rule
+                rule.raws = {
+                    text,
+                    nl,
+                };
+
+                // Add the rule to the list
+                rules.push(rule);
 
                 // Update offset: add 2 if we found CRLF, otherwise add 1
-                offset += raw[offset] === CR && raw[offset + 1] === LF ? 2 : 1;
+                offset += nl === 'crlf' ? 2 : 1;
 
                 // Update line start offset
                 lineStartOffset = offset;
@@ -63,7 +96,7 @@ export class FilterListParser {
             }
         }
 
-        // Parse the last rule
+        // Parse the last rule (it doesn't end with a new line)
         rules.push(
             RuleParser.parse(raw.substring(lineStartOffset, offset), tolerant, {
                 offset: lineStartOffset,
@@ -96,10 +129,35 @@ export class FilterListParser {
      * Serializes a whole adblock filter list (list of rules).
      *
      * @param ast AST to generate
+     * @param preferRaw If `true`, then the parser will use `raws.text` property of each rule
+     * if it is available. Default is `false`.
      * @returns Serialized filter list
      */
-    public static generate(ast: FilterList): string {
-        // Simply generate each rule and join them with a line feed character
-        return ast.rules.map((rule) => RuleParser.generate(rule)).join(LF);
+    public static generate(ast: FilterList, preferRaw = false): string {
+        let result = EMPTY;
+
+        for (const rule of ast.rules) {
+            if (preferRaw && rule.raws?.text) {
+                result += rule.raws.text;
+            } else {
+                result += RuleParser.generate(rule);
+            }
+
+            switch (rule.raws?.nl) {
+                case 'crlf':
+                    result += CRLF;
+                    break;
+                case 'cr':
+                    result += CR;
+                    break;
+                case 'lf':
+                    result += LF;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return result;
     }
 }
