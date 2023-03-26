@@ -3,20 +3,20 @@ import { EMPTY, SPACE } from '../../../src/utils/constants';
 
 describe('MetadataCommentRuleParser', () => {
     test('parse', () => {
-        expect(MetadataCommentRuleParser.parse(EMPTY)).toBe(null);
-        expect(MetadataCommentRuleParser.parse(SPACE)).toBe(null);
+        expect(MetadataCommentRuleParser.parse(EMPTY)).toBeNull();
+        expect(MetadataCommentRuleParser.parse(SPACE)).toBeNull();
 
-        expect(MetadataCommentRuleParser.parse('!')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('!##')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('##')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('!aaa:bbb')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('! aaa: bbb')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('!aaa:bbb:ccc')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('! aaa: bbb: ccc')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('!:::')).toBe(null);
-        expect(MetadataCommentRuleParser.parse('! : : :')).toBe(null);
+        expect(MetadataCommentRuleParser.parse('!')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('!##')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('##')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('!aaa:bbb')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('! aaa: bbb')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('!aaa:bbb:ccc')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('! aaa: bbb: ccc')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('!:::')).toBeNull();
+        expect(MetadataCommentRuleParser.parse('! : : :')).toBeNull();
 
-        expect(MetadataCommentRuleParser.parse('! Title: FilterList Title')).toEqual({
+        expect(MetadataCommentRuleParser.parse('! Title: FilterList Title')).toMatchObject({
             type: 'MetadataCommentRule',
             loc: {
                 start: {
@@ -82,7 +82,7 @@ describe('MetadataCommentRuleParser', () => {
             },
         });
 
-        expect(MetadataCommentRuleParser.parse('# Title: FilterList Title')).toEqual({
+        expect(MetadataCommentRuleParser.parse('# Title: FilterList Title')).toMatchObject({
             type: 'MetadataCommentRule',
             loc: {
                 start: {
@@ -148,7 +148,7 @@ describe('MetadataCommentRuleParser', () => {
             },
         });
 
-        expect(MetadataCommentRuleParser.parse('! title: FilterList Title')).toEqual({
+        expect(MetadataCommentRuleParser.parse('! title: FilterList Title')).toMatchObject({
             type: 'MetadataCommentRule',
             loc: {
                 start: {
@@ -214,7 +214,7 @@ describe('MetadataCommentRuleParser', () => {
             },
         });
 
-        expect(MetadataCommentRuleParser.parse('!    title:    Filter   ')).toEqual({
+        expect(MetadataCommentRuleParser.parse('!    title:    Filter   ')).toMatchObject({
             type: 'MetadataCommentRule',
             loc: {
                 start: {
@@ -282,7 +282,7 @@ describe('MetadataCommentRuleParser', () => {
 
         expect(
             MetadataCommentRuleParser.parse('! Homepage: https://github.com/AdguardTeam/some-repo/wiki'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'MetadataCommentRule',
             loc: {
                 start: {

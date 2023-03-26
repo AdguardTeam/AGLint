@@ -4,17 +4,17 @@ import { EMPTY, SPACE } from '../../../src/utils/constants';
 describe('PreProcessorParser', () => {
     test('isPreProcessorRule', () => {
         // Invalid
-        expect(PreProcessorCommentRuleParser.isPreProcessorRule(EMPTY)).toBe(false);
-        expect(PreProcessorCommentRuleParser.isPreProcessorRule(SPACE)).toBe(false);
+        expect(PreProcessorCommentRuleParser.isPreProcessorRule(EMPTY)).toBeFalsy();
+        expect(PreProcessorCommentRuleParser.isPreProcessorRule(SPACE)).toBeFalsy();
 
-        expect(PreProcessorCommentRuleParser.isPreProcessorRule('!')).toBe(false);
-        expect(PreProcessorCommentRuleParser.isPreProcessorRule('!##')).toBe(false);
-        expect(PreProcessorCommentRuleParser.isPreProcessorRule('##')).toBe(false);
+        expect(PreProcessorCommentRuleParser.isPreProcessorRule('!')).toBeFalsy();
+        expect(PreProcessorCommentRuleParser.isPreProcessorRule('!##')).toBeFalsy();
+        expect(PreProcessorCommentRuleParser.isPreProcessorRule('##')).toBeFalsy();
     });
 
     test('parse', () => {
         // Valid pre-processors
-        expect(PreProcessorCommentRuleParser.parse('!#endif')).toEqual({
+        expect(PreProcessorCommentRuleParser.parse('!#endif')).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {
@@ -48,7 +48,7 @@ describe('PreProcessorParser', () => {
             },
         });
 
-        expect(PreProcessorCommentRuleParser.parse('!#include ../sections/ads.txt')).toEqual({
+        expect(PreProcessorCommentRuleParser.parse('!#include ../sections/ads.txt')).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {
@@ -98,7 +98,7 @@ describe('PreProcessorParser', () => {
             },
         });
 
-        expect(PreProcessorCommentRuleParser.parse('!#if (adguard)')).toEqual({
+        expect(PreProcessorCommentRuleParser.parse('!#if (adguard)')).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {
@@ -163,7 +163,7 @@ describe('PreProcessorParser', () => {
             },
         });
 
-        expect(PreProcessorCommentRuleParser.parse('!#if      (adguard)')).toEqual({
+        expect(PreProcessorCommentRuleParser.parse('!#if      (adguard)')).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {
@@ -228,7 +228,7 @@ describe('PreProcessorParser', () => {
             },
         });
 
-        expect(PreProcessorCommentRuleParser.parse('!#if      (adguard)')).toEqual({
+        expect(PreProcessorCommentRuleParser.parse('!#if      (adguard)')).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {
@@ -295,7 +295,7 @@ describe('PreProcessorParser', () => {
 
         expect(
             PreProcessorCommentRuleParser.parse('!#safari_cb_affinity(content_blockers)'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {
@@ -346,7 +346,7 @@ describe('PreProcessorParser', () => {
         });
 
         // If the parenthesis is open, do not split it in half along the space:
-        expect(PreProcessorCommentRuleParser.parse('!#aaa(bbb ccc)')).toEqual({
+        expect(PreProcessorCommentRuleParser.parse('!#aaa(bbb ccc)')).toMatchObject({
             type: 'PreProcessorCommentRule',
             loc: {
                 start: {

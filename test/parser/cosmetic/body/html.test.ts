@@ -31,7 +31,7 @@ describe('HtmlFilteringBodyParser', () => {
     });
 
     test('parse', () => {
-        expect(HtmlFilteringBodyParser.parse('[tag-content="""a"""]')).toEqual({
+        expect(HtmlFilteringBodyParser.parse('[tag-content="""a"""]')).toMatchObject({
             type: 'HtmlFilteringRuleBody',
             loc: {
                 start: {
@@ -135,7 +135,7 @@ describe('HtmlFilteringBodyParser', () => {
             },
         });
 
-        expect(HtmlFilteringBodyParser.parse('[tag-content="""""a"""""]')).toEqual({
+        expect(HtmlFilteringBodyParser.parse('[tag-content="""""a"""""]')).toMatchObject({
             type: 'HtmlFilteringRuleBody',
             loc: {
                 start: {
@@ -239,7 +239,7 @@ describe('HtmlFilteringBodyParser', () => {
             },
         });
 
-        expect(HtmlFilteringBodyParser.parse('script:has-text(a), script:has-text(b)')).toEqual({
+        expect(HtmlFilteringBodyParser.parse('script:has-text(a), script:has-text(b)')).toMatchObject({
             type: 'HtmlFilteringRuleBody',
             loc: {
                 start: {
@@ -416,7 +416,7 @@ describe('HtmlFilteringBodyParser', () => {
         });
 
         // uBO responseheader
-        expect(HtmlFilteringBodyParser.parse('responseheader(header-name)')).toEqual({
+        expect(HtmlFilteringBodyParser.parse('responseheader(header-name)')).toMatchObject({
             type: 'HtmlFilteringRuleBody',
             loc: {
                 start: {

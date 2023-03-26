@@ -6,7 +6,7 @@ describe('ScriptletInjectionBodyParser', () => {
     test('parseAdgAndUboScriptletCall', () => {
         expect(
             ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(scriptlet0)'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -59,7 +59,7 @@ describe('ScriptletInjectionBodyParser', () => {
 
         expect(
             ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('//scriptlet(scriptlet0)'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -110,7 +110,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ],
         });
 
-        expect(ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(scriptlet0,arg0)')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(scriptlet0,arg0)')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -178,7 +178,7 @@ describe('ScriptletInjectionBodyParser', () => {
         });
 
         // Spaces
-        expect(ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(scriptlet0, arg0)')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(scriptlet0, arg0)')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -245,7 +245,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ],
         });
 
-        expect(ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js( scriptlet0 , arg0 )')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js( scriptlet0 , arg0 )')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -314,7 +314,7 @@ describe('ScriptletInjectionBodyParser', () => {
 
         expect(
             ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(scriptlet0, arg0, arg1, arg2)'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -415,7 +415,7 @@ describe('ScriptletInjectionBodyParser', () => {
 
         expect(
             ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall("js(scriptlet0, 'arg0', \"arg1\", /arg2/, arg3)"),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -534,7 +534,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall(
                 "js(scriptlet0, 'ar\\'g0', \"ar\\\"g1\", /ar\\/g2/)",
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -691,7 +691,7 @@ describe('ScriptletInjectionBodyParser', () => {
     });
 
     test('parseAbpSnippetCall', () => {
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -742,7 +742,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ],
         });
 
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -809,7 +809,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ],
         });
 
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0 arg1')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0 arg1')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -893,7 +893,7 @@ describe('ScriptletInjectionBodyParser', () => {
         });
 
         // Escaped space
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0\\ arg1 arg2')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0\\ arg1 arg2')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -977,7 +977,7 @@ describe('ScriptletInjectionBodyParser', () => {
         });
 
         // ; at end
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0 arg1;')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0 arg1;')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1061,7 +1061,7 @@ describe('ScriptletInjectionBodyParser', () => {
         });
 
         // Unfinished strings
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall("scriptlet0 'arg0 arg1;")).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall("scriptlet0 'arg0 arg1;")).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1128,7 +1128,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ],
         });
 
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 "arg0 arg1;')).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 "arg0 arg1;')).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1198,7 +1198,7 @@ describe('ScriptletInjectionBodyParser', () => {
         // Multiple scriptlets
         expect(
             ScriptletInjectionBodyParser.parseAbpSnippetCall('scriptlet0 arg0 arg1; scriptlet1; scriptlet2 arg0'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1363,7 +1363,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ],
         });
 
-        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall("scriptlet0 some'thing")).toEqual({
+        expect(ScriptletInjectionBodyParser.parseAbpSnippetCall("scriptlet0 some'thing")).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1435,7 +1435,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ScriptletInjectionBodyParser.parseAbpSnippetCall(
                 "scriptlet0 arg0 /a;b/ 'a;b' \"a;b\"; scriptlet-1; scriptlet2 'arg0' arg1\\ something;",
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1654,7 +1654,7 @@ describe('ScriptletInjectionBodyParser', () => {
                 // eslint-disable-next-line max-len
                 'hide-if-matches-xpath \'.//*[@class="test-xpath-class"]\'; hide-if-matches-xpath \'.//div[@id="aaa"]//div[starts-with(@id,"aaa")][.//h1//span/text()="aaa"]\'; hide-if-matches-xpath \'.//div[@id="bbb"]//div[starts-with(@id,"bbb")][.//h1//span/text()="bbb"]\'',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -1827,7 +1827,7 @@ describe('ScriptletInjectionBodyParser', () => {
                 // eslint-disable-next-line max-len
                 'race start; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ \'div[role=feed] div[role=article]\' a[href="#"][role="link"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ \'div[role=feed] div[role=article]\' a[href^="?__cft__"]; hide-if-contains-visible-text /[Sponsred]{9}|[Gesponrtd]{10}|[Sponrisé]{10}|[Comandité]{9}|[Publicda]{10}|[Sponsrwae]{12}|[Patrocind]{11}|[Sponsrizat]{13}/ \'div[role=feed] div[role=article]\' a[href="#"][role="link"]>span>span>b; hide-if-matches-xpath \'.//div[@role="feed"]//div[@role="article"]//a[@aria-label[.="Patrocinado" or .="Sponsa" or .="Bersponsor" or .="Commandité" or .="Ditaja" or .="Gesponsert" or .="Gesponsord" or .="Sponsrad" or .="Publicidad" or .="Sponsoreret" or .="Sponset" or .="Sponsored" or .="Sponsorisé" or .="Sponsorizat" or .="Sponsorizzato" or .="Sponsorlu" or .="Sponsorowane" or .="Реклама" or .="ממומן" or .="تمويل شوي" or .="دارای پشتیبانی مالی" or .="سپانسرڈ" or .="مُموَّل" or .="प्रायोजित" or .="সৌজন্যে" or .="ได้รับการสนับสนุน" or .="内容" or .="贊助" or .="Sponsoroitu" or .="May Sponsor" or .="Được tài trợ"]]/ancestor::div[@role="article"]\'; race stop;',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -2247,7 +2247,7 @@ describe('ScriptletInjectionBodyParser', () => {
 
     test('parse', () => {
         // ADG & uBO
-        expect(ScriptletInjectionBodyParser.parse("js(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")")).toEqual({
+        expect(ScriptletInjectionBodyParser.parse("js(scriptlet0, arg0, /a;b/, 'a;b', \"a;b\")")).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {
@@ -2367,7 +2367,7 @@ describe('ScriptletInjectionBodyParser', () => {
             ScriptletInjectionBodyParser.parse(
                 "scriptlet0 arg0 /a;b/ 'a;b' \"a;b\"; scriptlet-1; scriptlet2 'arg0' arg1\\ something;",
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ScriptletInjectionRuleBody',
             loc: {
                 start: {

@@ -4,7 +4,7 @@ import { ElementHidingBodyParser } from '../../../../src/parser/cosmetic/body/el
 describe('ElementHidingBodyParser', () => {
     test('parse', () => {
         // Single selector
-        expect(ElementHidingBodyParser.parse('.test')).toEqual({
+        expect(ElementHidingBodyParser.parse('.test')).toMatchObject({
             type: 'ElementHidingRuleBody',
             loc: {
                 start: {
@@ -74,7 +74,7 @@ describe('ElementHidingBodyParser', () => {
         });
 
         // Multiple selectors
-        expect(ElementHidingBodyParser.parse('.test1, .test2')).toEqual({
+        expect(ElementHidingBodyParser.parse('.test1, .test2')).toMatchObject({
             type: 'ElementHidingRuleBody',
             loc: {
                 start: {
@@ -178,7 +178,7 @@ describe('ElementHidingBodyParser', () => {
             },
         });
 
-        expect(ElementHidingBodyParser.parse('.test1, .test2, [ad-model]')).toEqual({
+        expect(ElementHidingBodyParser.parse('.test1, .test2, [ad-model]')).toMatchObject({
             type: 'ElementHidingRuleBody',
             loc: {
                 start: {

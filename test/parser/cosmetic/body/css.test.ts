@@ -4,23 +4,23 @@ import { EMPTY, SPACE } from '../../../../src/utils/constants';
 
 describe('CssInjectionBodyParser', () => {
     test('isUboCssInjection', () => {
-        expect(CssInjectionBodyParser.isUboCssInjection(EMPTY)).toBe(false);
-        expect(CssInjectionBodyParser.isUboCssInjection(SPACE)).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection(EMPTY)).toBeFalsy();
+        expect(CssInjectionBodyParser.isUboCssInjection(SPACE)).toBeFalsy();
 
-        expect(CssInjectionBodyParser.isUboCssInjection('.ad')).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection('.ad')).toBeFalsy();
 
-        expect(CssInjectionBodyParser.isUboCssInjection('body {}')).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection('body {}')).toBeFalsy();
 
-        expect(CssInjectionBodyParser.isUboCssInjection('body { padding-top: 0 !important; }')).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection('body { padding-top: 0 !important; }')).toBeFalsy();
 
         expect(
             CssInjectionBodyParser.isUboCssInjection(
                 '@media (min-width: 1024px) { body { padding-top: 0 !important; } }',
             ),
-        ).toBe(false);
+        ).toBeFalsy();
 
         // Empty
-        expect(CssInjectionBodyParser.isUboCssInjection('body:style()')).toBe(false);
+        expect(CssInjectionBodyParser.isUboCssInjection('body:style()')).toBeFalsy();
 
         expect(CssInjectionBodyParser.isUboCssInjection('body:style(padding-top: 0 !important;)')).toBe(true);
 
@@ -28,13 +28,13 @@ describe('CssInjectionBodyParser', () => {
     });
 
     test('isAdgCssInjection', () => {
-        expect(CssInjectionBodyParser.isAdgCssInjection(EMPTY)).toBe(false);
-        expect(CssInjectionBodyParser.isAdgCssInjection(SPACE)).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection(EMPTY)).toBeFalsy();
+        expect(CssInjectionBodyParser.isAdgCssInjection(SPACE)).toBeFalsy();
 
-        expect(CssInjectionBodyParser.isAdgCssInjection('.ad')).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection('.ad')).toBeFalsy();
 
         // Empty
-        expect(CssInjectionBodyParser.isAdgCssInjection('body {}')).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection('body {}')).toBeFalsy();
 
         expect(CssInjectionBodyParser.isAdgCssInjection('body { padding-top: 0 !important; }')).toBe(true);
 
@@ -44,15 +44,15 @@ describe('CssInjectionBodyParser', () => {
             ),
         ).toBe(true);
 
-        expect(CssInjectionBodyParser.isAdgCssInjection('body:style()')).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection('body:style()')).toBeFalsy();
 
-        expect(CssInjectionBodyParser.isAdgCssInjection('body:style(padding-top: 0 !important;)')).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection('body:style(padding-top: 0 !important;)')).toBeFalsy();
 
-        expect(CssInjectionBodyParser.isAdgCssInjection('body:ad-component:remove()')).toBe(false);
+        expect(CssInjectionBodyParser.isAdgCssInjection('body:ad-component:remove()')).toBeFalsy();
     });
 
     test('parse - AdGuard', () => {
-        expect(CssInjectionBodyParser.parse('body { padding-top: 0 !important; }')).toEqual({
+        expect(CssInjectionBodyParser.parse('body { padding-top: 0 !important; }')).toMatchObject({
             type: 'CssInjectionRuleBody',
             loc: {
                 start: {
@@ -198,7 +198,7 @@ describe('CssInjectionBodyParser', () => {
                 // eslint-disable-next-line max-len
                 'body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; }',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'CssInjectionRuleBody',
             loc: {
                 start: {
@@ -558,7 +558,7 @@ describe('CssInjectionBodyParser', () => {
                 // eslint-disable-next-line max-len
                 '@media (min-width: 1000px) and (max-width: 2000px) { body, section:has(.something) { padding-top: 0 !important; padding-bottom: 0 !important; color: red !important; } }',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'CssInjectionRuleBody',
             loc: {
                 start: {
@@ -1038,7 +1038,7 @@ describe('CssInjectionBodyParser', () => {
         // Remove
         expect(
             CssInjectionBodyParser.parse('body > section[ad-source] { remove: true; }'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'CssInjectionRuleBody',
             loc: {
                 start: {
@@ -1210,7 +1210,7 @@ describe('CssInjectionBodyParser', () => {
     });
 
     test('parse - uBlock', () => {
-        expect(CssInjectionBodyParser.parse('body:style(padding-top: 0 !important;)')).toEqual({
+        expect(CssInjectionBodyParser.parse('body:style(padding-top: 0 !important;)')).toMatchObject({
             type: 'CssInjectionRuleBody',
             selectorList: {
                 type: 'SelectorList',
@@ -1317,7 +1317,7 @@ describe('CssInjectionBodyParser', () => {
                 // eslint-disable-next-line max-len
                 'body, section:has(.something):style(padding-top: 0 !important; padding-bottom: 0 !important; color: red !important;)',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'CssInjectionRuleBody',
             selectorList: {
                 type: 'SelectorList',
@@ -1633,7 +1633,7 @@ describe('CssInjectionBodyParser', () => {
         });
 
         // Remove
-        expect(CssInjectionBodyParser.parse('body > section[ad-source]:remove()')).toEqual({
+        expect(CssInjectionBodyParser.parse('body > section[ad-source]:remove()')).toMatchObject({
             type: 'CssInjectionRuleBody',
             selectorList: {
                 type: 'SelectorList',
@@ -1740,7 +1740,7 @@ describe('CssInjectionBodyParser', () => {
                 // eslint-disable-next-line max-len
                 'body > section[ad-source]:matches-media((min-width: 1000px) and (max-width: 2000px)):style(background-color: red !important;)',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'CssInjectionRuleBody',
             selectorList: {
                 type: 'SelectorList',

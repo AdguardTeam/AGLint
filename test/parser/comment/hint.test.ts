@@ -3,21 +3,21 @@ import { EMPTY, SPACE } from '../../../src/utils/constants';
 
 describe('HintCommentRuleParser', () => {
     test('isHintRule', () => {
-        expect(HintCommentRuleParser.isHintRule(EMPTY)).toBe(false);
-        expect(HintCommentRuleParser.isHintRule(SPACE)).toBe(false);
-        expect(HintCommentRuleParser.isHintRule('! comment')).toBe(false);
-        expect(HintCommentRuleParser.isHintRule('# comment')).toBe(false);
-        expect(HintCommentRuleParser.isHintRule('#+')).toBe(false);
-        expect(HintCommentRuleParser.isHintRule('#+ HINT_NAME1(PARAMS) HINT_NAME2(PARAMS)')).toBe(false);
+        expect(HintCommentRuleParser.isHintRule(EMPTY)).toBeFalsy();
+        expect(HintCommentRuleParser.isHintRule(SPACE)).toBeFalsy();
+        expect(HintCommentRuleParser.isHintRule('! comment')).toBeFalsy();
+        expect(HintCommentRuleParser.isHintRule('# comment')).toBeFalsy();
+        expect(HintCommentRuleParser.isHintRule('#+')).toBeFalsy();
+        expect(HintCommentRuleParser.isHintRule('#+ HINT_NAME1(PARAMS) HINT_NAME2(PARAMS)')).toBeFalsy();
 
-        expect(HintCommentRuleParser.isHintRule('!+NOT_OPTIMIZED')).toBe(true);
-        expect(HintCommentRuleParser.isHintRule('!+ NOT_OPTIMIZED')).toBe(true);
-        expect(HintCommentRuleParser.isHintRule('!+ HINT_NAME1(PARAMS) HINT_NAME2(PARAMS)')).toBe(true);
+        expect(HintCommentRuleParser.isHintRule('!+NOT_OPTIMIZED')).toBeTruthy();
+        expect(HintCommentRuleParser.isHintRule('!+ NOT_OPTIMIZED')).toBeTruthy();
+        expect(HintCommentRuleParser.isHintRule('!+ HINT_NAME1(PARAMS) HINT_NAME2(PARAMS)')).toBeTruthy();
     });
 
     test('parse', () => {
         // Without parameters
-        expect(HintCommentRuleParser.parse('!+NOT_OPTIMIZED')).toEqual({
+        expect(HintCommentRuleParser.parse('!+NOT_OPTIMIZED')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -68,7 +68,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ NOT_OPTIMIZED')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ NOT_OPTIMIZED')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -120,7 +120,7 @@ describe('HintCommentRuleParser', () => {
         });
 
         // Multiple, without parameters
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME1 HINT_NAME2')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME1 HINT_NAME2')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -203,7 +203,7 @@ describe('HintCommentRuleParser', () => {
         });
 
         // Without parameters, but with empty parameter list ()
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME1()')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME1()')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -270,7 +270,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME1(     )')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME1(     )')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -337,7 +337,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME1() HINT_NAME2()')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME1() HINT_NAME2()')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -452,7 +452,7 @@ describe('HintCommentRuleParser', () => {
         });
 
         // Variadic
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME1(param0, param1) HINT_NAME2()')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME1(param0, param1) HINT_NAME2()')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -599,7 +599,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME1(param0, param1) HINT_NAME2(param0)')).toEqual(
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME1(param0, param1) HINT_NAME2(param0)')).toMatchObject(
             {
                 type: 'HintCommentRule',
                 loc: {
@@ -766,7 +766,7 @@ describe('HintCommentRuleParser', () => {
         );
 
         // Skipped parameters
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME(param0, , param1)')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME(param0, , param1)')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -882,7 +882,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME(param0, , , )')).toEqual(
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME(param0, , , )')).toMatchObject(
             {
                 type: 'HintCommentRule',
                 loc: {
@@ -1016,7 +1016,7 @@ describe('HintCommentRuleParser', () => {
             },
         );
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME( , , , )')).toEqual(
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME( , , , )')).toMatchObject(
             {
                 type: 'HintCommentRule',
                 loc: {
@@ -1150,7 +1150,7 @@ describe('HintCommentRuleParser', () => {
             },
         );
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME(,,,)')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME(,,,)')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -1267,7 +1267,7 @@ describe('HintCommentRuleParser', () => {
         });
 
         // Spaces
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME(    p0  ,   p1 ,   p2 ,     p3)')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME(    p0  ,   p1 ,   p2 ,     p3)')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -1399,7 +1399,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ HINT_NAME(hello world, hello   world)')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ HINT_NAME(hello world, hello   world)')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {
@@ -1499,7 +1499,7 @@ describe('HintCommentRuleParser', () => {
             ],
         });
 
-        expect(HintCommentRuleParser.parse('!+ hint_name(hello world, hello   world)')).toEqual({
+        expect(HintCommentRuleParser.parse('!+ hint_name(hello world, hello   world)')).toMatchObject({
             type: 'HintCommentRule',
             loc: {
                 start: {

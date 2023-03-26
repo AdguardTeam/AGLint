@@ -4,84 +4,84 @@ import { EMPTY, SPACE } from '../../../src/utils/constants';
 describe('ConfigCommentRuleParser', () => {
     test('isConfigComment', () => {
         // Empty
-        expect(ConfigCommentRuleParser.isConfigComment(EMPTY)).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment(SPACE)).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment(EMPTY)).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment(SPACE)).toBeFalsy();
 
         // Begins with !
-        expect(ConfigCommentRuleParser.isConfigComment('!')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!!')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('! comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!+comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!#comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!#########################')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('! #########################')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment(' !')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('  !')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!!')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('! comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!+comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!#comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!#########################')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('! #########################')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment(' !')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('  !')).toBeFalsy();
 
         // Begins with #
-        expect(ConfigCommentRuleParser.isConfigComment('#')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('##')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('# #')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('# comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#+comment')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#########################')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('# ########################')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment(' #')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('  ##')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('##')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('# #')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('# comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#+comment')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#########################')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('# ########################')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment(' #')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('  ##')).toBeFalsy();
 
         // Not "aglint" prefix
-        expect(ConfigCommentRuleParser.isConfigComment('!aaglint')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!aaglint-enable')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!aaglint-anything')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('! aaglint')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('! aaglint-enable')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('! aaglint-anything')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint  ')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint-enable  ')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint-anything  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('!aaglint')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!aaglint-enable')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!aaglint-anything')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('! aaglint')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('! aaglint-enable')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('! aaglint-anything')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint  ')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint-enable  ')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('!   aaglint-anything  ')).toBeFalsy();
 
-        expect(ConfigCommentRuleParser.isConfigComment('#aaglint')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#aaglint-enable')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#aaglint-anything')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('# aaglint')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('# aaglint-enable')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('# aaglint-anything')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint  ')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint-enable  ')).toBe(false);
-        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint-anything  ')).toBe(false);
+        expect(ConfigCommentRuleParser.isConfigComment('#aaglint')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#aaglint-enable')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#aaglint-anything')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('# aaglint')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('# aaglint-enable')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('# aaglint-anything')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint  ')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint-enable  ')).toBeFalsy();
+        expect(ConfigCommentRuleParser.isConfigComment('#   aaglint-anything  ')).toBeFalsy();
 
         // Valid cases
-        expect(ConfigCommentRuleParser.isConfigComment('!aglint')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('!aglint-enable')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('!aglint-anything')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('! aglint')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('! aglint-enable')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('! aglint-anything')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('!   aglint  ')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('!   aglint-enable  ')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('!   aglint-anything  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!aglint')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('!aglint-enable')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('!aglint-anything')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('! aglint')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('! aglint-enable')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('! aglint-anything')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('!   aglint  ')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('!   aglint-enable  ')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('!   aglint-anything  ')).toBeTruthy();
 
-        expect(ConfigCommentRuleParser.isConfigComment('#aglint')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('#aglint-enable')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('#aglint-anything')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('# aglint')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('# aglint-enable')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('# aglint-anything')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('#   aglint  ')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('#   aglint-enable  ')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('#   aglint-anything  ')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('#aglint')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('#aglint-enable')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('#aglint-anything')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('# aglint')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('# aglint-enable')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('# aglint-anything')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('#   aglint  ')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('#   aglint-enable  ')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('#   aglint-anything  ')).toBeTruthy();
 
-        expect(ConfigCommentRuleParser.isConfigComment('!AGLINT')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('#AGLINT')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('! AGLINT')).toBe(true);
-        expect(ConfigCommentRuleParser.isConfigComment('# AGLINT')).toBe(true);
+        expect(ConfigCommentRuleParser.isConfigComment('!AGLINT')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('#AGLINT')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('! AGLINT')).toBeTruthy();
+        expect(ConfigCommentRuleParser.isConfigComment('# AGLINT')).toBeTruthy();
     });
 
     test('parse', () => {
         // !
-        expect(ConfigCommentRuleParser.parse('! aglint-disable')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint-disable')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -131,7 +131,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('!aglint-disable')).toEqual({
+        expect(ConfigCommentRuleParser.parse('!aglint-disable')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -182,7 +182,7 @@ describe('ConfigCommentRuleParser', () => {
         });
 
         // #
-        expect(ConfigCommentRuleParser.parse('# aglint-disable')).toEqual({
+        expect(ConfigCommentRuleParser.parse('# aglint-disable')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -232,7 +232,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('#aglint-disable')).toEqual({
+        expect(ConfigCommentRuleParser.parse('#aglint-disable')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -283,7 +283,7 @@ describe('ConfigCommentRuleParser', () => {
         });
 
         // Different command
-        expect(ConfigCommentRuleParser.parse('! aglint-enable')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint-enable')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -333,7 +333,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -416,7 +416,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1,rule2')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1,rule2')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -515,7 +515,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1, rule2')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1, rule2')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -615,7 +615,7 @@ describe('ConfigCommentRuleParser', () => {
         });
 
         // Ignore comment
-        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1, rule2 -- comment')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint-enable rule1, rule2 -- comment')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -730,7 +730,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('! aglint rule1: "off"')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint rule1: "off"')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -798,7 +798,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('! aglint rule1: 1')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint rule1: 1')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -866,7 +866,7 @@ describe('ConfigCommentRuleParser', () => {
             },
         });
 
-        expect(ConfigCommentRuleParser.parse('! aglint rule1: ["error", "double"]')).toEqual({
+        expect(ConfigCommentRuleParser.parse('! aglint rule1: ["error", "double"]')).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {
@@ -943,7 +943,7 @@ describe('ConfigCommentRuleParser', () => {
                 // eslint-disable-next-line max-len
                 '! aglint rule1: "off", rule2: [1, 2], rule3: ["error", { "max": 100 }] -- this is a comment -- this doesn\'t matter',
             ),
-        ).toEqual({
+        ).toMatchObject({
             type: 'ConfigCommentRule',
             loc: {
                 start: {

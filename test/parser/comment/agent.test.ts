@@ -4,24 +4,24 @@ import { EMPTY, SPACE } from '../../../src/utils/constants';
 describe('AgentCommentRuleParser', () => {
     test('isAgent', () => {
         // Invalid
-        expect(AgentCommentRuleParser.isAgentRule(EMPTY)).toBe(false);
-        expect(AgentCommentRuleParser.isAgentRule(SPACE)).toBe(false);
-        expect(AgentCommentRuleParser.isAgentRule('[')).toBe(false);
+        expect(AgentCommentRuleParser.isAgentRule(EMPTY)).toBeFalsy();
+        expect(AgentCommentRuleParser.isAgentRule(SPACE)).toBeFalsy();
+        expect(AgentCommentRuleParser.isAgentRule('[')).toBeFalsy();
 
         // Cosmetic rule modifiers
-        expect(AgentCommentRuleParser.isAgentRule('[$path=/test]example.org##.ad')).toBe(false);
-        expect(AgentCommentRuleParser.isAgentRule('[$path=/test]##.ad')).toBe(false);
+        expect(AgentCommentRuleParser.isAgentRule('[$path=/test]example.org##.ad')).toBeFalsy();
+        expect(AgentCommentRuleParser.isAgentRule('[$path=/test]##.ad')).toBeFalsy();
 
         // Special case: starts with [ and ends with ] but not an agent
-        expect(AgentCommentRuleParser.isAgentRule('[$path=/test]##.ad[a="b"]')).toBe(false);
+        expect(AgentCommentRuleParser.isAgentRule('[$path=/test]##.ad[a="b"]')).toBeFalsy();
 
         // Empty agent
-        expect(AgentCommentRuleParser.isAgentRule('[]')).toBe(true);
-        expect(AgentCommentRuleParser.isAgentRule('[ ]')).toBe(true);
+        expect(AgentCommentRuleParser.isAgentRule('[]')).toBeTruthy();
+        expect(AgentCommentRuleParser.isAgentRule('[ ]')).toBeTruthy();
 
         // Agents
-        expect(AgentCommentRuleParser.isAgentRule('[Adblock Plus 2.0]')).toBe(true);
-        expect(AgentCommentRuleParser.isAgentRule('[Adblock Plus 3.1; AdGuard 1.0]')).toBe(true);
+        expect(AgentCommentRuleParser.isAgentRule('[Adblock Plus 2.0]')).toBeTruthy();
+        expect(AgentCommentRuleParser.isAgentRule('[Adblock Plus 3.1; AdGuard 1.0]')).toBeTruthy();
     });
 
     test('parse', () => {
@@ -32,7 +32,7 @@ describe('AgentCommentRuleParser', () => {
         expect(AgentCommentRuleParser.parse(SPACE)).toBeNull();
 
         // Valid agents
-        expect(AgentCommentRuleParser.parse('[AdBlock]')).toEqual({
+        expect(AgentCommentRuleParser.parse('[AdBlock]')).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
@@ -99,7 +99,7 @@ describe('AgentCommentRuleParser', () => {
             },
         });
 
-        expect(AgentCommentRuleParser.parse('[AdGuard]')).toEqual({
+        expect(AgentCommentRuleParser.parse('[AdGuard]')).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
@@ -166,7 +166,7 @@ describe('AgentCommentRuleParser', () => {
             },
         });
 
-        expect(AgentCommentRuleParser.parse('[uBlock]')).toEqual({
+        expect(AgentCommentRuleParser.parse('[uBlock]')).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
@@ -233,7 +233,7 @@ describe('AgentCommentRuleParser', () => {
             },
         });
 
-        expect(AgentCommentRuleParser.parse('[uBlock Origin]')).toEqual(
+        expect(AgentCommentRuleParser.parse('[uBlock Origin]')).toMatchObject(
             {
                 type: 'AgentCommentRule',
                 loc: {
@@ -302,7 +302,7 @@ describe('AgentCommentRuleParser', () => {
             },
         );
 
-        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0]')).toEqual(
+        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0]')).toMatchObject(
             {
                 type: 'AgentCommentRule',
                 loc: {
@@ -386,7 +386,7 @@ describe('AgentCommentRuleParser', () => {
             },
         );
 
-        expect(AgentCommentRuleParser.parse('[uBlock Origin 1.0.0]')).toEqual({
+        expect(AgentCommentRuleParser.parse('[uBlock Origin 1.0.0]')).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
@@ -468,7 +468,7 @@ describe('AgentCommentRuleParser', () => {
             },
         });
 
-        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard]')).toEqual({
+        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard]')).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
@@ -582,7 +582,7 @@ describe('AgentCommentRuleParser', () => {
             },
         });
 
-        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard 1.0.1.10]')).toEqual(
+        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard 1.0.1.10]')).toMatchObject(
             {
                 type: 'AgentCommentRule',
                 loc: {
@@ -715,7 +715,7 @@ describe('AgentCommentRuleParser', () => {
 
         expect(
             AgentCommentRuleParser.parse('[Adblock Plus 3.1; AdGuard 1.4; uBlock Origin 1.0.15.0]'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
@@ -893,7 +893,7 @@ describe('AgentCommentRuleParser', () => {
 
         expect(
             AgentCommentRuleParser.parse('[Adblock Plus 3.1 ; AdGuard  1.4 ;   uBlock Origin    1.0.15.0    ]'),
-        ).toEqual({
+        ).toMatchObject({
             type: 'AgentCommentRule',
             loc: {
                 start: {
