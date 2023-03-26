@@ -30,7 +30,8 @@ export type AnyRule =
     | EmptyRule
     | AnyCommentRule
     | AnyCosmeticRule
-    | NetworkRule;
+    | NetworkRule
+    | InvalidRule;
 
 /**
  * Represents any comment-like adblock rule.
@@ -91,6 +92,11 @@ export enum RuleCategory {
      * Empty "rules" that are only containing whitespaces. These rules are handled just for convenience.
      */
     Empty = 'Empty',
+
+    /**
+     * Syntactically invalid rules (tolerant mode only).
+     */
+    Invalid = 'Invalid',
 
     /**
      * Comment rules, such as comment rules, metadata rules, preprocessor rules, etc.
@@ -300,6 +306,28 @@ export interface RuleBase extends Node {
      * Category of the adblock rule
      */
     category: RuleCategory;
+}
+
+/**
+ * Represents an invalid rule (used by tolerant mode).
+ */
+export interface InvalidRule extends RuleBase {
+    type: 'InvalidRule';
+
+    /**
+     * Category of the adblock rule
+     */
+    category: RuleCategory.Invalid;
+
+    /**
+     * Raw rule text
+     */
+    raw: string;
+
+    /**
+     * Error details
+     */
+    error: Error;
 }
 
 /**

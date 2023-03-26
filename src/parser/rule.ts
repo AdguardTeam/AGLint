@@ -38,6 +38,8 @@ export class RuleParser {
      * mark the rule with the `AdGuard` syntax in this case.
      *
      * @param raw Raw adblock rule
+     * @param tolerant If `true`, then the parser will not throw if the rule is syntactically invalid, instead it will
+     * return an `InvalidRule` object with the error attached to it. Default is `false`.
      * @param loc Base location of the rule
      * @returns Adblock rule AST
      * @throws If the input matches a pattern but syntactically invalid
@@ -69,33 +71,44 @@ export class RuleParser {
      * const ast7 = RuleParser.parse("!#if (adguard)");
      * ```
      */
-    public static parse(raw: string, loc = defaultLocation): AnyRule {
-        // Empty lines / rules (handle it just for convenience)
-        if (raw.trim().length === 0) {
+    public static parse(raw: string, tolerant = false, loc = defaultLocation): AnyRule {
+        try {
+            // Empty lines / rules (handle it just for convenience)
+            if (raw.trim().length === 0) {
+                return {
+                    type: 'EmptyRule',
+                    loc: locRange(loc, 0, raw.length),
+                    category: RuleCategory.Empty,
+                    syntax: AdblockSyntax.Common,
+                };
+            }
+
+            // Try to parse the rule with all sub-parsers. If a rule doesn't match
+            // the pattern of a parser, then it will return `null`. For example, a
+            // network rule will not match the pattern of a comment rule, since it
+            // doesn't start with comment marker. But if the rule matches the
+            // pattern of a parser, then it will return the AST of the rule, or
+            // throw an error if the rule is syntactically invalid.
+            return CommentRuleParser.parse(raw, loc)
+                || CosmeticRuleParser.parse(raw, loc)
+                || NetworkRuleParser.parse(raw, loc);
+        } catch (error: unknown) {
+            // If tolerant mode is disabled or the error is not known, then simply
+            // re-throw the error
+            if (!tolerant || !(error instanceof Error)) {
+                throw error;
+            }
+
+            // Otherwise, return an invalid rule (tolerant mode)
             return {
-                type: 'EmptyRule',
+                type: 'InvalidRule',
                 loc: locRange(loc, 0, raw.length),
-                category: RuleCategory.Empty,
+                category: RuleCategory.Invalid,
                 syntax: AdblockSyntax.Common,
+                raw,
+                error,
             };
         }
-
-        // Comment rules (agent / metadata / hint / pre-processor / comment)
-        const comment = CommentRuleParser.parse(raw, loc);
-        if (comment !== null) {
-            return comment;
-        }
-
-        // Cosmetic rules / non-basic rules
-        const cosmetic = CosmeticRuleParser.parse(raw, loc);
-        if (cosmetic !== null) {
-            return cosmetic;
-        }
-
-        // Network / basic rules
-        const network = NetworkRuleParser.parse(raw, loc);
-
-        return network;
     }
 
     /**
@@ -119,6 +132,10 @@ export class RuleParser {
             // Empty lines
             case RuleCategory.Empty:
                 return EMPTY;
+
+            // Invalid rules
+            case RuleCategory.Invalid:
+                return ast.raw;
 
             // Comment rules
             case RuleCategory.Comment:
