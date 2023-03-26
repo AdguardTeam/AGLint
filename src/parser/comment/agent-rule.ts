@@ -117,6 +117,9 @@ export class AgentCommentRuleParser {
         return {
             type: CommentRuleType.AgentCommentRule,
             loc: locRange(loc, 0, raw.length),
+            raws: {
+                text: raw,
+            },
             syntax: AdblockSyntax.Common,
             category: RuleCategory.Comment,
             agents,

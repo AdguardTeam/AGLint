@@ -120,6 +120,9 @@ export class HintCommentRuleParser {
         return {
             type: CommentRuleType.HintCommentRule,
             loc: locRange(loc, 0, offset),
+            raws: {
+                text: raw,
+            },
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Adg,
             hints,

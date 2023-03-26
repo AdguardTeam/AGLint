@@ -94,6 +94,9 @@ export class NetworkRuleParser {
         return {
             type: 'NetworkRule',
             loc: locRange(loc, 0, raw.length),
+            raws: {
+                text: raw,
+            },
             category: RuleCategory.Network,
             syntax: AdblockSyntax.Common,
             exception,

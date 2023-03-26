@@ -169,6 +169,9 @@ export class CosmeticRuleParser {
                         category: RuleCategory.Cosmetic,
                         type: CosmeticRuleType.CssInjectionRule,
                         loc: locRange(loc, 0, raw.length),
+                        raws: {
+                            text: raw,
+                        },
                         syntax: AdblockSyntax.Ubo,
                         exception,
                         modifiers,
@@ -182,6 +185,9 @@ export class CosmeticRuleParser {
                     category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.ElementHidingRule,
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     syntax,
                     exception,
                     modifiers,
@@ -201,6 +207,9 @@ export class CosmeticRuleParser {
                         category: RuleCategory.Cosmetic,
                         type: CosmeticRuleType.CssInjectionRule,
                         loc: locRange(loc, 0, raw.length),
+                        raws: {
+                            text: raw,
+                        },
                         syntax: AdblockSyntax.Adg,
                         exception,
                         modifiers,
@@ -223,6 +232,9 @@ export class CosmeticRuleParser {
                         category: RuleCategory.Cosmetic,
                         type: CosmeticRuleType.ScriptletInjectionRule,
                         loc: locRange(loc, 0, raw.length),
+                        raws: {
+                            text: raw,
+                        },
                         syntax: AdblockSyntax.Abp,
                         exception,
                         modifiers,
@@ -253,6 +265,9 @@ export class CosmeticRuleParser {
                     category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.ScriptletInjectionRule,
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     syntax: AdblockSyntax.Ubo,
                     exception,
                     modifiers,
@@ -271,6 +286,9 @@ export class CosmeticRuleParser {
                         category: RuleCategory.Cosmetic,
                         type: CosmeticRuleType.ScriptletInjectionRule,
                         loc: locRange(loc, 0, raw.length),
+                        raws: {
+                            text: raw,
+                        },
                         syntax: AdblockSyntax.Adg,
                         exception,
                         modifiers,
@@ -293,6 +311,9 @@ export class CosmeticRuleParser {
                     category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.JsInjectionRule,
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     syntax: AdblockSyntax.Adg,
                     exception,
                     modifiers,
@@ -319,6 +340,9 @@ export class CosmeticRuleParser {
                     category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.HtmlFilteringRule,
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     syntax: AdblockSyntax.Ubo,
                     exception,
                     modifiers,
@@ -343,6 +367,9 @@ export class CosmeticRuleParser {
                     category: RuleCategory.Cosmetic,
                     type: CosmeticRuleType.HtmlFilteringRule,
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     syntax: AdblockSyntax.Adg,
                     exception,
                     modifiers,

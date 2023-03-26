@@ -78,6 +78,9 @@ export class RuleParser {
                 return {
                     type: 'EmptyRule',
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     category: RuleCategory.Empty,
                     syntax: AdblockSyntax.Common,
                 };
@@ -103,6 +106,9 @@ export class RuleParser {
             return {
                 type: 'InvalidRule',
                 loc: locRange(loc, 0, raw.length),
+                raws: {
+                    text: raw,
+                },
                 category: RuleCategory.Invalid,
                 syntax: AdblockSyntax.Common,
                 raw,

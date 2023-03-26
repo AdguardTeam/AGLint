@@ -139,6 +139,9 @@ export class PreProcessorCommentRuleParser {
             return {
                 type: CommentRuleType.PreProcessorCommentRule,
                 loc: locRange(loc, 0, raw.length),
+                raws: {
+                    text: raw,
+                },
                 category: RuleCategory.Comment,
                 syntax: AdblockSyntax.Common,
                 name,
@@ -170,6 +173,9 @@ export class PreProcessorCommentRuleParser {
         return {
             type: CommentRuleType.PreProcessorCommentRule,
             loc: locRange(loc, 0, raw.length),
+            raws: {
+                text: raw,
+            },
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Common,
             name,

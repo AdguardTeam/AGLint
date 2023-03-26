@@ -113,6 +113,9 @@ export class MetadataCommentRuleParser {
                 return {
                     type: CommentRuleType.MetadataCommentRule,
                     loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
                     category: RuleCategory.Comment,
                     syntax: AdblockSyntax.Common,
                     marker,

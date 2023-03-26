@@ -76,11 +76,15 @@ export class FilterListParser {
                     nl = 'lf';
                 }
 
-                // Add raw data to the rule
-                rule.raws = {
-                    text,
-                    nl,
-                };
+                // Add newline type to the rule (rule parser already added raws.text)
+                if (!rule.raws) {
+                    rule.raws = {
+                        text,
+                        nl,
+                    };
+                } else {
+                    rule.raws.nl = nl;
+                }
 
                 // Add the rule to the list
                 rules.push(rule);

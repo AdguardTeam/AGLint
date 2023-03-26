@@ -173,6 +173,9 @@ export class CommentRuleParser {
             category: RuleCategory.Comment,
             type: CommentRuleType.CommentRule,
             loc: locRange(loc, 0, raw.length),
+            raws: {
+                text: raw,
+            },
             // TODO: Change syntax when hashmark is used?
             syntax: AdblockSyntax.Common,
             marker,

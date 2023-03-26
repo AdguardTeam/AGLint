@@ -158,6 +158,9 @@ export class ConfigCommentRuleParser {
         return {
             type: CommentRuleType.ConfigCommentRule,
             loc: locRange(loc, 0, raw.length),
+            raws: {
+                text: raw,
+            },
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Common,
             marker,
