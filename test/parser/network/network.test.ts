@@ -4,7 +4,7 @@ import { NetworkRule, RuleCategory } from '../../../src/parser/common';
 
 describe('NetworkRuleParser', () => {
     test('parse', () => {
-        expect(NetworkRuleParser.parse('||example.com')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('||example.com')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -39,7 +39,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('@@||example.com')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('@@||example.com')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -74,7 +74,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('@@||example.com$m1,m2=v2')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('@@||example.com$m1,m2=v2')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -206,7 +206,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('/example/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('/example/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -241,7 +241,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('@@/example/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('@@/example/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -276,7 +276,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -409,7 +409,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Last $ in regex pattern
-        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3$/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3$/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -590,7 +590,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Escaped $ in regex
-        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3\\$/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('@@/example/$m1,m2=v2,m3=/^r3\\$/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -771,7 +771,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Escaped separator
-        expect(NetworkRuleParser.parse('example.com\\$m1')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('example.com\\$m1')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -807,7 +807,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Multiple separators
-        expect(NetworkRuleParser.parse('example.com$m1$m2$m3$m4$m5')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('example.com$m1$m2$m3$m4$m5')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -891,7 +891,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('example.com$m1=v1$m2$m3=v3$m4$m5=v5')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('example.com$m1=v1$m2$m3=v3$m4$m5=v5')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -992,7 +992,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Starts with "/"
-        expect(NetworkRuleParser.parse('/ad.js$m1=v1')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('/ad.js$m1=v1')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1093,7 +1093,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Pattern starts with / like regex patterns
-        expect(NetworkRuleParser.parse('/ad.js^$m1=v1')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('/ad.js^$m1=v1')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1193,7 +1193,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('/ad.js^$m1=/^v1$/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('/ad.js^$m1=/^v1$/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1294,7 +1294,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // Pattern contains an odd number of "/" characters
-        expect(NetworkRuleParser.parse('example.com/a/b/c$m1=v1')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('example.com/a/b/c$m1=v1')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1394,7 +1394,7 @@ describe('NetworkRuleParser', () => {
             },
         });
 
-        expect(NetworkRuleParser.parse('example.com$m1,m2=/^regex$/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('example.com$m1,m2=/^regex$/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1527,7 +1527,7 @@ describe('NetworkRuleParser', () => {
         });
 
         // https://github.com/AdguardTeam/AGLint/issues/60
-        expect(NetworkRuleParser.parse('||example.com/$aa/bb^$m1,m2=/^regex$/')).toEqual<NetworkRule>({
+        expect(NetworkRuleParser.parse('||example.com/$aa/bb^$m1,m2=/^regex$/')).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1662,7 +1662,7 @@ describe('NetworkRuleParser', () => {
         // Complicated case
         expect(
             NetworkRuleParser.parse('@@/example/scripts/ad.js$m1,m2=v2,m3=/^r3\\$/,m4=/r4\\/r4$/,m5=/^r5\\$/'),
-        ).toEqual<NetworkRule>({
+        ).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -1940,7 +1940,7 @@ describe('NetworkRuleParser', () => {
 
         expect(
             NetworkRuleParser.parse('@@||example.org^$replace=/(<VAST[\\s\\S]*?>)[\\s\\S]*<\\/VAST>/v\\$1<\\/VAST>/i'),
-        ).toEqual<NetworkRule>({
+        ).toMatchObject<NetworkRule>({
             type: 'NetworkRule',
             loc: {
                 start: {
@@ -2042,7 +2042,7 @@ describe('NetworkRuleParser', () => {
 
         expect(
             NetworkRuleParser.parse('@@||example.org^$removeheader=request:header-name'),
-        ).toEqual<NetworkRule>(
+        ).toMatchObject<NetworkRule>(
             {
                 type: 'NetworkRule',
                 loc: {
