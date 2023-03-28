@@ -99,30 +99,35 @@ export class HtmlFilteringBodyParser {
 
         try {
             // Try to parse the body as a CSS selector list (default)
-            body = <SelectorListPlain>CssTree.parsePlain(escapedRawBody, CssTreeParserContext.selectorList, loc);
-        } catch (e) {
-            // If it fails, try to parse it as a function node. This is the case for uBlock rules.
-            // For example, uBlock allows the following syntax: `example.org##^responseheader(name)`
-            const ast = CssTree.parsePlain(escapedRawBody, CssTreeParserContext.value, loc);
+            body = <SelectorListPlain>CssTree.parsePlain(escapedRawBody, CssTreeParserContext.selectorList, false, loc);
+        } catch (error: unknown) {
+            // If the body is not a selector list, it might be a function node: `example.org##^responseheader(name)`
+            // We should check this error "strictly", because we don't want to loose other previously detected selector
+            // errors (if any).
+            if (error instanceof Error && error.message.indexOf('Selector is expected') !== -1) {
+                const ast = CssTree.parsePlain(escapedRawBody, CssTreeParserContext.value, false, loc);
 
-            if (ast.type !== 'Value') {
-                throw new AdblockSyntaxError(
-                    `Expected a 'Value' node first child, got ${ast.type}`,
-                    locRange(loc, 0, raw.length),
-                );
+                if (ast.type !== 'Value') {
+                    throw new AdblockSyntaxError(
+                        `Expected a 'Value' node first child, got '${ast.type}'`,
+                        locRange(loc, 0, raw.length),
+                    );
+                }
+
+                // First child must be a function node
+                const func = ast.children[0];
+
+                if (func.type !== 'Function') {
+                    throw new AdblockSyntaxError(
+                        `Expected a 'Function' node, got '${func.type}'`,
+                        locRange(loc, 0, raw.length),
+                    );
+                }
+
+                body = func;
+            } else {
+                throw error;
             }
-
-            // First child must be a function node
-            const func = ast.children[0];
-
-            if (func.type !== 'Function') {
-                throw new AdblockSyntaxError(
-                    `Expected a 'Function' node, got ${func.type}`,
-                    locRange(loc, 0, raw.length),
-                );
-            }
-
-            body = func;
         }
 
         return {

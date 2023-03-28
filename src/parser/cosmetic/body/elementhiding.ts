@@ -37,7 +37,7 @@ export class ElementHidingBodyParser {
      */
     public static parse(raw: string, loc = defaultLocation): ElementHidingRuleBody {
         // eslint-disable-next-line max-len
-        const selectorList: SelectorListPlain = <SelectorListPlain>CssTree.parsePlain(raw, CssTreeParserContext.selectorList, loc);
+        const selectorList: SelectorListPlain = <SelectorListPlain>CssTree.parsePlain(raw, CssTreeParserContext.selectorList, false, loc);
 
         return {
             type: 'ElementHidingRuleBody',

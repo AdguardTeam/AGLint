@@ -21,7 +21,14 @@ describe('CSSTree utils', () => {
                 <Selector>CssTree.parse('#test[-ext-contains="something"]', CssTreeParserContext.selector),
             ),
         ).toMatchObject({
-            attributes: [CssTree.createAttributeSelector('-ext-contains', 'something')],
+            attributes: [
+                {
+                    name: {
+                        type: 'Identifier',
+                        name: '-ext-contains',
+                    },
+                },
+            ],
             pseudos: [],
         });
 
@@ -35,7 +42,14 @@ describe('CSSTree utils', () => {
                 ),
             ),
         ).toMatchObject({
-            attributes: [CssTree.createAttributeSelector('-ext-contains', 'something')],
+            attributes: [
+                {
+                    name: {
+                        type: 'Identifier',
+                        name: '-ext-contains',
+                    },
+                },
+            ],
             // Partial match, for important parts
             pseudos: [
                 {

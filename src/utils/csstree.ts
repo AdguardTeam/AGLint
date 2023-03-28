@@ -20,7 +20,6 @@ import {
 } from '@adguard/ecss-tree';
 import { EXTCSS_PSEUDO_CLASSES, EXTCSS_ATTRIBUTES } from '../converter/pseudo';
 import {
-    ASSIGN_OPERATOR,
     CLOSE_PARENTHESIS,
     CLOSE_SQUARE_BRACKET,
     COLON,
@@ -36,7 +35,7 @@ import {
 } from './constants';
 import { CssTreeNodeType, CssTreeParserContext } from './csstree-constants';
 import { AdblockSyntaxError } from '../parser/errors/syntax-error';
-import { defaultLocation } from '../parser/common';
+import { LocationRange, defaultLocation } from '../parser/common';
 import { locRange } from './location';
 
 /**
@@ -70,112 +69,62 @@ export interface ExtendedCssNodes {
  */
 export class CssTree {
     /**
-     * Helper function for parsing CSS parts.
+     * Shifts location of the CSSTree node. Temporary workaround for CSSTree issue:
+     * https://github.com/csstree/csstree/issues/251
      *
-     * @param raw Raw CSS input
-     * @param context CSSTree context
-     * @param loc Base location for the parsed node
-     * @returns CSSTree node (AST)
+     * @param root Root CSSTree node
+     * @param loc Location to shift
+     * @returns Root CSSTree node with shifted location
      */
-    public static parse(raw: string, context: CssTreeParserContext, loc = defaultLocation): CssNode {
-        try {
-            return parse(raw, {
-                context,
-                ...commonCssTreeOptions,
-                ...loc,
-                // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
-                onParseError: (error: SyntaxParseError) => {
-                    throw new AdblockSyntaxError(
-                        // eslint-disable-next-line max-len
-                        `ECSSTree parsing error: '${error.rawMessage || error.message}'`,
-                        locRange(loc, error.offset, raw.length),
-                    );
-                },
-                // TODO: False positive alert for :xpath('//*[contains(text(),"a")]')
-                // // We don't need CSS comments
-                // onComment: (value: string, commentLoc: CssLocation) => {
-                //     throw new AdblockSyntaxError(
-                //         'ECSSTree parsing error: \'Unexpected comment\'',
-                //         locRange(loc, commentLoc.start.offset, commentLoc.end.offset),
-                //     );
-                // },
-            });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                throw new AdblockSyntaxError(
-                    // eslint-disable-next-line max-len
-                    `ECSSTree parsing error: '${error.message}'`,
-                    locRange(loc, 0, raw.length),
-                );
+    public static shiftNodePosition(root: CssNode, loc = defaultLocation): CssNode {
+        walk(root, (node: CssNode) => {
+            if (node.loc) {
+                /* eslint-disable no-param-reassign */
+                node.loc.start.offset += loc.offset;
+                node.loc.start.line += loc.line - 1;
+                node.loc.start.column += loc.column - 1;
+
+                node.loc.end.offset += loc.offset;
+                node.loc.end.line += loc.line - 1;
+                node.loc.end.column += loc.column - 1;
+                /* eslint-enable no-param-reassign */
             }
+        });
 
-            // Pass through
-            throw error;
-        }
-    }
-
-    /**
-     * Helper function for parsing CSS parts. This function is tolerates CSSTree fallbacks
-     * (for example, fallback to Raw node if it can't parse the input).
-     *
-     * @param raw Raw CSS input
-     * @param context CSSTree context
-     * @param loc Base location for the parsed node
-     * @returns CSSTree node (AST)
-     */
-    public static parseTolerant(raw: string, context: CssTreeParserContext, loc = defaultLocation): CssNode {
-        try {
-            return parse(raw, {
-                context,
-                ...commonCssTreeOptions,
-                ...loc,
-                // TODO: False positive alert for :xpath('//*[contains(text(),"a")]')
-                // // We don't need CSS comments
-                // onComment: (value: string, commentLoc: CssLocation) => {
-                //     throw new AdblockSyntaxError(
-                //         'ECSSTree parsing error: \'Unexpected comment\'',
-                //         locRange(loc, commentLoc.start.offset, commentLoc.end.offset),
-                //     );
-                // },
-            });
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                throw new AdblockSyntaxError(
-                    // eslint-disable-next-line max-len
-                    `ECSSTree parsing error: '${error.message}'`,
-                    locRange(loc, 0, raw.length),
-                );
-            }
-
-            // Pass through
-            throw error;
-        }
+        return root;
     }
 
     /**
      * Helper function for parsing CSS parts.
      *
      * @param raw Raw CSS input
-     * @param context CSSTree context
+     * @param context CSSTree context for parsing
+     * @param tolerant If `true`, then the parser will not throw an error on parsing fallbacks. Default is `false`
      * @param loc Base location for the parsed node
      * @returns CSSTree node (AST)
      */
-    public static parsePlain(raw: string, context: CssTreeParserContext, loc = defaultLocation): CssNodePlain {
+    public static parse(raw: string, context: CssTreeParserContext, tolerant = false, loc = defaultLocation): CssNode {
         try {
-            return toPlainObject(
+            // TODO: Workaround for wrong error management: https://github.com/csstree/csstree/issues/251
+            return CssTree.shiftNodePosition(
                 parse(raw, {
                     context,
                     ...commonCssTreeOptions,
-                    ...loc,
                     // https://github.com/csstree/csstree/blob/master/docs/parsing.md#onparseerror
                     onParseError: (error: SyntaxParseError) => {
-                        throw new AdblockSyntaxError(
-                            // eslint-disable-next-line max-len
-                            `ECSSTree parsing error: '${error.rawMessage || error.message}'`,
-                            locRange(loc, error.offset, raw.length),
-                        );
+                        // Strict mode
+                        if (!tolerant) {
+                            throw new AdblockSyntaxError(
+                                // eslint-disable-next-line max-len
+                                `ECSSTree parsing error: '${error.rawMessage || error.message}'`,
+                                locRange(loc, error.offset, raw.length),
+                            );
+                        }
                     },
-                    // TODO: False positive alert for :xpath('//*[contains(text(),"a")]')
+
+                    // TODO: Resolve false positive alert for :xpath('//*[contains(text(),"a")]')
+                    // Temporarily disabled to avoid false positive alerts
+
                     // We don't need CSS comments
                     // onComment: (value: string, commentLoc: CssLocation) => {
                     //     throw new AdblockSyntaxError(
@@ -184,13 +133,22 @@ export class CssTree {
                     //     );
                     // },
                 }),
+                loc,
             );
         } catch (error: unknown) {
             if (error instanceof Error) {
+                let errorLoc: LocationRange;
+
+                // Get start offset of the error (if available), otherwise use the whole inputs length
+                if ('offset' in error && typeof error.offset === 'number') {
+                    errorLoc = locRange(loc, error.offset, raw.length);
+                } else {
+                    errorLoc = locRange(loc, 0, raw.length);
+                }
+
                 throw new AdblockSyntaxError(
-                    // eslint-disable-next-line max-len
                     `ECSSTree parsing error: '${error.message}'`,
-                    locRange(loc, 0, raw.length),
+                    errorLoc,
                 );
             }
 
@@ -200,32 +158,26 @@ export class CssTree {
     }
 
     /**
-     * Helper function for creating attribute selectors.
+     * Helper function for parsing CSS parts.
      *
-     * @param attribute Attribute name
-     * @param value Attribute value
-     * @returns Attribute selector AST
+     * @param raw Raw CSS input
+     * @param context CSSTree context
+     * @param tolerant If `true`, then the parser will not throw an error on parsing fallbacks. Default is `false`
+     * @param loc Base location for the parsed node
+     * @returns CSSTree node (AST)
      */
-    public static createAttributeSelector(attribute: string, value: string): AttributeSelector {
-        return {
-            type: CssTreeNodeType.AttributeSelector,
-            name: {
-                type: CssTreeNodeType.Identifier,
-                name: attribute,
-            },
-            matcher: ASSIGN_OPERATOR,
-            value: {
-                type: CssTreeNodeType.String,
-                value,
-            },
-            flags: null,
-        };
+    // eslint-disable-next-line max-len
+    public static parsePlain(raw: string, context: CssTreeParserContext, tolerant = false, loc = defaultLocation): CssNodePlain {
+        return toPlainObject(
+            CssTree.parse(raw, context, tolerant, loc),
+        );
     }
 
     /**
+     * Walks through the CSSTree node and returns all ExtendedCSS nodes.
      *
-     * @param selectorAst - CSSTree Selector AST
-     * @returns Extended CSS Nodes
+     * @param selectorAst CSSTree selector AST
+     * @returns Extended CSS nodes (pseudos and attributes)
      */
     public static getSelectorExtendedCssNodes(selectorAst: Selector): ExtendedCssNodes {
         const pseudos: PseudoClassSelector[] = [];
@@ -234,12 +186,12 @@ export class CssTree {
         walk(selectorAst, (node: CssNode) => {
             // Pseudo classes
             if (node.type === CssTreeNodeType.PseudoClassSelector) {
-                // ExtCSS pseudo classes
+                // Check if it's a known ExtendedCSS pseudo class
                 if (EXTCSS_PSEUDO_CLASSES.includes(node.name)) {
                     pseudos.push(node);
                 }
             } else if (node.type === CssTreeNodeType.AttributeSelector) {
-                // Attribute selectors
+                // Check if it's a known ExtendedCSS attribute
                 if (EXTCSS_ATTRIBUTES.includes(node.name.name)) {
                     attributes.push(node);
                 }

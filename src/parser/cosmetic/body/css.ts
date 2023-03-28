@@ -132,7 +132,7 @@ export class CssInjectionBodyParser {
      * @throws {AdblockSyntaxError} If the body is invalid or unsupported
      */
     private static parseUboStyleInjection(raw: string, loc = defaultLocation): CssInjectionRuleBody {
-        const selectorList = CssTree.parse(raw, CssTreeParserContext.selectorList, loc);
+        const selectorList = CssTree.parse(raw, CssTreeParserContext.selectorList, false, loc);
 
         const plainSelectorList: SelectorListPlain = {
             type: CssTreeNodeType.SelectorList,
@@ -350,7 +350,7 @@ export class CssInjectionBodyParser {
         // "stylesheet" context handles "at-rules" and "rules", but if we only have a single
         // selector, then the strict parser will throw an error, but the tolerant parser will
         // parses it as a raw fragment.
-        const stylesheet = CssTree.parseTolerant(raw, CssTreeParserContext.stylesheet, loc);
+        const stylesheet = CssTree.parse(raw, CssTreeParserContext.stylesheet, true, loc);
 
         // Check stylesheet
         if (stylesheet.type !== CssTreeNodeType.StyleSheet) {
