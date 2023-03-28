@@ -23,7 +23,7 @@ import {
     Value,
     defaultLocation,
 } from '../common';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 import { StringUtils } from '../../utils/string';
 import { locRange, shiftLoc } from '../../utils/location';
 import { ElementHidingBodyParser } from './body/elementhiding';

@@ -16,7 +16,7 @@ import {
     defaultLocation,
 } from '../common';
 import { locRange, shiftLoc } from '../../utils/location';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 
 /**
  * `NetworkRuleParser` is responsible for parsing network rules.

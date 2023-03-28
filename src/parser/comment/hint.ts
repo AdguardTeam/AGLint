@@ -11,7 +11,7 @@ import { StringUtils } from '../../utils/string';
 import {
     Hint, Location, Value, defaultLocation,
 } from '../common';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 import { ParameterListParser } from '../misc/parameter-list';
 
 /**

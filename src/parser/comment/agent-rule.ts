@@ -8,7 +8,7 @@ import {
     AgentCommentRule, Location, defaultLocation, CommentRuleType, RuleCategory,
 } from '../common';
 import { AgentParser } from './agent';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 import { AdblockSyntax } from '../../utils/adblockers';
 import { CosmeticRuleSeparatorUtils } from '../../utils/cosmetic-rule-separator';
 

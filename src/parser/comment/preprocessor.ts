@@ -25,7 +25,7 @@ import {
     CommentRuleType, Location, PreProcessorCommentRule, RuleCategory, Value, defaultLocation,
 } from '../common';
 import { LogicalExpressionParser } from '../misc/logical-expression';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 
 /**
  * `PreProcessorParser` is responsible for parsing preprocessor rules.

@@ -34,7 +34,7 @@ import {
     SPACE,
 } from './constants';
 import { CssTreeNodeType, CssTreeParserContext } from './csstree-constants';
-import { AdblockSyntaxError } from '../parser/errors/syntax-error';
+import { AdblockSyntaxError } from '../parser/errors/adblock-syntax-error';
 import { LocationRange, defaultLocation } from '../parser/common';
 import { locRange } from './location';
 

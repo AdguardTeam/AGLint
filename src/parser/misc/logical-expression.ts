@@ -10,7 +10,7 @@ import {
     AMPERSAND, CLOSE_PARENTHESIS, EXCLAMATION_MARK, OPEN_PARENTHESIS, PIPE, UNDERSCORE,
 } from '../../utils/constants';
 import { locRange } from '../../utils/location';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 
 const OPERATOR_PRECEDENCE = {
     '!': 3,

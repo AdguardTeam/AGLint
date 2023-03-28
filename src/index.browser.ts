@@ -71,7 +71,7 @@ export { DomainListParser } from './parser/misc/domain-list';
 export { ModifierListParser } from './parser/misc/modifier-list';
 export { ModifierParser } from './parser/misc/modifier';
 export { ParameterListParser } from './parser/misc/parameter-list';
-export { AdblockSyntaxError } from './parser/errors/syntax-error';
+export { AdblockSyntaxError } from './parser/errors/adblock-syntax-error';
 export { FilterListParser } from './parser/filterlist';
 
 // Core linter

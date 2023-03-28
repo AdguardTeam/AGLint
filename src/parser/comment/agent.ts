@@ -5,7 +5,7 @@ import { StringUtils } from '../../utils/string';
 import {
     Agent, Location, Value, defaultLocation,
 } from '../common';
-import { AdblockSyntaxError } from '../errors/syntax-error';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 
 /**
  * `AgentParser` is responsible for parsing single adblock agent elements.
