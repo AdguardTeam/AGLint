@@ -25,7 +25,7 @@
     "type": "module",
     "main": "dist/aglint.cjs",
     "module": "dist/aglint.esm.js",
-    "browser": "dist/aglint.iife.min.js",
+    "browser": "dist/aglint.umd.min.js",
     "types": "dist/aglint.d.ts",
     "bin": "dist/cli.js",
     "files": [
