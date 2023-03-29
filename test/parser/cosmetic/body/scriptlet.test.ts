@@ -643,27 +643,19 @@ describe('ScriptletInjectionBodyParser', () => {
         // Scriptlet cannot be empty
         expect(
             () => ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js()'),
-        ).toThrowError(
-            'Invalid AdGuard/uBlock scriptlet call, no scriptlet name specified',
-        );
+        ).not.toThrowError();
 
         expect(
             () => ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('//scriptlet()'),
-        ).toThrowError(
-            'Invalid AdGuard/uBlock scriptlet call, no scriptlet name specified',
-        );
+        ).not.toThrowError();
 
         expect(
             () => ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js( )'),
-        ).toThrowError(
-            'Invalid AdGuard/uBlock scriptlet call, no scriptlet name specified',
-        );
+        ).not.toThrowError();
 
         expect(
             () => ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('//scriptlet( )'),
-        ).toThrowError(
-            'Invalid AdGuard/uBlock scriptlet call, no scriptlet name specified',
-        );
+        ).not.toThrowError();
 
         expect(
             () => ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall('js(,arg0)'),

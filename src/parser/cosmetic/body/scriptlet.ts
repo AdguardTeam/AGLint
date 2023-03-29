@@ -108,8 +108,9 @@ export class ScriptletInjectionBodyParser {
             shiftLoc(loc, openingParenthesesIndex + 1),
         );
 
-        // Check if the scriptlet name is specified
-        if (params.children.length === 0 || params.children[0].value.trim() === EMPTY) {
+        // Allow empty scritptlet call: js() or //scriptlet(), but not allow parameters
+        // without scriptlet: js(, arg0, arg1) or //scriptlet(, arg0, arg1)
+        if (params.children.length > 0 && params.children[0].value.trim() === EMPTY) {
             throw new AdblockSyntaxError(
                 // eslint-disable-next-line max-len
                 'Invalid AdGuard/uBlock scriptlet call, no scriptlet name specified',
