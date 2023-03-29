@@ -1,3 +1,4 @@
+import cloneDeep from 'clone-deep';
 import { AnyRule, CosmeticRuleType, RuleCategory } from '../../parser/common';
 import { GenericRuleContext, LinterProblemReport, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
@@ -39,22 +40,15 @@ export const SingleSelector = <LinterRule>{
                         // Iterate over all selectors in the current rule
                         for (const selector of ast.body.selectorList.children) {
                             // Create a new rule with the same properties as the current rule.
+                            const clone = cloneDeep(ast);
+
+                            // Replace the selector list with a new selector list containing only
+                            // the currently iterated selector
+                            clone.body.selectorList.children = [selector];
+
                             // The only difference is that the new rule only contains one selector,
                             // which has the currently iterated selector in its body.
-                            report.fix.push({
-                                // Copy all properties from the current rule
-                                ...ast,
-
-                                // Simply replace the selectors array with a new array containing only the
-                                // currently iterated selector
-                                body: {
-                                    ...ast.body,
-                                    selectorList: {
-                                        ...ast.body.selectorList,
-                                        children: [selector],
-                                    },
-                                },
-                            });
+                            report.fix.push(clone);
                         }
                     }
 
