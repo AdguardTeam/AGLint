@@ -42,7 +42,6 @@ Table of Contents:
   - [Configuration hierarchy](#configuration-hierarchy)
     - [Hierarchy](#hierarchy)
 - [Linter rules](#linter-rules)
-  - [`adg-scriptlet-quotes`](#adg-scriptlet-quotes)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
   - [`duplicated-modifiers`](#duplicated-modifiers)
@@ -325,50 +324,6 @@ The linter rules documentation is written in the following schema:
 - **Example for fixing:** A simple example of the rule violation and how it will be fixed (if the problem is fixable).
 
 Currently, the following linter rules are available (we will add more rules in the future):
-
-### `adg-scriptlet-quotes`
-
-Check if the scriptlet parameters are wrapped in the expected quotes.
-
-- **Severity:** `warn` (1)
-- **Options:** `single` (default), `double`, `none`
-- **Options schema:** `enum` with the following values: `single`, `double`, `none`
-- **Fixable:** yes, quotes will be replaced with the expected quotes
-- **Example:**
-  ```adblock
-  example.com#%#//scriptlet("abort-on-property-read", "window.open")
-  ```
-  will be reported as warning:
-  ```
-    1:0  warn  Single quoted AdGuard scriptlet parameters are preferred
-  ```
-  since the parameters should be wrapped in single quotes according to AdGuard's coding policy.
-- **Example for fixing:**
-  ```adblock
-  example.com#%#//scriptlet("abort-on-property-read", "window.open")
-  ```
-  will be fixed to:
-  ```adblock
-  example.com#%#//scriptlet('abort-on-property-read', 'window.open')
-  ```
-- **Additional information:**
-  - If you want to change the default quotes, you can use the `adg-scriptlet-quotes` rule in your configuration file:
-    ```yaml
-    rules:
-      # We want to use double quotes instead of single quotes
-      adg-scriptlet-quotes:
-        - warn
-        - double
-    ```
-    or
-    ```json
-    {
-        "rules": {
-            "adg-scriptlet-quotes": ["warn", "double"]
-        }
-    }
-    ```
-    This will change the default quotes to double quotes.
 
 ### `if-closed`
 
@@ -681,13 +636,13 @@ You can find the detailed linter rule documentation [here](src/linter/rules/READ
 A tool for converting rules from one syntax to another. Sadly, this feature will only become available in a future version.
 
 A small summary of what to expect:
-- Compatibility tables for AdGuard, uBlock Origin and Adblock Plus
+- Compatibility tables for AdGuard, uBlock Origin and AdBlock / Adblock Plus
   - Extended CSS elements
   - Scriptlets
   - Redirects
   - etc. 
 - Rule converter (AST &#8594; AST)
-  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to Adblock Plus, since ABP simply doesn't support CSS injections.
+  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to AdBlock / Adblock Plus, since ABP simply doesn't support CSS injections.
 
 ## Development & Contribution
 

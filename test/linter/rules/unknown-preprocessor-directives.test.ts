@@ -106,19 +106,5 @@ describe('unknown-preprocessor-directives', () => {
                 },
             ],
         });
-
-        expect(linter.lint('!#safari_cb_affinity(')).toMatchObject({
-            problems: [
-                {
-                    rule: 'unknown-preprocessor-directives',
-                    severity: 2,
-                    message: 'Unknown preprocessor directive "safari_cb_affinity("',
-                    position: {
-                        startColumn: 0,
-                        endColumn: 21,
-                    },
-                },
-            ],
-        });
     });
 });

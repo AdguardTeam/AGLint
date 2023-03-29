@@ -1,28 +1,16 @@
-import { AnyCommentRule, CommentParser } from './comment';
-import { AnyCosmeticRule, CosmeticRuleParser } from './cosmetic';
-import { AnyNetworkRule, NetworkRuleParser } from './network';
 import { AdblockSyntax } from '../utils/adblockers';
 import { EMPTY } from '../utils/constants';
-import { Rule, RuleCategory } from './common';
-
-export const EMPTY_RULE_TYPE = 'EmptyRule';
-
-/**
- * Represents any kind of adblock rule.
- */
-export type AnyRule = EmptyRule | AnyCommentRule | AnyCosmeticRule | AnyNetworkRule;
-
-/**
- * Represents an "empty rule" (practically an empty line)
- */
-export interface EmptyRule extends Rule {
-    category: RuleCategory.Empty;
-
-    /**
-     * Type of the adblock rule (should be always present)
-     */
-    type: typeof EMPTY_RULE_TYPE;
-}
+import { locRange } from '../utils/location';
+import { CommentRuleParser } from './comment';
+import { CosmeticRuleParser } from './cosmetic';
+import { NetworkRuleParser } from './network';
+import {
+    AnyRule,
+    InvalidRule,
+    RuleCategory,
+    defaultLocation,
+} from './common';
+import { AdblockSyntaxError } from './errors/adblock-syntax-error';
 
 /**
  * `RuleParser` is responsible for parsing the rules.
@@ -55,7 +43,10 @@ export class RuleParser {
      * scriptlet is supported by AdGuard or not. This is also the task of the "Compatibility table". Here, we simply
      * mark the rule with the `AdGuard` syntax in this case.
      *
-     * @param raw - Raw adblock rule
+     * @param raw Raw adblock rule
+     * @param tolerant If `true`, then the parser will not throw if the rule is syntactically invalid, instead it will
+     * return an `InvalidRule` object with the error attached to it. Default is `false`.
+     * @param loc Base location of the rule
      * @returns Adblock rule AST
      * @throws If the input matches a pattern but syntactically invalid
      * @example
@@ -86,34 +77,61 @@ export class RuleParser {
      * const ast7 = RuleParser.parse("!#if (adguard)");
      * ```
      */
-    public static parse(raw: string): AnyRule {
-        const trimmed = raw.trim();
+    public static parse(raw: string, tolerant = false, loc = defaultLocation): AnyRule {
+        try {
+            // Empty lines / rules (handle it just for convenience)
+            if (raw.trim().length === 0) {
+                return {
+                    type: 'EmptyRule',
+                    loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
+                    category: RuleCategory.Empty,
+                    syntax: AdblockSyntax.Common,
+                };
+            }
 
-        // Empty lines / rules (handle it just for convenience)
-        if (trimmed.length === 0) {
-            return {
+            // Try to parse the rule with all sub-parsers. If a rule doesn't match
+            // the pattern of a parser, then it will return `null`. For example, a
+            // network rule will not match the pattern of a comment rule, since it
+            // doesn't start with comment marker. But if the rule matches the
+            // pattern of a parser, then it will return the AST of the rule, or
+            // throw an error if the rule is syntactically invalid.
+            return CommentRuleParser.parse(raw, loc)
+                || CosmeticRuleParser.parse(raw, loc)
+                || NetworkRuleParser.parse(raw, loc);
+        } catch (error: unknown) {
+            // If tolerant mode is disabled or the error is not known, then simply
+            // re-throw the error
+            if (!tolerant || !(error instanceof Error)) {
+                throw error;
+            }
+
+            // Otherwise, return an invalid rule (tolerant mode)
+            const result: InvalidRule = {
+                type: 'InvalidRule',
+                loc: locRange(loc, 0, raw.length),
+                raws: {
+                    text: raw,
+                },
+                category: RuleCategory.Invalid,
                 syntax: AdblockSyntax.Common,
-                category: RuleCategory.Empty,
-                type: EMPTY_RULE_TYPE,
+                raw,
+                error: {
+                    name: error.name,
+                    message: error.message,
+                },
             };
+
+            // If the error is an AdblockSyntaxError, then we can add the
+            // location of the error to the result
+            if (error instanceof AdblockSyntaxError) {
+                result.error.loc = error.loc;
+            }
+
+            return result;
         }
-
-        // Comment rules (agent / metadata / hint / pre-processor / comment)
-        const comment = CommentParser.parse(trimmed);
-        if (comment !== null) {
-            return comment;
-        }
-
-        // Cosmetic rules / non-basic rules
-        const cosmetic = CosmeticRuleParser.parse(trimmed);
-        if (cosmetic !== null) {
-            return cosmetic;
-        }
-
-        // Network / basic rules
-        const network = NetworkRuleParser.parse(trimmed);
-
-        return network;
     }
 
     /**
@@ -138,17 +156,21 @@ export class RuleParser {
             case RuleCategory.Empty:
                 return EMPTY;
 
+            // Invalid rules
+            case RuleCategory.Invalid:
+                return ast.raw;
+
             // Comment rules
             case RuleCategory.Comment:
-                return CommentParser.generate(<AnyCommentRule>ast);
+                return CommentRuleParser.generate(ast);
 
             // Cosmetic / non-basic rules
             case RuleCategory.Cosmetic:
-                return CosmeticRuleParser.generate(<AnyCosmeticRule>ast);
+                return CosmeticRuleParser.generate(ast);
 
             // Network / basic rules
             case RuleCategory.Network:
-                return NetworkRuleParser.generate(<AnyNetworkRule>ast);
+                return NetworkRuleParser.generate(ast);
 
             default:
                 throw new Error('Unknown rule category');

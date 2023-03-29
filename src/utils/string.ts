@@ -1,9 +1,22 @@
 /**
- * String helpers.
+ * @file Utility functions for string manipulation.
  */
 
 import {
-    EMPTY, ESCAPE_CHARACTER, SPACE, TAB,
+    CAPITAL_LETTER_A,
+    CAPITAL_LETTER_Z,
+    CR,
+    CRLF,
+    EMPTY,
+    ESCAPE_CHARACTER,
+    FF,
+    LF,
+    NUMBER_0,
+    NUMBER_9,
+    SMALL_LETTER_A,
+    SMALL_LETTER_Z,
+    SPACE,
+    TAB,
 } from './constants';
 
 export const SINGLE_QUOTE_MARKER = "'";
@@ -326,6 +339,56 @@ export class StringUtils {
     }
 
     /**
+     * Checks if the given character is a digit.
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a digit, `false` otherwise.
+     */
+    public static isDigit(char: string): boolean {
+        return char >= NUMBER_0 && char <= NUMBER_9;
+    }
+
+    /**
+     * Checks if the given character is a small letter.
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a small letter, `false` otherwise.
+     */
+    public static isSmallLetter(char: string): boolean {
+        return char >= SMALL_LETTER_A && char <= SMALL_LETTER_Z;
+    }
+
+    /**
+     * Checks if the given character is a capital letter.
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a capital letter, `false` otherwise.
+     */
+    public static isCapitalLetter(char: string): boolean {
+        return char >= CAPITAL_LETTER_A && char <= CAPITAL_LETTER_Z;
+    }
+
+    /**
+     * Checks if the given character is a letter (small or capital).
+     *
+     * @param char The character to check.
+     * @returns `true` if the given character is a letter, `false` otherwise.
+     */
+    public static isLetter(char: string): boolean {
+        return StringUtils.isSmallLetter(char) || StringUtils.isCapitalLetter(char);
+    }
+
+    /**
+     * Checks if the given character is a letter or a digit.
+     *
+     * @param char Character to check
+     * @returns `true` if the given character is a letter or a digit, `false` otherwise.
+     */
+    public static isAlphaNumeric(char: string): boolean {
+        return StringUtils.isLetter(char) || StringUtils.isDigit(char);
+    }
+
+    /**
      * Searches for the first non-whitespace character in the source pattern.
      *
      * @param pattern - Source pattern
@@ -354,6 +417,23 @@ export class StringUtils {
             }
         }
         return -1;
+    }
+
+    /**
+     * Finds the next whitespace character in the pattern.
+     *
+     * @param pattern Pattern to search in
+     * @param start Start index
+     * @returns Index of the next whitespace character or the length of the pattern if not found
+     */
+    public static findNextWhitespaceCharacter(pattern: string, start = 0): number {
+        for (let i = start; i < pattern.length; i += 1) {
+            if (StringUtils.isWhitespace(pattern[i])) {
+                return i;
+            }
+        }
+
+        return pattern.length;
     }
 
     /**
@@ -394,6 +474,67 @@ export class StringUtils {
     }
 
     /**
+     * Searches for the next non-whitespace character in the source pattern.
+     *
+     * @param pattern Pattern to search
+     * @param start Start index
+     * @returns Index of the next non-whitespace character or the length of the pattern
+     */
+    public static skipWS(pattern: string, start = 0): number {
+        let i = start;
+
+        while (i < pattern.length && StringUtils.isWhitespace(pattern[i])) {
+            i += 1;
+        }
+
+        return i;
+    }
+
+    /**
+     * Searches for the previous non-whitespace character in the source pattern.
+     *
+     * @param pattern Pattern to search
+     * @param start Start index
+     * @returns Index of the previous non-whitespace character or -1
+     */
+    public static skipWSBack(pattern: string, start = pattern.length - 1): number {
+        let i = start;
+
+        while (i >= 0 && StringUtils.isWhitespace(pattern[i])) {
+            i -= 1;
+        }
+
+        return i;
+    }
+
+    /**
+     * Finds the next EOL character in the pattern (CR, LF, FF) or the end of the pattern.
+     *
+     * @param pattern Pattern to search
+     * @param start Start index
+     * @returns Index of the next EOL character or the length of the pattern
+     */
+    public static findNextEOL(pattern: string, start = 0): number {
+        for (let i = start; i < pattern.length; i += 1) {
+            if (StringUtils.isEOL(pattern[i])) {
+                return i;
+            }
+        }
+
+        return pattern.length;
+    }
+
+    /**
+     * Checks if the given character is a new line character.
+     *
+     * @param char Character to check
+     * @returns `true` if the given character is a new line character, `false` otherwise.
+     */
+    public static isEOL(char: string): boolean {
+        return char === CR || char === LF || char === FF;
+    }
+
+    /**
      * Splits a string along newline characters.
      *
      * @param input - Input string
@@ -420,8 +561,8 @@ export class StringUtils {
         for (let i = 0; i < input.length; i += 1) {
             const char = input[i];
 
-            if (char === '\r') {
-                if (input[i + 1] === '\n') {
+            if (char === CR) {
+                if (input[i + 1] === LF) {
                     newLineType = 'crlf';
                     i += 1;
                 } else {
@@ -431,7 +572,7 @@ export class StringUtils {
                 result.push([currentLine, newLineType]);
                 currentLine = EMPTY;
                 newLineType = null;
-            } else if (char === '\n') {
+            } else if (char === LF) {
                 newLineType = 'lf';
                 result.push([currentLine, newLineType]);
                 currentLine = EMPTY;
@@ -466,11 +607,11 @@ export class StringUtils {
             // Add the appropriate new line character based on the newLineType
             if (newLineType !== null) {
                 if (newLineType === 'crlf') {
-                    result += '\r\n';
+                    result += CRLF;
                 } else if (newLineType === 'cr') {
-                    result += '\r';
+                    result += CR;
                 } else {
-                    result += '\n';
+                    result += LF;
                 }
             }
         }

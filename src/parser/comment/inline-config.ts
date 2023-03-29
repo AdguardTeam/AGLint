@@ -1,71 +1,30 @@
 /**
- * AGLint configuration comments. Inspired by ESLint inline configuration comments:
- *
+ * @file AGLint configuration comments. Inspired by ESLint inline configuration comments.
  * @see {@link https://eslint.org/docs/latest/user-guide/configuring/rules#using-configuration-comments}
  */
 
 import JSON5 from 'json5';
 import { AdblockSyntax } from '../../utils/adblockers';
-import { COMMA, EMPTY, SPACE } from '../../utils/constants';
-import { CommentRuleType } from './types';
-import { CommentMarker } from './marker';
-import { Comment } from './common';
-import { RuleCategory } from '../common';
-
-const AGLINT_COMMAND_PREFIX = 'aglint';
-const PARAMS_SEPARATOR = COMMA;
-const CONFIG_COMMENT_MARKER = '--';
-
-/**
- * Represents an inline linter configuration comment.
- *
- * @example
- * For example, if the comment is
- * ```adblock
- * ! aglint-disable some-rule another-rule
- * ```
- * then the command is `aglint-disable` and its params is `["some-rule", "another-rule"]`.
- */
-export interface ConfigComment extends Comment {
-    category: RuleCategory.Comment;
-    type: CommentRuleType.ConfigComment;
-
-    /**
-     * The marker for the comment. It can be `!` or `#`. It is always the first non-whitespace character in the comment.
-     */
-    marker: CommentMarker;
-
-    /**
-     * The command for the comment. It is always begins with the `aglint` prefix.
-     *
-     * @example
-     * ```adblock
-     * ! aglint-disable-next-line
-     * ```
-     */
-    command: string;
-
-    /**
-     * Params for the command. Can be a rule configuration object or a list of rule names.
-     *
-     * @example
-     * For the following comment:
-     * ```adblock
-     * ! aglint-disable some-rule another-rule
-     * ```
-     * the params would be `["some-rule", "another-rule"]`.
-     */
-    params?: object | string[];
-
-    /**
-     * Config comment text. The idea is generally the same as in ESLint.
-     *
-     * @example
-     * You can use the following syntax to specify a comment for a config comment:
-     * `! aglint-enable -- this is the comment`
-     */
-    comment?: string;
-}
+import {
+    AGLINT_COMMAND_PREFIX,
+    AGLINT_CONFIG_COMMENT_MARKER,
+    COMMA,
+    EMPTY,
+    SPACE,
+} from '../../utils/constants';
+import {
+    CommentMarker,
+    CommentRuleType,
+    ConfigCommentRule,
+    Location,
+    ParameterList,
+    RuleCategory,
+    Value,
+    defaultLocation,
+} from '../common';
+import { StringUtils } from '../../utils/string';
+import { locRange, shiftLoc } from '../../utils/location';
+import { ParameterListParser } from '../misc/parameter-list';
 
 /**
  * `ConfigCommentParser` is responsible for parsing inline AGLint configuration rules.
@@ -73,11 +32,11 @@ export interface ConfigComment extends Comment {
  *
  * @see {@link https://eslint.org/docs/latest/user-guide/configuring/rules#using-configuration-comments}
  */
-export class ConfigCommentParser {
+export class ConfigCommentRuleParser {
     /**
-     * Determines whether the rule is an inline configuration comment rule.
+     * Checks if the raw rule is an inline configuration comment rule.
      *
-     * @param raw - Raw rule
+     * @param raw Raw rule
      * @returns `true` if the rule is an inline configuration comment rule, otherwise `false`.
      */
     public static isConfigComment(raw: string): boolean {
@@ -105,97 +64,140 @@ export class ConfigCommentParser {
     /**
      * Parses a raw rule as an inline configuration comment.
      *
-     * @param raw - Raw rule
+     * @param raw Raw rule
+     * @param loc Base location
      * @returns
      * Inline configuration comment AST or null (if the raw rule cannot be parsed as configuration comment)
      */
-    public static parse(raw: string): ConfigComment | null {
-        const trimmed = raw.trim();
-
-        if (!ConfigCommentParser.isConfigComment(trimmed)) {
+    public static parse(raw: string, loc: Location = defaultLocation): ConfigCommentRule | null {
+        if (!ConfigCommentRuleParser.isConfigComment(raw)) {
             return null;
         }
 
-        let text = raw.slice(1).trim();
-        let comment: string | undefined;
+        let offset = 0;
 
-        // Remove comment part, for example: "! aglint rule1: "off" -- this is a comment"
-        // Correct rules doesn't includes "--" inside
-        const commentPos = text.indexOf(CONFIG_COMMENT_MARKER);
-        if (commentPos !== -1) {
-            comment = text.substring(commentPos + 2).trim();
-            text = text.substring(0, commentPos).trim();
-        }
+        // Skip leading whitespace (if any)
+        offset = StringUtils.skipWS(raw, offset);
 
-        // Prepare result
-        const result: ConfigComment = {
-            category: RuleCategory.Comment,
-            type: CommentRuleType.ConfigComment,
-            syntax: AdblockSyntax.Common,
-            marker: raw[0] as CommentMarker,
-            command: text,
+        // Get comment marker
+        const marker: Value<CommentMarker> = {
+            type: 'Value',
+            loc: locRange(loc, offset, offset + 1),
+            value: raw[offset] === CommentMarker.Hashmark ? CommentMarker.Hashmark : CommentMarker.Regular,
         };
 
-        if (comment) {
-            result.comment = comment;
+        // Skip marker
+        offset += 1;
+
+        // Skip whitespace (if any)
+        offset = StringUtils.skipWS(raw, offset);
+
+        // Save the command start position
+        const commandStart = offset;
+
+        // Get comment text, for example: "aglint-disable-next-line"
+        offset = StringUtils.findNextWhitespaceCharacter(raw, offset);
+
+        const command: Value = {
+            type: 'Value',
+            loc: locRange(loc, commandStart, offset),
+            value: raw.substring(commandStart, offset),
+        };
+
+        // Skip whitespace after command
+        offset = StringUtils.skipWS(raw, offset);
+
+        // Get comment (if any)
+        const commentStart = raw.indexOf(AGLINT_CONFIG_COMMENT_MARKER, offset);
+        const commentEnd = commentStart !== -1 ? StringUtils.skipWSBack(raw) + 1 : -1;
+
+        let comment: Value | undefined;
+
+        // Check if there is a comment
+        if (commentStart !== -1) {
+            comment = {
+                type: 'Value',
+                loc: locRange(loc, commentStart, commentEnd),
+                value: raw.substring(commentStart, commentEnd),
+            };
         }
 
-        let rawParams: string | undefined;
+        // Get parameter
+        const paramsStart = offset;
+        const paramsEnd = commentStart !== -1
+            ? StringUtils.skipWSBack(raw, commentStart - 1) + 1
+            : StringUtils.skipWSBack(raw) + 1;
 
-        // Get the AGLint command and its parameters. For example, if the following config comment is given:
-        // ! aglint-disable something
-        // then the command is "aglint-disable" and the parameter is "something".
-        const firstSpaceIndex = text.indexOf(SPACE);
-        if (firstSpaceIndex !== -1) {
-            result.command = text.substring(0, firstSpaceIndex).trim().toLocaleLowerCase();
-            rawParams = text.substring(firstSpaceIndex + 1).trim();
-        }
+        let params: Value<object> | ParameterList | undefined;
 
-        // If the command is simply "aglint", then it is a special case whose parameter is a rule configuration object
-        if (result.command === AGLINT_COMMAND_PREFIX) {
-            if (!rawParams || rawParams.length === 0) {
-                throw new SyntaxError('Missing configuration object');
+        // ! aglint config
+        if (command.value === AGLINT_COMMAND_PREFIX) {
+            params = {
+                type: 'Value',
+                loc: locRange(loc, paramsStart, paramsEnd),
+                // It is necessary to use JSON5.parse instead of JSON.parse
+                // because JSON5 allows unquoted keys.
+                // But don't forget to add { } to the beginning and end of the string,
+                // otherwise JSON5 will not be able to parse it.
+                // TODO: Better solution? ESLint uses "levn" package for parsing these comments.
+                value: JSON5.parse(`{${raw.substring(paramsStart, paramsEnd)}}`),
+            };
+
+            // Throw error for empty config
+            if (Object.keys(params.value).length === 0) {
+                throw new Error('Empty AGLint config');
             }
-
-            // Delegate to JSON parser (JSON5 also supports unquoted properties)
-            // TODO: Is some structure validation required at this point? This is currently just a general object
-            result.params = JSON5.parse(`{ ${rawParams} }`);
-        } else if (rawParams) {
-            result.params = rawParams.split(PARAMS_SEPARATOR).map((param) => param.trim());
+        } else if (paramsStart < paramsEnd) {
+            params = ParameterListParser.parse(
+                raw.substring(paramsStart, paramsEnd),
+                COMMA,
+                shiftLoc(loc, paramsStart),
+            );
         }
 
-        return result;
+        return {
+            type: CommentRuleType.ConfigCommentRule,
+            loc: locRange(loc, 0, raw.length),
+            raws: {
+                text: raw,
+            },
+            category: RuleCategory.Comment,
+            syntax: AdblockSyntax.Common,
+            marker,
+            command,
+            params,
+            comment,
+        };
     }
 
     /**
      * Converts an inline configuration comment AST to a string.
      *
-     * @param ast - Inline configuration comment AST
+     * @param ast Inline configuration comment AST
      * @returns Raw string
      */
-    public static generate(ast: ConfigComment): string {
+    public static generate(ast: ConfigCommentRule): string {
         let result = EMPTY;
 
-        result += ast.marker;
+        result += ast.marker.value;
         result += SPACE;
-        result += ast.command;
+        result += ast.command.value;
 
         if (ast.params) {
             result += SPACE;
-            if (Array.isArray(ast.params)) {
-                result += ast.params.join(PARAMS_SEPARATOR + SPACE);
+
+            if (ast.params.type === 'ParameterList') {
+                result += ParameterListParser.generate(ast.params, COMMA);
             } else {
                 // Trim JSON boundaries
-                result += JSON.stringify(ast.params).slice(1, -1).trim();
+                result += JSON.stringify(ast.params.value).slice(1, -1).trim();
             }
         }
 
         // Add comment within the config comment
         if (ast.comment) {
             result += SPACE;
-            result += CONFIG_COMMENT_MARKER;
-            result += SPACE;
-            result += ast.comment;
+            result += ast.comment.value;
         }
 
         return result;
