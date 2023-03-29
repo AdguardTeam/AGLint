@@ -212,7 +212,11 @@ export class ScriptletInjectionBodyParser {
     public static parse(raw: string, loc = defaultLocation): ScriptletInjectionRuleBody {
         const trimmed = raw.trim();
 
-        if (trimmed.startsWith(ADG_SCRIPTLET_MASK) || trimmed.startsWith(UBO_SCRIPTLET_MASK)) {
+        if (
+            trimmed.startsWith(ADG_SCRIPTLET_MASK)
+            // We shouldn't parse ABP's json-prune as a uBlock scriptlet call
+            || (trimmed.startsWith(UBO_SCRIPTLET_MASK) && !trimmed.startsWith('json'))
+        ) {
             return ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall(trimmed, loc);
         }
 
