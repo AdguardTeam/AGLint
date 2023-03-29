@@ -135,11 +135,11 @@ export class CommentRuleParser {
         }
 
         // First, try to parse as non-regular comment
-        const nonRegular = AgentCommentRuleParser.parse(raw)
-            || HintCommentRuleParser.parse(raw)
-            || PreProcessorCommentRuleParser.parse(raw)
-            || MetadataCommentRuleParser.parse(raw)
-            || ConfigCommentRuleParser.parse(raw);
+        const nonRegular = AgentCommentRuleParser.parse(raw, loc)
+            || HintCommentRuleParser.parse(raw, loc)
+            || PreProcessorCommentRuleParser.parse(raw, loc)
+            || MetadataCommentRuleParser.parse(raw, loc)
+            || ConfigCommentRuleParser.parse(raw, loc);
 
         if (nonRegular) {
             return nonRegular;
