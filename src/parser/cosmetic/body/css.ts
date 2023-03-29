@@ -23,7 +23,7 @@ import { CssTree } from '../../../utils/csstree';
 import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
 import { CssInjectionRuleBody, defaultLocation } from '../../common';
 import { AdblockSyntaxError } from '../../errors/adblock-syntax-error';
-import { locRange } from '../../../utils/location';
+import { locRange, shiftLoc } from '../../../utils/location';
 import {
     AT_SIGN,
     CLOSE_CURLY_BRACKET,
@@ -165,7 +165,10 @@ export class CssInjectionBodyParser {
                 throw new AdblockSyntaxError(
                     // eslint-disable-next-line max-len
                     `Invalid selector, expected '${CssTreeNodeType.Selector}' but got '${selector.type || NONE}' instead`,
-                    locRange(loc, selector.loc?.start.offset ?? 0, raw.length),
+                    {
+                        start: selector.loc?.start ?? loc,
+                        end: selector.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
@@ -177,7 +180,10 @@ export class CssInjectionBodyParser {
                     if (node.type === CssTreeNodeType.PseudoClassSelector && SPECIAL_PSEUDO_CLASSES.includes(node.name)) {
                         throw new AdblockSyntaxError(
                             `Invalid selector, pseudo-class '${node.name}' can only be used in the last selector`,
-                            locRange(loc, 0, raw.length),
+                            {
+                                start: node.loc?.start ?? loc,
+                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                            },
                         );
                     }
                 });
@@ -210,7 +216,10 @@ export class CssInjectionBodyParser {
                                     throw new AdblockSyntaxError(
                                         // eslint-disable-next-line max-len
                                         `Invalid selector, pseudo-class '${node.name}' can only be used at the top level of the selector`,
-                                        locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                        {
+                                            start: node.loc?.start ?? loc,
+                                            end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                        },
                                     );
                                 }
 
@@ -219,7 +228,10 @@ export class CssInjectionBodyParser {
                                     if (mediaQueryList) {
                                         throw new AdblockSyntaxError(
                                             `Duplicated pseudo-class '${node.name}'`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -228,7 +240,10 @@ export class CssInjectionBodyParser {
                                         throw new AdblockSyntaxError(
                                             // eslint-disable-next-line max-len
                                             `Invalid selector, pseudo-class '${node.name}' must be parametrized with a media query list`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -242,7 +257,10 @@ export class CssInjectionBodyParser {
                                     if (declarationList) {
                                         throw new AdblockSyntaxError(
                                             `Duplicated pseudo-class '${node.name}'`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -250,7 +268,10 @@ export class CssInjectionBodyParser {
                                     if (remove) {
                                         throw new AdblockSyntaxError(
                                             `'${STYLE}' and '${REMOVE}' cannot be used together`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -259,7 +280,10 @@ export class CssInjectionBodyParser {
                                         throw new AdblockSyntaxError(
                                             // eslint-disable-next-line max-len
                                             `Invalid selector, pseudo-class '${node.name}' must be parametrized with a declaration list`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -273,7 +297,10 @@ export class CssInjectionBodyParser {
                                     if (remove) {
                                         throw new AdblockSyntaxError(
                                             `Duplicated pseudo-class '${node.name}'`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -281,7 +308,10 @@ export class CssInjectionBodyParser {
                                     if (declarationList) {
                                         throw new AdblockSyntaxError(
                                             `'${STYLE}' and '${REMOVE}' cannot be used together`,
-                                            locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
                                         );
                                     }
 
@@ -301,7 +331,10 @@ export class CssInjectionBodyParser {
                                 throw new AdblockSyntaxError(
                                     // eslint-disable-next-line max-len
                                     'Invalid selector, regular selector elements can\'t be used after special pseudo-classes',
-                                    locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                                    {
+                                        start: node.loc?.start ?? loc,
+                                        end: shiftLoc(loc, raw.length),
+                                    },
                                 );
                             }
 
@@ -356,7 +389,10 @@ export class CssInjectionBodyParser {
         if (stylesheet.type !== CssTreeNodeType.StyleSheet) {
             throw new AdblockSyntaxError(
                 `Invalid stylesheet, expected '${CssTreeNodeType.StyleSheet}' but got '${stylesheet.type}' instead`,
-                locRange(loc, stylesheet.loc?.start.offset ?? 0, raw.length),
+                {
+                    start: stylesheet.loc?.start ?? loc,
+                    end: stylesheet.loc?.end ?? shiftLoc(loc, raw.length),
+                },
             );
         }
 
@@ -364,7 +400,10 @@ export class CssInjectionBodyParser {
         if (stylesheet.children.size !== 1) {
             throw new AdblockSyntaxError(
                 `Invalid stylesheet, expected a single rule but got ${stylesheet.children.size} instead`,
-                locRange(loc, stylesheet.loc?.start.offset ?? 0, raw.length),
+                {
+                    start: stylesheet.loc?.start ?? loc,
+                    end: stylesheet.loc?.end ?? shiftLoc(loc, raw.length),
+                },
             );
         }
 
@@ -390,7 +429,10 @@ export class CssInjectionBodyParser {
         if (!injection) {
             throw new AdblockSyntaxError(
                 'Invalid style injection, expected a CSS rule or at-rule, but got nothing',
-                locRange(loc, stylesheet.loc?.start.offset ?? 0, raw.length),
+                {
+                    start: stylesheet.loc?.start ?? loc,
+                    end: stylesheet.loc?.end ?? shiftLoc(loc, raw.length),
+                },
             );
         }
 
@@ -407,7 +449,10 @@ export class CssInjectionBodyParser {
             throw new AdblockSyntaxError(
                 // eslint-disable-next-line max-len
                 `Invalid injection, expected '${CssTreeNodeType.Rule}' or '${CssTreeNodeType.Atrule}' but got '${injection.type ?? NONE}' instead`,
-                locRange(loc, injection.loc?.start.offset ?? 0, injection.loc?.end.offset ?? raw.length),
+                {
+                    start: injection.loc?.start ?? loc,
+                    end: injection.loc?.end ?? shiftLoc(loc, raw.length),
+                },
             );
         }
 
@@ -420,7 +465,10 @@ export class CssInjectionBodyParser {
             if (atrule.name !== MEDIA) {
                 throw new AdblockSyntaxError(
                     `Invalid at-rule name, expected '${MEDIA_MARKER}' but got '${AT_SIGN}${atrule.name}' instead`,
-                    locRange(loc, atrule.loc?.start.offset ?? 0, atrule.loc?.end.offset ?? raw.length),
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
@@ -429,7 +477,10 @@ export class CssInjectionBodyParser {
                 throw new AdblockSyntaxError(
                     // eslint-disable-next-line max-len
                     `Invalid at-rule prelude, expected '${CssTreeNodeType.AtrulePrelude}' but got '${atrule.prelude?.type ?? NONE}' instead`,
-                    locRange(loc, atrule.loc?.start.offset ?? 0, atrule.loc?.end.offset ?? raw.length),
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
@@ -439,7 +490,10 @@ export class CssInjectionBodyParser {
                 throw new AdblockSyntaxError(
                     // eslint-disable-next-line max-len
                     `Invalid at-rule prelude, expected a media query list but got '${atrule.prelude.children.first?.type ?? NONE}' instead`,
-                    locRange(loc, atrule.loc?.start.offset ?? 0, atrule.loc?.end.offset ?? raw.length),
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
@@ -448,7 +502,10 @@ export class CssInjectionBodyParser {
                 throw new AdblockSyntaxError(
                     // eslint-disable-next-line max-len
                     `Invalid at-rule block, expected '${CssTreeNodeType.Block}' but got '${atrule.block?.type ?? NONE}' instead`,
-                    locRange(loc, atrule.loc?.start.offset ?? 0, atrule.loc?.end.offset ?? raw.length),
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
@@ -457,7 +514,10 @@ export class CssInjectionBodyParser {
                 throw new AdblockSyntaxError(
                     // eslint-disable-next-line max-len
                     `Invalid at-rule block, expected a rule but got '${atrule.block.children.first?.type ?? NONE}' instead`,
-                    locRange(loc, atrule.loc?.start.offset ?? 0, atrule.loc?.end.offset ?? raw.length),
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
@@ -472,7 +532,10 @@ export class CssInjectionBodyParser {
         if (!rule.prelude || rule.prelude.type !== CssTreeNodeType.SelectorList) {
             throw new AdblockSyntaxError(
                 `Invalid rule prelude, expected a selector list but got '${rule.prelude?.type ?? NONE}' instead`,
-                locRange(loc, rule.loc?.start.offset ?? 0, raw.length),
+                {
+                    start: rule.loc?.start ?? loc,
+                    end: rule.loc?.end ?? shiftLoc(loc, raw.length),
+                },
             );
         }
 
@@ -486,7 +549,10 @@ export class CssInjectionBodyParser {
                 if (node.name === REMOVE) {
                     throw new AdblockSyntaxError(
                         `Invalid selector list, '${REMOVE}' pseudo-class should be used in the declaration list`,
-                        locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                        {
+                            start: node.loc?.start ?? loc,
+                            end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                        },
                     );
                 }
             }
@@ -505,7 +571,10 @@ export class CssInjectionBodyParser {
             if (node.type !== CssTreeNodeType.Declaration) {
                 throw new AdblockSyntaxError(
                     `Invalid rule block, expected a declaration but got '${node.type}' instead`,
-                    locRange(loc, node.loc?.start.offset ?? 0, raw.length),
+                    {
+                        start: node.loc?.start ?? loc,
+                        end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
         });
@@ -534,7 +603,10 @@ export class CssInjectionBodyParser {
             if (declarationKeys.length > 1) {
                 throw new AdblockSyntaxError(
                     `Invalid declaration list, '${REMOVE}' declaration should be used alone`,
-                    locRange(loc, rule.block.loc?.start.offset ?? 0, rule.block.loc?.end.offset ?? raw.length),
+                    {
+                        start: rule.block.loc?.start ?? loc,
+                        end: rule.block.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
                 );
             }
 
