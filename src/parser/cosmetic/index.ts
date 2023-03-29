@@ -96,6 +96,7 @@ export class CosmeticRuleParser {
 
         // Parse pattern
         const rawPattern = raw.substring(patternStart, patternEnd);
+        let domainListStart = patternStart;
         let rawDomainList = rawPattern;
 
         let modifiers: ModifierList | undefined;
@@ -127,13 +128,14 @@ export class CosmeticRuleParser {
 
             // Domain list is everything after the modifier list
             rawDomainList = rawPattern.substring(modifierListEnd + 1);
+            domainListStart = modifierListEnd + 1;
 
             // Change syntax, since only AdGuard supports this type of modifier list
             syntax = AdblockSyntax.Adg;
         }
 
         // Parse domain list
-        const domains = DomainListParser.parse(rawDomainList);
+        const domains = DomainListParser.parse(rawDomainList, ',', shiftLoc(loc, domainListStart));
 
         // Parse body
         const rawBody = raw.substring(bodyStart, bodyEnd);

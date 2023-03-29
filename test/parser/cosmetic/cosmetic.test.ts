@@ -1777,7 +1777,10 @@ describe('CosmeticRuleParser', () => {
                 'app=com.something',
                 shiftLoc(defaultLocation, 2), // shift [$
             ),
-            domains: DomainListParser.parse('', ',', defaultLocation),
+            domains: DomainListParser.parse('', ',', shiftLoc(
+                defaultLocation,
+                '[$app=com.something]'.length,
+            )),
             separator: {
                 type: 'Value',
                 loc: locRange(
@@ -1803,7 +1806,10 @@ describe('CosmeticRuleParser', () => {
                 'app=com.something,b=c',
                 shiftLoc(defaultLocation, 2), // shift [$
             ),
-            domains: DomainListParser.parse('example.com,~example.net', ',', defaultLocation),
+            domains: DomainListParser.parse('example.com,~example.net', ',', shiftLoc(
+                defaultLocation,
+                '[$app=com.something,b=c]'.length,
+            )),
             separator: {
                 type: 'Value',
                 loc: locRange(
