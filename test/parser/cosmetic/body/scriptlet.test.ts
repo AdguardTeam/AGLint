@@ -20,7 +20,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 15,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -73,7 +73,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 24,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -124,7 +124,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 20,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -192,7 +192,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 21,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -259,7 +259,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 24,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -328,7 +328,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 33,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -429,7 +429,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 45,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -548,7 +548,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 45,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -705,7 +705,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 11,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -756,7 +756,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 16,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -823,7 +823,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 21,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -907,7 +907,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 27,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -991,7 +991,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 22,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1075,7 +1075,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 23,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1142,7 +1142,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 23,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1212,7 +1212,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 50,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1377,7 +1377,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 22,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1449,7 +1449,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 83,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1668,7 +1668,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 252,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -1841,7 +1841,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 1330,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -2261,7 +2261,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 42,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {
@@ -2381,7 +2381,7 @@ describe('ScriptletInjectionBodyParser', () => {
                     column: 83,
                 },
             },
-            scriptlets: [
+            children: [
                 {
                     type: 'ParameterList',
                     loc: {

@@ -4,8 +4,12 @@ import {
 } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
 import {
-    AgentList,
-    AgentCommentRule, Location, defaultLocation, CommentRuleType, RuleCategory,
+    AgentCommentRule,
+    Location,
+    defaultLocation,
+    CommentRuleType,
+    RuleCategory,
+    Agent,
 } from '../common';
 import { AgentParser } from './agent';
 import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
@@ -76,11 +80,7 @@ export class AgentCommentRuleParser {
         const closingBracketIndex = raw.lastIndexOf(CLOSE_SQUARE_BRACKET);
 
         // Initialize the agent list
-        const agents: AgentList = {
-            type: 'AgentList',
-            loc: locRange(loc, offset, closingBracketIndex),
-            children: [],
-        };
+        const agents: Agent[] = [];
 
         while (offset < closingBracketIndex) {
             // Skip whitespace characters before the agent
@@ -101,13 +101,13 @@ export class AgentCommentRuleParser {
             const agent = AgentParser.parse(raw.substring(offset, agentEndIndex), shiftLoc(loc, offset));
 
             // Collect the agent
-            agents.children.push(agent);
+            agents.push(agent);
 
             // Set the offset to the next agent or the end of the rule
             offset = separatorIndex + 1;
         }
 
-        if (agents.children.length === 0) {
+        if (agents.length === 0) {
             throw new AdblockSyntaxError(
                 'Empty agent list',
                 locRange(loc, 0, raw.length),
@@ -122,7 +122,7 @@ export class AgentCommentRuleParser {
             },
             syntax: AdblockSyntax.Common,
             category: RuleCategory.Comment,
-            agents,
+            children: agents,
         };
     }
 
@@ -135,7 +135,7 @@ export class AgentCommentRuleParser {
     public static generate(ast: AgentCommentRule): string {
         let result = OPEN_SQUARE_BRACKET;
 
-        result += ast.agents.children
+        result += ast.children
             .map(AgentParser.generate)
             .join(SEMICOLON + SPACE);
 

@@ -2472,7 +2472,7 @@ describe('Linter', () => {
         expect(config).toMatchObject(linter.getConfig());
         expect(content).toBe(filterList);
         expect(rawRules).toMatchObject(filterListRawRules);
-        expect(astRules).toMatchObject(FilterListParser.parse(filterList).rules);
+        expect(astRules).toMatchObject(FilterListParser.parse(filterList).children);
         expect(lines).toMatchObject(Array.from({ length: filterListRawRules.length }, (_, i) => i + 1));
         expect(receivedConfig).toEqual({ a: 1 });
     });

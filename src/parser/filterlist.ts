@@ -125,7 +125,7 @@ export class FilterListParser {
                     column: raw.length + 1,
                 },
             },
-            rules,
+            children: rules,
         };
     }
 
@@ -140,7 +140,7 @@ export class FilterListParser {
     public static generate(ast: FilterList, preferRaw = false): string {
         let result = EMPTY;
 
-        for (const rule of ast.rules) {
+        for (const rule of ast.children) {
             if (preferRaw && rule.raws?.text) {
                 result += rule.raws.text;
             } else {

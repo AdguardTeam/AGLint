@@ -594,7 +594,7 @@ export class Linter {
         const filterList = FilterListParser.parse(content);
 
         // Iterate over all filter list adblock rules
-        filterList.rules.forEach((ast, index) => {
+        filterList.children.forEach((ast, index) => {
             // Update actual line number for the context object
             actualLine = index + 1;
 
@@ -757,12 +757,12 @@ export class Linter {
         if (fix) {
             const fixedFilterList: FilterList = {
                 type: 'FilterList',
-                rules: [],
+                children: [],
             };
 
             // Iterate over all rules in the original filter list
-            for (let i = 0; i < filterList.rules.length; i += 1) {
-                const rule = filterList.rules[i];
+            for (let i = 0; i < filterList.children.length; i += 1) {
+                const rule = filterList.children[i];
 
                 // Find the fix for the current rule
                 const fixed: AnyRule[] = [];
@@ -792,9 +792,9 @@ export class Linter {
                 // matches is 1 (only 1 fix is allowed per rule), otherwise push
                 // the original rule
                 if (matches === 1) {
-                    fixedFilterList.rules.push(...fixed);
+                    fixedFilterList.children.push(...fixed);
                 } else {
-                    fixedFilterList.rules.push(rule);
+                    fixedFilterList.children.push(rule);
                 }
             }
 

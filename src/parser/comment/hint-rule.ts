@@ -125,7 +125,7 @@ export class HintCommentRuleParser {
             },
             category: RuleCategory.Comment,
             syntax: AdblockSyntax.Adg,
-            hints,
+            children: hints,
         };
     }
 
@@ -138,7 +138,7 @@ export class HintCommentRuleParser {
     public static generate(ast: HintCommentRule): string {
         let result = HINT_MARKER + SPACE;
 
-        result += ast.hints.map(HintParser.generate).join(SPACE);
+        result += ast.children.map(HintParser.generate).join(SPACE);
 
         return result;
     }

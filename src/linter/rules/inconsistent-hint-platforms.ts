@@ -25,7 +25,7 @@ export const InconsistentHintPlatforms: LinterRule = {
 
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Only makes sense to check this, if there are at least two hints within the comment
-                if (ast.hints.length < 2) {
+                if (ast.children.length < 2) {
                     return;
                 }
 
@@ -35,7 +35,7 @@ export const InconsistentHintPlatforms: LinterRule = {
                 let excluded: string[] = [];
 
                 // Iterate over all hints within the comment rule
-                for (const hint of ast.hints) {
+                for (const hint of ast.children) {
                     if (hint.name.value === PLATFORM) {
                         // Platform targeted by a PLATFORM() hint
                         targeted = targeted.concat(hint.params?.children.map((param) => param.value) ?? []);

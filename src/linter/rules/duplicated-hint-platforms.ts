@@ -22,7 +22,7 @@ export const DuplicatedHintPlatforms: LinterRule = {
 
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Iterate over all hints within the comment rule
-                for (const hint of ast.hints) {
+                for (const hint of ast.children) {
                     const name = hint.name.value;
                     const params = hint.params?.children.map((param) => param.value) ?? [];
 

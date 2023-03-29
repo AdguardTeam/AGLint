@@ -72,23 +72,23 @@ describe('CommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 17,
+                            line: 1,
+                            column: 18,
+                        },
                     },
-                    end: {
-                        offset: 17,
-                        line: 1,
-                        column: 18,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -96,46 +96,31 @@ describe('CommentRuleParser', () => {
                                 column: 2,
                             },
                             end: {
+                                offset: 13,
+                                line: 1,
+                                column: 14,
+                            },
+                        },
+                        value: 'Adblock Plus',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                            end: {
                                 offset: 17,
                                 line: 1,
                                 column: 18,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 13,
-                                    line: 1,
-                                    column: 14,
-                                },
-                            },
-                            value: 'Adblock Plus',
-                        },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 14,
-                                    line: 1,
-                                    column: 15,
-                                },
-                                end: {
-                                    offset: 17,
-                                    line: 1,
-                                    column: 18,
-                                },
-                            },
-                            value: '2.0',
-                        },
+                        value: '2.0',
                     },
-                ],
-            },
+                },
+            ],
         });
 
         expect(CommentRuleParser.parse('[AdGuard]')).toMatchObject({
@@ -154,23 +139,23 @@ describe('CommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 8,
+                            line: 1,
+                            column: 9,
+                        },
                     },
-                    end: {
-                        offset: 8,
-                        line: 1,
-                        column: 9,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -183,26 +168,11 @@ describe('CommentRuleParser', () => {
                                 column: 9,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 8,
-                                    line: 1,
-                                    column: 9,
-                                },
-                            },
-                            value: 'AdGuard',
-                        },
-                        version: null,
+                        value: 'AdGuard',
                     },
-                ],
-            },
+                    version: null,
+                },
+            ],
         });
 
         // Hints
@@ -222,7 +192,7 @@ describe('CommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -273,7 +243,7 @@ describe('CommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -326,7 +296,7 @@ describe('CommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {

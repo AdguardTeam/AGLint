@@ -293,7 +293,7 @@ export interface FilterList extends Node {
     /**
      * List of rules
      */
-    rules: AnyRule[];
+    children: AnyRule[];
 }
 
 /**
@@ -548,18 +548,6 @@ export interface Agent extends Node {
 }
 
 /**
- * Represents a list of agents.
- */
-export interface AgentList extends Node {
-    type: 'AgentList';
-
-    /**
-     * Agent list.
-     */
-    children: Agent[];
-}
-
-/**
  * Represents an agent comment rule.
  *
  * @example
@@ -578,7 +566,7 @@ export interface AgentCommentRule extends RuleBase {
     /**
      * Agent list.
      */
-    agents: AgentList;
+    children: Agent[];
 }
 
 /**
@@ -635,7 +623,7 @@ export interface HintCommentRule extends RuleBase {
     /**
      * List of hints.
      */
-    hints: Hint[];
+    children: Hint[];
 }
 
 /**
@@ -784,7 +772,7 @@ export interface ScriptletInjectionRuleBody extends Node {
     /**
      * List of scriptlets (list of parameter lists).
      */
-    scriptlets: ParameterList[];
+    children: ParameterList[];
 }
 
 /**

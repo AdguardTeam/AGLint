@@ -48,23 +48,23 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 8,
+                            line: 1,
+                            column: 9,
+                        },
                     },
-                    end: {
-                        offset: 8,
-                        line: 1,
-                        column: 9,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -77,26 +77,11 @@ describe('AgentCommentRuleParser', () => {
                                 column: 9,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 8,
-                                    line: 1,
-                                    column: 9,
-                                },
-                            },
-                            value: 'AdBlock',
-                        },
-                        version: null,
+                        value: 'AdBlock',
                     },
-                ],
-            },
+                    version: null,
+                },
+            ],
         });
 
         expect(AgentCommentRuleParser.parse('[AdGuard]')).toMatchObject({
@@ -115,23 +100,23 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 8,
+                            line: 1,
+                            column: 9,
+                        },
                     },
-                    end: {
-                        offset: 8,
-                        line: 1,
-                        column: 9,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -144,26 +129,11 @@ describe('AgentCommentRuleParser', () => {
                                 column: 9,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 8,
-                                    line: 1,
-                                    column: 9,
-                                },
-                            },
-                            value: 'AdGuard',
-                        },
-                        version: null,
+                        value: 'AdGuard',
                     },
-                ],
-            },
+                    version: null,
+                },
+            ],
         });
 
         expect(AgentCommentRuleParser.parse('[uBlock]')).toMatchObject({
@@ -182,23 +152,23 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 7,
+                            line: 1,
+                            column: 8,
+                        },
                     },
-                    end: {
-                        offset: 7,
-                        line: 1,
-                        column: 8,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -211,26 +181,11 @@ describe('AgentCommentRuleParser', () => {
                                 column: 8,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 7,
-                                    line: 1,
-                                    column: 8,
-                                },
-                            },
-                            value: 'uBlock',
-                        },
-                        version: null,
+                        value: 'uBlock',
                     },
-                ],
-            },
+                    version: null,
+                },
+            ],
         });
 
         expect(AgentCommentRuleParser.parse('[uBlock Origin]')).toMatchObject(
@@ -250,23 +205,23 @@ describe('AgentCommentRuleParser', () => {
                 },
                 syntax: 'Common',
                 category: 'Comment',
-                agents: {
-                    type: 'AgentList',
-                    loc: {
-                        start: {
-                            offset: 1,
-                            line: 1,
-                            column: 2,
+                children: [
+                    {
+                        type: 'Agent',
+                        loc: {
+                            start: {
+                                offset: 1,
+                                line: 1,
+                                column: 2,
+                            },
+                            end: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
                         },
-                        end: {
-                            offset: 14,
-                            line: 1,
-                            column: 15,
-                        },
-                    },
-                    children: [
-                        {
-                            type: 'Agent',
+                        adblock: {
+                            type: 'Value',
                             loc: {
                                 start: {
                                     offset: 1,
@@ -279,26 +234,11 @@ describe('AgentCommentRuleParser', () => {
                                     column: 15,
                                 },
                             },
-                            adblock: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 1,
-                                        line: 1,
-                                        column: 2,
-                                    },
-                                    end: {
-                                        offset: 14,
-                                        line: 1,
-                                        column: 15,
-                                    },
-                                },
-                                value: 'uBlock Origin',
-                            },
-                            version: null,
+                            value: 'uBlock Origin',
                         },
-                    ],
-                },
+                        version: null,
+                    },
+                ],
             },
         );
 
@@ -319,23 +259,23 @@ describe('AgentCommentRuleParser', () => {
                 },
                 syntax: 'Common',
                 category: 'Comment',
-                agents: {
-                    type: 'AgentList',
-                    loc: {
-                        start: {
-                            offset: 1,
-                            line: 1,
-                            column: 2,
+                children: [
+                    {
+                        type: 'Agent',
+                        loc: {
+                            start: {
+                                offset: 1,
+                                line: 1,
+                                column: 2,
+                            },
+                            end: {
+                                offset: 17,
+                                line: 1,
+                                column: 18,
+                            },
                         },
-                        end: {
-                            offset: 17,
-                            line: 1,
-                            column: 18,
-                        },
-                    },
-                    children: [
-                        {
-                            type: 'Agent',
+                        adblock: {
+                            type: 'Value',
                             loc: {
                                 start: {
                                     offset: 1,
@@ -343,46 +283,31 @@ describe('AgentCommentRuleParser', () => {
                                     column: 2,
                                 },
                                 end: {
+                                    offset: 13,
+                                    line: 1,
+                                    column: 14,
+                                },
+                            },
+                            value: 'Adblock Plus',
+                        },
+                        version: {
+                            type: 'Value',
+                            loc: {
+                                start: {
+                                    offset: 14,
+                                    line: 1,
+                                    column: 15,
+                                },
+                                end: {
                                     offset: 17,
                                     line: 1,
                                     column: 18,
                                 },
                             },
-                            adblock: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 1,
-                                        line: 1,
-                                        column: 2,
-                                    },
-                                    end: {
-                                        offset: 13,
-                                        line: 1,
-                                        column: 14,
-                                    },
-                                },
-                                value: 'Adblock Plus',
-                            },
-                            version: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 14,
-                                        line: 1,
-                                        column: 15,
-                                    },
-                                    end: {
-                                        offset: 17,
-                                        line: 1,
-                                        column: 18,
-                                    },
-                                },
-                                value: '2.0',
-                            },
+                            value: '2.0',
                         },
-                    ],
-                },
+                    },
+                ],
             },
         );
 
@@ -402,23 +327,23 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 20,
+                            line: 1,
+                            column: 21,
+                        },
                     },
-                    end: {
-                        offset: 20,
-                        line: 1,
-                        column: 21,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -426,46 +351,31 @@ describe('AgentCommentRuleParser', () => {
                                 column: 2,
                             },
                             end: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                        },
+                        value: 'uBlock Origin',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 15,
+                                line: 1,
+                                column: 16,
+                            },
+                            end: {
                                 offset: 20,
                                 line: 1,
                                 column: 21,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 14,
-                                    line: 1,
-                                    column: 15,
-                                },
-                            },
-                            value: 'uBlock Origin',
-                        },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 15,
-                                    line: 1,
-                                    column: 16,
-                                },
-                                end: {
-                                    offset: 20,
-                                    line: 1,
-                                    column: 21,
-                                },
-                            },
-                            value: '1.0.0',
-                        },
+                        value: '1.0.0',
                     },
-                ],
-            },
+                },
+            ],
         });
 
         expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard]')).toMatchObject({
@@ -484,20 +394,106 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 17,
+                            line: 1,
+                            column: 18,
+                        },
                     },
-                    end: {
-                        offset: 26,
-                        line: 1,
-                        column: 27,
+                    adblock: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 1,
+                                line: 1,
+                                column: 2,
+                            },
+                            end: {
+                                offset: 13,
+                                line: 1,
+                                column: 14,
+                            },
+                        },
+                        value: 'Adblock Plus',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                            end: {
+                                offset: 17,
+                                line: 1,
+                                column: 18,
+                            },
+                        },
+                        value: '2.0',
                     },
                 },
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 19,
+                            line: 1,
+                            column: 20,
+                        },
+                        end: {
+                            offset: 26,
+                            line: 1,
+                            column: 27,
+                        },
+                    },
+                    adblock: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 19,
+                                line: 1,
+                                column: 20,
+                            },
+                            end: {
+                                offset: 26,
+                                line: 1,
+                                column: 27,
+                            },
+                        },
+                        value: 'AdGuard',
+                    },
+                    version: null,
+                },
+            ],
+        });
+
+        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard 1.0.1.10]')).toMatchObject(
+            {
+                type: 'AgentCommentRule',
+                loc: {
+                    start: {
+                        offset: 0,
+                        line: 1,
+                        column: 1,
+                    },
+                    end: {
+                        offset: 36,
+                        line: 1,
+                        column: 37,
+                    },
+                },
+                syntax: 'Common',
+                category: 'Comment',
                 children: [
                     {
                         type: 'Agent',
@@ -555,9 +551,9 @@ describe('AgentCommentRuleParser', () => {
                                 column: 20,
                             },
                             end: {
-                                offset: 26,
+                                offset: 35,
                                 line: 1,
-                                column: 27,
+                                column: 36,
                             },
                         },
                         adblock: {
@@ -576,98 +572,13 @@ describe('AgentCommentRuleParser', () => {
                             },
                             value: 'AdGuard',
                         },
-                        version: null,
-                    },
-                ],
-            },
-        });
-
-        expect(AgentCommentRuleParser.parse('[Adblock Plus 2.0; AdGuard 1.0.1.10]')).toMatchObject(
-            {
-                type: 'AgentCommentRule',
-                loc: {
-                    start: {
-                        offset: 0,
-                        line: 1,
-                        column: 1,
-                    },
-                    end: {
-                        offset: 36,
-                        line: 1,
-                        column: 37,
-                    },
-                },
-                syntax: 'Common',
-                category: 'Comment',
-                agents: {
-                    type: 'AgentList',
-                    loc: {
-                        start: {
-                            offset: 1,
-                            line: 1,
-                            column: 2,
-                        },
-                        end: {
-                            offset: 35,
-                            line: 1,
-                            column: 36,
-                        },
-                    },
-                    children: [
-                        {
-                            type: 'Agent',
+                        version: {
+                            type: 'Value',
                             loc: {
                                 start: {
-                                    offset: 1,
+                                    offset: 27,
                                     line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 17,
-                                    line: 1,
-                                    column: 18,
-                                },
-                            },
-                            adblock: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 1,
-                                        line: 1,
-                                        column: 2,
-                                    },
-                                    end: {
-                                        offset: 13,
-                                        line: 1,
-                                        column: 14,
-                                    },
-                                },
-                                value: 'Adblock Plus',
-                            },
-                            version: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 14,
-                                        line: 1,
-                                        column: 15,
-                                    },
-                                    end: {
-                                        offset: 17,
-                                        line: 1,
-                                        column: 18,
-                                    },
-                                },
-                                value: '2.0',
-                            },
-                        },
-                        {
-                            type: 'Agent',
-                            loc: {
-                                start: {
-                                    offset: 19,
-                                    line: 1,
-                                    column: 20,
+                                    column: 28,
                                 },
                                 end: {
                                     offset: 35,
@@ -675,41 +586,10 @@ describe('AgentCommentRuleParser', () => {
                                     column: 36,
                                 },
                             },
-                            adblock: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 19,
-                                        line: 1,
-                                        column: 20,
-                                    },
-                                    end: {
-                                        offset: 26,
-                                        line: 1,
-                                        column: 27,
-                                    },
-                                },
-                                value: 'AdGuard',
-                            },
-                            version: {
-                                type: 'Value',
-                                loc: {
-                                    start: {
-                                        offset: 27,
-                                        line: 1,
-                                        column: 28,
-                                    },
-                                    end: {
-                                        offset: 35,
-                                        line: 1,
-                                        column: 36,
-                                    },
-                                },
-                                value: '1.0.1.10',
-                            },
+                            value: '1.0.1.10',
                         },
-                    ],
-                },
+                    },
+                ],
             },
         );
 
@@ -731,23 +611,23 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 17,
+                            line: 1,
+                            column: 18,
+                        },
                     },
-                    end: {
-                        offset: 54,
-                        line: 1,
-                        column: 55,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -755,46 +635,46 @@ describe('AgentCommentRuleParser', () => {
                                 column: 2,
                             },
                             end: {
+                                offset: 13,
+                                line: 1,
+                                column: 14,
+                            },
+                        },
+                        value: 'Adblock Plus',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                            end: {
                                 offset: 17,
                                 line: 1,
                                 column: 18,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 13,
-                                    line: 1,
-                                    column: 14,
-                                },
-                            },
-                            value: 'Adblock Plus',
+                        value: '3.1',
+                    },
+                },
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 19,
+                            line: 1,
+                            column: 20,
                         },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 14,
-                                    line: 1,
-                                    column: 15,
-                                },
-                                end: {
-                                    offset: 17,
-                                    line: 1,
-                                    column: 18,
-                                },
-                            },
-                            value: '3.1',
+                        end: {
+                            offset: 30,
+                            line: 1,
+                            column: 31,
                         },
                     },
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 19,
@@ -802,46 +682,46 @@ describe('AgentCommentRuleParser', () => {
                                 column: 20,
                             },
                             end: {
+                                offset: 26,
+                                line: 1,
+                                column: 27,
+                            },
+                        },
+                        value: 'AdGuard',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 27,
+                                line: 1,
+                                column: 28,
+                            },
+                            end: {
                                 offset: 30,
                                 line: 1,
                                 column: 31,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 19,
-                                    line: 1,
-                                    column: 20,
-                                },
-                                end: {
-                                    offset: 26,
-                                    line: 1,
-                                    column: 27,
-                                },
-                            },
-                            value: 'AdGuard',
+                        value: '1.4',
+                    },
+                },
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 32,
+                            line: 1,
+                            column: 33,
                         },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 27,
-                                    line: 1,
-                                    column: 28,
-                                },
-                                end: {
-                                    offset: 30,
-                                    line: 1,
-                                    column: 31,
-                                },
-                            },
-                            value: '1.4',
+                        end: {
+                            offset: 54,
+                            line: 1,
+                            column: 55,
                         },
                     },
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 32,
@@ -849,46 +729,31 @@ describe('AgentCommentRuleParser', () => {
                                 column: 33,
                             },
                             end: {
+                                offset: 45,
+                                line: 1,
+                                column: 46,
+                            },
+                        },
+                        value: 'uBlock Origin',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 46,
+                                line: 1,
+                                column: 47,
+                            },
+                            end: {
                                 offset: 54,
                                 line: 1,
                                 column: 55,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 32,
-                                    line: 1,
-                                    column: 33,
-                                },
-                                end: {
-                                    offset: 45,
-                                    line: 1,
-                                    column: 46,
-                                },
-                            },
-                            value: 'uBlock Origin',
-                        },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 46,
-                                    line: 1,
-                                    column: 47,
-                                },
-                                end: {
-                                    offset: 54,
-                                    line: 1,
-                                    column: 55,
-                                },
-                            },
-                            value: '1.0.15.0',
-                        },
+                        value: '1.0.15.0',
                     },
-                ],
-            },
+                },
+            ],
         });
 
         expect(
@@ -909,23 +774,23 @@ describe('AgentCommentRuleParser', () => {
             },
             syntax: 'Common',
             category: 'Comment',
-            agents: {
-                type: 'AgentList',
-                loc: {
-                    start: {
-                        offset: 1,
-                        line: 1,
-                        column: 2,
+            children: [
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 1,
+                            line: 1,
+                            column: 2,
+                        },
+                        end: {
+                            offset: 17,
+                            line: 1,
+                            column: 18,
+                        },
                     },
-                    end: {
-                        offset: 66,
-                        line: 1,
-                        column: 67,
-                    },
-                },
-                children: [
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 1,
@@ -933,46 +798,46 @@ describe('AgentCommentRuleParser', () => {
                                 column: 2,
                             },
                             end: {
+                                offset: 13,
+                                line: 1,
+                                column: 14,
+                            },
+                        },
+                        value: 'Adblock Plus',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 14,
+                                line: 1,
+                                column: 15,
+                            },
+                            end: {
                                 offset: 17,
                                 line: 1,
                                 column: 18,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 1,
-                                    line: 1,
-                                    column: 2,
-                                },
-                                end: {
-                                    offset: 13,
-                                    line: 1,
-                                    column: 14,
-                                },
-                            },
-                            value: 'Adblock Plus',
+                        value: '3.1',
+                    },
+                },
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 20,
+                            line: 1,
+                            column: 21,
                         },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 14,
-                                    line: 1,
-                                    column: 15,
-                                },
-                                end: {
-                                    offset: 17,
-                                    line: 1,
-                                    column: 18,
-                                },
-                            },
-                            value: '3.1',
+                        end: {
+                            offset: 32,
+                            line: 1,
+                            column: 33,
                         },
                     },
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 20,
@@ -980,46 +845,46 @@ describe('AgentCommentRuleParser', () => {
                                 column: 21,
                             },
                             end: {
+                                offset: 27,
+                                line: 1,
+                                column: 28,
+                            },
+                        },
+                        value: 'AdGuard',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 29,
+                                line: 1,
+                                column: 30,
+                            },
+                            end: {
                                 offset: 32,
                                 line: 1,
                                 column: 33,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 20,
-                                    line: 1,
-                                    column: 21,
-                                },
-                                end: {
-                                    offset: 27,
-                                    line: 1,
-                                    column: 28,
-                                },
-                            },
-                            value: 'AdGuard',
+                        value: '1.4',
+                    },
+                },
+                {
+                    type: 'Agent',
+                    loc: {
+                        start: {
+                            offset: 37,
+                            line: 1,
+                            column: 38,
                         },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 29,
-                                    line: 1,
-                                    column: 30,
-                                },
-                                end: {
-                                    offset: 32,
-                                    line: 1,
-                                    column: 33,
-                                },
-                            },
-                            value: '1.4',
+                        end: {
+                            offset: 62,
+                            line: 1,
+                            column: 63,
                         },
                     },
-                    {
-                        type: 'Agent',
+                    adblock: {
+                        type: 'Value',
                         loc: {
                             start: {
                                 offset: 37,
@@ -1027,46 +892,31 @@ describe('AgentCommentRuleParser', () => {
                                 column: 38,
                             },
                             end: {
+                                offset: 50,
+                                line: 1,
+                                column: 51,
+                            },
+                        },
+                        value: 'uBlock Origin',
+                    },
+                    version: {
+                        type: 'Value',
+                        loc: {
+                            start: {
+                                offset: 54,
+                                line: 1,
+                                column: 55,
+                            },
+                            end: {
                                 offset: 62,
                                 line: 1,
                                 column: 63,
                             },
                         },
-                        adblock: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 37,
-                                    line: 1,
-                                    column: 38,
-                                },
-                                end: {
-                                    offset: 50,
-                                    line: 1,
-                                    column: 51,
-                                },
-                            },
-                            value: 'uBlock Origin',
-                        },
-                        version: {
-                            type: 'Value',
-                            loc: {
-                                start: {
-                                    offset: 54,
-                                    line: 1,
-                                    column: 55,
-                                },
-                                end: {
-                                    offset: 62,
-                                    line: 1,
-                                    column: 63,
-                                },
-                            },
-                            value: '1.0.15.0',
-                        },
+                        value: '1.0.15.0',
                     },
-                ],
-            },
+                },
+            ],
         });
 
         // AgentParser not called in the following case

@@ -33,7 +33,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -84,7 +84,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -136,7 +136,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -219,7 +219,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -286,7 +286,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -353,7 +353,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -468,7 +468,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -616,7 +616,7 @@ describe('HintCommentRuleParser', () => {
                 },
                 category: 'Comment',
                 syntax: 'AdGuard',
-                hints: [
+                children: [
                     {
                         type: 'Hint',
                         loc: {
@@ -782,7 +782,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -899,7 +899,7 @@ describe('HintCommentRuleParser', () => {
                 },
                 category: 'Comment',
                 syntax: 'AdGuard',
-                hints: [
+                children: [
                     {
                         type: 'Hint',
                         loc: {
@@ -1033,7 +1033,7 @@ describe('HintCommentRuleParser', () => {
                 },
                 category: 'Comment',
                 syntax: 'AdGuard',
-                hints: [
+                children: [
                     {
                         type: 'Hint',
                         loc: {
@@ -1166,7 +1166,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -1283,7 +1283,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -1415,7 +1415,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {
@@ -1515,7 +1515,7 @@ describe('HintCommentRuleParser', () => {
             },
             category: 'Comment',
             syntax: 'AdGuard',
-            hints: [
+            children: [
                 {
                     type: 'Hint',
                     loc: {

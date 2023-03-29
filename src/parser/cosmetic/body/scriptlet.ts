@@ -120,7 +120,7 @@ export class ScriptletInjectionBodyParser {
         return {
             type: 'ScriptletInjectionRuleBody',
             loc: locRange(loc, 0, raw.length),
-            scriptlets: [
+            children: [
                 params,
             ],
         };
@@ -142,7 +142,7 @@ export class ScriptletInjectionBodyParser {
         const result: ScriptletInjectionRuleBody = {
             type: 'ScriptletInjectionRuleBody',
             loc: locRange(loc, 0, raw.length),
-            scriptlets: [],
+            children: [],
         };
 
         let offset = 0;
@@ -184,13 +184,13 @@ export class ScriptletInjectionBodyParser {
             }
 
             // Parse the scriptlet call
-            result.scriptlets.push(params);
+            result.children.push(params);
 
             // Skip the semicolon
             offset = semicolonIndex + 1;
         }
 
-        if (result.scriptlets.length === 0) {
+        if (result.children.length === 0) {
             throw new AdblockSyntaxError(
                 // eslint-disable-next-line max-len
                 'Invalid ABP snippet call, no scriptlets specified at all',
@@ -247,11 +247,11 @@ export class ScriptletInjectionBodyParser {
 
         // AdGuard and uBlock doesn't support multiple scriptlet calls in one rule
         if (syntax === AdblockSyntax.Adg || syntax === AdblockSyntax.Ubo) {
-            if (ast.scriptlets.length > 1) {
+            if (ast.children.length > 1) {
                 throw new Error('AdGuard and uBlock syntaxes don\'t support multiple scriptlet calls in one rule');
             }
 
-            const scriptletCall = ast.scriptlets[0];
+            const scriptletCall = ast.children[0];
 
             if (scriptletCall.children.length === 0) {
                 throw new Error('Scriptlet name is not specified');
@@ -270,7 +270,7 @@ export class ScriptletInjectionBodyParser {
             // First generate a string representation of all scriptlet calls, then join them with semicolons
             const scriptletCalls: string[] = [];
 
-            for (const scriptletCall of ast.scriptlets) {
+            for (const scriptletCall of ast.children) {
                 if (scriptletCall.children.length === 0) {
                     throw new Error('Scriptlet name is not specified');
                 }

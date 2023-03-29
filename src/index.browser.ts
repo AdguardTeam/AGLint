@@ -35,7 +35,6 @@ export {
     ConfigCommentRule,
     PreProcessorCommentRule,
     Agent,
-    AgentList,
     AgentCommentRule,
     Hint,
     HintCommentRule,
