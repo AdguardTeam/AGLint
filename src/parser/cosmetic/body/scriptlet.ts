@@ -205,17 +205,27 @@ export class ScriptletInjectionBodyParser {
      * Parses the specified scriptlet injection rule body into an AST.
      *
      * @param raw Raw rule body
+     * @param syntax Preferred syntax to use. If not specified, the syntax will be
+     * automatically detected, but it may lead to incorrect parsing results.
      * @param loc Rule body location
      * @returns Parsed rule body
      * @throws If the rule body is syntactically incorrect
      */
-    public static parse(raw: string, loc = defaultLocation): ScriptletInjectionRuleBody {
+    public static parse(
+        raw: string,
+        syntax: AdblockSyntax | null = null,
+        loc = defaultLocation,
+    ): ScriptletInjectionRuleBody {
         const trimmed = raw.trim();
 
         if (
-            trimmed.startsWith(ADG_SCRIPTLET_MASK)
-            // We shouldn't parse ABP's json-prune as a uBlock scriptlet call
-            || (trimmed.startsWith(UBO_SCRIPTLET_MASK) && !trimmed.startsWith('json'))
+            (syntax === null && (
+                trimmed.startsWith(ADG_SCRIPTLET_MASK)
+                // We shouldn't parse ABP's json-prune as a uBlock scriptlet call
+                || (trimmed.startsWith(UBO_SCRIPTLET_MASK) && !trimmed.startsWith('json'))
+            ))
+            || syntax === AdblockSyntax.Adg
+            || syntax === AdblockSyntax.Ubo
         ) {
             return ScriptletInjectionBodyParser.parseAdgAndUboScriptletCall(trimmed, loc);
         }

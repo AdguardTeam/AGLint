@@ -9,6 +9,7 @@ import { locRange, shiftLoc } from '../../../src/utils/location';
 import { ScriptletInjectionBodyParser } from '../../../src/parser/cosmetic/body/scriptlet';
 import { HtmlFilteringBodyParser } from '../../../src/parser/cosmetic/body/html';
 import { ModifierListParser } from '../../../src/parser/misc/modifier-list';
+import { AdblockSyntax } from '../../../src/utils/adblockers';
 
 describe('CosmeticRuleParser', () => {
     test('isCosmetic', async () => {
@@ -821,6 +822,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                AdblockSyntax.Adg,
                 shiftLoc(defaultLocation, '#%#'.length),
             ),
         });
@@ -847,6 +849,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                AdblockSyntax.Adg,
                 shiftLoc(defaultLocation, 'example.com,~example.net#%#'.length),
             ),
         });
@@ -873,6 +876,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                AdblockSyntax.Adg,
                 shiftLoc(defaultLocation, '#@%#'.length),
             ),
         });
@@ -899,6 +903,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 "//scriptlet('scriptlet0', 'arg0', 'arg1')",
+                AdblockSyntax.Adg,
                 shiftLoc(defaultLocation, 'example.com,~example.net#@%#'.length),
             ),
         });
@@ -926,6 +931,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'js(scriptlet0, arg0, arg1)',
+                AdblockSyntax.Ubo,
                 shiftLoc(defaultLocation, '##+'.length),
             ),
         });
@@ -952,6 +958,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'js(scriptlet0, arg0, arg1)',
+                AdblockSyntax.Ubo,
                 shiftLoc(defaultLocation, 'example.com,~example.net##+'.length),
             ),
         });
@@ -978,6 +985,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'js(scriptlet0, arg0, arg1)',
+                AdblockSyntax.Ubo,
                 shiftLoc(defaultLocation, '#@#+'.length),
             ),
         });
@@ -1004,6 +1012,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'js(scriptlet0, arg0, arg1)',
+                AdblockSyntax.Ubo,
                 shiftLoc(defaultLocation, 'example.com,~example.net#@#+'.length),
             ),
         });
@@ -1031,6 +1040,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg0 arg1',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, '#$#'.length),
             ),
         });
@@ -1057,6 +1067,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg0 arg1',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
             ),
         });
@@ -1083,6 +1094,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg0 arg1',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, '#@$#'.length),
             ),
         });
@@ -1109,6 +1121,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg0 arg1',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
             ),
         });
@@ -1136,6 +1149,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, '#$#'.length),
             ),
         });
@@ -1163,6 +1177,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, '#$#'.length),
             ),
         });
@@ -1189,6 +1204,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
             ),
         });
@@ -1216,6 +1232,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, 'example.com,~example.net#$#'.length),
             ),
         });
@@ -1242,6 +1259,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, '#@$#'.length),
             ),
         });
@@ -1269,6 +1287,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, '#@$#'.length),
             ),
         });
@@ -1295,6 +1314,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
             ),
         });
@@ -1322,6 +1342,7 @@ describe('CosmeticRuleParser', () => {
             },
             body: ScriptletInjectionBodyParser.parse(
                 'scriptlet0 arg00 arg01; scriptlet1 arg10 arg11;',
+                AdblockSyntax.Abp,
                 shiftLoc(defaultLocation, 'example.com,~example.net#@$#'.length),
             ),
         });

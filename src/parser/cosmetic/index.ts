@@ -242,7 +242,7 @@ export class CosmeticRuleParser {
                         modifiers,
                         domains,
                         separator,
-                        body: ScriptletInjectionBodyParser.parse(rawBody, shiftLoc(loc, bodyStart)),
+                        body: ScriptletInjectionBodyParser.parse(rawBody, AdblockSyntax.Abp, shiftLoc(loc, bodyStart)),
                     };
                 }
 
@@ -275,7 +275,7 @@ export class CosmeticRuleParser {
                     modifiers,
                     domains,
                     separator,
-                    body: ScriptletInjectionBodyParser.parse(rawBody, shiftLoc(loc, bodyStart)),
+                    body: ScriptletInjectionBodyParser.parse(rawBody, AdblockSyntax.Ubo, shiftLoc(loc, bodyStart)),
                 };
 
             // ADG JS / scriptlet injection
@@ -296,7 +296,7 @@ export class CosmeticRuleParser {
                         modifiers,
                         domains,
                         separator,
-                        body: ScriptletInjectionBodyParser.parse(rawBody, shiftLoc(loc, bodyStart)),
+                        body: ScriptletInjectionBodyParser.parse(rawBody, AdblockSyntax.Ubo, shiftLoc(loc, bodyStart)),
                     };
                 }
 
