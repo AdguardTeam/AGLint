@@ -309,8 +309,11 @@ describe('PreProcessorParser', () => {
                     column: 39,
                 },
             },
+            raws: {
+                text: '!#safari_cb_affinity(content_blockers)',
+            },
             category: 'Comment',
-            syntax: 'Common',
+            syntax: 'AdGuard',
             name: {
                 type: 'Value',
                 loc: {
@@ -328,20 +331,37 @@ describe('PreProcessorParser', () => {
                 value: 'safari_cb_affinity',
             },
             params: {
-                type: 'Value',
+                type: 'ParameterList',
                 loc: {
                     start: {
-                        offset: 20,
+                        offset: 21,
                         line: 1,
-                        column: 21,
+                        column: 22,
                     },
                     end: {
-                        offset: 38,
+                        offset: 37,
                         line: 1,
-                        column: 39,
+                        column: 38,
                     },
                 },
-                value: '(content_blockers)',
+                children: [
+                    {
+                        type: 'Parameter',
+                        loc: {
+                            start: {
+                                offset: 21,
+                                line: 1,
+                                column: 22,
+                            },
+                            end: {
+                                offset: 37,
+                                line: 1,
+                                column: 38,
+                            },
+                        },
+                        value: 'content_blockers',
+                    },
+                ],
             },
         });
 

@@ -8,6 +8,8 @@
 import { locRange, shiftLoc } from '../../utils/location';
 import { AdblockSyntax } from '../../utils/adblockers';
 import {
+    CLOSE_PARENTHESIS,
+    COMMA,
     EMPTY,
     HASHMARK,
     IF,
@@ -26,6 +28,7 @@ import {
 } from '../common';
 import { LogicalExpressionParser } from '../misc/logical-expression';
 import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
+import { ParameterListParser } from '../misc/parameter-list';
 
 /**
  * `PreProcessorParser` is responsible for parsing preprocessor rules.
@@ -121,6 +124,59 @@ export class PreProcessorCommentRuleParser {
                     locRange(loc, nameEnd, offset),
                 );
             }
+
+            // safari_cb_affinity directive optionally accepts a parameter list
+            // So at this point we should check if there are parameters or not
+            // (cb_affinity directive followed by an opening parenthesis or if we
+            // skip the whitespace we reach the end of the string)
+            if (StringUtils.skipWS(raw, offset) !== raw.length) {
+                if (raw[offset] !== OPEN_PARENTHESIS) {
+                    throw new AdblockSyntaxError(
+                        `Unexpected character '${raw[offset]}' after '${SAFARI_CB_AFFINITY}' directive name`,
+                        locRange(loc, offset, offset + 1),
+                    );
+                }
+
+                // If we have parameters, then we should parse them
+                // Note: we don't validate the parameters at this stage
+
+                // Ignore opening parenthesis
+                offset += 1;
+
+                // Save parameter list start offset
+                const parameterListStart = offset;
+
+                // Check for closing parenthesis
+                const closingParenthesesIndex = StringUtils.skipWSBack(raw);
+
+                if (closingParenthesesIndex === -1 || raw[closingParenthesesIndex] !== CLOSE_PARENTHESIS) {
+                    throw new AdblockSyntaxError(
+                        `Missing closing parenthesis for '${SAFARI_CB_AFFINITY}' directive`,
+                        locRange(loc, offset, raw.length),
+                    );
+                }
+
+                // Save parameter list end offset
+                const parameterListEnd = closingParenthesesIndex;
+
+                // Parse parameters between the opening and closing parentheses
+                return {
+                    type: CommentRuleType.PreProcessorCommentRule,
+                    loc: locRange(loc, 0, raw.length),
+                    raws: {
+                        text: raw,
+                    },
+                    category: RuleCategory.Comment,
+                    syntax: AdblockSyntax.Adg,
+                    name,
+                    // comma separated list of parameters
+                    params: ParameterListParser.parse(
+                        raw.substring(parameterListStart, parameterListEnd),
+                        COMMA,
+                        shiftLoc(loc, parameterListStart),
+                    ),
+                };
+            }
         }
 
         // If we reached the end of the string, then we have a directive without parameters
@@ -204,6 +260,10 @@ export class PreProcessorCommentRuleParser {
 
             if (ast.params.type === 'Value') {
                 result += ast.params.value;
+            } else if (ast.params.type === 'ParameterList') {
+                result += OPEN_PARENTHESIS;
+                result += ParameterListParser.generate(ast.params);
+                result += CLOSE_PARENTHESIS;
             } else {
                 result += LogicalExpressionParser.generate(ast.params);
             }

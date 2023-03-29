@@ -527,7 +527,7 @@ export interface PreProcessorCommentRule extends CommentBase {
     /**
      * Params (optional)
      */
-    params?: Value | AnyExpressionNode;
+    params?: Value | ParameterList | AnyExpressionNode;
 }
 
 /**
