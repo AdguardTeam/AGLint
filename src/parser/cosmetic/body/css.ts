@@ -362,6 +362,7 @@ export class CssInjectionBodyParser {
 
         return {
             type: 'CssInjectionRuleBody',
+            loc: locRange(loc, 0, raw.length),
             selectorList: plainSelectorList,
             mediaQueryList,
             declarationList,
