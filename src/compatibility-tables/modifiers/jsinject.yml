@@ -28,7 +28,6 @@ adg_ext_any:
     - elemhide
     - genericblock
     - urlblock
-    - extension
     - content
     - xmlhttprequest
     - badfilter
@@ -47,7 +46,6 @@ adg_cb_ios:
     - elemhide
     - genericblock
     - urlblock
-    - extension
     - content
     - xmlhttprequest
     - badfilter
@@ -66,7 +64,6 @@ adg_cb_safari:
     - elemhide
     - genericblock
     - urlblock
-    - extension
     - content
     - xmlhttprequest
     - badfilter

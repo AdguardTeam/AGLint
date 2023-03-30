@@ -4,9 +4,12 @@ adg_os_any:
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#genericblock-modifier
   conflicts:
     - domain
+    - specifichide
     - generichide
+    - elemhide
     - extension
     - jsinject
+    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -19,9 +22,12 @@ adg_ext_any:
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#genericblock-modifier
   conflicts:
     - domain
+    - specifichide
     - generichide
+    - elemhide
     - extension
     - jsinject
+    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -34,9 +40,12 @@ adg_cb_ios:
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#genericblock-modifier
   conflicts:
     - domain
+    - specifichide
     - generichide
+    - elemhide
     - extension
     - jsinject
+    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -49,9 +58,12 @@ adg_cb_safari:
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#genericblock-modifier
   conflicts:
     - domain
+    - specifichide
     - generichide
+    - elemhide
     - extension
     - jsinject
+    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
