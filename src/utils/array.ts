@@ -1,4 +1,8 @@
 /**
+ * @file Utility functions for arrays.
+ */
+
+/**
  * Array helpers.
  */
 export class ArrayUtils {

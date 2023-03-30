@@ -1,39 +1,57 @@
 /**
- * CSS injection rule body parser
+ * @file CSS injection rule body parser
  */
 
 import {
+    CssNode,
+    DeclarationList,
+    DeclarationListPlain,
+    DeclarationPlain,
+    List,
+    MediaQueryList,
+    MediaQueryListPlain,
+    Rule,
     Selector,
     SelectorList,
-    Block,
-    Rule,
-    generate as generateCss,
-    SelectorPlain,
-    BlockPlain,
-    toPlainObject,
+    SelectorListPlain,
     fromPlainObject,
-    MediaQueryListPlain,
+    toPlainObject,
+    walk,
 } from '@adguard/ecss-tree';
 import { AdblockSyntax } from '../../../utils/adblockers';
-import {
-    CSS_BLOCK_CLOSE,
-    CSS_BLOCK_OPEN,
-    CSS_MEDIA_MARKER,
-    CSS_PSEUDO_CLOSE,
-    CSS_PSEUDO_MARKER,
-    CSS_PSEUDO_OPEN,
-    CSS_SELECTORS_SEPARATOR,
-    EMPTY,
-    SPACE,
-} from '../../../utils/constants';
 import { CssTree } from '../../../utils/csstree';
 import { CssTreeNodeType, CssTreeParserContext } from '../../../utils/csstree-constants';
+import { CssInjectionRuleBody, defaultLocation } from '../../common';
+import { AdblockSyntaxError } from '../../errors/adblock-syntax-error';
+import { locRange, shiftLoc } from '../../../utils/location';
+import {
+    AT_SIGN,
+    CLOSE_CURLY_BRACKET,
+    CLOSE_PARENTHESIS,
+    COLON,
+    EMPTY,
+    OPEN_CURLY_BRACKET,
+    OPEN_PARENTHESIS,
+    SEMICOLON,
+    SPACE,
+} from '../../../utils/constants';
 
-/**
- * `@media <mediaQueryList> { rule }` where rule is `selectorList { declarations block }`
- * This method is much faster than direct parsing (try `atrule`, then `rule` context).
- */
-const MEDIA_QUERY_PATTERN = /^(?:@media\s*(?<mediaQueryList>[^{]+))\s*{\s*(?<rule>.+)\s*}$/;
+const NONE = 'None';
+
+const MEDIA = 'media';
+const TRUE = 'true';
+const REMOVE = 'remove';
+const STYLE = 'style';
+const MATCHES_MEDIA = 'matches-media';
+
+const MEDIA_MARKER = AT_SIGN + MEDIA; // @media
+const REMOVE_DECLARATION = REMOVE + COLON + SPACE + TRUE + SEMICOLON; // remove: true;
+
+const SPECIAL_PSEUDO_CLASSES = [
+    MATCHES_MEDIA,
+    STYLE,
+    REMOVE,
+];
 
 /** selectorList:style(declarations) or selectorList:remove() */
 // eslint-disable-next-line max-len
@@ -41,41 +59,6 @@ const UBO_CSS_INJECTION_PATTERN = /^(?<selectors>.+)(?:(?<style>:style\()(?<decl
 
 /** selectorList { declarations } */
 const ADG_CSS_INJECTION_PATTERN = /^(?:.+){(?:.+)}$/;
-
-const REMOVE_BLOCK = '{ remove: true; }';
-const UBO_STYLE = 'style';
-const UBO_REMOVE = 'remove';
-const UBO_STYLE_MARKER = CSS_PSEUDO_MARKER + UBO_STYLE + CSS_PSEUDO_OPEN;
-const UBO_REMOVE_MARKER = CSS_PSEUDO_MARKER + UBO_REMOVE + CSS_PSEUDO_OPEN;
-
-export const REMOVE_BLOCK_TYPE = 'remove';
-
-/**
- * Represents the CSS rule body, which can be:
- *  - CSS declaration block
- *  - remove
- */
-export type CssInjectionBlock = BlockPlain | typeof REMOVE_BLOCK_TYPE;
-
-/**
- * Represents a CSS injection body.
- */
-export interface CssRuleBody {
-    /**
-     * List of media queries (if any)
-     */
-    mediaQueryList?: MediaQueryListPlain;
-
-    /**
-     * List of selectors
-     */
-    selectors: SelectorPlain[];
-
-    /**
-     * CSS declaration block or remove
-     */
-    block?: CssInjectionBlock;
-}
 
 /**
  * `CssInjectionBodyParser` is responsible for parsing a CSS injection body.
@@ -112,15 +95,18 @@ export class CssInjectionBodyParser {
     /**
      * Checks if a selector is a uBlock CSS injection.
      *
-     * @param raw - Raw selector body
+     * @param raw Raw selector body
      * @returns `true` if the selector is a uBlock CSS injection, `false` otherwise
      */
     public static isUboCssInjection(raw: string): boolean {
         const trimmed = raw.trim();
 
-        // Since it has to run for every elementhide rule, the regex would be slow,
-        // so firstly we search for the keywords.
-        if (trimmed.indexOf(UBO_STYLE_MARKER) !== -1 || trimmed.indexOf(UBO_REMOVE_MARKER) !== -1) {
+        // Since it runs on every element hiding rule, we want to avoid unnecessary regex checks,
+        // so we first check if the selector contains either `:style(` or `:remove(`.
+        if (
+            trimmed.indexOf(COLON + STYLE + OPEN_PARENTHESIS) !== -1
+            || trimmed.indexOf(COLON + REMOVE + OPEN_PARENTHESIS) !== -1
+        ) {
             return UBO_CSS_INJECTION_PATTERN.test(trimmed);
         }
 
@@ -130,7 +116,7 @@ export class CssInjectionBodyParser {
     /**
      * Checks if a selector is an AdGuard CSS injection.
      *
-     * @param raw - Raw selector body
+     * @param raw Raw selector body
      * @returns `true` if the selector is an AdGuard CSS injection, `false` otherwise
      */
     public static isAdgCssInjection(raw: string) {
@@ -138,233 +124,583 @@ export class CssInjectionBodyParser {
     }
 
     /**
-     * Parses a raw selector as an AdGuard CSS injection.
+     * Parses a uBlock Origin CSS injection body.
      *
-     * @param raw - Raw rule
-     * @returns CSS injection AST or null (if the raw rule cannot be parsed
-     * as AdGuard CSS injection)
-     * @throws
-     *   - If the selector is invalid according to the CSS syntax
-     *   - If no selector is found
-     *   - If several remove properties have been declared
-     *   - If there are other declarations in addition to the remove property
+     * @param raw Raw CSS injection body
+     * @param loc Location of the body
+     * @returns Parsed CSS injection body
+     * @throws {AdblockSyntaxError} If the body is invalid or unsupported
      */
-    public static parseAdgCssInjection(raw: string): CssRuleBody | null {
-        const trimmed = raw.trim();
+    private static parseUboStyleInjection(raw: string, loc = defaultLocation): CssInjectionRuleBody {
+        const selectorList = CssTree.parse(raw, CssTreeParserContext.selectorList, false, loc);
 
-        // Check pattern first
-        if (!CssInjectionBodyParser.isAdgCssInjection(trimmed)) {
-            return null;
-        }
+        const plainSelectorList: SelectorListPlain = {
+            type: CssTreeNodeType.SelectorList,
+            children: [],
+        };
 
         let mediaQueryList: MediaQueryListPlain | undefined;
-        const selectors: Selector[] = [];
-        let rawRule = trimmed;
+        let declarationList: DeclarationListPlain | undefined;
+        let remove: boolean | undefined;
 
-        // Parse media queries (if any)
-        const mediaQueryMatch = trimmed.match(MEDIA_QUERY_PATTERN);
-        if (mediaQueryMatch && mediaQueryMatch.groups) {
-            mediaQueryList = <MediaQueryListPlain>(
-                CssTree.parsePlain(mediaQueryMatch.groups.mediaQueryList.trim(), CssTreeParserContext.mediaQueryList)
-            );
-
-            rawRule = mediaQueryMatch.groups.rule.trim();
-        }
-
-        // Parse rule part (rule = selector list + declaration block)
-        const ruleAst = <Rule>CssTree.parse(rawRule, CssTreeParserContext.rule);
-
-        if (ruleAst.prelude.type !== CssTreeNodeType.SelectorList) {
-            throw new Error(`No selector list found in the following CSS injection body: "${raw}"`);
-        }
-
-        const selectorListAst = ruleAst.prelude;
-
-        selectorListAst.children.forEach((node) => {
-            if (node.type === CssTreeNodeType.Selector) {
-                selectors.push(node);
-            }
-        });
-
-        let block: BlockPlain | typeof REMOVE_BLOCK_TYPE = <BlockPlain>toPlainObject(ruleAst.block);
-
-        // Check for remove property
-        let removeDeclFound = false;
-        let nonRemoveDeclFound = false;
-
-        ruleAst.block.children.forEach((node) => {
-            if (node.type === CssTreeNodeType.Declaration) {
-                if (node.property === REMOVE_BLOCK_TYPE) {
-                    if (removeDeclFound) {
-                        throw new Error(`Multiple remove property found in the following CSS injection body: "${raw}"`);
-                    }
-                    removeDeclFound = true;
-                } else {
-                    nonRemoveDeclFound = true;
-                }
-            }
-        });
-
-        if (removeDeclFound && nonRemoveDeclFound) {
-            throw new Error(
+        // Check selector list
+        if (selectorList.type !== CssTreeNodeType.SelectorList) {
+            throw new AdblockSyntaxError(
                 // eslint-disable-next-line max-len
-                `In addition to the remove property, the following CSS injection body also uses other properties: "${raw}"`,
+                `Invalid selector list, expected '${CssTreeNodeType.SelectorList}' but got '${selectorList.type || NONE}' instead`,
+                locRange(loc, 0, raw.length),
             );
         }
 
-        if (removeDeclFound) {
-            block = REMOVE_BLOCK_TYPE;
+        // Convert selector list to regular array
+        const selectors = selectorList.children.toArray();
+
+        // Iterate over selectors
+        for (let i = 0; i < selectors.length; i += 1) {
+            // Store current selector (just for convenience)
+            const selector = selectors[i];
+
+            // Type guard for the actual selector
+            if (selector.type !== CssTreeNodeType.Selector) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `Invalid selector, expected '${CssTreeNodeType.Selector}' but got '${selector.type || NONE}' instead`,
+                    {
+                        start: selector.loc?.start ?? loc,
+                        end: selector.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            // Not the last selector
+            if (i !== selectors.length - 1) {
+                // Special pseudo-classes (:style, :remove, :matches-media) can only be used in the last selector
+                walk(selector, (node) => {
+                    // eslint-disable-next-line max-len
+                    if (node.type === CssTreeNodeType.PseudoClassSelector && SPECIAL_PSEUDO_CLASSES.includes(node.name)) {
+                        throw new AdblockSyntaxError(
+                            `Invalid selector, pseudo-class '${node.name}' can only be used in the last selector`,
+                            {
+                                start: node.loc?.start ?? loc,
+                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                            },
+                        );
+                    }
+                });
+
+                // Add selector to plain selector list
+                plainSelectorList.children.push(toPlainObject(selector));
+            } else if (i === selectors.length - 1) {
+                // Last selector can (should) contain special pseudo-classes
+                const regularSelector: Selector = {
+                    type: CssTreeNodeType.Selector,
+                    children: new List<CssNode>(),
+                };
+
+                let depth = 0;
+
+                walk(selector, {
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func
+                    enter: (node: CssNode) => {
+                        // Increment depth
+                        depth += 1;
+
+                        if (node.type === CssTreeNodeType.PseudoClassSelector) {
+                            if (SPECIAL_PSEUDO_CLASSES.includes(node.name)) {
+                                // Only allow special pseudo-classes at the top level
+                                // Depth look like this:
+                                //   1: Selector (root)
+                                //   2: Direct child of the root selector (e.g. TypeSelector, PseudoClassSelector, etc.)
+                                //      ...
+                                if (depth !== 2) {
+                                    throw new AdblockSyntaxError(
+                                        // eslint-disable-next-line max-len
+                                        `Invalid selector, pseudo-class '${node.name}' can only be used at the top level of the selector`,
+                                        {
+                                            start: node.loc?.start ?? loc,
+                                            end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                        },
+                                    );
+                                }
+
+                                // :matches-media(...)
+                                if (node.name === MATCHES_MEDIA) {
+                                    if (mediaQueryList) {
+                                        throw new AdblockSyntaxError(
+                                            `Duplicated pseudo-class '${node.name}'`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // eslint-disable-next-line max-len
+                                    if (!node.children || !node.children.first || node.children.first.type !== CssTreeNodeType.MediaQueryList) {
+                                        throw new AdblockSyntaxError(
+                                            // eslint-disable-next-line max-len
+                                            `Invalid selector, pseudo-class '${node.name}' must be parametrized with a media query list`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // Store media query list, but convert it to a plain object first
+                                    mediaQueryList = <MediaQueryListPlain>toPlainObject(node.children.first);
+                                    return;
+                                }
+
+                                // :style(...)
+                                if (node.name === STYLE) {
+                                    if (declarationList) {
+                                        throw new AdblockSyntaxError(
+                                            `Duplicated pseudo-class '${node.name}'`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // Remove selected elements or style them, but not both
+                                    if (remove) {
+                                        throw new AdblockSyntaxError(
+                                            `'${STYLE}' and '${REMOVE}' cannot be used together`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // eslint-disable-next-line max-len
+                                    if (!node.children || !node.children.first || node.children.first.type !== CssTreeNodeType.DeclarationList) {
+                                        throw new AdblockSyntaxError(
+                                            // eslint-disable-next-line max-len
+                                            `Invalid selector, pseudo-class '${node.name}' must be parametrized with a declaration list`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // Store declaration list, but convert it to plain object first
+                                    declarationList = <DeclarationListPlain>toPlainObject(node.children.first);
+                                    return;
+                                }
+
+                                // :remove()
+                                if (node.name === REMOVE) {
+                                    if (remove) {
+                                        throw new AdblockSyntaxError(
+                                            `Duplicated pseudo-class '${node.name}'`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // Remove selected elements or style them, but not both
+                                    if (declarationList) {
+                                        throw new AdblockSyntaxError(
+                                            `'${STYLE}' and '${REMOVE}' cannot be used together`,
+                                            {
+                                                start: node.loc?.start ?? loc,
+                                                end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                                            },
+                                        );
+                                    }
+
+                                    // Set remove flag to true (and don't store anything)
+                                    remove = true;
+                                    return;
+                                }
+                            }
+                        }
+
+                        // If the node is a direct child of the selector (depth === 2) and it's not a special
+                        // pseudo-class, then it's a regular selector element, so add it to the regular selector
+                        // (We split the selector into two parts: regular selector and special pseudo-classes)
+                        if (depth === 2) {
+                            // Regular selector elements can't be used after special pseudo-classes
+                            if (mediaQueryList || declarationList || remove) {
+                                throw new AdblockSyntaxError(
+                                    // eslint-disable-next-line max-len
+                                    'Invalid selector, regular selector elements can\'t be used after special pseudo-classes',
+                                    {
+                                        start: node.loc?.start ?? loc,
+                                        end: shiftLoc(loc, raw.length),
+                                    },
+                                );
+                            }
+
+                            regularSelector.children.push(node);
+                        }
+                    },
+                    leave: () => {
+                        // Decrement depth
+                        depth -= 1;
+                    },
+                });
+
+                // Store the last selector with special pseudo-classes
+                plainSelectorList.children.push(toPlainObject(regularSelector));
+            }
+        }
+
+        // At least one of the following must be present: declaration list, :remove() pseudo-class
+        if (!declarationList && !remove) {
+            throw new AdblockSyntaxError(
+                'No CSS declaration list or :remove() pseudo-class found',
+                locRange(loc, 0, raw.length),
+            );
         }
 
         return {
+            type: 'CssInjectionRuleBody',
+            loc: locRange(loc, 0, raw.length),
+            selectorList: plainSelectorList,
             mediaQueryList,
-            selectors: <SelectorPlain[]>selectors.map((selector) => toPlainObject(selector)),
-            block,
+            declarationList,
+            remove,
         };
     }
 
     /**
-     * Parses a raw selector as a uBlock CSS injection.
+     * Parse a CSS injection rule body from a raw string. It determines the syntax
+     * automatically.
      *
-     * @param raw - Raw rule
-     * @returns CSS injection AST or null (if the raw rule cannot be parsed
-     * as uBlock CSS injection)
+     * @param raw Raw CSS injection rule body
+     * @param loc Location of the body
+     * @returns CSS injection rule body AST
+     * @throws {AdblockSyntaxError} If the raw string is not a valid CSS injection rule body
      */
-    public static parseUboCssInjection(raw: string): CssRuleBody | null {
-        const trimmed = raw.trim();
+    public static parse(raw: string, loc = defaultLocation): CssInjectionRuleBody {
+        // Parse stylesheet in tolerant mode.
+        // "stylesheet" context handles "at-rules" and "rules", but if we only have a single
+        // selector, then the strict parser will throw an error, but the tolerant parser will
+        // parses it as a raw fragment.
+        const stylesheet = CssTree.parse(raw, CssTreeParserContext.stylesheet, true, loc);
 
-        // Check pattern first
-        const uboCssInjection = trimmed.match(UBO_CSS_INJECTION_PATTERN);
-        if (!(uboCssInjection && uboCssInjection.groups)) {
-            return null;
+        // Check stylesheet
+        if (stylesheet.type !== CssTreeNodeType.StyleSheet) {
+            throw new AdblockSyntaxError(
+                `Invalid stylesheet, expected '${CssTreeNodeType.StyleSheet}' but got '${stylesheet.type}' instead`,
+                {
+                    start: stylesheet.loc?.start ?? loc,
+                    end: stylesheet.loc?.end ?? shiftLoc(loc, raw.length),
+                },
+            );
         }
 
-        const selectors: Selector[] = [];
+        // Stylesheet should contain a single rule
+        if (stylesheet.children.size !== 1) {
+            throw new AdblockSyntaxError(
+                `Invalid stylesheet, expected a single rule but got ${stylesheet.children.size} instead`,
+                {
+                    start: stylesheet.loc?.start ?? loc,
+                    end: stylesheet.loc?.end ?? shiftLoc(loc, raw.length),
+                },
+            );
+        }
 
-        const rawSelectorList = uboCssInjection.groups.selectors.trim();
-        const selectorListAst = <SelectorList>CssTree.parse(rawSelectorList, CssTreeParserContext.selectorList);
+        // At this point there are 3 possible cases:
+        //
+        // 1. At-rule (ADG):
+        //      @media (media query list) { selector list { declaration list } }
+        //      @media (media query list) { selector list { remove: true; } }
+        //
+        // 2. Rule (ADG):
+        //      selector list { declaration list }
+        //      selector list { remove: true; }
+        //
+        // 3. Raw:
+        //      selector list:style(declaration list)
+        //      selector list:remove()
+        //      selector list:matches-media(media query list):style(declaration list)
+        //      selector list:matches-media(media query list):remove()
+        //      invalid input
+        //
+        const injection = stylesheet.children.first;
 
-        selectorListAst.children.forEach((node) => {
-            if (node.type === CssTreeNodeType.Selector) {
-                selectors.push(node);
+        if (!injection) {
+            throw new AdblockSyntaxError(
+                'Invalid style injection, expected a CSS rule or at-rule, but got nothing',
+                {
+                    start: stylesheet.loc?.start ?? loc,
+                    end: stylesheet.loc?.end ?? shiftLoc(loc, raw.length),
+                },
+            );
+        }
+
+        let mediaQueryList: MediaQueryList | undefined;
+        let rule: Rule;
+
+        // Try to parse Raw fragment as uBO style injection
+        if (injection.type === CssTreeNodeType.Raw) {
+            return CssInjectionBodyParser.parseUboStyleInjection(raw, loc);
+        }
+
+        // Parse AdGuard style injection
+        if (injection.type !== CssTreeNodeType.Rule && injection.type !== CssTreeNodeType.Atrule) {
+            throw new AdblockSyntaxError(
+                // eslint-disable-next-line max-len
+                `Invalid injection, expected '${CssTreeNodeType.Rule}' or '${CssTreeNodeType.Atrule}' but got '${injection.type ?? NONE}' instead`,
+                {
+                    start: injection.loc?.start ?? loc,
+                    end: injection.loc?.end ?? shiftLoc(loc, raw.length),
+                },
+            );
+        }
+
+        // At-rule injection (typically used for media queries, but later can be extended easily)
+        // TODO: Extend to support other at-rules if needed
+        if (injection.type === CssTreeNodeType.Atrule) {
+            const atrule = injection;
+
+            // Check at-rule name
+            if (atrule.name !== MEDIA) {
+                throw new AdblockSyntaxError(
+                    `Invalid at-rule name, expected '${MEDIA_MARKER}' but got '${AT_SIGN}${atrule.name}' instead`,
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            // Check at-rule prelude
+            if (!atrule.prelude || atrule.prelude.type !== CssTreeNodeType.AtrulePrelude) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `Invalid at-rule prelude, expected '${CssTreeNodeType.AtrulePrelude}' but got '${atrule.prelude?.type ?? NONE}' instead`,
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            // At-rule prelude should contain a single media query list
+            // eslint-disable-next-line max-len
+            if (!atrule.prelude.children.first || atrule.prelude.children.first.type !== CssTreeNodeType.MediaQueryList) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `Invalid at-rule prelude, expected a media query list but got '${atrule.prelude.children.first?.type ?? NONE}' instead`,
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            // Check at-rule block
+            if (!atrule.block || atrule.block.type !== CssTreeNodeType.Block) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `Invalid at-rule block, expected '${CssTreeNodeType.Block}' but got '${atrule.block?.type ?? NONE}' instead`,
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            // At-rule block should contain a single rule
+            if (!atrule.block.children.first || atrule.block.children.first.type !== CssTreeNodeType.Rule) {
+                throw new AdblockSyntaxError(
+                    // eslint-disable-next-line max-len
+                    `Invalid at-rule block, expected a rule but got '${atrule.block.children.first?.type ?? NONE}' instead`,
+                    {
+                        start: atrule.loc?.start ?? loc,
+                        end: atrule.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            mediaQueryList = atrule.prelude.children.first;
+            rule = atrule.block.children.first;
+        } else {
+            // Otherwise the whole injection is a simple CSS rule (without at-rule)
+            rule = injection;
+        }
+
+        // Check rule prelude
+        if (!rule.prelude || rule.prelude.type !== CssTreeNodeType.SelectorList) {
+            throw new AdblockSyntaxError(
+                `Invalid rule prelude, expected a selector list but got '${rule.prelude?.type ?? NONE}' instead`,
+                {
+                    start: rule.loc?.start ?? loc,
+                    end: rule.loc?.end ?? shiftLoc(loc, raw.length),
+                },
+            );
+        }
+
+        // Don't allow :remove() in the selector list at this point, because
+        // it doesn't make sense to have it here:
+        //  - we parsed 'selector list:remove()' case as uBO-way before, and
+        //  - we parse 'selector list { remove: true; }' case as ADG-way
+        //    at the end of this function
+        walk(rule.prelude, (node) => {
+            if (node.type === CssTreeNodeType.PseudoClassSelector) {
+                if (node.name === REMOVE) {
+                    throw new AdblockSyntaxError(
+                        `Invalid selector list, '${REMOVE}' pseudo-class should be used in the declaration list`,
+                        {
+                            start: node.loc?.start ?? loc,
+                            end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                        },
+                    );
+                }
             }
         });
 
-        const result: CssRuleBody = {
-            selectors: <SelectorPlain[]>selectors.map((selector) => toPlainObject(selector)),
-            block: REMOVE_BLOCK_TYPE,
-        };
-
-        if (uboCssInjection.groups.declarations) {
-            const rawDeclarations = uboCssInjection.groups.declarations.trim();
-
-            // Hack: CSS parser waits for `{declarations}` pattern, so we need { and } chars:
-            result.block = <BlockPlain>toPlainObject(CssTree.parse(`{${rawDeclarations}}`, CssTreeParserContext.block));
+        // Check rule block
+        if (!rule.block || rule.block.type !== CssTreeNodeType.Block) {
+            throw new AdblockSyntaxError(
+                `Invalid rule block, expected a block but got '${rule.block?.type ?? NONE}' instead`,
+                locRange(loc, rule.loc?.start.offset ?? 0, raw.length),
+            );
         }
 
-        return result;
+        // Rule block should contain a Declaration nodes
+        rule.block.children.forEach((node) => {
+            if (node.type !== CssTreeNodeType.Declaration) {
+                throw new AdblockSyntaxError(
+                    `Invalid rule block, expected a declaration but got '${node.type}' instead`,
+                    {
+                        start: node.loc?.start ?? loc,
+                        end: node.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+        });
+
+        const declarationList: DeclarationListPlain = {
+            type: 'DeclarationList',
+            loc: rule.block.loc,
+            children: [],
+        };
+
+        const declarationKeys: string[] = [];
+        let remove = false;
+
+        // Walk through the rule block and collect declarations
+        walk(rule.block, {
+            enter(node: CssNode) {
+                if (node.type === CssTreeNodeType.Declaration) {
+                    declarationList.children.push(<DeclarationPlain>toPlainObject(node));
+                    declarationKeys.push(node.property);
+                }
+            },
+        });
+
+        // Check for "remove" declaration
+        if (declarationKeys.includes(REMOVE)) {
+            if (declarationKeys.length > 1) {
+                throw new AdblockSyntaxError(
+                    `Invalid declaration list, '${REMOVE}' declaration should be used alone`,
+                    {
+                        start: rule.block.loc?.start ?? loc,
+                        end: rule.block.loc?.end ?? shiftLoc(loc, raw.length),
+                    },
+                );
+            }
+
+            remove = true;
+        }
+
+        // It is safe to cast plain objects here
+        return {
+            type: 'CssInjectionRuleBody',
+            loc: locRange(loc, 0, raw.length),
+            mediaQueryList: mediaQueryList ? <MediaQueryListPlain>toPlainObject(mediaQueryList) : undefined,
+            selectorList: <SelectorListPlain>toPlainObject(rule.prelude),
+            declarationList: remove ? undefined : declarationList,
+            remove,
+        };
     }
 
     /**
-     * Parses a raw selector as a CSS injection. It determines the syntax automatically.
+     * Generates a string representation of the CSS injection rule body (serialized).
      *
-     * @param raw - Raw rule
-     * @returns CSS injection AST or null (if the raw rule cannot be parsed
-     * as CSS injection)
+     * @param ast Raw CSS injection rule body
+     * @param syntax Syntax to use (default: AdGuard)
+     * @returns String representation of the CSS injection rule body
+     * @throws If the body is invalid
      */
-    public static parse(raw: string): CssRuleBody | null {
-        const trimmed = raw.trim();
-
-        return (
-            CssInjectionBodyParser.parseAdgCssInjection(trimmed) || CssInjectionBodyParser.parseUboCssInjection(trimmed)
-        );
-    }
-
-    /**
-     * Converts a CSS injection AST to a string.
-     *
-     * @param ast - CSS injection rule body AST
-     * @param syntax - Desired syntax of the generated result
-     * @returns Raw string
-     * @throws
-     *   - If you generate a media query with uBlock syntax
-     *   - If you enter unsupported syntax
-     */
-    public static generate(ast: CssRuleBody, syntax: AdblockSyntax): string {
+    public static generate(ast: CssInjectionRuleBody, syntax: AdblockSyntax = AdblockSyntax.Adg): string {
         let result = EMPTY;
 
-        switch (syntax) {
-            case AdblockSyntax.Adg: {
-                if (ast.mediaQueryList) {
-                    result += CSS_MEDIA_MARKER;
-                    result += SPACE;
-                    result += generateCss(fromPlainObject(ast.mediaQueryList));
-                    result += SPACE;
-                    result += CSS_BLOCK_OPEN;
-                    result += SPACE;
-                }
+        if (ast.remove && ast.declarationList) {
+            throw new Error('Invalid body, both "remove" and "declarationList" are present');
+        }
 
-                // Selectors (comma separated)
-                result += ast.selectors
-                    .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
-                    .join(CSS_SELECTORS_SEPARATOR + SPACE);
-
-                // Rule body (remove or another declarations)
+        if (syntax === AdblockSyntax.Adg) {
+            if (ast.mediaQueryList) {
+                result += MEDIA_MARKER;
                 result += SPACE;
-
-                if (!ast.block) {
-                    result += `${CSS_BLOCK_OPEN} ${CSS_BLOCK_CLOSE}`;
-                } else if (ast.block === REMOVE_BLOCK_TYPE) {
-                    result += REMOVE_BLOCK;
-                } else {
-                    result += CSS_BLOCK_OPEN;
-                    result += SPACE;
-                    result += CssTree.generateBlock(<Block>fromPlainObject(ast.block));
-                    result += SPACE;
-                    result += CSS_BLOCK_CLOSE;
-                }
-
-                if (ast.mediaQueryList) {
-                    result += SPACE;
-                    result += CSS_BLOCK_CLOSE;
-                }
-                break;
+                result += CssTree.generateMediaQueryList(<MediaQueryList>fromPlainObject(ast.mediaQueryList));
+                result += SPACE;
+                result += OPEN_CURLY_BRACKET;
+                result += SPACE;
             }
 
-            case AdblockSyntax.Ubo: {
-                if (ast.mediaQueryList !== undefined) {
-                    throw new SyntaxError("uBlock doesn't support media queries");
-                }
+            result += CssTree.generateSelectorList(<SelectorList>fromPlainObject(ast.selectorList));
 
-                // Selectors (comma separated)
-                result += ast.selectors
-                    .map((selector) => CssTree.generateSelector(<Selector>fromPlainObject(selector)))
-                    .join(CSS_SELECTORS_SEPARATOR + SPACE);
+            result += SPACE;
+            result += OPEN_CURLY_BRACKET;
+            result += SPACE;
 
-                // Add :remove() or :style() at the end of the injection
-                if (!ast.block) {
-                    result += CSS_PSEUDO_MARKER;
-                    result += UBO_STYLE;
-                    result += CSS_PSEUDO_OPEN;
-                    result += CSS_PSEUDO_CLOSE;
-                } else if (ast.block === REMOVE_BLOCK_TYPE) {
-                    result += CSS_PSEUDO_MARKER;
-                    result += UBO_REMOVE;
-                    result += CSS_PSEUDO_OPEN;
-                    result += CSS_PSEUDO_CLOSE;
-                } else {
-                    result += CSS_PSEUDO_MARKER;
-                    result += UBO_STYLE;
-                    result += CSS_PSEUDO_OPEN;
-                    result += CssTree.generateBlock(<Block>fromPlainObject(ast.block));
-                    result += CSS_PSEUDO_CLOSE;
-                }
-
-                break;
+            if (ast.remove) {
+                result += REMOVE_DECLARATION;
+            } else if (ast.declarationList) {
+                result += CssTree.generateDeclarationList(<DeclarationList>fromPlainObject(ast.declarationList));
+            } else {
+                throw new Error('Invalid body');
             }
 
-            default:
-                throw new SyntaxError(`Unsupported syntax: ${syntax}`);
+            result += SPACE;
+            result += CLOSE_CURLY_BRACKET;
+
+            if (ast.mediaQueryList) {
+                result += SPACE;
+                result += CLOSE_CURLY_BRACKET;
+            }
+        } else if (syntax === AdblockSyntax.Ubo) {
+            // Generate regular selector list
+            result += CssTree.generateSelectorList(<SelectorList>fromPlainObject(ast.selectorList));
+
+            // Generate media query list, if present (:matches-media(...))
+            if (ast.mediaQueryList) {
+                result += COLON;
+                result += MATCHES_MEDIA;
+                result += OPEN_PARENTHESIS;
+                result += CssTree.generateMediaQueryList(<MediaQueryList>fromPlainObject(ast.mediaQueryList));
+                result += CLOSE_PARENTHESIS;
+            }
+
+            // Generate remove or style pseudo-class (:remove() or :style(...))
+            if (ast.remove) {
+                result += COLON;
+                result += REMOVE;
+                result += OPEN_PARENTHESIS;
+                result += CLOSE_PARENTHESIS;
+            } else if (ast.declarationList) {
+                result += COLON;
+                result += STYLE;
+                result += OPEN_PARENTHESIS;
+                result += CssTree.generateDeclarationList(<DeclarationList>fromPlainObject(ast.declarationList));
+                result += CLOSE_PARENTHESIS;
+            } else {
+                throw new Error('Invalid body');
+            }
+        } else {
+            throw new Error(`Unsupported syntax: ${syntax}`);
         }
 
         return result;

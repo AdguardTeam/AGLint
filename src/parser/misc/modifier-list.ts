@@ -1,62 +1,12 @@
-import { EMPTY } from '../../utils/constants';
+import { MODIFIERS_SEPARATOR } from '../../utils/constants';
+import { locRange, shiftLoc } from '../../utils/location';
 import { StringUtils } from '../../utils/string';
-
-// Modifiers are separated by ",". For example: "script,domain=example.com"
-const MODIFIERS_SEPARATOR = ',';
-
-// Modifiers can be assigned. For example: "domain=example.com"
-const MODIFIER_ASSIGN_OPERATOR = '=';
-
-const MODIFIER_EXCEPTION_MARKER = '~';
-
-export const MODIFIER_LIST_TYPE = 'ModifierList';
+import { ModifierList, defaultLocation } from '../common';
+import { ModifierParser } from './modifier';
 
 /**
- * Represents a modifier list.
- *
- * @example
- * If the rule is
- * ```adblock
- * some-rule$script,domain=example.com
- * ```
- * then the list of modifiers will be `script,domain=example.com`.
- */
-export interface ModifierList {
-    // Basically, the idea is that each main AST part should have a type
-    type: typeof MODIFIER_LIST_TYPE;
-    modifiers: RuleModifier[];
-}
-
-/**
- * Represents a modifier.
- *
- * @example
- * If the modifier is `third-party`, the value of the modifier property
- * will be `third-party`, but the value will remain undefined.
- *
- * But if the modifier is `domain=example.com`, then the modifier property will be
- * `domain` and the value property will be `example.com`.
- */
-export interface RuleModifier {
-    /**
-     * Modifier name
-     */
-    modifier: string;
-
-    /**
-     * Is this modifier an exception? For example, `~third-party` is an exception
-     */
-    exception?: boolean;
-
-    /**
-     * Modifier value (optional)
-     */
-    value?: string;
-}
-
-/**
- * `ModifierListParser` is responsible for parsing modifiers. Please note that the name is not uniform,
- * "modifiers" are also known as "options".
+ * `ModifierListParser` is responsible for parsing modifier lists. Please note that the name is not
+ * uniform, "modifiers" are also known as "options".
  *
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#basic-rules-modifiers}
  * @see {@link https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters#non-basic-rules-modifiers}
@@ -64,56 +14,51 @@ export interface RuleModifier {
  */
 export class ModifierListParser {
     /**
-     * Parses the cosmetic rule modifiers, eg. `script,key=value`
+     * Parses the cosmetic rule modifiers, eg. `third-party,domain=example.com|~example.org`.
      *
-     * @param raw - Raw modifiers
+     * _Note:_ you should remove `$` separator before passing the raw modifiers to this function,
+     *  or it will be parsed in the first modifier.
+     *
+     * @param raw Raw modifier list
+     * @param loc Location of the modifier list
      * @returns Parsed modifiers interface
      */
-    public static parse(raw: string): ModifierList {
+    public static parse(raw: string, loc = defaultLocation): ModifierList {
         const result: ModifierList = {
-            type: MODIFIER_LIST_TYPE,
-            modifiers: [],
+            type: 'ModifierList',
+            loc: locRange(loc, 0, raw.length),
+            children: [],
         };
 
+        let offset = 0;
+
+        // Skip whitespace before the modifier list
+        offset = StringUtils.skipWS(raw, offset);
+
         // Split modifiers by unescaped commas
-        const rawModifiers = StringUtils.splitStringByUnescapedCharacter(raw, MODIFIERS_SEPARATOR);
+        while (offset < raw.length) {
+            // Skip whitespace before the modifier
+            offset = StringUtils.skipWS(raw, offset);
 
-        // Skip empty modifiers
-        if (rawModifiers.length === 1 && rawModifiers[0].trim() === EMPTY) {
-            return result;
-        }
+            const modifierStart = offset;
 
-        // Parse each modifier separately
-        for (const rawModifier of rawModifiers) {
-            const trimmedRawModifier = rawModifier.trim();
+            // Find the index of the first unescaped "," character
+            const separatorStartIndex = StringUtils.findNextUnescapedCharacter(raw, MODIFIERS_SEPARATOR, offset);
 
-            // Find the index of the first unescaped "=" character
-            const assignmentOperatorIndex = StringUtils.findNextUnescapedCharacter(
-                trimmedRawModifier,
-                MODIFIER_ASSIGN_OPERATOR,
+            const modifierEnd = separatorStartIndex === -1
+                ? StringUtils.skipWSBack(raw) + 1
+                : StringUtils.skipWSBack(raw, separatorStartIndex - 1) + 1;
+
+            // Parse the modifier
+            const modifier = ModifierParser.parse(
+                raw.substring(modifierStart, modifierEnd),
+                shiftLoc(loc, modifierStart),
             );
 
-            const exception = trimmedRawModifier.startsWith(MODIFIER_EXCEPTION_MARKER);
+            result.children.push(modifier);
 
-            let modifier;
-            let value;
-
-            if (assignmentOperatorIndex === -1) {
-                // Modifier without assigned value. For example: "third-party"
-                modifier = trimmedRawModifier.substring(exception ? MODIFIER_EXCEPTION_MARKER.length : 0);
-            } else {
-                // Modifier with assigned value. For example: "domain=example.com"
-                value = trimmedRawModifier.substring(assignmentOperatorIndex + MODIFIER_ASSIGN_OPERATOR.length).trim();
-                modifier = trimmedRawModifier
-                    .substring(exception ? MODIFIER_EXCEPTION_MARKER.length : 0, assignmentOperatorIndex)
-                    .trim();
-            }
-
-            result.modifiers.push({
-                modifier,
-                value,
-                exception,
-            });
+            // Increment the offset to the next modifier (or the end of the string)
+            offset = separatorStartIndex === -1 ? raw.length : separatorStartIndex + 1;
         }
 
         return result;
@@ -122,27 +67,12 @@ export class ModifierListParser {
     /**
      * Converts a modifier list AST to a string.
      *
-     * @param ast - Modifier list AST
+     * @param ast Modifier list AST
      * @returns Raw string
      */
     public static generate(ast: ModifierList): string {
-        const result = ast.modifiers
-            .map(({ modifier, exception, value }) => {
-                let subresult = EMPTY;
-
-                if (exception) {
-                    subresult += MODIFIER_EXCEPTION_MARKER;
-                }
-
-                subresult += modifier.trim();
-
-                if (value) {
-                    subresult += MODIFIER_ASSIGN_OPERATOR;
-                    subresult += value.trim();
-                }
-
-                return subresult;
-            })
+        const result = ast.children
+            .map(ModifierParser.generate)
             .join(MODIFIERS_SEPARATOR);
 
         return result;

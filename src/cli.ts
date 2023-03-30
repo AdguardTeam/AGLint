@@ -1,6 +1,5 @@
 /**
- * AGLint CLI
- *
+ * @file AGLint CLI
  * @todo DEV run: node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/cli.ts
  */
 

@@ -1,21 +1,13 @@
-// Linter stuff
 import { SEVERITY } from '../severity';
-
-// Parser stuff
-import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/common';
-import { CommentRuleType } from '../../parser/comment/types';
-import { CLOSE_PARENTHESIS, EMPTY, OPEN_PARENTHESIS } from '../../utils/constants';
 import { GenericRuleContext, LinterRule } from '../common';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 
 const COMMON_PREPROCESSOR_DIRECTIVES = [
     'if',
     'endif',
     'include',
+    'safari_cb_affinity',
 ];
-
-// Special case: Safari Content Blocker Affinity
-const SAFARI_CB_AFFINITY = 'safari_cb_affinity';
 
 /**
  * Checks if a preprocessor directive is known
@@ -24,17 +16,7 @@ const SAFARI_CB_AFFINITY = 'safari_cb_affinity';
  * @returns `true` if the preprocessor directive is known, `false` otherwise
  */
 function isKnownPreProcessorDirective(name: string): boolean {
-    if (COMMON_PREPROCESSOR_DIRECTIVES.includes(name)) {
-        return true;
-    }
-
-    // Special case: safari_cb_affinity and safari_cb_affinity(params) are also valid
-    if (name.startsWith(SAFARI_CB_AFFINITY)) {
-        const params = name.substring(SAFARI_CB_AFFINITY.length);
-        return params === EMPTY || (params.startsWith(OPEN_PARENTHESIS) && params.endsWith(CLOSE_PARENTHESIS));
-    }
-
-    return false;
+    return COMMON_PREPROCESSOR_DIRECTIVES.includes(name);
 }
 
 /**
@@ -52,10 +34,10 @@ export const UnknownPreProcessorDirectives = <LinterRule>{
             const line = context.getActualLine();
 
             // Check if the rule is a preprocessor comment
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessor) {
-                if (!isKnownPreProcessorDirective(ast.name)) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessorCommentRule) {
+                if (!isKnownPreProcessorDirective(ast.name.value)) {
                     context.report({
-                        message: `Unknown preprocessor directive "${ast.name}"`,
+                        message: `Unknown preprocessor directive "${ast.name.value}"`,
                         position: {
                             startLine: line,
                             startColumn: 0,

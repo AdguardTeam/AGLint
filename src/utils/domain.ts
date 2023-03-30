@@ -1,9 +1,13 @@
-import { parse } from 'tldts';
-import { DOT } from './constants';
+/**
+ * @file Utility functions for domain and hostname validation.
+ */
 
-const WILDCARD = '*';
-const WILDCARD_TLD = DOT + WILDCARD;
-const WILDCARD_SUBDOMAIN = WILDCARD + DOT;
+import { parse } from 'tldts';
+import { ASTERISK, DOT } from './constants';
+
+const WILDCARD = ASTERISK; // *
+const WILDCARD_TLD = DOT + WILDCARD; // .*
+const WILDCARD_SUBDOMAIN = WILDCARD + DOT; // *.
 
 export class DomainUtils {
     /**
