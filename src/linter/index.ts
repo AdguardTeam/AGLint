@@ -13,13 +13,14 @@ import {
     SEVERITY, getSeverity, AnySeverity, isSeverity,
 } from './severity';
 import {
+    AnyLinterRule,
     GenericRuleContext,
     LinterConfig,
     LinterPosition,
     LinterProblemReport,
-    LinterRule,
     LinterRuleConfig,
     LinterRuleConfigObject,
+    LinterRuleEvents,
     LinterRuleStorage,
 } from './common';
 import {
@@ -96,7 +97,7 @@ export interface LinterRuleData {
      * The linter rule itself. It's meta provides the rule severity and default config,
      * which can be overridden by the user here.
      */
-    rule: LinterRule;
+    rule: AnyLinterRule;
 
     /**
      * Storage for storing data between events. This storage is only visible
@@ -250,7 +251,7 @@ export class Linter {
      * @param rule The rule itself
      * @throws If the rule name is already taken
      */
-    public addRule(name: string, rule: LinterRule): void {
+    public addRule(name: string, rule: AnyLinterRule): void {
         this.addRuleEx(name, {
             rule,
 
@@ -360,7 +361,7 @@ export class Linter {
      * @param name - The name of the rule
      * @returns The `LinterRule` object, or `undefined` if no such rule exists
      */
-    public getRule(name: string): LinterRule | undefined {
+    public getRule(name: string): AnyLinterRule | undefined {
         return cloneDeep(this.rules.get(name)?.rule);
     }
 
@@ -485,8 +486,8 @@ export class Linter {
         let actualLine = 0;
 
         // Store the actual rule here for the context object
-        let actualAdblockRuleAst: AnyRule | undefined;
-        let actualAdblockRuleRaw: string | undefined;
+        let actualAdblockRuleAst: AnyRule;
+        let actualAdblockRuleRaw: string;
 
         /**
          * Invokes an event for all rules. This function is only used internally
@@ -497,7 +498,7 @@ export class Linter {
          *
          * @param event - The event to invoke (e.g. `onRule`)
          */
-        const invokeEvent = (event: keyof LinterRule['events']): void => {
+        const invokeEvent = (event: keyof LinterRuleEvents): void => {
             for (const [name, data] of this.rules) {
                 // If the rule is disabled, skip it
                 if (
@@ -513,76 +514,83 @@ export class Linter {
                     assert(data.configOverride || data.rule.meta.config.default, data.rule.meta.config.schema);
                 }
 
-                // Get event handler for the rule
-                const eventHandler = data.rule.events[event];
+                const genericContext: GenericRuleContext = Object.freeze({
+                    // Deep copy of the linter configuration
+                    getLinterConfig: () => ({ ...this.config }),
 
-                // Invoke event handler (if it exists)
-                if (eventHandler) {
-                    // Create a context object and freeze it in order to prevent
-                    // accidental / unwanted modifications
-                    const context: GenericRuleContext = Object.freeze({
-                        // Deep copy of the linter configuration
-                        getLinterConfig: () => ({ ...this.config }),
+                    // Currently linted filter list content
+                    getFilterListContent: () => content,
 
-                        // Currently linted filter list content
-                        getFilterListContent: () => content,
+                    fixingEnabled: () => fix,
 
-                        // Currently iterated adblock rule
-                        // eslint-disable-next-line @typescript-eslint/no-loop-func
-                        getActualAdblockRuleAst: () => (actualAdblockRuleAst ? { ...actualAdblockRuleAst } : undefined),
+                    // Storage reference
+                    storage: data.storage,
 
-                        // Currently iterated adblock rule
-                        // eslint-disable-next-line @typescript-eslint/no-loop-func
-                        getActualAdblockRuleRaw: () => (actualAdblockRuleRaw || undefined),
+                    // Rule configuration
+                    config: data.configOverride || data.rule.meta.config?.default,
 
-                        // eslint-disable-next-line @typescript-eslint/no-loop-func
-                        getActualLine: () => actualLine,
+                    // Reporter function
+                    report: (problem: LinterProblemReport) => {
+                        let severity = getSeverity(data.rule.meta.severity);
 
-                        fixingEnabled: () => fix,
-
-                        // Storage reference
-                        storage: data.storage,
-
-                        // Rule configuration
-                        config: data.configOverride || data.rule.meta.config?.default,
-
-                        // Reporter function
-                        report: (problem: LinterProblemReport) => {
-                            let severity = getSeverity(data.rule.meta.severity);
-
-                            if (!nextLineEnabled.has(name)) {
-                                if (isSeverity(data.severityOverride)) {
-                                    severity = getSeverity(data.severityOverride);
-                                }
+                        if (!nextLineEnabled.has(name)) {
+                            if (isSeverity(data.severityOverride)) {
+                                severity = getSeverity(data.severityOverride);
                             }
+                        }
 
-                            result.problems.push({
-                                rule: name,
-                                severity,
-                                message: problem.message,
-                                position: { ...problem.position },
-                                fix: problem.fix,
-                            });
+                        result.problems.push({
+                            rule: name,
+                            severity,
+                            message: problem.message,
+                            position: { ...problem.position },
+                            fix: problem.fix,
+                        });
 
-                            // Update problem counts
-                            switch (severity) {
-                                case SEVERITY.warn:
-                                    result.warningCount += 1;
-                                    break;
-                                case SEVERITY.error:
-                                    result.errorCount += 1;
-                                    break;
-                                case SEVERITY.fatal:
-                                    result.fatalErrorCount += 1;
-                                    break;
-                                default:
-                                    break;
-                            }
-                        },
-                    });
+                        // Update problem counts
+                        switch (severity) {
+                            case SEVERITY.warn:
+                                result.warningCount += 1;
+                                break;
+                            case SEVERITY.error:
+                                result.errorCount += 1;
+                                break;
+                            case SEVERITY.fatal:
+                                result.fatalErrorCount += 1;
+                                break;
+                            default:
+                                break;
+                        }
+                    },
+                });
 
-                    // Invoke event handler with the context object
-                    eventHandler(context);
+                // Call the proper event handler
+                if (event !== 'onRule') {
+                    const handler = data.rule.events[event];
+
+                    if (handler) {
+                        handler(genericContext);
+                    }
+                } else {
+                    const handler = data.rule.events.onRule;
+
+                    if (handler) {
+                        handler(
+                            Object.freeze({
+                                ...genericContext,
+                                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                                getActualLine: () => actualLine,
+
+                                // Currently iterated adblock rule
+                                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                                getActualAdblockRuleAst: () => actualAdblockRuleAst,
+
+                                // Currently iterated adblock rule
+                                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                                getActualAdblockRuleRaw: () => actualAdblockRuleRaw,
+                            }),
+                        );
+                    }
                 }
             }
         };
@@ -732,7 +740,10 @@ export class Linter {
 
                     // Deep copy of the line data
                     actualAdblockRuleAst = { ...ast };
-                    actualAdblockRuleRaw = ast.raws?.text;
+                    // It is safe to use the `!` operator here, because we know that the `raws` property exists,
+                    // since we configured the parser to return the raw data as well.
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    actualAdblockRuleRaw = ast.raws!.text!;
 
                     // Invoke onRule event for all rules (process actual adblock rule)
                     invokeEvent('onRule');

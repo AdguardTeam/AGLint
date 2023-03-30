@@ -1,19 +1,19 @@
-import { AnyRule, RuleCategory } from '../../parser/common';
-import { GenericRuleContext, LinterRule } from '../common';
+import { RuleCategory } from '../../parser/common';
+import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**
  * Rule that checks if a network rule contains multiple same modifiers
  */
-export const DuplicatedModifiers = <LinterRule>{
+export const DuplicatedModifiers: LinterRule = {
     meta: {
         severity: SEVERITY.error,
     },
     events: {
-        onRule: (context: GenericRuleContext): void => {
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             // Check if the rule is a basic network rule
