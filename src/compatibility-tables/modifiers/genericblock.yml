@@ -25,7 +25,6 @@ adg_ext_any:
     - generichide
     - elemhide
     - jsinject
-    - xmlhttprequest
     - badfilter
   inverse_conflicts: true
   negatable: false
@@ -41,7 +40,6 @@ adg_cb_ios:
     - generichide
     - elemhide
     - jsinject
-    - xmlhttprequest
     - badfilter
   inverse_conflicts: true
   negatable: false
@@ -57,7 +55,6 @@ adg_cb_safari:
     - generichide
     - elemhide
     - jsinject
-    - xmlhttprequest
     - badfilter
   inverse_conflicts: true
   negatable: false
