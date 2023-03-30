@@ -25,9 +25,7 @@ adg_ext_any:
     - specifichide
     - generichide
     - elemhide
-    - extension
     - jsinject
-    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -43,9 +41,7 @@ adg_cb_ios:
     - specifichide
     - generichide
     - elemhide
-    - extension
     - jsinject
-    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -61,9 +57,7 @@ adg_cb_safari:
     - specifichide
     - generichide
     - elemhide
-    - extension
     - jsinject
-    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true

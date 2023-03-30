@@ -28,7 +28,6 @@ adg_ext_any:
     - elemhide
     - genericblock
     - urlblock
-    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -46,7 +45,6 @@ adg_cb_ios:
     - elemhide
     - genericblock
     - urlblock
-    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
@@ -64,7 +62,6 @@ adg_cb_safari:
     - elemhide
     - genericblock
     - urlblock
-    - content
     - xmlhttprequest
     - badfilter
   inverse_conflicts: true
