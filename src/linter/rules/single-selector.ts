@@ -1,20 +1,20 @@
 import cloneDeep from 'clone-deep';
-import { AnyRule, CosmeticRuleType, RuleCategory } from '../../parser/common';
-import { GenericRuleContext, LinterProblemReport, LinterRule } from '../common';
+import { CosmeticRuleType, RuleCategory } from '../../parser/common';
+import { LinterProblemReport, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**
  * Rule that checks if a cosmetic rule contains multiple selectors
  */
-export const SingleSelector = <LinterRule>{
+export const SingleSelector: LinterRule = {
     meta: {
         severity: SEVERITY.warn,
     },
     events: {
-        onRule: (context: GenericRuleContext): void => {
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             // Check if the rule is an element hiding rule

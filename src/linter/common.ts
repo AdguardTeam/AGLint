@@ -3,6 +3,12 @@ import { AnySeverity } from './severity';
 import { AnyRule } from '../parser/common';
 
 /**
+ * Represents any linter rule
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyLinterRule = LinterRule<any, any>;
+
+/**
  * Type for rule configuration object
  */
 export type LinterRuleConfigObject = { [key: string]: LinterRuleConfig };
@@ -55,14 +61,14 @@ export interface LinterRuleMeta {
 /**
  * Represents what events a linter rule can handle
  */
-export interface LinterRuleEvents {
+export interface LinterRuleEvents<StorageType = LinterRuleStorage<unknown>, ConfigType = unknown> {
     /**
      * Called before analyzing a filter list (before any rule is analyzed).
      * You can retrieve the filter list and other necessary information from the context.
      *
      * @param context - Linter context
      */
-    onStartFilterList?: (context: GenericRuleContext) => void;
+    onStartFilterList?: (context: GenericRuleContext<StorageType, ConfigType>) => void;
 
     /**
      * Called after analyzing a filter list (after all rules are analyzed).
@@ -70,7 +76,7 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onEndFilterList?: (context: GenericRuleContext) => void;
+    onEndFilterList?: (context: GenericRuleContext<StorageType, ConfigType>) => void;
 
     /**
      * Called when analyzing an adblock rule. This event is called for each rule, including comments.
@@ -78,13 +84,13 @@ export interface LinterRuleEvents {
      *
      * @param context - Linter context
      */
-    onRule?: (context: GenericRuleContext) => void;
+    onRule?: (context: SpecificRuleContext<StorageType, ConfigType>) => void;
 }
 
 /**
  * Represents an AGLint rule
  */
-export interface LinterRule {
+export interface LinterRule<StorageType = LinterRuleStorage<unknown>, ConfigType = unknown> {
     /**
      * Basic data of the rule (metadata)
      */
@@ -93,7 +99,7 @@ export interface LinterRule {
     /**
      * Events belonging to the rule
      */
-    events: LinterRuleEvents;
+    events: LinterRuleEvents<StorageType, ConfigType>;
 }
 
 /**
@@ -119,7 +125,7 @@ export interface LinterConfig {
 /**
  * Represents a linter context that is passed to the rules when their events are triggered
  */
-export interface GenericRuleContext {
+export interface GenericRuleContext<StorageType = LinterRuleStorage<unknown>, ConfigType = unknown> {
     /**
      * Returns the clone of the shared linter configuration.
      *
@@ -135,27 +141,6 @@ export interface GenericRuleContext {
     getFilterListContent: () => string;
 
     /**
-     * Returns the AST of the adblock rule currently being iterated by the linter.
-     *
-     * @returns The actual adblock rule as AST
-     */
-    getActualAdblockRuleAst: () => AnyRule | undefined;
-
-    /**
-     * Returns the raw version of the adblock rule currently being iterated by the linter.
-     *
-     * @returns The actual adblock rule as original string
-     */
-    getActualAdblockRuleRaw: () => string | undefined;
-
-    /**
-     * Returns the line number that the linter is currently iterating.
-     *
-     * @returns The actual line number
-     */
-    getActualLine: () => number;
-
-    /**
      * Returns whether a fix was requested from the linter. This is an optimization
      * for the linter, so it doesn't have to run the fixer if it's not needed.
      *
@@ -166,13 +151,13 @@ export interface GenericRuleContext {
     /**
      * Storage for storing data between events. This storage is only visible to the rule.
      */
-    storage: LinterRuleStorage;
+    storage: StorageType;
 
     /**
      * Additional config for the rule. This is unknown at this point, but the concrete
      * type is defined by the rule.
      */
-    config: unknown;
+    config: ConfigType;
 
     /**
      * Function for reporting problems to the linter.
@@ -180,6 +165,33 @@ export interface GenericRuleContext {
      * @param problem - The problem to report
      */
     report: (problem: LinterProblemReport) => void;
+}
+
+/**
+ * Specialized linter context for the rule that is triggered when analyzing an adblock rule
+ */
+// eslint-disable-next-line max-len
+export interface SpecificRuleContext<StorageType = LinterRuleStorage<unknown>, ConfigType = unknown> extends GenericRuleContext<StorageType, ConfigType> {
+    /**
+     * Returns the AST of the adblock rule currently being iterated by the linter.
+     *
+     * @returns The actual adblock rule as AST
+     */
+    getActualAdblockRuleAst: () => AnyRule;
+
+    /**
+     * Returns the raw version of the adblock rule currently being iterated by the linter.
+     *
+     * @returns The actual adblock rule as original string
+     */
+    getActualAdblockRuleRaw: () => string;
+
+    /**
+     * Returns the line number that the linter is currently iterating.
+     *
+     * @returns The actual line number
+     */
+    getActualLine: () => number;
 }
 
 /**
@@ -233,8 +245,8 @@ export interface LinterProblemReport {
  *
  * Basically used internally by the linter, so no need to export this.
  */
-export interface LinterRuleStorage {
+export interface LinterRuleStorage<T = unknown> {
     // The key is some string, the value is unknown at this point.
     // The concrete value type is defined by the rule.
-    [key: string]: unknown;
+    [key: string]: T;
 }

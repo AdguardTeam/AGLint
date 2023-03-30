@@ -1,6 +1,6 @@
-import { AnyRule, RuleCategory } from '../../parser/common';
+import { RuleCategory } from '../../parser/common';
 import { DomainUtils } from '../../utils/domain';
-import { GenericRuleContext, LinterRule } from '../common';
+import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**
@@ -11,11 +11,10 @@ export const InvalidDomainList: LinterRule = {
         severity: SEVERITY.error,
     },
     events: {
-        onRule: (context: GenericRuleContext): void => {
-            // TODO: Remove type assertion
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             // Check if the rule is a cosmetic rule (any cosmetic rule)

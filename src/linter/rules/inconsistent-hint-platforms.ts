@@ -1,8 +1,8 @@
-import { GenericRuleContext, LinterRule } from '../common';
+import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 import { EMPTY } from '../../utils/constants';
 import { ArrayUtils } from '../../utils/array';
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
+import { CommentRuleType, RuleCategory } from '../../parser/common';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
@@ -16,11 +16,10 @@ export const InconsistentHintPlatforms: LinterRule = {
         severity: SEVERITY.error,
     },
     events: {
-        onRule: (context: GenericRuleContext): void => {
-            // TODO: Remove type assertion
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {

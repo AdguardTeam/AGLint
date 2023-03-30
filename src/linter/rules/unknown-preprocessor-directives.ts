@@ -1,6 +1,6 @@
 import { SEVERITY } from '../severity';
-import { GenericRuleContext, LinterRule } from '../common';
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
+import { LinterRule } from '../common';
+import { CommentRuleType, RuleCategory } from '../../parser/common';
 
 const COMMON_PREPROCESSOR_DIRECTIVES = [
     'if',
@@ -22,15 +22,15 @@ function isKnownPreProcessorDirective(name: string): boolean {
 /**
  * Rule that checks if a preprocessor directive is known
  */
-export const UnknownPreProcessorDirectives = <LinterRule>{
+export const UnknownPreProcessorDirectives: LinterRule = {
     meta: {
         severity: SEVERITY.error,
     },
     events: {
-        onRule: (context: GenericRuleContext): void => {
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             // Check if the rule is a preprocessor comment

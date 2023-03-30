@@ -1,10 +1,12 @@
 import {
-    AnyRule,
     CommentRuleType,
     PreProcessorCommentRule,
     RuleCategory,
 } from '../../parser/common';
-import { GenericRuleContext, LinterPosition, LinterRule } from '../common';
+import {
+    LinterPosition,
+    LinterRule,
+} from '../common';
 import { SEVERITY } from '../severity';
 
 const IF_DIRECTIVE = 'if';
@@ -14,7 +16,7 @@ const ENDIF_DIRECTIVE = 'endif';
  * Concreting the storage type definition (the linter only provides a general
  * form where the value type is unknown)
  */
-interface RuleStorage {
+interface Storage {
     /**
      * Array of all open if directives
      */
@@ -37,29 +39,22 @@ interface StoredIf {
 }
 
 /**
- * Inserting the storage type definition into the context
- */
-type RuleContext = GenericRuleContext & {
-    storage: RuleStorage;
-};
-
-/**
  * Rule that checks if all if directives are closed
  */
-export const IfClosed = <LinterRule>{
+export const IfClosed: LinterRule<Storage> = {
     meta: {
         severity: SEVERITY.error,
     },
     events: {
-        onStartFilterList: (context: RuleContext): void => {
+        onStartFilterList: (context): void => {
             // Each rule ONLY sees its own storage. At the beginning of the filter list,
             // we just initialize the storage.
             context.storage.openIfs = [];
         },
-        onRule: (context: RuleContext): void => {
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             // Check adblock rule category and type
@@ -95,7 +90,7 @@ export const IfClosed = <LinterRule>{
                 }
             }
         },
-        onEndFilterList: (context: RuleContext): void => {
+        onEndFilterList: (context): void => {
             // If there are any collected "if"s, that means they aren't closed, so a problem must be reported for them
             for (const openIf of context.storage.openIfs) {
                 context.report({

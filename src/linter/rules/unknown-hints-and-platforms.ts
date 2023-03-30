@@ -1,6 +1,6 @@
-import { GenericRuleContext, LinterRule } from '../common';
+import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
+import { CommentRuleType, RuleCategory } from '../../parser/common';
 
 const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
 const PLATFORM = 'PLATFORM';
@@ -32,11 +32,10 @@ export const UnknownHintsAndPlatforms: LinterRule = {
         severity: SEVERITY.error,
     },
     events: {
-        onRule: (context: GenericRuleContext): void => {
-            // TODO: Remove type assertion
+        onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
-            const raw = <string>context.getActualAdblockRuleRaw();
+            const ast = context.getActualAdblockRuleAst();
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {

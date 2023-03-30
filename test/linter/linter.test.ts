@@ -5,7 +5,7 @@ import { defaultLinterRules } from '../../src/linter/rules';
 import { SEVERITY, SeverityValue, SeverityName } from '../../src/linter/severity';
 import { RuleParser } from '../../src/parser/rule';
 import { EMPTY, NEWLINE } from '../../src/utils/constants';
-import { GenericRuleContext, LinterConfig, LinterRule } from '../../src/linter/common';
+import { LinterConfig, LinterRule } from '../../src/linter/common';
 import { AnyRule } from '../../src/parser/common';
 import { FilterListParser } from '../../src/parser/filterlist';
 
@@ -38,8 +38,8 @@ const demoRuleEverythingIsProblem1: LinterRule = {
         severity: SEVERITY.warn,
     },
     events: {
-        onRule: (context: GenericRuleContext) => {
-            const raw = <string>context.getActualAdblockRuleRaw();
+        onRule: (context) => {
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             context.report({
@@ -60,8 +60,8 @@ const demoRuleEverythingIsProblem2: LinterRule = {
         severity: SEVERITY.warn,
     },
     events: {
-        onRule: (context: GenericRuleContext) => {
-            const raw = <string>context.getActualAdblockRuleRaw();
+        onRule: (context) => {
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
             context.report({
@@ -90,8 +90,8 @@ const demoRuleEverythingIsProblem3: LinterRule = {
         },
     },
     events: {
-        onRule: (context: GenericRuleContext) => {
-            const raw = <string>context.getActualAdblockRuleRaw();
+        onRule: (context) => {
+            const raw = context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
             const { message } = context.config as { message: string };
 
@@ -2055,8 +2055,8 @@ describe('Linter', () => {
                 severity: SEVERITY.error,
             },
             events: {
-                onRule: (context: GenericRuleContext) => {
-                    const raw = <string>context.getActualAdblockRuleRaw();
+                onRule: (context) => {
+                    const raw = context.getActualAdblockRuleRaw();
                     const line = context.getActualLine();
 
                     context.report({
@@ -2154,8 +2154,8 @@ describe('Linter', () => {
                 severity: SEVERITY.error,
             },
             events: {
-                onRule: (context: GenericRuleContext) => {
-                    const raw = <string>context.getActualAdblockRuleRaw();
+                onRule: (context) => {
+                    const raw = context.getActualAdblockRuleRaw();
                     const line = context.getActualLine();
 
                     context.report({
@@ -2242,8 +2242,8 @@ describe('Linter', () => {
                 severity: SEVERITY.error,
             },
             events: {
-                onRule: (context: GenericRuleContext) => {
-                    const raw = <string>context.getActualAdblockRuleRaw();
+                onRule: (context) => {
+                    const raw = context.getActualAdblockRuleRaw();
                     const line = context.getActualLine();
 
                     context.report({
@@ -2271,8 +2271,8 @@ describe('Linter', () => {
                 severity: SEVERITY.error,
             },
             events: {
-                onRule: (context: GenericRuleContext) => {
-                    const raw = <string>context.getActualAdblockRuleRaw();
+                onRule: (context) => {
+                    const raw = context.getActualAdblockRuleRaw();
                     const line = context.getActualLine();
 
                     context.report({
@@ -2446,7 +2446,7 @@ describe('Linter', () => {
                 },
             },
             events: {
-                onRule: (context: GenericRuleContext) => {
+                onRule: (context) => {
                     config = context.getLinterConfig();
                     content = context.getFilterListContent();
                     rawRules.push(context.getActualAdblockRuleRaw());
