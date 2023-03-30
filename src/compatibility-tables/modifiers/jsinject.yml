@@ -1,6 +1,6 @@
 adg_os_any:
   name: jsinject
-  description: Forbids adding of javascript code to the page. You can read about javascript rules further.
+  description: Forbids adding of javascript code to the page.
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#jsinject-modifier
   conflicts:
     - domain
@@ -19,7 +19,7 @@ adg_os_any:
 
 adg_ext_any:
   name: jsinject
-  description: Forbids adding of javascript code to the page. You can read about javascript rules further.
+  description: Forbids adding of javascript code to the page.
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#jsinject-modifier
   conflicts:
     - domain
@@ -38,7 +38,7 @@ adg_ext_any:
 
 adg_cb_ios:
   name: jsinject
-  description: Forbids adding of javascript code to the page. You can read about javascript rules further.
+  description: Forbids adding of javascript code to the page.
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#jsinject-modifier
   conflicts:
     - domain
@@ -57,7 +57,7 @@ adg_cb_ios:
 
 adg_cb_safari:
   name: jsinject
-  description: Forbids adding of javascript code to the page. You can read about javascript rules further.
+  description: Forbids adding of javascript code to the page.
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#jsinject-modifier
   conflicts:
     - domain
