@@ -1,11 +1,6 @@
-// Linter stuff
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-
-// Parser stuff
-import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/common';
-import { CommentRuleType } from '../../parser/comment/types';
 
 /**
  * Rule that checks if hints are duplicated within the same comment rule.
@@ -22,9 +17,9 @@ export const DuplicatedHints: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Only makes sense to check this, if there are at least two hints within the comment
-                if (ast.hints.length < 2) {
+                if (ast.children.length < 2) {
                     return;
                 }
 
@@ -34,13 +29,15 @@ export const DuplicatedHints: LinterRule = {
                 } = {};
 
                 // Iterate over all hints within the comment rule
-                for (const hint of ast.hints) {
+                for (const hint of ast.children) {
+                    const name = hint.name.value;
+
                     // Add the hint to the stats if it's not already there
-                    if (!(hint.name in stats)) {
-                        stats[hint.name] = 1;
+                    if (!(name in stats)) {
+                        stats[name] = 1;
                     } else {
                         // Increment the counter
-                        stats[hint.name] += 1;
+                        stats[name] += 1;
                     }
                 }
 

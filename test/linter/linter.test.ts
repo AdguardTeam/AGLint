@@ -1,10 +1,13 @@
 import ss, { Struct } from 'superstruct';
+import merge from 'deepmerge';
 import { Linter, LinterRuleData } from '../../src/linter';
 import { defaultLinterRules } from '../../src/linter/rules';
 import { SEVERITY, SeverityValue, SeverityName } from '../../src/linter/severity';
-import { AnyRule, RuleParser } from '../../src/parser';
+import { RuleParser } from '../../src/parser/rule';
 import { EMPTY, NEWLINE } from '../../src/utils/constants';
 import { GenericRuleContext, LinterConfig, LinterRule } from '../../src/linter/common';
+import { AnyRule } from '../../src/parser/common';
+import { FilterListParser } from '../../src/parser/filterlist';
 
 const demoRule: LinterRule = {
     meta: {
@@ -715,12 +718,12 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 5,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 5,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
             ],
@@ -736,9 +739,9 @@ describe('Linter', () => {
                     '[AdGuard; uBlock Origin]',
                     'example.org##.ad',
                     '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)', // Missing closing bracket
-                    'example.com##+js(aopr, test', // Missing opening bracket
-                    'example.com##+js...',
+                    'example.com##+js(aopr, test', // Missing closing bracket
+                    'example.com##+jsaopr, test)', // Missing opening bracket
+                    'example.com##+js...', // Invalid scriptlet rule, missing opening bracket
                     'example.com#$#body { padding 2px !important; }', // Invalid CSS rule (missing : after padding)
                     '! comment',
                     '||example.net^$third-party',
@@ -747,42 +750,53 @@ describe('Linter', () => {
         ).toMatchObject({
             problems: [
                 {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                    severity: 3,
+                    // eslint-disable-next-line max-len
+                    message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                    position: {
+                        startLine: 4,
+                        startColumn: 17,
+                        endLine: 4,
+                        endColumn: 28,
+                    },
+                },
+                {
+                    severity: 3,
+                    // eslint-disable-next-line max-len
+                    message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
                     position: {
                         startLine: 5,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 5,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
                 {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no opening parentheses "(" at call: "..."',
+                    severity: 3,
+                    // eslint-disable-next-line max-len
+                    message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
                     position: {
                         startLine: 6,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 6,
-                        endColumn: 19,
+                        endColumn: 20,
                     },
                 },
                 {
-                    severity: SEVERITY.fatal,
+                    severity: 3,
+                    // eslint-disable-next-line max-len
+                    message: "AGLint parsing error: Invalid rule block, expected a declaration but got 'Raw' instead",
                     position: {
                         startLine: 7,
-                        startColumn: 0,
+                        startColumn: 22,
                         endLine: 7,
-                        endColumn: 46,
+                        endColumn: 45,
                     },
                 },
             ],
             warningCount: 0,
             errorCount: 0,
-            fatalErrorCount: 3,
+            fatalErrorCount: 4,
         });
     });
 
@@ -809,12 +823,12 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 6,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 6,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
             ],
@@ -840,12 +854,12 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 6,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 6,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
             ],
@@ -935,24 +949,24 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 7,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 7,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
                 {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 8,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 8,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
             ],
@@ -990,36 +1004,36 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 10,
-                        startColumn: 0,
+                        startColumn: 16,
                         endLine: 10,
-                        endColumn: 26,
+                        endColumn: 27,
                     },
                 },
                 {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 11,
-                        startColumn: 0,
+                        startColumn: 16,
                         endLine: 11,
-                        endColumn: 26,
+                        endColumn: 27,
                     },
                 },
                 {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 17,
-                        startColumn: 0,
+                        startColumn: 16,
                         endLine: 17,
-                        endColumn: 26,
+                        endColumn: 27,
                     },
                 },
             ],
@@ -1051,36 +1065,36 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 7,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 7,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
                 {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 10,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 10,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
                 {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        'AGLint parsing error: Invalid uBlock/AdGuard scriptlet call, no closing parentheses ")" at call: "(aopr, test"',
+                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 11,
-                        startColumn: 0,
+                        startColumn: 17,
                         endLine: 11,
-                        endColumn: 27,
+                        endColumn: 28,
                     },
                 },
             ],
@@ -2031,7 +2045,10 @@ describe('Linter', () => {
     test('fixable interface (single line fix)', () => {
         const linter = new Linter(false);
 
-        const fix1 = RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com');
+        const fix1 = merge<AnyRule>(
+            RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com'),
+            { raws: { nl: 'lf' } },
+        );
 
         const rule1: LinterRule = {
             meta: {
@@ -2116,9 +2133,20 @@ describe('Linter', () => {
         const linter = new Linter(false);
 
         const fix2 = [
-            RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com'),
-            RuleParser.parse('bbb.js$script,redirect=noopjs,domain=example.com'),
-            RuleParser.parse('ccc.js$script,redirect=noopjs,domain=example.com'),
+            merge<AnyRule>(
+                RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com'),
+                { raws: { nl: 'lf' } },
+            ),
+
+            merge<AnyRule>(
+                RuleParser.parse('bbb.js$script,redirect=noopjs,domain=example.com'),
+                { raws: { nl: 'lf' } },
+            ),
+
+            merge<AnyRule>(
+                RuleParser.parse('ccc.js$script,redirect=noopjs,domain=example.com'),
+                { raws: { nl: 'lf' } },
+            ),
         ];
 
         const rule2: LinterRule = {
@@ -2443,9 +2471,9 @@ describe('Linter', () => {
 
         expect(config).toMatchObject(linter.getConfig());
         expect(content).toBe(filterList);
-        expect(rawRules).toEqual(filterListRawRules);
-        expect(astRules).toEqual(filterListRawRules.map((raw) => RuleParser.parse(raw)));
-        expect(lines).toEqual(Array.from({ length: filterListRawRules.length }, (_, i) => i + 1));
+        expect(rawRules).toMatchObject(filterListRawRules);
+        expect(astRules).toMatchObject(FilterListParser.parse(filterList).children);
+        expect(lines).toMatchObject(Array.from({ length: filterListRawRules.length }, (_, i) => i + 1));
         expect(receivedConfig).toEqual({ a: 1 });
     });
 });

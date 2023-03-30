@@ -1,8 +1,7 @@
 /**
- * AGLint core
+ * @file AGLint core
  */
 
-// Linter stuff
 import { assert } from 'superstruct';
 import cloneDeep from 'clone-deep';
 import {
@@ -13,18 +12,20 @@ import { ConfigCommentType } from './inline-config';
 import {
     SEVERITY, getSeverity, AnySeverity, isSeverity,
 } from './severity';
-
-// Parser stuff
-import { RuleCategory } from '../parser/common';
-import { CommentRuleType } from '../parser/comment/types';
-import { AnyRule, RuleParser } from '../parser';
-
-import { NewLineSplit, StringUtils } from '../utils/string';
-import { ArrayUtils } from '../utils/array';
 import {
-    // eslint-disable-next-line max-len
-    GenericRuleContext, LinterConfig, LinterPosition, LinterProblemReport, LinterRule, LinterRuleConfig, LinterRuleConfigObject, LinterRuleStorage,
+    GenericRuleContext,
+    LinterConfig,
+    LinterPosition,
+    LinterProblemReport,
+    LinterRule,
+    LinterRuleConfig,
+    LinterRuleConfigObject,
+    LinterRuleStorage,
 } from './common';
+import {
+    AnyRule, CommentRuleType, FilterList, RuleCategory,
+} from '../parser/common';
+import { FilterListParser } from '../parser/filterlist';
 
 /**
  * Represents a linter result that is returned by the `lint` method
@@ -589,23 +590,54 @@ export class Linter {
         // Invoke onStartFilterList event before parsing the filter list
         invokeEvent('onStartFilterList');
 
-        // Get lines (rules) of the filter list
-        const rules = StringUtils.splitStringByNewLinesEx(content);
+        // Parse the filter list
+        const filterList = FilterListParser.parse(content);
 
         // Iterate over all filter list adblock rules
-        rules.forEach((rule, index) => {
+        filterList.children.forEach((ast, index) => {
             // Update actual line number for the context object
             actualLine = index + 1;
 
             // Process the line
             const code = ((): number => {
-                try {
-                    // Parse the current adblock rule, but this throw an error if the rule is invalid.
-                    // We catch the error and report it as a problem.
-                    const ast = RuleParser.parse(rule[0]);
+                // Invalid rules
+                if (ast.category === RuleCategory.Invalid) {
+                    // If the linter is actually disabled, skip the error reporting
+                    if ((isDisabled || isDisabledForNextLine) && !isEnabledForNextLine) {
+                        return 0;
+                    }
 
+                    // If an error occurs during parsing, it means that the rule is invalid,
+                    // that is, it could not be parsed for some reason. This is a fatal error,
+                    // since the linter rules can only accept AST.
+
+                    // AdblockSyntaxError is a special error type that is thrown by the parser
+                    // when it encounters a syntax error. In this case, we can get the position
+                    // of the error from the error object.
+                    // Otherwise, we assume that the error occurred at the beginning of the line
+                    // and we report the error for the entire line (from the beginning to the end).
+
+                    /* eslint-disable @typescript-eslint/no-non-null-assertion */
+                    const position: LinterPosition = {
+                        startLine: ast.error.loc!.start!.line,
+                        startColumn: ast.error.loc!.start!.column,
+                        endLine: ast.error.loc!.end!.line,
+                        endColumn: ast.error.loc!.end!.column,
+                    };
+                    /* eslint-enable @typescript-eslint/no-non-null-assertion */
+
+                    // Store the error in the result object
+                    result.problems.push({
+                        severity: SEVERITY.fatal,
+                        message: `AGLint parsing error: ${ast.error.message}`,
+                        position,
+                    });
+
+                    // Don't forget to increase the fatal error count when parsing fails
+                    result.fatalErrorCount += 1;
+                } else {
                     // Handle inline config comments
-                    if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.ConfigComment) {
+                    if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.ConfigCommentRule) {
                         // If inline config is not allowed in the linter configuration,
                         // simply skip the comment processing
                         if (!this.config.allowInlineConfig) {
@@ -613,24 +645,25 @@ export class Linter {
                         }
 
                         // Process the inline config comment
-                        switch (ast.command) {
+                        switch (ast.command.value) {
                             case ConfigCommentType.Main: {
-                                if (ast.params) {
-                                    assert(ast.params, linterRulesSchema);
+                                if (ast.params && ast.params.type === 'Value') {
+                                    assert(ast.params.value, linterRulesSchema);
 
                                     this.config = mergeConfigs(this.config, {
-                                        rules: ast.params,
+                                        rules: ast.params.value,
                                     });
 
-                                    this.applyRulesConfig(ast.params);
+                                    this.applyRulesConfig(ast.params.value);
                                 }
+
                                 break;
                             }
 
                             case ConfigCommentType.Disable: {
-                                if (ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        this.disableRule(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        this.disableRule(param.value);
                                     }
 
                                     break;
@@ -641,9 +674,9 @@ export class Linter {
                             }
 
                             case ConfigCommentType.Enable: {
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        this.enableRule(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        this.enableRule(param.value);
                                     }
 
                                     break;
@@ -655,9 +688,9 @@ export class Linter {
 
                             case ConfigCommentType.DisableNextLine: {
                                 // Disable specific rules for the next line
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        nextLineDisabled.add(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        nextLineDisabled.add(param.value);
                                     }
                                 } else {
                                     // Disable all rules for the next line
@@ -669,12 +702,12 @@ export class Linter {
 
                             case ConfigCommentType.EnableNextLine: {
                                 // Enable specific rules for the next line
-                                if (ast.params && ArrayUtils.isArrayOfStrings(ast.params)) {
-                                    for (const param of ast.params) {
-                                        nextLineEnabled.add(param);
+                                if (ast.params && ast.params.type === 'ParameterList') {
+                                    for (const param of ast.params.children) {
+                                        nextLineEnabled.add(param.value);
                                     }
                                 } else {
-                                    // Enable all rules for the next line
+                                    // Disable all rules for the next line
                                     isEnabledForNextLine = true;
                                 }
 
@@ -699,34 +732,10 @@ export class Linter {
 
                     // Deep copy of the line data
                     actualAdblockRuleAst = { ...ast };
-                    [actualAdblockRuleRaw] = rule;
+                    actualAdblockRuleRaw = ast.raws?.text;
 
                     // Invoke onRule event for all rules (process actual adblock rule)
                     invokeEvent('onRule');
-                } catch (error: unknown) {
-                    // If the linter is actually disabled, skip the error reporting
-                    if ((isDisabled || isDisabledForNextLine) && !isEnabledForNextLine) {
-                        return 0;
-                    }
-
-                    if (error instanceof Error) {
-                        // If an error occurs during parsing, it means that the rule is invalid,
-                        // that is, it could not be parsed for some reason. This is a fatal error,
-                        // since the linter rules can only accept AST.
-                        result.problems.push({
-                            severity: SEVERITY.fatal,
-                            message: `AGLint parsing error: ${error.message}`,
-                            position: {
-                                startLine: index + 1,
-                                startColumn: 0,
-                                endLine: index + 1,
-                                endColumn: rule[0].length,
-                            },
-                        });
-
-                        // Don't forget to increase the fatal error count when parsing fails
-                        result.fatalErrorCount += 1;
-                    }
                 }
 
                 return 0;
@@ -746,50 +755,50 @@ export class Linter {
 
         // Build fixed content if fixing is enabled
         if (fix) {
-            // Create a new array for the fixed content (later we will join it)
-            const fixes: NewLineSplit = [];
+            const fixedFilterList: FilterList = {
+                type: 'FilterList',
+                children: [],
+            };
 
-            // Iterate over all lines in the original content (filter list content)
-            for (let i = 0; i < rules.length; i += 1) {
-                let conflict = false;
-                let foundFix: AnyRule | AnyRule[] | undefined;
+            // Iterate over all rules in the original filter list
+            for (let i = 0; i < filterList.children.length; i += 1) {
+                const rule = filterList.children[i];
 
-                // Iterate over all problems and check if the problem is on the current line
+                // Find the fix for the current rule
+                const fixed: AnyRule[] = [];
+
+                // Currently only 1 fix is allowed per rule
+                let matches = 0;
+
                 for (const problem of result.problems) {
-                    // TODO: Currently we only support fixes for single-line problems
-                    if (problem.position.startLine === i + 1 && i + 1 === problem.position.endLine) {
-                        // If the problem has a fix, check if there is a conflict.
-                        // We can't fix the line if there are multiple fixes for the same line.
-                        if (problem.fix) {
-                            if (foundFix && foundFix !== problem.fix) {
-                                conflict = true;
-                                break;
-                            }
+                    if (problem.fix && problem.position.startLine === i + 1 && i + 1 === problem.position.endLine) {
+                        const fixes: AnyRule[] = Array.isArray(problem.fix) ? problem.fix : [problem.fix];
 
-                            foundFix = problem.fix;
-                        }
+                        // We prefer to use raw generated content if available, so
+                        // we can avoid generating wrong (old) content again, if
+                        // the rule was changed in the meantime
+                        fixed.push(...(fixes.map((e) => {
+                            if (e.raws && e.raws.text) {
+                                delete e.raws.text;
+                            }
+                            return e;
+                        })));
+
+                        matches += 1;
                     }
                 }
 
-                // If there is a fix and there is no conflict, push the fix to the fixes array
-                if (foundFix && !conflict) {
-                    // If the fix is an array, we need to push all its elements
-                    if (Array.isArray(foundFix)) {
-                        for (const ast of foundFix) {
-                            fixes.push([RuleParser.generate(ast), rules[i][1]]);
-                        }
-                    } else {
-                        // Otherwise, we can simply push the generated (fixed) rule
-                        fixes.push([RuleParser.generate(foundFix), rules[i][1]]);
-                    }
+                // Push the fixed version of the rule to the fixed filter list if
+                // matches is 1 (only 1 fix is allowed per rule), otherwise push
+                // the original rule
+                if (matches === 1) {
+                    fixedFilterList.children.push(...fixed);
                 } else {
-                    // Otherwise, push the original rule
-                    fixes.push(rules[i]);
+                    fixedFilterList.children.push(rule);
                 }
             }
 
-            // Join the fixed rules by newlines
-            result.fixed = StringUtils.mergeStringByNewLines(fixes);
+            result.fixed = FilterListParser.generate(fixedFilterList, true);
         }
 
         // Return linting result

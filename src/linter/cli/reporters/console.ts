@@ -15,7 +15,7 @@ import {
     OPEN_PARENTHESIS,
     REPO_URL,
     SPACE,
-} from 'src/utils/constants';
+} from '../../../utils/constants';
 import { LinterProblem, LinterResult } from '../../index';
 import { LinterCliReporter } from '../reporter';
 

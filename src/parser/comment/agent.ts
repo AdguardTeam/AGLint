@@ -1,214 +1,137 @@
-import { AdblockSyntax } from '../../utils/adblockers';
-import { SPACE } from '../../utils/constants';
+import { coerce, valid } from 'semver';
+import { locRange } from '../../utils/location';
+import { EMPTY, SPACE } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
-import { CommentRuleType } from './types';
-import { CommentMarker } from './marker';
-import { Comment } from './common';
-import { RuleCategory } from '../common';
-
-// Agent list is started with `[` and ended with `]`, and agents are separated by `;`.
-// For example, `[Adblock Plus 2.0; AdGuard]`.
-const AGENT_LIST_OPEN = '[';
-const AGENT_LIST_CLOSE = ']';
-const AGENT_SEPARATOR = ';';
+import {
+    Agent, Location, Value, defaultLocation,
+} from '../common';
+import { AdblockSyntaxError } from '../errors/adblock-syntax-error';
 
 /**
- * Represents an agent (eg `Adblock Plus 2.0`, where adblock is `Adblock Plus` and version is `2.0`).
- * Specifying the version is optional, since `[Adblock Plus]` is also a valid agent.
- */
-export interface AgentMember {
-    /**
-     * Ad blocker name.
-     */
-    adblock: string;
-
-    /**
-     * Ad blocker version (optional).
-     */
-    version?: string;
-}
-
-/**
- * Represents an agent comment.
- *
- * There can be several agents in a rule. For example, if the rule is `[Adblock Plus 2.0; AdGuard]`,
- * then there are two agent members: `Adblock Plus 2.0` and `AdGuard` (without version).
+ * `AgentParser` is responsible for parsing single adblock agent elements.
  *
  * @example
- * Example rules:
- *  - ```adblock
- *    [AdGuard]
- *    ```
- *  - ```adblock
- *    [Adblock Plus 2.0]
- *    ```
- *  - ```adblock
- *    [uBlock Origin]
- *    ```
- */
-export interface Agent extends Comment {
-    type: CommentRuleType.Agent;
-
-    /**
-     * List of agents.
-     *
-     * @example
-     * If the rule is `[Adblock Plus 2.0; AdGuard]`, then the list will contain two agent members:
-     * `Adblock Plus 2.0` and `AdGuard` (without version).
-     */
-    agents: AgentMember[];
-}
-
-/**
- * `AgentParser` is responsible for parsing an Adblock agent comment.
- * Adblock agent comment marks that the filter list is supposed to be used by the specified
- * ad blockers.
- *
- * @example
- * Example agent comments:
- *  - ```adblock
- *    [AdGuard]
- *    ```
- *  - ```adblock
- *    [Adblock Plus 2.0]
- *    ```
- *  - ```adblock
- *    [uBlock Origin]
- *    ```
+ * If the adblock agent rule is
+ * ```adblock
+ * [Adblock Plus 2.0; AdGuard]
+ * ```
+ * then the adblock agents are `Adblock Plus 2.0` and `AdGuard`, and this
+ * class is responsible for parsing them. The rule itself is parsed by
+ * `AgentCommentRuleParser`, which uses this class to parse single agents.
  */
 export class AgentParser {
     /**
-     * Determines whether a rule is an adblock agent.
+     * Checks if the string is a valid version.
      *
-     * @param raw - Raw rule
-     * @returns `true` if the rule is an adblock agent, `false` otherwise
+     * @param str String to check
+     * @returns `true` if the string is a valid version, `false` otherwise
      */
-    public static isAgent(raw: string): boolean {
-        const trimmed = raw.trim();
-
-        if (trimmed[0] === AGENT_LIST_OPEN) {
-            if (trimmed[trimmed.length - 1] === AGENT_LIST_CLOSE) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Parses an adblock agent member.
-     *
-     * @param raw - Raw agent member, eg `Adblock Plus 2.0`
-     * @returns - Agent member AST
-     * @example
-     * ```js
-     * AgentParser.parseAgent('Adblock Plus 2.0');
-     * AgentParser.parseAgent('uBlock Origin 1.40.1');
-     * ```
-     */
-    private static parseAgent(raw: string): AgentMember {
-        const trimmed = raw.trim();
-        const splitted = trimmed.split(SPACE);
-
-        for (let i = 0; i < splitted.length; i += 1) {
-            // Part contains dot or number
-            if (splitted[i].indexOf('.') > -1 || (splitted[i] >= '0' && splitted[i] <= '9')) {
-                // Missing adblock name
-                if (i === 0) {
-                    break;
-                }
-
-                return {
-                    adblock: splitted.slice(0, i).join(SPACE),
-                    version: splitted.slice(i).join(SPACE),
-                };
-            }
-        }
-
-        return {
-            adblock: trimmed,
-        };
+    private static isValidVersion(str: string): boolean {
+        return valid(coerce(str)) !== null;
     }
 
     /**
      * Parses a raw rule as an adblock agent comment.
      *
-     * @param raw - Raw rule
-     * @returns Adblock agent AST or null (if the raw rule cannot be parsed as an adblock agent comment)
+     * @param raw Raw rule
+     * @param loc Base location
+     * @returns Agent rule AST
+     * @throws {AdblockSyntaxError} If the raw rule cannot be parsed as an adblock agent
      */
-    public static parse(raw: string): Agent | null {
-        const trimmed = raw.trim();
+    public static parse(raw: string, loc: Location = defaultLocation): Agent {
+        let offset = 0;
 
-        // Check basic adblock agents pattern: [...], ![...], ! [...], #[...], etc.
-        let openingBracketIndex = -1;
-        const ruleLength = trimmed.length;
+        // Save name start position
+        const nameStartIndex = offset;
+        let nameEndIndex = offset;
 
-        if (ruleLength > 1 && trimmed[ruleLength - 1] === AGENT_LIST_CLOSE) {
-            if (trimmed[0] === AGENT_LIST_OPEN) {
-                openingBracketIndex = 0;
-            } else if (trimmed[0] === CommentMarker.Regular || trimmed[0] === CommentMarker.Hashmark) {
-                if (trimmed[1] === AGENT_LIST_OPEN) {
-                    openingBracketIndex = 1;
-                } else {
-                    // Skip comment marker
-                    const shift = 1;
-                    const firstNonWhitespaceIndex = StringUtils.findFirstNonWhitespaceCharacter(trimmed.slice(shift));
-                    if (trimmed[firstNonWhitespaceIndex + shift] === AGENT_LIST_OPEN) {
-                        openingBracketIndex = firstNonWhitespaceIndex + shift;
-                    }
+        // Prepare variables for name and version
+        let name: Value | null = null;
+        let version: Value | null = null;
+
+        // Get agent parts by splitting it by spaces. The last part may be a version.
+        // Example: "Adblock Plus 2.0"
+        while (offset < raw.length) {
+            // Skip whitespace before the part
+            offset = StringUtils.skipWS(raw, offset);
+
+            const partEnd = StringUtils.findNextWhitespaceCharacter(raw, offset);
+            const part = raw.substring(offset, partEnd);
+
+            if (AgentParser.isValidVersion(part)) {
+                // Multiple versions aren't allowed
+                if (version !== null) {
+                    throw new AdblockSyntaxError(
+                        'Duplicated versions are not allowed',
+                        locRange(loc, offset, partEnd),
+                    );
                 }
+
+                // Save name
+                name = {
+                    type: 'Value',
+                    loc: locRange(loc, nameStartIndex, nameEndIndex),
+                    value: raw.substring(nameStartIndex, nameEndIndex),
+                };
+
+                // Save version
+                version = {
+                    type: 'Value',
+                    loc: locRange(loc, offset, partEnd),
+                    value: part,
+                };
+            } else {
+                nameEndIndex = partEnd;
             }
+
+            // Skip whitespace after the part
+            offset = StringUtils.skipWS(raw, partEnd);
         }
 
-        // Parse content between brackets
-        if (openingBracketIndex !== -1) {
-            const collectedAgents: AgentMember[] = [];
-            const rawAgents = trimmed.slice(openingBracketIndex + 1, -1);
-            const agents = rawAgents.split(AGENT_SEPARATOR);
-            for (const agent of agents) {
-                const trimmedAgent = agent.trim();
-                const parsedAgent = AgentParser.parseAgent(trimmedAgent);
-
-                // Filter out empty agents
-                if (parsedAgent.adblock.length > 0) {
-                    collectedAgents.push(parsedAgent);
-                }
-            }
-
-            return {
-                category: RuleCategory.Comment,
-                type: CommentRuleType.Agent,
-                syntax: AdblockSyntax.Common,
-                agents: collectedAgents,
+        // If we didn't find a version, the whole string is the name
+        if (name === null) {
+            name = {
+                type: 'Value',
+                loc: locRange(loc, nameStartIndex, nameEndIndex),
+                value: raw.substring(nameStartIndex, nameEndIndex),
             };
         }
 
-        return null;
+        // Agent name cannot be empty
+        if (name.value.length === 0) {
+            throw new AdblockSyntaxError(
+                'Agent name cannot be empty',
+                locRange(loc, 0, raw.length),
+            );
+        }
+
+        return {
+            type: 'Agent',
+            loc: locRange(loc, 0, raw.length),
+            adblock: name,
+            version,
+        };
     }
 
     /**
      * Converts an adblock agent AST to a string.
      *
-     * @param ast - Agent AST
+     * @param ast Agent AST
      * @returns Raw string
      */
     public static generate(ast: Agent): string {
-        let result = AGENT_LIST_OPEN;
+        let result = EMPTY;
 
-        result += ast.agents
-            .map(({ adblock, version }) => {
-                let subresult = adblock;
+        // Agent adblock name
+        result += ast.adblock.value;
 
-                if (version) {
-                    subresult += SPACE;
-                    subresult += version;
-                }
+        // Agent adblock version (if present)
+        if (ast.version !== null) {
+            // Add a space between the name and the version
+            result += SPACE;
 
-                return subresult;
-            })
-            .join(AGENT_SEPARATOR + SPACE);
-
-        result += AGENT_LIST_CLOSE;
+            result += ast.version.value;
+        }
 
         return result;
     }

@@ -108,12 +108,10 @@ const browserPlugins = [
         presets: [
             [
                 '@babel/preset-env',
-                {
-                    targets: ['> 1%', 'not dead'],
-                },
             ],
         ],
         allowAllFormats: true,
+        compact: false,
     }),
     terser(),
 ];

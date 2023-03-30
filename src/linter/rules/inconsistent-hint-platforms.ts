@@ -1,13 +1,8 @@
-// Linter stuff
 import { GenericRuleContext, LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-
-// Parser stuff
-import { AnyRule } from '../../parser';
-import { RuleCategory } from '../../parser/common';
-import { CommentRuleType } from '../../parser/comment/types';
 import { EMPTY } from '../../utils/constants';
 import { ArrayUtils } from '../../utils/array';
+import { AnyRule, CommentRuleType, RuleCategory } from '../../parser/common';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
@@ -28,9 +23,9 @@ export const InconsistentHintPlatforms: LinterRule = {
             const raw = <string>context.getActualAdblockRuleRaw();
             const line = context.getActualLine();
 
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.Hint) {
+            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Only makes sense to check this, if there are at least two hints within the comment
-                if (ast.hints.length < 2) {
+                if (ast.children.length < 2) {
                     return;
                 }
 
@@ -40,13 +35,13 @@ export const InconsistentHintPlatforms: LinterRule = {
                 let excluded: string[] = [];
 
                 // Iterate over all hints within the comment rule
-                for (const hint of ast.hints) {
-                    if (hint.name === PLATFORM) {
+                for (const hint of ast.children) {
+                    if (hint.name.value === PLATFORM) {
                         // Platform targeted by a PLATFORM() hint
-                        targeted = targeted.concat(hint.params);
-                    } else if (hint.name === NOT_PLATFORM) {
+                        targeted = targeted.concat(hint.params?.children.map((param) => param.value) ?? []);
+                    } else if (hint.name.value === NOT_PLATFORM) {
                         // Platform excluded by a NOT_PLATFORM() hint
-                        excluded = excluded.concat(hint.params);
+                        excluded = excluded.concat(hint.params?.children.map((param) => param.value) ?? []);
                     }
                 }
 
