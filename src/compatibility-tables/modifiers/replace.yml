@@ -22,7 +22,6 @@ adg_os_any:
 adg_ext_firefox:
   name:	replace
   conflicts:
-    - app
     - domain
     - document
     - subdocument
