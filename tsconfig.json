@@ -14,11 +14,7 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "skipLibCheck": true,
-        "baseUrl": ".",
-        "paths": {
-            "@aglint": ["src/index"]
-        }
+        "skipLibCheck": true
     },
     "include": ["./src/"],
     "exclude": ["./node_modules", "./dist"]

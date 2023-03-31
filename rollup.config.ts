@@ -15,6 +15,7 @@ import alias from '@rollup/plugin-alias';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
+import { fileURLToPath } from 'url';
 
 const commonPlugins = [externals(), commonjs({ sourceMap: false }), resolve({ preferBuiltins: false })];
 
@@ -53,23 +54,33 @@ const aglintEsm = {
     ],
 };
 
+// Path to the index file of the library
+const linterIndex = fileURLToPath(
+    new URL(
+        'src/index.ts',
+        import.meta.url,
+    ),
+);
+
 // CLI tool build
 const aglintCli = {
     input: './src/cli.ts',
-    // Since the library is built elsewhere, we do not bundle it again in the CLI,
-    // so we mark it as an external package here.
-    // This path had to be named in tsconfig, as "." or "./something" didn't work here
-    external: ['@aglint'],
     output: [
         {
             file: './dist/cli.js',
             format: 'esm',
             sourcemap: false,
+            // Replace import './index' with './aglint.esm.js'
             paths: {
-                // The CLI is placed in the same folder as the library, so we simply rewrite the path
-                '@aglint': './aglint.esm.js',
+                [linterIndex]: './aglint.esm.js',
             },
         },
+    ],
+    external: [
+        // It is no makes sense to bundle the core library into the CLI tool,
+        // so we exclude it from the build and instead we import it from the
+        // same directory where the CLI tool is located
+        linterIndex,
     ],
     plugins: [
         json({ preferConst: true }),
