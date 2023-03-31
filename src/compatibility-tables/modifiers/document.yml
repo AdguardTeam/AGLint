@@ -27,5 +27,6 @@ ubo_ext_any:
   name: document
   description: The rule corresponds to the main frame document requests, i.e. HTML documents that are loaded in the browser tab.
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#document
-  aliases: doc
+  aliases:
+    - doc
   negatable: false
