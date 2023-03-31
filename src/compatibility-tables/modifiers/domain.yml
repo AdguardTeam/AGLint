@@ -11,7 +11,7 @@ abp_any:
   aliases:
     - from
   assignable: true
-  docs: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#generic-specific
+  docs: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#domain-restrictions
   description: '$domain limits the rule application area to a list of domains and their subdomains.'
 
 ubo_any:
