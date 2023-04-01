@@ -14,23 +14,16 @@ export const InvalidDomainList: LinterRule = {
         onRule: (context): void => {
             // Get actually iterated adblock rule
             const ast = context.getActualAdblockRuleAst();
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
 
             // Check if the rule is a cosmetic rule (any cosmetic rule)
             if (ast.category === RuleCategory.Cosmetic) {
-                for (const domainNode of ast.domains.children) {
-                    const domain = domainNode.value;
-
-                    if (!DomainUtils.isValidDomainOrHostname(domain)) {
+                // Iterate over all domains within the rule
+                for (const node of ast.domains.children) {
+                    // If the domain is invalid, report it
+                    if (!DomainUtils.isValidDomainOrHostname(node.value)) {
                         context.report({
-                            message: `Invalid domain "${domain}"`,
-                            position: {
-                                startLine: line,
-                                startColumn: 0,
-                                endLine: line,
-                                endColumn: raw.length,
-                            },
+                            message: `Invalid domain "${node.value}"`,
+                            node,
                         });
                     }
                 }

@@ -27,7 +27,25 @@ describe('duplicated-modifiers', () => {
                     severity: 2,
                     message: 'The modifier "script" is used multiple times, but it should be used only once',
                     position: {
-                        startColumn: 0,
+                        startColumn: 34,
+                        endColumn: 40,
+                    },
+                },
+                {
+                    rule: 'duplicated-modifiers',
+                    severity: 2,
+                    message: 'The modifier "script" is used multiple times, but it should be used only once',
+                    position: {
+                        startColumn: 41,
+                        endColumn: 47,
+                    },
+                },
+                {
+                    rule: 'duplicated-modifiers',
+                    severity: 2,
+                    message: 'The modifier "script" is used multiple times, but it should be used only once',
+                    position: {
+                        startColumn: 48,
                         endColumn: 54,
                     },
                 },
@@ -44,8 +62,26 @@ describe('duplicated-modifiers', () => {
                     severity: 2,
                     message: 'The modifier "script" is used multiple times, but it should be used only once',
                     position: {
-                        startColumn: 0,
-                        endColumn: 92,
+                        startColumn: 34,
+                        endColumn: 40,
+                    },
+                },
+                {
+                    rule: 'duplicated-modifiers',
+                    severity: 2,
+                    message: 'The modifier "script" is used multiple times, but it should be used only once',
+                    position: {
+                        startColumn: 41,
+                        endColumn: 47,
+                    },
+                },
+                {
+                    rule: 'duplicated-modifiers',
+                    severity: 2,
+                    message: 'The modifier "script" is used multiple times, but it should be used only once',
+                    position: {
+                        startColumn: 48,
+                        endColumn: 54,
                     },
                 },
                 {
@@ -53,8 +89,17 @@ describe('duplicated-modifiers', () => {
                     severity: 2,
                     message: 'The modifier "third-party" is used multiple times, but it should be used only once',
                     position: {
-                        startColumn: 0,
-                        endColumn: 92,
+                        startColumn: 55,
+                        endColumn: 66,
+                    },
+                },
+                {
+                    rule: 'duplicated-modifiers',
+                    severity: 2,
+                    message: 'The modifier "script" is used multiple times, but it should be used only once',
+                    position: {
+                        startColumn: 67,
+                        endColumn: 73,
                     },
                 },
             ],
@@ -70,7 +115,7 @@ describe('duplicated-modifiers', () => {
                     severity: 2,
                     message: 'The modifier "domain" is used multiple times, but it should be used only once',
                     position: {
-                        startColumn: 0,
+                        startColumn: 33,
                         endColumn: 51,
                     },
                 },

@@ -13,8 +13,6 @@ export const DuplicatedHints: LinterRule = {
         onRule: (context): void => {
             // Get actually iterated adblock rule
             const ast = context.getActualAdblockRuleAst();
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
 
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Only makes sense to check this, if there are at least two hints within the comment
@@ -22,37 +20,21 @@ export const DuplicatedHints: LinterRule = {
                     return;
                 }
 
-                // Count the number of various hints
-                const stats: {
-                    [key: string]: number;
-                } = {};
+                // Store which hints are already present
+                const occurred = new Set<string>();
 
                 // Iterate over all hints within the comment rule
                 for (const hint of ast.children) {
                     const name = hint.name.value;
+                    const nameToLowerCase = name.toLowerCase();
 
-                    // Add the hint to the stats if it's not already there
-                    if (!(name in stats)) {
-                        stats[name] = 1;
+                    if (!occurred.has(nameToLowerCase)) {
+                        occurred.add(nameToLowerCase);
                     } else {
-                        // Increment the counter
-                        stats[name] += 1;
-                    }
-                }
-
-                // Report problems based on the stats
-                for (const [hint, count] of Object.entries(stats)) {
-                    // Report if a hint is occurring more than once
-                    if (count > 1) {
+                        // Report if a hint is occurring more than once
                         context.report({
-                            // eslint-disable-next-line max-len
-                            message: `The hint "${hint}" is occurring more than once within the same comment rule`,
-                            position: {
-                                startLine: line,
-                                startColumn: 0,
-                                endLine: line,
-                                endColumn: raw.length,
-                            },
+                            message: `The hint "${name}" is occurring more than once within the same comment rule`,
+                            node: hint,
                         });
                     }
                 }

@@ -89,9 +89,9 @@ describe('CLI tests', () => {
                                 message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 15,
+                                    startColumn: 14,
                                     endLine: 2,
-                                    endColumn: 18,
+                                    endColumn: 17,
                                 },
                             },
                         ],
@@ -114,7 +114,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 2,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 2,
                                     endColumn: 29,
                                 },
@@ -152,7 +152,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 2,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 2,
                                     endColumn: 29,
                                 },
@@ -163,7 +163,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 5,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 5,
                                     endColumn: 29,
                                 },
@@ -203,9 +203,9 @@ describe('CLI tests', () => {
                                 message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 15,
+                                    startColumn: 14,
                                     endLine: 2,
-                                    endColumn: 18,
+                                    endColumn: 17,
                                 },
                             },
                         ],
@@ -229,9 +229,9 @@ describe('CLI tests', () => {
                                     "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 26,
+                                    startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 26,
+                                    endColumn: 25,
                                 },
                             },
                         ],
@@ -254,7 +254,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 2,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 2,
                                     endColumn: 29,
                                 },
@@ -292,7 +292,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 2,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 2,
                                     endColumn: 29,
                                 },
@@ -303,7 +303,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 5,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 5,
                                     endColumn: 29,
                                 },
@@ -343,9 +343,9 @@ describe('CLI tests', () => {
                                 message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 15,
+                                    startColumn: 14,
                                     endLine: 2,
-                                    endColumn: 18,
+                                    endColumn: 17,
                                 },
                             },
                         ],
@@ -449,7 +449,7 @@ describe('CLI tests', () => {
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
                                     startLine: 2,
-                                    startColumn: 0,
+                                    startColumn: 13,
                                     endLine: 2,
                                     endColumn: 29,
                                 },

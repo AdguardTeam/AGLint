@@ -72,7 +72,7 @@ describe('invalid-domain-list', () => {
                     message: 'Invalid domain "example."',
                     position: {
                         startColumn: 0,
-                        endColumn: 17,
+                        endColumn: 8,
                     },
                 },
             ],
@@ -87,7 +87,7 @@ describe('invalid-domain-list', () => {
                     message: 'Invalid domain "."',
                     position: {
                         startColumn: 0,
-                        endColumn: 10,
+                        endColumn: 1,
                     },
                 },
             ],
@@ -101,7 +101,7 @@ describe('invalid-domain-list', () => {
                     message: 'Invalid domain "..."',
                     position: {
                         startColumn: 0,
-                        endColumn: 12,
+                        endColumn: 3,
                     },
                 },
             ],
@@ -116,7 +116,7 @@ describe('invalid-domain-list', () => {
                     message: 'Invalid domain "AA BB"',
                     position: {
                         startColumn: 0,
-                        endColumn: 14,
+                        endColumn: 5,
                     },
                 },
             ],
@@ -131,7 +131,7 @@ describe('invalid-domain-list', () => {
                     message: 'Invalid domain "AA BB CC"',
                     position: {
                         startColumn: 0,
-                        endColumn: 17,
+                        endColumn: 8,
                     },
                 },
             ],
@@ -146,7 +146,7 @@ describe('invalid-domain-list', () => {
                     message: 'Invalid domain "a^b"',
                     position: {
                         startColumn: 0,
-                        endColumn: 12,
+                        endColumn: 3,
                     },
                 },
             ],

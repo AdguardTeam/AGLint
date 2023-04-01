@@ -16,50 +16,35 @@ export const DuplicatedHintPlatforms: LinterRule = {
         onRule: (context): void => {
             // Get actually iterated adblock rule
             const ast = context.getActualAdblockRuleAst();
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
 
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 // Iterate over all hints within the comment rule
                 for (const hint of ast.children) {
                     const name = hint.name.value;
-                    const params = hint.params?.children.map((param) => param.value) ?? [];
 
                     // Only makes sense to check this, if the hint is a PLATFORM or NOT_PLATFORM hint
                     // and there are at least two platforms within the hint
-                    if ((name !== PLATFORM && name !== NOT_PLATFORM) || params.length < 2) {
+                    // eslint-disable-next-line max-len
+                    if ((name !== PLATFORM && name !== NOT_PLATFORM) || !hint.params || hint.params.children.length < 2) {
                         continue;
                     }
 
-                    // Count the number of various platforms
-                    const stats: {
-                        [key: string]: number;
-                    } = {};
+                    // Store which platforms are already present
+                    const occurred = new Set<string>();
 
                     // Iterate over all platforms within the hint
-                    for (const platform of params) {
-                        // Add the platform to the stats if it's not already there
-                        if (!(platform in stats)) {
-                            stats[platform] = 1;
-                        } else {
-                            // Increment the counter
-                            stats[platform] += 1;
-                        }
-                    }
+                    for (const param of hint.params.children) {
+                        const platform = param.value;
+                        const platformToLowerCase = platform.toLowerCase();
 
-                    // Report problems based on the stats
-                    for (const [platform, count] of Object.entries(stats)) {
-                        // Report if a platform is occurring more than once
-                        if (count > 1) {
+                        if (!occurred.has(platformToLowerCase)) {
+                            occurred.add(platformToLowerCase);
+                        } else {
+                            // Report if a platform is occurring more than once
                             context.report({
                                 // eslint-disable-next-line max-len
                                 message: `The platform "${platform}" is occurring more than once within the same "${hint.name.value}" hint`,
-                                position: {
-                                    startLine: line,
-                                    startColumn: 0,
-                                    endLine: line,
-                                    endColumn: raw.length,
-                                },
+                                node: param,
                             });
                         }
                     }

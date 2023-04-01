@@ -530,6 +530,7 @@ export class Linter {
                     config: data.configOverride || data.rule.meta.config?.default,
 
                     // Reporter function
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func
                     report: (problem: LinterProblemReport) => {
                         let severity = getSeverity(data.rule.meta.severity);
 
@@ -539,11 +540,30 @@ export class Linter {
                             }
                         }
 
+                        // Default problem location: whole line
+                        let position: LinterPosition = {
+                            startLine: actualLine,
+                            startColumn: 0,
+                            endLine: actualLine,
+                            endColumn: actualAdblockRuleRaw.length,
+                        };
+
+                        if (problem.position) {
+                            position = problem.position;
+                        } else if (problem.node && problem.node.loc !== undefined) {
+                            position = {
+                                startLine: problem.node.loc.start.line,
+                                startColumn: problem.node.loc.start.column - 1,
+                                endLine: problem.node.loc.end.line,
+                                endColumn: problem.node.loc.end.column - 1,
+                            };
+                        }
+
                         result.problems.push({
                             rule: name,
                             severity,
                             message: problem.message,
-                            position: { ...problem.position },
+                            position,
                             fix: problem.fix,
                         });
 
@@ -628,9 +648,9 @@ export class Linter {
                     /* eslint-disable @typescript-eslint/no-non-null-assertion */
                     const position: LinterPosition = {
                         startLine: ast.error.loc!.start!.line,
-                        startColumn: ast.error.loc!.start!.column,
+                        startColumn: ast.error.loc!.start!.column - 1,
                         endLine: ast.error.loc!.end!.line,
-                        endColumn: ast.error.loc!.end!.column,
+                        endColumn: ast.error.loc!.end!.column - 1,
                     };
                     /* eslint-enable @typescript-eslint/no-non-null-assertion */
 

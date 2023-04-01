@@ -50,10 +50,19 @@ describe('inconsistent-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 42,
+                        startColumn: 12,
+                        endColumn: 19,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    message:
+                        // eslint-disable-next-line max-len
+                        'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startColumn: 34,
+                        endColumn: 41,
                     },
                 },
             ],
@@ -66,27 +75,41 @@ describe('inconsistent-hint-platforms', () => {
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 88,
+                        startColumn: 12,
+                        endColumn: 15,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 88,
+                        startColumn: 30,
+                        endColumn: 33,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startColumn: 48,
+                        endColumn: 55,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startColumn: 80,
+                        endColumn: 87,
                     },
                 },
             ],
@@ -101,14 +124,31 @@ describe('inconsistent-hint-platforms', () => {
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 100,
+                        startColumn: 52,
+                        endColumn: 59,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startColumn: 74,
+                        endColumn: 81,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startColumn: 92,
+                        endColumn: 99,
                     },
                 },
             ],
@@ -124,144 +164,265 @@ describe('inconsistent-hint-platforms', () => {
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 16,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 23,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 25,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 28,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 30,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 37,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ios" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ios" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 39,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 42,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_chromium" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_chromium" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 44,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 56,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_ff" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_ff" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 58,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 64,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_edge" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_edge" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 66,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 74,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_opera" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_opera" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 76,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 85,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_safari" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_safari" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 87,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 97,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_android_cb" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_android_cb" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 99,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 113,
                     },
                 },
                 {
                     rule: 'inconsistent-hint-platforms',
                     severity: 2,
-                    message:
-                        // eslint-disable-next-line max-len
-                        'Platform "ext_ublock" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_ublock" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
                     position: {
                         startLine: 1,
-                        startColumn: 0,
+                        startColumn: 115,
                         endLine: 1,
-                        endColumn: 246,
+                        endColumn: 125,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 136,
+                        endLine: 1,
+                        endColumn: 143,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 145,
+                        endLine: 1,
+                        endColumn: 148,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 150,
+                        endLine: 1,
+                        endColumn: 157,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ios" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 159,
+                        endLine: 1,
+                        endColumn: 162,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_chromium" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 164,
+                        endLine: 1,
+                        endColumn: 176,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_ff" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 178,
+                        endLine: 1,
+                        endColumn: 184,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_edge" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 186,
+                        endLine: 1,
+                        endColumn: 194,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_opera" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 196,
+                        endLine: 1,
+                        endColumn: 205,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_safari" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 207,
+                        endLine: 1,
+                        endColumn: 217,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_android_cb" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 219,
+                        endLine: 1,
+                        endColumn: 233,
+                    },
+                },
+                {
+                    rule: 'inconsistent-hint-platforms',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: 'Platform "ext_ublock" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                    position: {
+                        startLine: 1,
+                        startColumn: 235,
+                        endLine: 1,
+                        endColumn: 245,
                     },
                 },
             ],

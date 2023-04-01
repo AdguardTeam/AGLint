@@ -13,31 +13,28 @@ export const DuplicatedModifiers: LinterRule = {
         onRule: (context): void => {
             // Get actually iterated adblock rule
             const ast = context.getActualAdblockRuleAst();
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
 
             // Check if the rule is a basic network rule
             if (ast.category === RuleCategory.Network && ast.type === 'NetworkRule') {
-                // Count the number of each modifier
-                const stat: { [key: string]: number } = {};
+                // Store which modifiers are already present
+                const occurred = new Set<string>();
 
-                for (const modifierNode of ast.modifiers?.children ?? []) {
-                    const modifier = modifierNode.modifier.value;
-                    stat[modifier] = stat[modifier] ? stat[modifier] + 1 : 1;
+                // This check is only relevant if there are at least two modifiers
+                if (!ast.modifiers || ast.modifiers.children.length < 2) {
+                    return;
                 }
 
-                for (const [modifier, count] of Object.entries(stat)) {
-                    // Check if the modifier is occurs multiple times
-                    if (count > 1) {
+                for (const modifier of ast.modifiers.children) {
+                    const name = modifier.modifier.value;
+                    const nameToLowerCase = name.toLowerCase();
+
+                    if (!occurred.has(nameToLowerCase)) {
+                        occurred.add(nameToLowerCase);
+                    } else {
+                        // Report if a modifier is occurring more than once
                         context.report({
-                            // eslint-disable-next-line max-len
-                            message: `The modifier "${modifier}" is used multiple times, but it should be used only once`,
-                            position: {
-                                startLine: line,
-                                startColumn: 0,
-                                endLine: line,
-                                endColumn: raw.length,
-                            },
+                            message: `The modifier "${name}" is used multiple times, but it should be used only once`,
+                            node: modifier,
                         });
                     }
                 }

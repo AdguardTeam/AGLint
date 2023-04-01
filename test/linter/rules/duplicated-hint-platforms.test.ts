@@ -38,8 +38,8 @@ describe('duplicated-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'The platform "windows" is occurring more than once within the same "PLATFORM" hint',
                     position: {
-                        startColumn: 0,
-                        endColumn: 29,
+                        startColumn: 21,
+                        endColumn: 28,
                     },
                 },
             ],
@@ -54,8 +54,8 @@ describe('duplicated-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'The platform "windows" is occurring more than once within the same "NOT_PLATFORM" hint',
                     position: {
-                        startColumn: 0,
-                        endColumn: 33,
+                        startColumn: 25,
+                        endColumn: 32,
                     },
                 },
             ],
@@ -64,7 +64,7 @@ describe('duplicated-hint-platforms', () => {
         expect(
             linter.lint(
                 // eslint-disable-next-line max-len
-                '!+ PLATFORM(windows, mac, android, ios, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
+                '!+ PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
             ),
         ).toMatchObject({
             problems: [
@@ -75,8 +75,19 @@ describe('duplicated-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'The platform "windows" is occurring more than once within the same "PLATFORM" hint',
                     position: {
-                        startColumn: 0,
-                        endColumn: 143,
+                        startColumn: 40,
+                        endColumn: 47,
+                    },
+                },
+                {
+                    rule: 'duplicated-hint-platforms',
+                    severity: 1,
+                    message:
+                        // eslint-disable-next-line max-len
+                        'The platform "windows" is occurring more than once within the same "PLATFORM" hint',
+                    position: {
+                        startColumn: 49,
+                        endColumn: 56,
                     },
                 },
                 {
@@ -86,8 +97,8 @@ describe('duplicated-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'The platform "ext_safari" is occurring more than once within the same "PLATFORM" hint',
                     position: {
-                        startColumn: 0,
-                        endColumn: 143,
+                        startColumn: 129,
+                        endColumn: 139,
                     },
                 },
             ],
@@ -96,7 +107,7 @@ describe('duplicated-hint-platforms', () => {
         expect(
             linter.lint(
                 // eslint-disable-next-line max-len
-                '!+ NOT_PLATFORM(windows, mac, android, ios, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
+                '!+ NOT_PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
             ),
         ).toMatchObject({
             problems: [
@@ -107,8 +118,19 @@ describe('duplicated-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'The platform "windows" is occurring more than once within the same "NOT_PLATFORM" hint',
                     position: {
-                        startColumn: 0,
-                        endColumn: 147,
+                        startColumn: 44,
+                        endColumn: 51,
+                    },
+                },
+                {
+                    rule: 'duplicated-hint-platforms',
+                    severity: 1,
+                    message:
+                        // eslint-disable-next-line max-len
+                        'The platform "windows" is occurring more than once within the same "NOT_PLATFORM" hint',
+                    position: {
+                        startColumn: 53,
+                        endColumn: 60,
                     },
                 },
                 {
@@ -118,8 +140,8 @@ describe('duplicated-hint-platforms', () => {
                         // eslint-disable-next-line max-len
                         'The platform "ext_safari" is occurring more than once within the same "NOT_PLATFORM" hint',
                     position: {
-                        startColumn: 0,
-                        endColumn: 147,
+                        startColumn: 133,
+                        endColumn: 143,
                     },
                 },
             ],
