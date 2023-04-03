@@ -24,8 +24,10 @@ export const DuplicatedHintPlatforms: LinterRule = {
 
                     // Only makes sense to check this, if the hint is a PLATFORM or NOT_PLATFORM hint
                     // and there are at least two platforms within the hint
-                    // eslint-disable-next-line max-len
-                    if ((name !== PLATFORM && name !== NOT_PLATFORM) || !hint.params || hint.params.children.length < 2) {
+                    if (
+                        (name !== PLATFORM && name !== NOT_PLATFORM)
+                        || !hint.params || hint.params.children.length < 2
+                    ) {
                         continue;
                     }
 
