@@ -1,0 +1,55 @@
+adg_os_any:
+  name: removeheader
+  conflicts:
+    - domain
+    - third-party
+    - first-party
+    - app
+    - important
+    - match-case
+    - document
+    - image
+    - stylesheet
+    - script
+    - object
+    - font
+    - media
+    - subdocument
+    - ping
+    - xmlhttpreqeust
+    - websocket
+    - other
+    - webrtc
+  inverse_conflicts: true
+  assignable: true
+  negatable: false
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#removeheader-modifier
+  description: Rules with $removeheader modifier are intended to remove headers from HTTP requests and responses.
+
+adg_ext_any:
+  name: removeheader
+  conflicts:
+    - domain
+    - third-party
+    - first-party
+    - app
+    - important
+    - match-case
+    - document
+    - image
+    - stylesheet
+    - script
+    - object
+    - font
+    - media
+    - subdocument
+    - ping
+    - xmlhttpreqeust
+    - websocket
+    - other
+    - webrtc
+  inverse_conflicts: true
+  assignable: true
+  negatable: false
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#removeheader-modifier
+  description: Rules with $removeheader modifier are intended to remove headers from HTTP requests and responses.
