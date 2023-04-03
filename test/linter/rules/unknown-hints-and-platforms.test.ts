@@ -65,8 +65,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 3,
                     message: 'AGLint parsing error: Missing closing parenthesis for hint "NOT_OPTIMIZED"',
                     position: {
-                        startColumn: 4,
-                        endColumn: 18,
+                        startColumn: 3,
+                        endColumn: 17,
                     },
                 },
             ],
@@ -80,7 +80,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 18,
                     },
                 },
@@ -95,7 +95,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 20,
                     },
                 },
@@ -110,7 +110,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 24,
                     },
                 },
@@ -125,7 +125,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "not_optimized"',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 16,
                     },
                 },
@@ -139,8 +139,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 3,
                     message: 'AGLint parsing error: Missing closing parenthesis for hint "PLATFORM"',
                     position: {
-                        startColumn: 4,
-                        endColumn: 13,
+                        startColumn: 3,
+                        endColumn: 12,
                     },
                 },
             ],
@@ -154,7 +154,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Hint "PLATFORM" must have at least one platform specified',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 13,
                     },
                 },
@@ -169,8 +169,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "PLATFORM"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 15,
+                        startColumn: 12,
+                        endColumn: 14,
                     },
                 },
             ],
@@ -184,8 +184,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "PLATFORM"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 19,
+                        startColumn: 12,
+                        endColumn: 14,
                     },
                 },
                 {
@@ -193,8 +193,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown platform "bb" in hint "PLATFORM"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 19,
+                        startColumn: 16,
+                        endColumn: 18,
                     },
                 },
             ],
@@ -208,8 +208,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "platform"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 20,
+                        startColumn: 3,
+                        endColumn: 11,
                     },
                 },
             ],
@@ -222,8 +222,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 3,
                     message: 'AGLint parsing error: Missing closing parenthesis for hint "NOT_PLATFORM"',
                     position: {
-                        startColumn: 4,
-                        endColumn: 17,
+                        startColumn: 3,
+                        endColumn: 16,
                     },
                 },
             ],
@@ -237,7 +237,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Hint "NOT_PLATFORM" must have at least one platform specified',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 17,
                     },
                 },
@@ -252,8 +252,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "NOT_PLATFORM"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 19,
+                        startColumn: 16,
+                        endColumn: 18,
                     },
                 },
             ],
@@ -267,8 +267,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown platform "aa" in hint "NOT_PLATFORM"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 23,
+                        startColumn: 16,
+                        endColumn: 18,
                     },
                 },
                 {
@@ -276,8 +276,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown platform "bb" in hint "NOT_PLATFORM"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 23,
+                        startColumn: 20,
+                        endColumn: 22,
                     },
                 },
             ],
@@ -291,8 +291,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "not_platform"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 24,
+                        startColumn: 3,
+                        endColumn: 15,
                     },
                 },
             ],
@@ -305,8 +305,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 3,
                     message: 'AGLint parsing error: Missing closing parenthesis for hint "HINT"',
                     position: {
-                        startColumn: 4,
-                        endColumn: 9,
+                        startColumn: 3,
+                        endColumn: 8,
                     },
                 },
             ],
@@ -320,7 +320,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "HINT"',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 7,
                     },
                 },
@@ -335,8 +335,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "HINT"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 11,
+                        startColumn: 3,
+                        endColumn: 7,
                     },
                 },
             ],
@@ -350,8 +350,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "HINT"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 15,
+                        startColumn: 3,
+                        endColumn: 7,
                     },
                 },
             ],
@@ -365,7 +365,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown hint name "NOT_HINT"',
                     position: {
-                        startColumn: 0,
+                        startColumn: 3,
                         endColumn: 11,
                     },
                 },

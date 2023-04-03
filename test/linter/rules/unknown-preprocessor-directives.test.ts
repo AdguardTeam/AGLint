@@ -30,8 +30,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown preprocessor directive "incl2ude"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 52,
+                        startColumn: 2,
+                        endColumn: 10,
                     },
                 },
             ],
@@ -44,8 +44,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown preprocessor directive "IF"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 17,
+                        startColumn: 2,
+                        endColumn: 4,
                     },
                 },
             ],
@@ -58,8 +58,8 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown preprocessor directive "if2"',
                     position: {
-                        startColumn: 0,
-                        endColumn: 20,
+                        startColumn: 2,
+                        endColumn: 5,
                     },
                 },
             ],
@@ -72,7 +72,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown preprocessor directive "end-if"',
                     position: {
-                        startColumn: 0,
+                        startColumn: 2,
                         endColumn: 8,
                     },
                 },
@@ -86,7 +86,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown preprocessor directive "something"',
                     position: {
-                        startColumn: 0,
+                        startColumn: 2,
                         endColumn: 11,
                     },
                 },
@@ -100,7 +100,7 @@ describe('unknown-preprocessor-directives', () => {
                     severity: 2,
                     message: 'Unknown preprocessor directive "something"',
                     position: {
-                        startColumn: 0,
+                        startColumn: 2,
                         endColumn: 11,
                     },
                 },

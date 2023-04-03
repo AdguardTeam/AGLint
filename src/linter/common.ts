@@ -1,6 +1,6 @@
 import { Struct } from 'superstruct';
 import { AnySeverity } from './severity';
-import { AnyRule } from '../parser/common';
+import { AnyRule, Node } from '../parser/common';
 
 /**
  * Represents any linter rule
@@ -199,24 +199,24 @@ export interface SpecificRuleContext<StorageType = LinterRuleStorage<unknown>, C
  */
 export interface LinterPosition {
     /**
-     * Start line number
+     * 1-based line number of the problem
      */
     startLine: number;
 
     /**
-     * Start column position
+     * 0-based column number of the problem
      */
-    startColumn?: number;
+    startColumn: number;
 
     /**
-     * End line number
+     * 1-based line number of the problem
      */
     endLine: number;
 
     /**
-     * End column position
+     * 0-based column number of the problem
      */
-    endColumn?: number;
+    endColumn: number;
 }
 
 /**
@@ -229,9 +229,14 @@ export interface LinterProblemReport {
     message: string;
 
     /**
+     * Node that caused the problem
+     */
+    node?: Node;
+
+    /**
      * The location of the problem
      */
-    position: LinterPosition;
+    position?: LinterPosition;
 
     /**
      * Suggested fix for the problem

@@ -3,10 +3,7 @@ import {
     PreProcessorCommentRule,
     RuleCategory,
 } from '../../parser/common';
-import {
-    LinterPosition,
-    LinterRule,
-} from '../common';
+import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 const IF_DIRECTIVE = 'if';
@@ -20,22 +17,7 @@ interface Storage {
     /**
      * Array of all open if directives
      */
-    openIfs: Array<StoredIf>;
-}
-
-/**
- * Interface for storing the directive and its position
- */
-interface StoredIf {
-    /**
-     * Position of the directive
-     */
-    position: LinterPosition;
-
-    /**
-     * Collected if directive
-     */
-    rule: PreProcessorCommentRule;
+    openIfs: PreProcessorCommentRule[];
 }
 
 /**
@@ -53,35 +35,20 @@ export const IfClosed: LinterRule<Storage> = {
         },
         onRule: (context): void => {
             // Get actually iterated adblock rule
-            const ast = context.getActualAdblockRuleAst();
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
+            const rule = context.getActualAdblockRuleAst();
 
             // Check adblock rule category and type
-            if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessorCommentRule) {
+            if (rule.category === RuleCategory.Comment && rule.type === CommentRuleType.PreProcessorCommentRule) {
                 // Check for "if" and "endif" directives
-                if (ast.name.value === IF_DIRECTIVE) {
+                if (rule.name.value === IF_DIRECTIVE) {
                     // Collect open "if"
-                    context.storage.openIfs.push({
-                        position: {
-                            startLine: line,
-                            startColumn: 0,
-                            endLine: line,
-                            endColumn: raw.length,
-                        },
-                        rule: ast,
-                    });
-                } else if (ast.name.value === ENDIF_DIRECTIVE) {
+                    context.storage.openIfs.push(rule);
+                } else if (rule.name.value === ENDIF_DIRECTIVE) {
                     if (context.storage.openIfs.length === 0) {
                         context.report({
                             // eslint-disable-next-line max-len
                             message: `Using an "${ENDIF_DIRECTIVE}" directive without an opening "${IF_DIRECTIVE}" directive`,
-                            position: {
-                                startLine: line,
-                                startColumn: 0,
-                                endLine: line,
-                                endColumn: raw.length,
-                            },
+                            node: rule,
                         });
                     } else {
                         // Mark "if" as closed (simply delete it from collection)
@@ -92,10 +59,10 @@ export const IfClosed: LinterRule<Storage> = {
         },
         onEndFilterList: (context): void => {
             // If there are any collected "if"s, that means they aren't closed, so a problem must be reported for them
-            for (const openIf of context.storage.openIfs) {
+            for (const rule of context.storage.openIfs) {
                 context.report({
                     message: `Unclosed "${IF_DIRECTIVE}" directive`,
-                    position: openIf.position,
+                    node: rule,
                 });
             }
         },

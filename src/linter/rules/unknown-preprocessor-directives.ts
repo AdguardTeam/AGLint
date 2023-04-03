@@ -30,20 +30,13 @@ export const UnknownPreProcessorDirectives: LinterRule = {
         onRule: (context): void => {
             // Get actually iterated adblock rule
             const ast = context.getActualAdblockRuleAst();
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
 
             // Check if the rule is a preprocessor comment
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.PreProcessorCommentRule) {
                 if (!isKnownPreProcessorDirective(ast.name.value)) {
                     context.report({
                         message: `Unknown preprocessor directive "${ast.name.value}"`,
-                        position: {
-                            startLine: line,
-                            startColumn: 0,
-                            endLine: line,
-                            endColumn: raw.length,
-                        },
+                        node: ast.name,
                     });
                 }
             }

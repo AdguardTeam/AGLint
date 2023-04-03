@@ -2,14 +2,16 @@ import { Linter } from '../../../src/linter';
 import { SingleSelector } from '../../../src/linter/rules/single-selector';
 import { NEWLINE } from '../../../src/utils/constants';
 
+let linter: Linter;
+
 describe('single-selector', () => {
-    test('Detects multiple selectors', () => {
-        // Create and configure linter
-        const linter = new Linter(false);
-
+    beforeAll(() => {
+        // Configure linter with the rule
+        linter = new Linter(false);
         linter.addRule('single-selector', SingleSelector);
+    });
 
-        // Problem-free rules
+    test('should ignore non-problematic cases', () => {
         expect(
             linter.lint(
                 [
@@ -26,8 +28,9 @@ describe('single-selector', () => {
             errorCount: 0,
             fatalErrorCount: 0,
         });
+    });
 
-        // Problematic rules
+    it('should detect problematic cases', () => {
         expect(
             linter.lint(
                 [
@@ -46,7 +49,7 @@ describe('single-selector', () => {
                     message: 'An element hiding rule should contain only one selector',
                     position: {
                         startLine: 2,
-                        startColumn: 0,
+                        startColumn: 13,
                         endLine: 2,
                         endColumn: 22,
                     },
@@ -57,7 +60,7 @@ describe('single-selector', () => {
                     message: 'An element hiding rule should contain only one selector',
                     position: {
                         startLine: 4,
-                        startColumn: 0,
+                        startColumn: 13,
                         endLine: 4,
                         endColumn: 28,
                     },
@@ -69,12 +72,7 @@ describe('single-selector', () => {
         });
     });
 
-    test('Suggest fix', () => {
-        const linter = new Linter(false);
-
-        // Add single-selector rule
-        linter.addRule('single-selector', SingleSelector);
-
+    test('should fix problematic cases', () => {
         // No multiple selectors
         expect(
             linter.lint(

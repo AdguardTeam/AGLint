@@ -47,8 +47,8 @@ describe('duplicated-hints', () => {
                     severity: 1,
                     message: 'The hint "PLATFORM" is occurring more than once within the same comment rule',
                     position: {
-                        startColumn: 0,
-                        endColumn: 70,
+                        startColumn: 21,
+                        endColumn: 34,
                     },
                 },
             ],
@@ -61,8 +61,8 @@ describe('duplicated-hints', () => {
                     severity: 1,
                     message: 'The hint "NOT_OPTIMIZED" is occurring more than once within the same comment rule',
                     position: {
-                        startColumn: 0,
-                        endColumn: 48,
+                        startColumn: 17,
+                        endColumn: 30,
                     },
                 },
             ],
@@ -77,7 +77,16 @@ describe('duplicated-hints', () => {
                     severity: 1,
                     message: 'The hint "NOT_PLATFORM" is occurring more than once within the same comment rule',
                     position: {
-                        startColumn: 0,
+                        startColumn: 42,
+                        endColumn: 59,
+                    },
+                },
+                {
+                    rule: 'duplicated-hints',
+                    severity: 1,
+                    message: 'The hint "NOT_PLATFORM" is occurring more than once within the same comment rule',
+                    position: {
+                        startColumn: 60,
                         endColumn: 81,
                     },
                 },
@@ -93,10 +102,10 @@ describe('duplicated-hints', () => {
                 {
                     rule: 'duplicated-hints',
                     severity: 1,
-                    message: 'The hint "PLATFORM" is occurring more than once within the same comment rule',
+                    message: 'The hint "NOT_PLATFORM" is occurring more than once within the same comment rule',
                     position: {
-                        startColumn: 0,
-                        endColumn: 100,
+                        startColumn: 42,
+                        endColumn: 59,
                     },
                 },
                 {
@@ -104,7 +113,16 @@ describe('duplicated-hints', () => {
                     severity: 1,
                     message: 'The hint "NOT_PLATFORM" is occurring more than once within the same comment rule',
                     position: {
-                        startColumn: 0,
+                        startColumn: 60,
+                        endColumn: 81,
+                    },
+                },
+                {
+                    rule: 'duplicated-hints',
+                    severity: 1,
+                    message: 'The hint "PLATFORM" is occurring more than once within the same comment rule',
+                    position: {
+                        startColumn: 82,
                         endColumn: 100,
                     },
                 },
@@ -118,7 +136,25 @@ describe('duplicated-hints', () => {
                     severity: 1,
                     message: 'The hint "HINT" is occurring more than once within the same comment rule',
                     position: {
-                        startColumn: 0,
+                        startColumn: 8,
+                        endColumn: 17,
+                    },
+                },
+                {
+                    rule: 'duplicated-hints',
+                    severity: 1,
+                    message: 'The hint "HINT" is occurring more than once within the same comment rule',
+                    position: {
+                        startColumn: 18,
+                        endColumn: 24,
+                    },
+                },
+                {
+                    rule: 'duplicated-hints',
+                    severity: 1,
+                    message: 'The hint "HINT" is occurring more than once within the same comment rule',
+                    position: {
+                        startColumn: 25,
                         endColumn: 44,
                     },
                 },
