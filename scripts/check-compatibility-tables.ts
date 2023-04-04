@@ -64,7 +64,7 @@ const predefinedValidators = [
  *
  * @returns `true` if the value is valid, or an error message if it's not.
  */
-const valueFormat = () => ss.define('regex', (value) => {
+const valueFormat = () => ss.define('value_format', (value) => {
     // Mark any non-string values as invalid
     if (typeof value !== 'string') {
         return `Expected a string, got ${typeof value}`;
