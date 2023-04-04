@@ -35,16 +35,13 @@ describe('scan', () => {
 
         if (result !== null) {
             // We may find a config file outside of the project root directory,
-            // so we need to check that the config file is located inside the
+            // so we need to check that the config file is located outside the
             // project root directory.
             const projectRoot = path.resolve(__dirname, '../../../');
-
-            // Check that the result is inside the project root directory
             const relativePath = path.relative(projectRoot, result);
 
             // If the result is outside of the project root directory, then
-            // the relative path will start with '..'. So we need to check
-            // that the relative path does not start with '..'.
+            // the relative path will start with '..'.
             expect(relativePath.startsWith('..')).toBeTruthy();
         }
     });
