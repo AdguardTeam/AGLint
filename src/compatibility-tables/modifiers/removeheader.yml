@@ -21,7 +21,7 @@ adg_os_any:
     - other
     - webrtc
   value_format: |-
-    ^(?!(
+    /^(request:)?(?!(
     access-control-allow-origin|
     access-control-allow-credentials|
     access-control-allow-headers|
@@ -70,7 +70,7 @@ adg_os_any:
     connection|
     transfer-encoding|
     upgrade
-    )$)
+    )$)[A-z0-9-]+$/
   inverse_conflicts: true
   assignable: true
   negatable: false
