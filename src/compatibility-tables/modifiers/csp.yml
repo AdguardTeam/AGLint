@@ -4,6 +4,11 @@ adg_os_any:
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#csp-modifier
   assignable: true
   value_format: /[^,$]+/
+  conflicts:
+    - domain
+    - important
+    - subdocument
+  inverse_conflicts: false
   negatable: false
 adg_ext_any:
   name: csp
@@ -11,6 +16,11 @@ adg_ext_any:
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#csp-modifier
   assignable: true
   value_format: /[^,$]+/
+  conflicts:
+    - domain
+    - important
+    - subdocument
+  inverse_conflicts: false
   negatable: false
 abp_ext_any:
   name: csp
@@ -18,6 +28,11 @@ abp_ext_any:
   docs: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#content-security-policies
   assignable: true
   value_format: /[^,$]+/
+  conflicts:
+    - domain
+    - important
+    - subdocument
+  inverse_conflicts: false
   negatable: false
 ubo_ext_any:
   name: csp
@@ -25,4 +40,9 @@ ubo_ext_any:
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#csp
   assignable: true
   value_format: /[^,$]+/
+  conflicts:
+    - 1p
+    - 3p
+    - domain
+  inverse_conflicts: false
   negatable: false
