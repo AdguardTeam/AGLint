@@ -8,6 +8,7 @@ import { globSync } from 'glob';
 import { join } from 'path';
 import yaml from 'js-yaml';
 import ss from 'superstruct';
+import XRegExp from 'xregexp';
 
 /**
  * List of all supported platforms and shortcuts.
@@ -49,6 +50,58 @@ const platforms = ss.enums([
     'abp_ext_chromium',
 ]);
 
+const predefinedValidators = [
+    'domain',
+    'pipe_separated_domains',
+    'regexp',
+    'url',
+];
+
+/**
+ * Validates 'value_format' field, which can be either a regex or a predefined
+ * validator name.
+ * We use XRegExp for regex validation, because it supports free-spacing mode.
+ *
+ * @returns `true` if the value is valid, or an error message if it's not.
+ */
+const valueFormat = () => ss.define('value_format', (value) => {
+    // Mark any non-string values as invalid
+    if (typeof value !== 'string') {
+        return `Expected a string, got ${typeof value}`;
+    }
+
+    // Trim the value for simplicity
+    const trimmedValue = value.trim();
+
+    // String cannot be empty
+    if (trimmedValue === '') {
+        return 'Expected a non-empty string';
+    }
+
+    // Try to validate as predefined validator name first
+    if (predefinedValidators.includes(trimmedValue)) {
+        // true return means that the value is valid
+        return true;
+    }
+
+    // Otherwise, try to validate as a regex
+    try {
+        // This will throw if the regex is invalid
+        XRegExp(value);
+
+        // so if we're here, the regex is valid
+        return true;
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return error.message;
+        }
+
+        // Unknown error, may never happen
+        // false return generates a generic error message
+        return false;
+    }
+});
+
 /**
  * Schema for compatibility tables.
  *
@@ -70,7 +123,7 @@ const SCHEMA_MAP = {
             conflicts: ss.defaulted(ss.array(ss.nonempty(ss.string())), []),
             inverse_conflicts: ss.defaulted(ss.boolean(), false),
             assignable: ss.defaulted(ss.boolean(), false),
-            value_format: ss.defaulted(ss.nullable(ss.nonempty(ss.string())), null),
+            value_format: ss.defaulted(ss.nullable(valueFormat()), null),
             negatable: ss.defaulted(ss.boolean(), true),
             block_only: ss.defaulted(ss.boolean(), false),
             exception_only: ss.defaulted(ss.boolean(), false),
