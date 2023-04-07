@@ -1,5 +1,5 @@
-adg_os_any: 
-  name:	redirect-rule
+adg_os_any:
+  name: redirect-rule
   inverse_conflicts: true
   conflicts:
     - domain
@@ -72,9 +72,9 @@ adg_os_any:
       )?$
   description: 'This is basically an alias to $redirect since it has the same "redirection" values and the logic is almost similar. The difference is that $redirect-rule is applied only in the case when the target request is blocked by a different basic rule.'
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#redirect-rule-modifier
-  
-adg_ext_any: 
-  name:	redirect-rule
+
+adg_ext_any:
+  name: redirect-rule
   inverse_conflicts: true
   conflicts:
     - domain
@@ -147,9 +147,9 @@ adg_ext_any:
       )?$
   description: 'This is basically an alias to $redirect since it has the same "redirection" values and the logic is almost similar. The difference is that $redirect-rule is applied only in the case when the target request is blocked by a different basic rule.'
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#redirect-rule-modifier
-  
-ubo_ext_any: 
-  name:	redirect-rule
+
+ubo_ext_any:
+  name: redirect-rule
   inverse_conflicts: true
   conflicts:
     - domain
