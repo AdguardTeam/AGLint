@@ -5,7 +5,7 @@ adg_os_any:
   conflicts:
     - to
   assignable: true
-  value_format: ^[^~].*$
+  value_format: pipe_separated_domains
   negatable: false
 adg_ext_any:
   name: denyallow
@@ -14,7 +14,7 @@ adg_ext_any:
   conflicts:
     - to
   assignable: true
-  value_format: ^[^~].*$
+  value_format: pipe_separated_domains
 adg_cb_ios:
   name: denyallow
   description: $denyallow modifier allows to avoid creating additional rules when it is needed to disable a certain rule for specific domains. $denyallow matches only target domains and not referrer domains.
@@ -22,7 +22,7 @@ adg_cb_ios:
   conflicts:
     - to
   assignable: true
-  value_format: ^[^~].*$
+  value_format: pipe_separated_domains
 adg_cb_safari:
   name: denyallow
   description: $denyallow modifier allows to avoid creating additional rules when it is needed to disable a certain rule for specific domains. $denyallow matches only target domains and not referrer domains.
@@ -30,7 +30,7 @@ adg_cb_safari:
   conflicts:
     - to
   assignable: true
-  value_format: ^[^~].*$
+  value_format: pipe_separated_domains
 ubo_ext_any:
   name: denyallow
   description: $denyallow modifier allows to avoid creating additional rules when it is needed to disable a certain rule for specific domains. $denyallow matches only target domains and not referrer domains.
@@ -38,4 +38,4 @@ ubo_ext_any:
   conflicts:
     - to
   assignable: true
-  value_format: ^[^~].*$
+  value_format: pipe_separated_domains

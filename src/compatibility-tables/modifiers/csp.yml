@@ -8,7 +8,8 @@ adg_os_any:
     - domain
     - important
     - subdocument
-  inverse_conflicts: false
+    - badfilter
+  inverse_conflicts: true
   negatable: false
 adg_ext_any:
   name: csp
@@ -20,7 +21,8 @@ adg_ext_any:
     - domain
     - important
     - subdocument
-  inverse_conflicts: false
+    - badfilter
+  inverse_conflicts: true
   negatable: false
 abp_ext_any:
   name: csp
@@ -32,7 +34,8 @@ abp_ext_any:
     - domain
     - important
     - subdocument
-  inverse_conflicts: false
+    - badfilter
+  inverse_conflicts: true
   negatable: false
 ubo_ext_any:
   name: csp
@@ -44,5 +47,6 @@ ubo_ext_any:
     - 1p
     - 3p
     - domain
-  inverse_conflicts: false
+    - badfilter
+  inverse_conflicts: true
   negatable: false
