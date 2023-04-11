@@ -32,9 +32,7 @@ abp_ext_any:
   value_format: /[^,$]+/
   conflicts:
     - domain
-    - important
     - subdocument
-    - badfilter
   inverse_conflicts: true
   negatable: false
 ubo_ext_any:
