@@ -9,8 +9,6 @@ adg_any:
 
 abp_any:
   name: domain
-  aliases:
-    - from
   assignable: true
   value_format: pipe_separated_domains
   docs: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#domain-restrictions
