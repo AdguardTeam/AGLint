@@ -24,6 +24,7 @@ adg_os_any:
     - webrtc
     - important
     - badfilter
+    - app
   value_format: |-
     (?x)
       ^(
