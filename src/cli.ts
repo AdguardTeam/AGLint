@@ -59,7 +59,15 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
         // Create the config file
         // TODO: This is a very basic implementation, we should implement a proper config file generator in the future
         // eslint-disable-next-line max-len
-        await writeFile(join(cwd, '.aglintrc.yaml'), '# AGLint config file\n# Documentation: https://github.com/AdguardTeam/AGLint#configuration\nextends:\n  - aglint:recommended\n');
+        await writeFile(join(cwd, '.aglintrc.yaml'), '# AGLint root config file\n# Documentation: https://github.com/AdguardTeam/AGLint#configuration\nroot: true\nextends:\n  - aglint:recommended\n');
+
+        // Notify the user that the config file was created successfully
+        // eslint-disable-next-line no-console
+        console.log(`Config file was created successfully in directory "${cwd}" as ".aglintrc.yaml"`);
+
+        // Notify user about root: true option
+        // eslint-disable-next-line no-console, max-len
+        console.log('Note: "root: true" option was added to the config file. Please make sure that the config file is located in the root directory of your project.');
 
         // We should exit the process here, because we don't want to run the linter after initializing the config file
         process.exit(0);
