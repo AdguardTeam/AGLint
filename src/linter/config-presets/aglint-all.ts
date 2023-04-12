@@ -12,7 +12,7 @@ const config: LinterConfig = {
         'if-closed': 'error',
         'inconsistent-hint-platforms': 'error',
         'invalid-domain-list': 'error',
-        'single-selector': 'error',
+        'single-selector': 'warn',
         'unknown-hints-and-platforms': 'error',
         'unknown-preprocessor-directives': 'error',
     },
