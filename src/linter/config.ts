@@ -4,7 +4,12 @@
 
 import merge from 'deepmerge';
 import {
-    boolean, object, optional, record, string,
+    array,
+    boolean,
+    object,
+    optional,
+    record,
+    string,
 } from 'superstruct';
 import { linterRuleConfigSchema } from './rule';
 import { LinterConfig } from './common';
@@ -20,6 +25,7 @@ export const linterRulesSchema = optional(record(string(), linterRuleConfigSchem
  * in the CLI config object.
  */
 export const linterConfigPropsSchema = {
+    extends: optional(array(string())),
     allowInlineConfig: optional(boolean()),
     rules: linterRulesSchema,
 };
