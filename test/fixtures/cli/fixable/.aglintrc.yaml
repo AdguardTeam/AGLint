@@ -1,0 +1,3 @@
+# enable "single-selector" rule, which is fixable
+rules:
+  single-selector: warn
