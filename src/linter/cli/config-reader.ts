@@ -59,7 +59,6 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
         return parsed;
     } catch (error: unknown) {
         if (error instanceof Error) {
-            // Pass through any other errors
             throw new Error(`Failed to parse config file "${filePath}": ${error.message}`);
         }
 
