@@ -289,8 +289,8 @@ export class Linter {
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const preset = this.configPresets.get(entry)!;
 
-                // TODO: allow "extends" in config presets (recursively)?
-                // FIXME: if the config preset extends itself, we'll get an infinite loop
+                // TODO: Allow "extends" in config presets (recursively)?
+                // ! If the config preset extends itself, we'll get an infinite loop
 
                 // Merge the config preset into the result
                 result = mergeConfigs(result, preset);
