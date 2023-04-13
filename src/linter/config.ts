@@ -25,6 +25,7 @@ export const linterRulesSchema = optional(record(string(), linterRuleConfigSchem
  * in the CLI config object.
  */
 export const linterConfigPropsSchema = {
+    root: optional(boolean()),
     extends: optional(array(string())),
     allowInlineConfig: optional(boolean()),
     rules: linterRulesSchema,
