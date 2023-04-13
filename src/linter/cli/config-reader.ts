@@ -1,13 +1,11 @@
 import { readFile } from 'fs/promises';
-import { assert, StructError } from 'superstruct';
 import { parse } from 'path';
 import yaml from 'js-yaml';
-import { linterConfigSchema } from '../config';
-import { EMPTY } from '../../utils/constants';
 import {
     EXT_JSON, EXT_YAML, EXT_YML, RC_CONFIG_FILE,
 } from './constants';
 import { LinterConfig } from '../common';
+import { validateLinterConfig } from '../config-validator';
 
 /**
  * Reads and parses supported configuration files.
@@ -56,30 +54,11 @@ export async function parseConfigFile(filePath: string): Promise<LinterConfig> {
         }
 
         // Validate the parsed config object against the config schema using Superstruct
-        assert(parsed, linterConfigSchema);
+        validateLinterConfig(parsed);
 
         return parsed;
     } catch (error: unknown) {
         if (error instanceof Error) {
-            // Handle Superstruct errors
-            if (error instanceof StructError) {
-                // We can customize the error message here to make it more user-friendly
-                // https://docs.superstructjs.org/guides/05-handling-errors#customizing-errors
-                const { key, value, type } = error;
-
-                let message = EMPTY;
-
-                if (value === undefined) {
-                    message = `"${key}" is required, but it was not provided`;
-                } else if (type === 'never') {
-                    message = `"${key}" is unknown in the config schema, please remove it`;
-                } else {
-                    message = `Value "${value}" for "${key}" is not a valid "${type}" type`;
-                }
-
-                throw new Error(`Failed to parse config file "${filePath}": ${message}`);
-            }
-
             throw new Error(`Failed to parse config file "${filePath}": ${error.message}`);
         }
 

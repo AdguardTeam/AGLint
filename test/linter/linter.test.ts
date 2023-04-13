@@ -338,6 +338,128 @@ describe('Linter', () => {
         expect(linter.getRuleConfig('rule-3')).toEqual([2, { a: 300, b: 300 }]);
     });
 
+    test('addConfigPreset & applyConfigExtensions', () => {
+        // Prepare two demo presets
+        const preset1: LinterConfig = {
+            rules: {
+                'rule-1': 'off',
+                'rule-2': 'warn',
+                'rule-3': 'error',
+            },
+        };
+
+        const preset2: LinterConfig = {
+            rules: {
+                'rule-3': 'off',
+                'rule-4': 'warn',
+                'rule-5': 'error',
+            },
+        };
+
+        // Create linter
+        const linter = new Linter(false);
+
+        // Add demo presets
+        linter.addConfigPreset('preset-1', preset1);
+        linter.addConfigPreset('preset-2', preset2);
+
+        // Should throw error if preset already exists
+        expect(() => linter.addConfigPreset('preset-1', preset1)).toThrowError(
+            'Config preset "preset-1" already exists',
+        );
+
+        // Should throw error if preset doesn't exist
+        expect(() => linter.applyConfigExtensions({
+            extends: ['preset-100'],
+            allowInlineConfig: true,
+        })).toThrowError('Config preset "preset-100" doesn\'t exist');
+
+        // Should throw error if the config is invalid
+        // We need to disable the type check here because we're passing an invalid config
+        expect(() => linter.applyConfigExtensions({
+            extends: ['preset-1'],
+            allowInlineConfig: true,
+            someUnknownProperty: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any)).toThrowError(
+            'Invalid linter config: "someUnknownProperty" is unknown in the config schema, please remove it',
+        );
+
+        // Should merge presets properly if they exist
+        expect(
+            linter.applyConfigExtensions({
+                extends: ['preset-1'],
+                allowInlineConfig: true,
+            }),
+        ).toMatchObject({
+            extends: ['preset-1'],
+            allowInlineConfig: true,
+            rules: {
+                'rule-1': 'off',
+                'rule-2': 'warn',
+                'rule-3': 'error',
+            },
+        });
+
+        expect(
+            linter.applyConfigExtensions({
+                extends: ['preset-2'],
+                allowInlineConfig: true,
+            }),
+        ).toMatchObject({
+            extends: ['preset-2'],
+            allowInlineConfig: true,
+            rules: {
+                'rule-3': 'off',
+                'rule-4': 'warn',
+                'rule-5': 'error',
+            },
+        });
+
+        // Should merge multiple presets properly if they exist
+        // Presets are merged in order, so the last preset will override the previous ones,
+        // this is why the rule-3 severity is 'off' instead of 'error'
+        expect(
+            linter.applyConfigExtensions({
+                extends: ['preset-1', 'preset-2'],
+                allowInlineConfig: true,
+            }),
+        ).toMatchObject({
+            extends: ['preset-1', 'preset-2'],
+            allowInlineConfig: true,
+            rules: {
+                'rule-1': 'off',
+                'rule-2': 'warn',
+                'rule-3': 'off',
+                'rule-4': 'warn',
+                'rule-5': 'error',
+            },
+        });
+
+        // Complicated case
+        expect(
+            linter.applyConfigExtensions({
+                extends: ['preset-1', 'preset-2'],
+                allowInlineConfig: true,
+                rules: {
+                    'rule-1': 'error',
+                    'rule-100': 'error',
+                },
+            }),
+        ).toMatchObject({
+            extends: ['preset-1', 'preset-2'],
+            allowInlineConfig: true,
+            rules: {
+                'rule-1': 'off',
+                'rule-100': 'error',
+                'rule-2': 'warn',
+                'rule-3': 'off',
+                'rule-4': 'warn',
+                'rule-5': 'error',
+            },
+        });
+    });
+
     test('setConfig', () => {
         const linter = new Linter(false);
 

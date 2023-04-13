@@ -107,6 +107,11 @@ export interface LinterRule<StorageType = LinterRuleStorage<unknown>, ConfigType
  */
 export interface LinterConfig {
     /**
+     * An array of configuration presets to extend
+     */
+    extends?: string[];
+
+    /**
      * Whether to allow inline configuration or not
      *
      * @example

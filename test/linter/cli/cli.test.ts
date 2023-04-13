@@ -7,10 +7,14 @@ import { LinterCliReporter } from '../../../src/linter/cli/reporter';
 import { LinterResult } from '../../../src';
 import { StringUtils } from '../../../src/utils/string';
 
-/** Path to the `test/fixtures/cli` directory */
+/**
+ * Path to the `test/fixtures/cli` directory
+ */
 const FIXTURE_SOURCE = path.join('test/fixtures', 'cli');
 
-/** Path to the `test/fixtures/cli-temporary` directory */
+/**
+ * Path to the `test/fixtures/cli-temporary` directory
+ */
 const FIXTURE_PATH = path.join('test/fixtures', 'cli-temporary');
 
 /**
@@ -85,7 +89,6 @@ describe('CLI tests', () => {
                         problems: [
                             {
                                 severity: 3,
-                                // eslint-disable-next-line max-len
                                 message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
@@ -109,20 +112,20 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                rule: 'single-selector',
-                                severity: 1,
-                                message: 'An element hiding rule should contain only one selector',
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 13,
+                                    startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 29,
+                                    endColumn: 55,
                                 },
                             },
                         ],
-                        warningCount: 1,
+                        warningCount: 0,
                         errorCount: 0,
-                        fatalErrorCount: 0,
+                        fatalErrorCount: 1,
                     },
                 },
             ],
@@ -147,29 +150,57 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                rule: 'single-selector',
-                                severity: 1,
-                                message: 'An element hiding rule should contain only one selector',
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 13,
+                                    startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 29,
+                                    endColumn: 55,
                                 },
                             },
+                            {
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                position: {
+                                    startLine: 6,
+                                    startColumn: 25,
+                                    endLine: 6,
+                                    endColumn: 55,
+                                },
+                            },
+                        ],
+                        warningCount: 0,
+                        errorCount: 0,
+                        fatalErrorCount: 2,
+                    },
+                },
+            ],
+            [
+                'onFileStart',
+                path.parse(path.join(FIXTURE_PATH, 'fixable/fixable_file1.txt')),
+            ],
+            [
+                'onFileEnd',
+                {
+                    file: path.parse(path.join(FIXTURE_PATH, 'fixable/fixable_file1.txt')),
+                    result: {
+                        problems: [
                             {
                                 rule: 'single-selector',
                                 severity: 1,
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
-                                    startLine: 5,
-                                    startColumn: 13,
-                                    endLine: 5,
-                                    endColumn: 29,
+                                    startLine: 2,
+                                    startColumn: 2,
+                                    endLine: 2,
+                                    endColumn: 24,
                                 },
                             },
                         ],
-                        warningCount: 2,
+                        warningCount: 1,
                         errorCount: 0,
                         fatalErrorCount: 0,
                     },
@@ -199,7 +230,6 @@ describe('CLI tests', () => {
                         problems: [
                             {
                                 severity: 3,
-                                // eslint-disable-next-line max-len
                                 message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
                                 position: {
                                     startLine: 2,
@@ -224,14 +254,13 @@ describe('CLI tests', () => {
                         problems: [
                             {
                                 severity: 3,
-                                message:
-                                    // eslint-disable-next-line max-len
-                                    "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 25,
+                                    endColumn: 55,
                                 },
                             },
                         ],
@@ -249,20 +278,20 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                rule: 'single-selector',
-                                severity: 1,
-                                message: 'An element hiding rule should contain only one selector',
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 13,
+                                    startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 29,
+                                    endColumn: 55,
                                 },
                             },
                         ],
-                        warningCount: 1,
+                        warningCount: 0,
                         errorCount: 0,
-                        fatalErrorCount: 0,
+                        fatalErrorCount: 1,
                     },
                 },
             ],
@@ -287,29 +316,57 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                rule: 'single-selector',
-                                severity: 1,
-                                message: 'An element hiding rule should contain only one selector',
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 13,
+                                    startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 29,
+                                    endColumn: 55,
                                 },
                             },
+                            {
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                position: {
+                                    startLine: 6,
+                                    startColumn: 25,
+                                    endLine: 6,
+                                    endColumn: 55,
+                                },
+                            },
+                        ],
+                        warningCount: 0,
+                        errorCount: 0,
+                        fatalErrorCount: 2,
+                    },
+                },
+            ],
+            [
+                'onFileStart',
+                path.parse(path.join(FIXTURE_PATH, 'fixable/fixable_file1.txt')),
+            ],
+            [
+                'onFileEnd',
+                {
+                    file: path.parse(path.join(FIXTURE_PATH, 'fixable/fixable_file1.txt')),
+                    result: {
+                        problems: [
                             {
                                 rule: 'single-selector',
                                 severity: 1,
                                 message: 'An element hiding rule should contain only one selector',
                                 position: {
-                                    startLine: 5,
-                                    startColumn: 13,
-                                    endLine: 5,
-                                    endColumn: 29,
+                                    startLine: 2,
+                                    startColumn: 2,
+                                    endLine: 2,
+                                    endColumn: 24,
                                 },
                             },
                         ],
-                        warningCount: 2,
+                        warningCount: 1,
                         errorCount: 0,
                         fatalErrorCount: 0,
                     },
@@ -328,101 +385,19 @@ describe('CLI tests', () => {
         // Don't pass any arguments to use the default values
         await cli.run(FIXTURE_PATH);
 
-        expect(reporter.getLoggedEvents()).toMatchObject([
-            ['onLintStart', null],
-            ['onFileStart', path.parse(path.join(FIXTURE_PATH, 'root_file1.txt'))],
-            [
-                'onFileEnd',
-                {
-                    file: path.parse(path.join(FIXTURE_PATH, 'root_file1.txt')),
-                    result: {
-                        problems: [
-                            {
-                                severity: 3,
-                                // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
-                                position: {
-                                    startLine: 2,
-                                    startColumn: 14,
-                                    endLine: 2,
-                                    endColumn: 17,
-                                },
-                            },
-                        ],
-                        warningCount: 0,
-                        errorCount: 0,
-                        fatalErrorCount: 1,
-                    },
-                },
-            ],
-            ['onFileStart', path.parse(path.join(FIXTURE_PATH, 'dir1/dir1_file1.txt'))],
-            [
-                'onFileEnd',
-                {
-                    file: path.parse(path.join(FIXTURE_PATH, 'dir1/dir1_file1.txt')),
-                    result: {
-                        problems: [],
-                        warningCount: 0,
-                        errorCount: 0,
-                        fatalErrorCount: 0,
-                    },
-                },
-            ],
-            ['onFileStart', path.parse(path.join(FIXTURE_PATH, 'dir1/dir1_file2.txt'))],
-            [
-                'onFileEnd',
-                {
-                    file: path.parse(path.join(FIXTURE_PATH, 'dir1/dir1_file2.txt')),
-                    result: {
-                        problems: [],
-                        warningCount: 0,
-                        errorCount: 0,
-                        fatalErrorCount: 0,
-                    },
-                },
-            ],
-            ['onFileStart', path.parse(path.join(FIXTURE_PATH, 'dir2/dir2_file1.txt'))],
-            [
-                'onFileEnd',
-                {
-                    file: path.parse(path.join(FIXTURE_PATH, 'dir2/dir2_file1.txt')),
-                    result: {
-                        problems: [],
-                        warningCount: 0,
-                        errorCount: 0,
-                        fatalErrorCount: 0,
-                    },
-                },
-            ],
-            ['onLintEnd', null],
-        ]);
-
-        // Check that the files were fixed
+        // Check that the file was actually fixed
         expect(
-            StringUtils.splitStringByNewLines(await readFile(path.join(FIXTURE_PATH, 'dir1/dir1_file1.txt'), 'utf8')),
+            StringUtils.splitStringByNewLines(
+                await readFile(path.join(FIXTURE_PATH, 'fixable/fixable_file1.txt'), 'utf8'),
+            ),
         ).toEqual([
-            '! Multiple selectors',
-            'example.com##.ad1',
-            'example.com##.ad2',
-            'example.com##.ad3',
+            '! should be fixed',
+            '##.class1',
+            '##.class2',
+            '###id1',
             '',
             '! aglint-disable-next-line',
-            'example.com##.ad1, .ad2, .ad3',
-            '',
-        ]);
-
-        expect(
-            StringUtils.splitStringByNewLines(await readFile(path.join(FIXTURE_PATH, 'dir2/dir2_file1.txt'), 'utf8')),
-        ).toEqual([
-            '! Multiple selectors',
-            'example.com##.ad1',
-            'example.com##.ad2',
-            'example.com##.ad3',
-            '',
-            '! aglint-disable-next-line',
-            'example.com##.ad1',
-            'example.com##.ad2',
-            'example.com##.ad3',
+            '##.class1, .class2, #id1',
             '',
         ]);
     });
@@ -444,20 +419,20 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                rule: 'single-selector',
-                                severity: 1,
-                                message: 'An element hiding rule should contain only one selector',
+                                severity: 3,
+                                // eslint-disable-next-line max-len
+                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
-                                    startColumn: 13,
+                                    startColumn: 25,
                                     endLine: 2,
-                                    endColumn: 29,
+                                    endColumn: 55,
                                 },
                             },
                         ],
-                        warningCount: 1,
+                        warningCount: 0,
                         errorCount: 0,
-                        fatalErrorCount: 0,
+                        fatalErrorCount: 1,
                     },
                 },
             ],

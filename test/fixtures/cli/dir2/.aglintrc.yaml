@@ -1,0 +1,2 @@
+# disable inline configs ("! aglint-" comments within filters)
+allowInlineConfig: false

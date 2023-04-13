@@ -9,14 +9,14 @@ describe('parseConfigFile', () => {
             `Failed to parse config file "${path.join(
                 base,
                 '.aglintrc',
-            )}": "unknownConfigOption" is unknown in the config schema, please remove it`,
+            )}": Invalid linter config: "unknownConfigOption" is unknown in the config schema, please remove it`,
         );
 
         await expect(parseConfigFile(path.join(base, 'aglint.config.json'))).rejects.toThrowError(
             `Failed to parse config file "${path.join(
                 base,
                 'aglint.config.json',
-            )}": Value "false" for "rules" is not a valid "record" type`,
+            )}": Invalid linter config: Value "false" for "rules" is not a valid "record" type`,
         );
 
         await expect(parseConfigFile(path.join(base, 'invalid-json.json'))).rejects.toThrowError(

@@ -27,6 +27,8 @@ import {
     AnyRule, CommentRuleType, FilterList, RuleCategory,
 } from '../parser/common';
 import { FilterListParser } from '../parser/filterlist';
+import { validateLinterConfig } from './config-validator';
+import { defaultConfigPresets } from './config-presets';
 
 /**
  * Represents a linter result that is returned by the `lint` method
@@ -131,14 +133,21 @@ export class Linter {
     private config: LinterConfig = defaultLinterConfig;
 
     /**
+     * Config presets
+     */
+    private configPresets: Map<string, LinterConfig> = new Map();
+
+    /**
      * Creates a new linter instance.
      *
-     * @param defaultRules - Whether to add all default rules to the linter
-     * @param config - The linter configuration
+     * @param defaultRules Add default linter rules and config presets to the linter
+     * (by default it adds them)
+     * @param config Linter config to use (by default it uses the default config)
      */
     constructor(defaultRules = true, config: LinterConfig = defaultLinterConfig) {
         if (defaultRules) {
             this.addDefaultRules();
+            this.addDefaultConfigPresets();
         }
 
         this.setConfig(config);
@@ -150,6 +159,15 @@ export class Linter {
     public addDefaultRules(): void {
         for (const [name, rule] of defaultLinterRules) {
             this.addRule(name, rule);
+        }
+    }
+
+    /**
+     * Adds all default config presets to the linter.
+     */
+    public addDefaultConfigPresets(): void {
+        for (const [name, config] of defaultConfigPresets) {
+            this.addConfigPreset(name, config);
         }
     }
 
@@ -221,26 +239,101 @@ export class Linter {
     }
 
     /**
+     * Adds a new config preset to the linter.
+     *
+     * @param name Config preset name, e.g. "aglint:recommended"
+     * @param config Related config object
+     * @throws If the config preset already exists
+     */
+    public addConfigPreset(name: string, config: LinterConfig): void {
+        // Don't allow to override existing config presets
+        if (this.configPresets.has(name)) {
+            throw new Error(`Config preset "${name}" already exists`);
+        }
+
+        // Validate the config
+        validateLinterConfig(config);
+
+        this.configPresets.set(name, config);
+    }
+
+    /**
+     * Applies the config presets to the config object (extends the config
+     * with the given presets if they exist).
+     *
+     * @param config Config object
+     * @returns Extended config object
+     * @throws If the config preset doesn't exist
+     * @throws If the config is invalid
+     */
+    public applyConfigExtensions(config: LinterConfig): LinterConfig {
+        // Validate the config (before we merge it with the config presets)
+        validateLinterConfig(config);
+
+        // Make a deep copy of the config, so we don't modify the original one
+        // and we can safely merge it with the config presets
+        let result = cloneDeep(config);
+
+        // If config contains "extends", we should merge it with the corresponding
+        // config presets
+        if (config.extends) {
+            // Iterate over all entries in the "extends" array
+            for (const entry of config.extends) {
+                // Throw error if the config preset doesn't exist
+                if (!this.configPresets.has(entry)) {
+                    throw new Error(`Config preset "${entry}" doesn't exist`);
+                }
+
+                // It's safe to use the non-null assertion operator here, because
+                // we already checked that the config preset exists
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const preset = this.configPresets.get(entry)!;
+
+                // TODO: Allow "extends" in config presets (recursively)?
+                // ! If the config preset extends itself, we'll get an infinite loop
+
+                // Merge the config preset into the result
+                result = mergeConfigs(result, preset);
+            }
+        }
+
+        // Validate the result
+        validateLinterConfig(result);
+
+        return result;
+    }
+
+    /**
      * Sets the linter configuration. If `reset` is set to `true`, all rule
      * configurations are reset to their default values (removing overrides).
      *
      * @param config Core linter configuration
      * @param reset Whether to reset all rule configs
+     * @throws If any of the config presets doesn't exist
+     * @throws If the rule config is invalid in any way
      */
     public setConfig(config: LinterConfig, reset = true): void {
-        // Merge with default config
-        this.config = mergeConfigs(defaultLinterConfig, config);
+        // Merge the given config with the default config, but before that
+        // don't forget apply the config presets
+        const newConfig = mergeConfigs(
+            defaultLinterConfig,
+            this.applyConfigExtensions(config),
+        );
+
+        // Set the new config
+        this.config = newConfig;
 
         // Reset all rule configs
         if (reset) {
             for (const entry of this.rules.values()) {
                 entry.configOverride = undefined;
-                entry.severityOverride = undefined;
+                // By default, severity is set to 0 (which means "off")
+                entry.severityOverride = 0;
             }
         }
 
-        if (config.rules) {
-            this.applyRulesConfig(config.rules);
+        if (newConfig.rules) {
+            this.applyRulesConfig(newConfig.rules);
         }
     }
 
