@@ -107,6 +107,11 @@ export interface LinterRule<StorageType = LinterRuleStorage<unknown>, ConfigType
  */
 export interface LinterConfig {
     /**
+     * Root configuration flag. If it's value is true, the configuration is root configuration.
+     */
+    root?: boolean;
+
+    /**
      * An array of configuration presets to extend
      */
     extends?: string[];
