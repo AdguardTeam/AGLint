@@ -1,7 +1,7 @@
 adg_os_any:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
-  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#denyallow-modifier
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#stealth-modifier
   assignable: true
   negatable: false
   exception_only: true
@@ -10,7 +10,7 @@ adg_os_any:
 adg_ext_chrome:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
-  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#denyallow-modifier
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#stealth-modifier
   assignable: true
   negatable: false
   exception_only: true
@@ -19,7 +19,7 @@ adg_ext_chrome:
 adg_ext_firefox:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
-  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#denyallow-modifier
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#stealth-modifier
   assignable: true
   negatable: false
   exception_only: true
@@ -28,7 +28,7 @@ adg_ext_firefox:
 adg_ext_opera:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
-  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#denyallow-modifier
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#stealth-modifier
   assignable: true
   negatable: false
   exception_only: true
@@ -37,7 +37,7 @@ adg_ext_opera:
 adg_ext_edge:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
-  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#denyallow-modifier
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#stealth-modifier
   assignable: true
   negatable: false
   exception_only: true
