@@ -5,26 +5,8 @@ adg_os_any:
   assignable: true
   negatable: false
   exception_only: true
-  value_format: |-
-    (?x)
-      ^(?:(
-        searchqueries|
-        donottrack|
-        3p-cookie|
-        1p-cookie|
-        3p-cache|
-        3p-auth|
-        webrtc|
-        push|
-        location|
-        flash|
-        java|
-        referrer|
-        useragent|
-        ip|
-        xclientdata|
-        dpi)
-      (\|(?1))*)?$
+  # TODO: implement validation
+  # value_format: 
 adg_ext_chrome:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
@@ -32,17 +14,8 @@ adg_ext_chrome:
   assignable: true
   negatable: false
   exception_only: true
-  value_format: |-
-    (?x)
-      ^(?:(
-        searchqueries|
-        donottrack|
-        3p-cookie|
-        1p-cookie|
-        webrtc|
-        referrer|
-        xclientdata)
-      (\|(?1))*)?$
+  # TODO: implement validation
+  # value_format: 
 adg_ext_firefox:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
@@ -50,16 +23,8 @@ adg_ext_firefox:
   assignable: true
   negatable: false
   exception_only: true
-  value_format: |-
-    (?x)
-      ^(?:(
-        searchqueries|
-        donottrack|
-        3p-cookie|
-        1p-cookie|
-        webrtc|
-        referrer)
-      (\|(?1))*)?$
+  # TODO: implement validation
+  # value_format: 
 adg_ext_opera:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
@@ -67,16 +32,8 @@ adg_ext_opera:
   assignable: true
   negatable: false
   exception_only: true
-  value_format: |-
-    (?x)
-      ^(?:(
-        searchqueries|
-        donottrack|
-        3p-cookie|
-        1p-cookie|
-        webrtc|
-        referrer)
-      (\|(?1))*)?$
+  # TODO: implement validation
+  # value_format: 
 adg_ext_edge:
   name: stealth
   description: 'Disables the Stealth Mode module for all corresponding pages and requests.'
@@ -84,13 +41,5 @@ adg_ext_edge:
   assignable: true
   negatable: false
   exception_only: true
-  value_format: |-
-    (?x)
-      ^(?:(
-        searchqueries|
-        donottrack|
-        3p-cookie|
-        1p-cookie|
-        webrtc|
-        referrer)
-      (\|(?1))*)?$
+  # TODO: implement validation
+  # value_format: 
