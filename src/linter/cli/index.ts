@@ -3,12 +3,12 @@ import { readFile, writeFile } from 'fs/promises';
 import { pathExists } from 'fs-extra';
 import cloneDeep from 'clone-deep';
 import { Linter } from '../index';
-import { defaultLinterConfig } from '../config';
 import { walk } from './walk';
 import { scan } from './scan';
 import { LinterCliReporter } from './reporter';
 import { LinterConfig } from '../common';
 import { buildConfigForDirectory } from './config-builder';
+import { NoConfigError } from './errors/no-config-error';
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.
@@ -127,6 +127,13 @@ export class LinterCli {
                 await this.lintFile(parsedFile, config);
             }
         } else {
+            // Get the config for the cwd, should exist
+            const rootConfig = await buildConfigForDirectory(cwd);
+
+            if (!rootConfig) {
+                throw new NoConfigError(cwd);
+            }
+
             // Run the scanner on the cwd
             const scanResult = await scan(cwd, [], this.ignore);
 
@@ -137,7 +144,8 @@ export class LinterCli {
                     // Call the lint function for each file during the walk
                     file: this.lintFile,
                 },
-                defaultLinterConfig,
+                // Use cwd config as base config for the walker
+                rootConfig,
                 this.fix,
             );
         }
