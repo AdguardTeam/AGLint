@@ -5,9 +5,8 @@
  */
 export class NoConfigError extends Error {
     constructor(dir: string) {
-        super(dir);
+        super(`No config file found for ${dir}`);
 
         this.name = 'NoConfigError';
-        super(`No config file found for ${dir}`);
     }
 }
