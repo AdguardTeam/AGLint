@@ -2,6 +2,7 @@ import { join, parse, ParsedPath } from 'path';
 import { walk } from '../../../src/linter/cli/walk';
 import { scan } from '../../../src/linter/cli/scan';
 import { LinterConfig } from '../../../src/linter/common';
+import { defaultLinterConfig } from '../../../src/linter/config';
 
 /**
  * Represents an event that is emitted by the walk function,
@@ -23,7 +24,7 @@ describe('walk', () => {
             walk(await scan(base), {
                 dir: async () => {},
                 file: async () => {},
-            }),
+            }, defaultLinterConfig),
         ).rejects.toThrowError();
     });
 
@@ -32,18 +33,22 @@ describe('walk', () => {
         const events: StoredEvent[] = [];
 
         // Scan the directory and walk it, and store all events
-        await walk(await scan(base), {
-            dir: async (path: ParsedPath, config: LinterConfig, fix: boolean) => {
-                events.push({
-                    event: 'dir', path, config, fix,
-                });
+        await walk(
+            await scan(base),
+            {
+                dir: async (path: ParsedPath, config: LinterConfig, fix: boolean) => {
+                    events.push({
+                        event: 'dir', path, config, fix,
+                    });
+                },
+                file: async (path: ParsedPath, config: LinterConfig, fix: boolean) => {
+                    events.push({
+                        event: 'file', path, config, fix,
+                    });
+                },
             },
-            file: async (path: ParsedPath, config: LinterConfig, fix: boolean) => {
-                events.push({
-                    event: 'file', path, config, fix,
-                });
-            },
-        });
+            defaultLinterConfig,
+        );
 
         expect(events).toMatchObject([
             {
@@ -136,7 +141,8 @@ describe('walk', () => {
                 config: {
                     allowInlineConfig: true,
                     rules: {
-                        'rule-1': ['error', 'value-1', 'value-2'],
+                        'rule-1': ['error', 'value-1', 'value-2', 'value-3'],
+                        'rule-2': ['error', 'value-1', 'value-2'],
                     },
                 },
                 fix: false,
