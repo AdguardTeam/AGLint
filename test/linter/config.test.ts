@@ -4,7 +4,6 @@ import { linterConfigSchema, mergeConfigs } from '../../src/linter/config';
 describe('Linter config', () => {
     describe('mergeConfigs', () => {
         test('should merge configs when rule values are arrays', () => {
-            // should work when both rule values are arrays
             expect(
                 mergeConfigs(
                     {
