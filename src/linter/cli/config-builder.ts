@@ -39,11 +39,7 @@ export async function buildConfigForDirectory(dir: string): Promise<LinterConfig
 
     // Merge config files in reverse order
     // (reverse order = merge from the root directory to the actual directory)
-    let mergedConfig = parsedConfigs[parsedConfigs.length - 1];
-
-    for (let i = parsedConfigs.length - 2; i >= 0; i -= 1) {
-        mergedConfig = mergeConfigs(mergedConfig, parsedConfigs[i]);
-    }
+    const mergedConfig = parsedConfigs.reverse().reduce((prev, curr) => mergeConfigs(prev, curr));
 
     // Make sure that the config object is not mutated
     return cloneDeep(mergedConfig);
