@@ -9,7 +9,6 @@ import { readdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { LinterCli, LinterConsoleReporter } from './index';
 import { CONFIG_FILE_NAMES } from './linter/cli/constants';
-import { NoConfigError } from './linter/cli/errors/no-config-error';
 
 // Based on https://github.com/rollup/plugins/tree/master/packages/json#usage
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
@@ -125,7 +124,7 @@ function printError(error: unknown): void {
             process.exit(1);
         }
     } catch (error: unknown) {
-        if (error instanceof NoConfigError && error.name === 'NoConfigError') {
+        if (error instanceof Error && error.name === 'NoConfigError') {
             /* eslint-disable max-len, no-console */
             // Show a detailed error message if the config file was not found
             console.error([
