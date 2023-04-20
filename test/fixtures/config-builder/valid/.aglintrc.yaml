@@ -1,0 +1,8 @@
+# Root config file
+root: true
+allowInlineConfig: true
+rules:
+  'rule-1': 'error'
+  'rule-2': 0
+  'rule-3': 'off'
+  'rule-4': ['error', 'always']

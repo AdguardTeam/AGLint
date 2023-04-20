@@ -124,6 +124,26 @@ function printError(error: unknown): void {
             process.exit(1);
         }
     } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'NoConfigError') {
+            /* eslint-disable max-len, no-console */
+            // Show a detailed error message if the config file was not found
+            console.error([
+                'AGLint couldn\'t find the config file. To set up a configuration file for this project, please run:',
+                '',
+                '    If you use NPM:\tnpx aglint init',
+                '    If you use Yarn:\tyarn aglint init',
+                '',
+                'IMPORTANT: The init command creates a root config file, so be sure to run it in the root directory of your project!',
+                '',
+                'AGLint will try to find the config file in the current directory (cwd), but if the config file is not found',
+                'there, it will try to find it in the parent directory, and so on until it reaches your OS root directory.',
+            ].join('\n'));
+            /* eslint-enable max-len, no-console */
+
+            // Exit with code 1. This is necessary for CI/CD pipelines
+            process.exit(1);
+        }
+
         // If any error occurs it means that the linter failed to run
         // Format and print error to the console
         printError(error);

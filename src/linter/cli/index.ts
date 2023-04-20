@@ -1,15 +1,14 @@
 import path, { ParsedPath } from 'path';
-import { readFile, readdir, writeFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { pathExists } from 'fs-extra';
 import cloneDeep from 'clone-deep';
 import { Linter } from '../index';
-import { mergeConfigs, defaultLinterConfig } from '../config';
 import { walk } from './walk';
 import { scan } from './scan';
 import { LinterCliReporter } from './reporter';
-import { CONFIG_FILE_NAMES } from './constants';
-import { parseConfigFile } from './config-reader';
 import { LinterConfig } from '../common';
+import { buildConfigForDirectory } from './config-builder';
+import { NoConfigError } from './errors/no-config-error';
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.
@@ -121,28 +120,20 @@ export class LinterCli {
                 // Parse the file path
                 const parsedFile = path.parse(fullPath);
 
-                // Check for config files in the file's directory
-                const items = await readdir(parsedFile.dir);
-                const configs = items.filter((item) => CONFIG_FILE_NAMES.includes(item));
-
-                // If multiple config files were found, throw an error, because we don't know which one to use
-                if (configs.length > 1) {
-                    throw new Error(
-                        `Multiple config files found in directory "${parsedFile.dir}" (${configs.join(', ')})`,
-                    );
-                }
-
-                // If a config file was found, parse it
-                // eslint-disable-next-line max-len
-                const config = configs.length === 1 ? await parseConfigFile(path.join(parsedFile.dir, configs[0])) : undefined;
+                // Get config for the directory where the file is located
+                const config = await buildConfigForDirectory(parsedFile.dir);
 
                 // Lint the file
-                await this.lintFile(
-                    parsedFile,
-                    config === undefined ? defaultLinterConfig : mergeConfigs(defaultLinterConfig, config),
-                );
+                await this.lintFile(parsedFile, config);
             }
         } else {
+            // Get the config for the cwd, should exist
+            const rootConfig = await buildConfigForDirectory(cwd);
+
+            if (!rootConfig) {
+                throw new NoConfigError(cwd);
+            }
+
             // Run the scanner on the cwd
             const scanResult = await scan(cwd, [], this.ignore);
 
@@ -153,7 +144,8 @@ export class LinterCli {
                     // Call the lint function for each file during the walk
                     file: this.lintFile,
                 },
-                defaultLinterConfig,
+                // Use cwd config as base config for the walker
+                rootConfig,
                 this.fix,
             );
         }
