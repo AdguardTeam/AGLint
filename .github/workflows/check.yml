@@ -1,5 +1,8 @@
 name: Check code
 
+env:
+  NODE_VERSION: 18
+
 on:
   push:
     branches:
@@ -24,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ env.NODE_VERSION }}
           cache: yarn
 
       - name: Install dependencies
