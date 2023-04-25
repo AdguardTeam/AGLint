@@ -19,6 +19,7 @@ on:
 
 jobs:
   check_code:
+    name: Run type checking, linting, and tests
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository

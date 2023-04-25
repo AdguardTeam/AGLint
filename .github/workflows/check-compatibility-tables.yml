@@ -17,6 +17,7 @@ on:
 
 jobs:
   check_compatibility_tables:
+    name: Check compatibility tables
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository

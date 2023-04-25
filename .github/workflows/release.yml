@@ -10,6 +10,7 @@ on:
 
 jobs:
   release:
+    name: Release to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
