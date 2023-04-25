@@ -1,16 +1,21 @@
-name: NPM release
+name: Release
 
 env:
   NODE_VERSION: 18
 
+# Workflow need write access to the repository to create
+# a GitHub release
+permissions:
+  contents: write
+
 on:
   push:
     tags:
-      - "v*"
+      - v*
 
 jobs:
   release:
-    name: Release to NPM
+    name: Create NPM and GitHub release
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
@@ -39,9 +44,20 @@ jobs:
         run: yarn build
 
       - name: Pack files
-        run: yarn pack --filename release.tgz
+        run: yarn pack --filename aglint.tgz
 
       - name: Publish to NPM
-        run: yarn publish release.tgz --access=public --non-interactive
+        run: yarn publish aglint.tgz --access=public --non-interactive
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            aglint.tgz
+            dist/aglint.iife.min.js
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
