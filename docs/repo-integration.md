@@ -168,7 +168,7 @@ npm run prepare
 Finally, you can add AGLint to your pre-commit hook by running the following commands:
 
 ```
-npx husky add .husky/pre-commit "npm test"
+npx husky add .husky/pre-commit "npm run lint"
 git add .husky/pre-commit
 ```
 
