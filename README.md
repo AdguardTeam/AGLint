@@ -53,6 +53,8 @@ Table of Contents:
   - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Use programmatically](#use-programmatically)
     - [Parser](#parser)
+      - [Parsing rules](#parsing-rules)
+      - [Parsing filter lists](#parsing-filter-lists)
   - [Linter](#linter)
   - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
@@ -539,52 +541,188 @@ You can use several parts of `AGLint` programmatically, but it is only recommend
 
 #### Parser
 
-An error-tolerant parser capable of parsing all ADG, uBO and ABP rules currently in use. In other words, any filter list can be parsed with it. The parser API basically has two main parts:
+AGLint includes a powerful, error-tolerant parser for all kinds of ad blocking rules. It fully supports AdGuard, uBlock Origin and Adblock Plus syntaxes, and provides a high-detail AST for all rules.
+
+Basically, the parser API has two main parts:
 - Parser: parsing rules (string &#8594; AST)
-- Generator: serialization of ASTs (AST &#8594; string)
+- Generator: serialization of ASTs (AST &#8594; string) 
 
-For example, this code:
+##### Parsing rules
 
+You can parse individual rules using the `RuleParser` class. It has a `parse` method that takes a rule string and returns an AST. For example, this code:
 ```typescript
 import { RuleParser } from '@adguard/aglint';
 
 // RuleParser automatically determines the rule type
-const ast = RuleParser.parse('/ads.js^$script,domain=example.com');
+const ast = RuleParser.parse('/ads.js^$script');
 ```
+
 will gives you this AST:
 
 ```json
 {
+    "type": "NetworkRule",
     "category": "Network",
-    "type": "BasicNetworkRule",
     "syntax": "Common",
     "exception": false,
-    "pattern": "/ads.js^",
-    "modifiers": [
-        {
-            "modifier": "script",
-            "exception": false
-        },
-        {
-            "modifier": "domain",
-            "value": "example.com",
-            "exception": false
-        }
-    ]
+    "pattern": {
+        "type": "Value",
+        "value": "/ads.js^"
+    },
+    "modifiers": {
+        "type": "ModifierList",
+        "children": [
+            {
+                "type": "Modifier",
+                "modifier": {
+                    "type": "Value",
+                    "value": "script"
+                },
+                "exception": false
+            }
+        ]
+    }
 }
 ```
 
-Then, you can serialize this AST:
+<details>
+
+<summary>Show full AST (with locations)</summary>
+
+```json
+{
+    "type": "NetworkRule",
+    "loc": {
+        "start": {
+            "offset": 0,
+            "line": 1,
+            "column": 1
+        },
+        "end": {
+            "offset": 15,
+            "line": 1,
+            "column": 16
+        }
+    },
+    "raws": {
+        "text": "/ads.js^$script"
+    },
+    "category": "Network",
+    "syntax": "Common",
+    "exception": false,
+    "pattern": {
+        "type": "Value",
+        "loc": {
+            "start": {
+                "offset": 0,
+                "line": 1,
+                "column": 1
+            },
+            "end": {
+                "offset": 8,
+                "line": 1,
+                "column": 9
+            }
+        },
+        "value": "/ads.js^"
+    },
+    "modifiers": {
+        "type": "ModifierList",
+        "loc": {
+            "start": {
+                "offset": 9,
+                "line": 1,
+                "column": 10
+            },
+            "end": {
+                "offset": 15,
+                "line": 1,
+                "column": 16
+            }
+        },
+        "children": [
+            {
+                "type": "Modifier",
+                "loc": {
+                    "start": {
+                        "offset": 9,
+                        "line": 1,
+                        "column": 10
+                    },
+                    "end": {
+                        "offset": 15,
+                        "line": 1,
+                        "column": 16
+                    }
+                },
+                "modifier": {
+                    "type": "Value",
+                    "loc": {
+                        "start": {
+                            "offset": 9,
+                            "line": 1,
+                            "column": 10
+                        },
+                        "end": {
+                            "offset": 15,
+                            "line": 1,
+                            "column": 16
+                        }
+                    },
+                    "value": "script"
+                },
+                "exception": false
+            }
+        ]
+    }
+}
+```
+
+</details>
+
+As you can see, this AST is very detailed and contains all the information about the rule: syntax, category, exception, modifiers, node locations, and so on. Locations are especially useful for linters, since they allow you to point to the exact place in the rule where the error occurred.
+
+And this code:
 ```typescript
 RuleParser.generate(ast);
 ```
 
-Which returns the rule as string (this is not the same as the original rule, it is generated from the AST, and not related to the original rule):
+will generate the adblock rule from the AST (serialization):
 ```adblock
-/ads.js^$script,domain=example.com
+/ads.js^$script
 ```
 
-Please keep in mind that the parser omits unnecessary spaces, so the generated rule may not be the same as the original rule. Only the formatting can change, the rule itself remains the same. You can pass any rule to the parser, it automatically determines the type and category of the rule. If the rule is syntactically incorrect, the parser will throw an error.
+Please keep in mind that the parser omits unnecessary whitespaces, so the generated rule may not match with the original rule character by character. Only the formatting can change, the rule itself remains the same. You can pass any rule to the parser, it automatically determines the type and category of the rule. If the rule is syntactically incorrect, the parser will throw an error.
+
+##### Parsing filter lists
+
+You can also parse complete filter lists using the `FilterListParser` class. It works the same way as the `RuleParser` class. Here is an example of parsing [EasyList](https://easylist.to/easylist/easylist.txt) and generating it back:
+
+```typescript
+import { FilterListParser } from '@adguard/aglint';
+import { writeFile } from 'fs/promises';
+// Requires installing "node-fetch" package
+import fetch from 'node-fetch';
+
+// Download EasyList
+const easyList = await (await fetch('https://easylist.to/easylist/easylist.txt')).text();
+
+// Or read it from file
+// const easyList = await readFile('easylist.txt', 'utf-8');
+
+// Parse EasyList to AST. By default, parser is very tolerant,
+// if it can't parse some rules, it will just mark them as "raw".
+// If you want to disable this behavior, you can pass the second
+// argument as "false" to the "parse" method, like this:
+// const ast = FilterListParser.parse(easyList, false);
+const ast = FilterListParser.parse(easyList);
+
+// Generate filter list from filter list AST
+const easyListGenerated = FilterListParser.generate(ast);
+
+// Write generated filter list to file
+await writeFile('easylist-generated.txt', easyListGenerated);
+```
 
 ### Linter
 
