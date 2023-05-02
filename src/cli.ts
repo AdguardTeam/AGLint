@@ -4,14 +4,10 @@
  */
 
 import { program } from 'commander';
-import { readFileSync } from 'fs';
 import { readdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { LinterCli, LinterConsoleReporter } from './index';
+import { LinterCli, LinterConsoleReporter, version } from './index';
 import { CONFIG_FILE_NAMES } from './linter/cli/constants';
-
-// Based on https://github.com/rollup/plugins/tree/master/packages/json#usage
-const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 /**
  * Print error to the console, also handle unknown errors.
@@ -22,7 +18,7 @@ function printError(error: unknown): void {
     const lines = [
         'Oops! Something went wrong! :(',
         '',
-        `AGLint: ${pkg.version}`,
+        `AGLint: ${version}`,
         '',
     ];
 
@@ -53,7 +49,7 @@ function printError(error: unknown): void {
             // Basic info
             .name('AGLint')
             .description('Adblock filter list linter')
-            .version(pkg.version, '-v, --version', 'Output the version number')
+            .version(version, '-v, --version', 'Output the version number')
             .usage('[options] [file paths...]')
 
             // Customized help option
