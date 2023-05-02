@@ -1,8 +1,8 @@
 /**
  * @file AGLint browser entry point
+ *
+ * ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.)
  */
-
-// ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.)
 
 // Parser
 export { RuleParser } from './parser/rule';
@@ -94,3 +94,6 @@ export {
     LinterProblemReport,
     LinterRuleStorage,
 } from './linter/common';
+
+// Version
+export { version } from './version';

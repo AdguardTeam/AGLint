@@ -17,7 +17,18 @@ import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import { fileURLToPath } from 'url';
 
-const commonPlugins = [externals(), commonjs({ sourceMap: false }), resolve({ preferBuiltins: false })];
+const commonPlugins = [
+    json(),
+    externals(),
+    commonjs({ sourceMap: false }),
+    resolve({ preferBuiltins: false }),
+];
+
+const typeScriptPlugin = typescript({
+    declaration: true,
+    declarationDir: './dist/types',
+    rootDir: './',
+});
 
 // CommonJS build
 const aglintCjs = {
@@ -30,7 +41,10 @@ const aglintCjs = {
             sourcemap: false,
         },
     ],
-    plugins: [typescript({ declaration: false }), ...commonPlugins],
+    plugins: [
+        ...commonPlugins,
+        typeScriptPlugin,
+    ],
 };
 
 // ECMAScript build
@@ -44,13 +58,8 @@ const aglintEsm = {
         },
     ],
     plugins: [
-        typescript({
-            declaration: false,
-            compilerOptions: {
-                moduleResolution: 'node16',
-            },
-        }),
         ...commonPlugins,
+        typeScriptPlugin,
     ],
 };
 
@@ -84,12 +93,7 @@ const aglintCli = {
     ],
     plugins: [
         json({ preferConst: true }),
-        typescript({
-            declaration: false,
-            compilerOptions: {
-                moduleResolution: 'node16',
-            },
-        }),
+        typeScriptPlugin,
         /**
          * Inserting a special "shebang" comment at the beginning of the CLI file
          *
@@ -104,7 +108,7 @@ const aglintCli = {
 // File operations are delegated to the CLI tool, the core library only handles strings.
 const browserPlugins = [
     json({ preferConst: true }),
-    typescript({ declaration: false }),
+    typeScriptPlugin,
     commonjs({ sourceMap: false }),
     resolve({ preferBuiltins: false, browser: true }),
     nodePolyfills(),
@@ -157,8 +161,8 @@ const aglintIife = {
 
 // Merge .d.ts files
 const aglintDts = {
-    input: './dist/types/index.d.ts',
-    output: [{ file: 'dist/aglint.d.ts', format: 'es' }],
+    input: './dist/types/src/index.d.ts',
+    output: [{ file: './dist/aglint.d.ts', format: 'es' }],
     plugins: [externals(), dts()],
 };
 

@@ -113,3 +113,6 @@ export {
     findNextRootConfig,
 } from './linter/cli/config-finder';
 export { NoConfigError } from './linter/cli/errors/no-config-error';
+
+// Version
+export { version } from './version';
