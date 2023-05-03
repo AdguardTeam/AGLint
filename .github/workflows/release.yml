@@ -57,6 +57,7 @@ jobs:
           files: |
             aglint.tgz
             dist/aglint.iife.min.js
+            dist/aglint.umd.min.js
           draft: false
           prerelease: false
         env:
