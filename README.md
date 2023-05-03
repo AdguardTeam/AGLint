@@ -110,12 +110,12 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 
 That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
 
-You can also install AGLint globally, so you can use it without `npx` or `yarn`, but we recommend to install it locally to your project.
+> **Note**: You can also install AGLint globally, so you can use it without `npx` or `yarn`, but we recommend to install it locally to your project.
 
-If you want to lint just some specific files, you can pass them as arguments:
+> **Note**:  If you want to lint just some specific files, you can pass them as arguments:
 `aglint path/to/file.txt path/to/another/file.txt`
 
-To see all available options, run `aglint --help`.
+> **Note**: To see all available options, run `aglint --help`.
 
 *To customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
 
