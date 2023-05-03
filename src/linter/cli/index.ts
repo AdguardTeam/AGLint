@@ -79,7 +79,8 @@ export class LinterCli {
             throw new NoConfigError(parsedPath.dir);
         }
 
-        // Create a new linter instance and add the default rules
+        // Create a new linter instance and add the default rules and the merged result
+        // of the config files
         const linter = new Linter(true, config);
 
         // Get the generated config from the linter instance

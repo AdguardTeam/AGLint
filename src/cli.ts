@@ -73,7 +73,7 @@ function printError(error: unknown): void {
         // and use "process.cwd" as fallback. This is the current working directory (cwd).
         const cwd = process.env.INIT_CWD || process.cwd();
 
-        // Print configuration for the specified file path and exit
+        // Print configuration for the specified path and exit
         if (program.opts().printConfig) {
             // TODO: Print config file chain before the resolved config
 
