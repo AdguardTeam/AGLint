@@ -103,7 +103,7 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 2. Initialize the configuration file for AGLint:
    - NPM: `npx aglint init`
    - Yarn: `yarn aglint init`
-3. Run AGlint:
+3. Run AGLint:
    - NPM: `npx aglint`
    - Yarn: `yarn aglint`
 
