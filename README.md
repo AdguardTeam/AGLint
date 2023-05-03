@@ -28,6 +28,7 @@ Table of Contents:
 - [Getting started](#getting-started)
   - [Pre-requisites](#pre-requisites)
   - [Installation \& Usage](#installation--usage)
+  - [Integrate AGLint into your project](#integrate-aglint-into-your-project)
 - [VSCode extension](#vscode-extension)
 - [Special comments (inline configuration)](#special-comments-inline-configuration)
   - [Ignore adblock rules](#ignore-adblock-rules)
@@ -117,6 +118,10 @@ If you want to lint just some specific files, you can pass them as arguments:
 To see all available options, run `aglint --help`.
 
 *To customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
+
+### Integrate AGLint into your project
+
+If you would like to integrate AGLint into your project / filter list, please read our detailed [Integration guide](https://github.com/AdguardTeam/AGLint/blob/fix/140/docs/repo-integration.md) for more info.
 
 ## VSCode extension
 
