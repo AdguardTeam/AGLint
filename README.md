@@ -121,7 +121,7 @@ That's all! :hugs: The linter will check all filter lists in your project and pr
 
 ### Integrate AGLint into your project
 
-If you would like to integrate AGLint into your project / filter list, please read our detailed [Integration guide](https://github.com/AdguardTeam/AGLint/blob/fix/140/docs/repo-integration.md) for more info.
+If you would like to integrate AGLint into your project / filter list, please read our detailed [Integration guide](https://github.com/AdguardTeam/AGLint/blob/master/docs/repo-integration.md) for more info.
 
 ## VSCode extension
 
