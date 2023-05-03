@@ -40,6 +40,53 @@ export class LinterCli {
     }
 
     /**
+     * Resolves the linter config for the given file or directory. If the given path is
+     * a file, the config for the directory where the file is located will be resolved.
+     * Mainly for debugging purposes.
+     *
+     * @param fileOrDir File or directory to be debugged
+     * @param cwd Current working directory (optional)
+     * @returns Resolved linter config object for the given file or directory
+     * @throws If the file or directory does not exist
+     * @throws If no config file was found in the given directory or any of its parents
+     */
+    public static async resolveConfig(fileOrDir: string, cwd: string | null = process.cwd()): Promise<LinterConfig> {
+        // Determine the full path of the file or directory
+        let fullPath: string;
+
+        if (path.isAbsolute(fileOrDir)) {
+            fullPath = fileOrDir;
+        } else {
+            if (!cwd) {
+                throw new Error('Current working directory should be specified if the path is relative');
+            }
+
+            fullPath = path.join(cwd, fileOrDir);
+        }
+
+        // Check if the path exists
+        if (!(await pathExists(fullPath))) {
+            throw new Error(`File "${fullPath}" does not exist`);
+        }
+
+        // Resolve config for the given directory (or the directory where the file is located)
+        const parsedPath = path.parse(fullPath);
+        const config = await buildConfigForDirectory(parsedPath.dir);
+
+        // If the config is null, throw an error, because no config file was found
+        // in the given directory or any of its parents
+        if (!config) {
+            throw new NoConfigError(parsedPath.dir);
+        }
+
+        // Create a new linter instance and add the default rules
+        const linter = new Linter(true, config);
+
+        // Get the generated config from the linter instance
+        return linter.getConfig();
+    }
+
+    /**
      * Lints a file with the given config. Also compatible with the `WalkEvent` type,
      * so it can be used with the `walk` function.
      *

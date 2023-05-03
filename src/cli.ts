@@ -64,6 +64,7 @@ function printError(error: unknown): void {
             .option('-c, --colors', 'Force enabling colors', true)
             .option('--no-colors', 'Force disabling colors')
             .option('--no-ignores', 'Force ignoring .aglintignore files')
+            .option('--print-config <path>', 'Print resolved config for the specified file path')
 
             // Parse the arguments
             .parse(process.argv);
@@ -71,6 +72,18 @@ function printError(error: unknown): void {
         // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
         // and use "process.cwd" as fallback. This is the current working directory (cwd).
         const cwd = process.env.INIT_CWD || process.cwd();
+
+        // Print configuration for the specified file path and exit
+        if (program.opts().printConfig) {
+            // TODO: Print config file chain before the resolved config
+
+            // Print resolved config for the specified file path
+            const config = await LinterCli.resolveConfig(program.opts().printConfig, cwd);
+
+            // eslint-disable-next-line no-console
+            console.log(JSON.stringify(config, null, 2));
+            return;
+        }
 
         // "aglint init": initialize config file in the current directory (cwd)
         if (program.args[0] === 'init') {
