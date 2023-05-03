@@ -217,7 +217,7 @@ If you don't have a configuration file, you can create it by running `aglint ini
 
 You can also create a configuration file manually, please check the section below for more info.
 
-> **Note:** We are planning to add a configuration wizard in the future, so you will be able to create a configuration file by answering a few questions.
+> **Note**: We are planning to add a configuration wizard in the future, so you will be able to create a configuration file by answering a few questions.
 
 ### Configuration file name and format
 
@@ -231,11 +231,11 @@ We also plan to support `.aglintrc.js` (JavaScript) in the future.
 
 We recommend using `.aglintrc.yaml` or `.aglintrc.yml` because YAML is more compact and easier to read, and it supports comments.
 
-> :warning: **Note:** If you have multiple configuration files in the same directory, the CLI will throw an error and ask you to fix it.
+> **Warning**: If you have multiple configuration files in the same directory, the CLI will throw an error and ask you to fix it.
 
-> :warning: **Note:** If your configuration file is syntactically invalid or contains unknown / invalid options, the CLI will throw an error and ask you to fix it.
+> **Warning**: If your configuration file is syntactically invalid or contains unknown / invalid options, the CLI will throw an error and ask you to fix it.
 
-> :warning: **Note:** If your configuration file is not named in one of the ways listed above, the CLI will ignore it (since it cannot recognize it as a configuration file).
+> **Warning**: If your configuration file is not named in one of the ways listed above, the CLI will ignore it (since it cannot recognize it as a configuration file).
 
 ### Configuration file structure
 
@@ -288,7 +288,7 @@ Configuration presets are basically configuration files that you can use to exte
 - [`aglint:recommended`](https://github.com/AdguardTeam/AGLint/blob/master/src/linter/config-presets/aglint-recommended.ts): a set of recommended rules that are enabled by default. It is enough to use this preset in most cases.
 - [`aglint:all`](https://github.com/AdguardTeam/AGLint/blob/master/src/linter/config-presets/aglint-all.ts): a set of **all** rules that are available in the linter. This option maybe too strict for most projects.
 
-> **Note:** We are planning to add more presets in the future, and also allow users to create their own presets, but currently it is not possible.
+> **Note**: We are planning to add more presets in the future, and also allow users to create their own presets, but currently it is not possible.
 
 ### Default configuration file
 
@@ -313,7 +313,7 @@ This configuration file is the same as created by `aglint init` command. It simp
   }
   ```
 
-> **Note:** JavaScript configuration files aren't supported at the moment, but we plan to add support for them in the future (CJS and ESM syntaxes).
+> **Note**: JavaScript configuration files aren't supported at the moment, but we plan to add support for them in the future (CJS and ESM syntaxes).
 
 ### Configuration cascading and hierarchy
 
