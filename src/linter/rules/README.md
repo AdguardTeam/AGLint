@@ -32,41 +32,37 @@ In order to create a new rule you need to create a new TypeScript file in this f
 - the `events` property.
 The `meta` property is used to define the name, severity and the default config of the rule. The `events` property is used to define the events that the rule will listen to.
 ```typescript
-import { GenericRuleContext } from "../index";
-import { LinterRule, LinterRuleSeverity } from "../rule";
-import { AnyRule } from "../../parser";
+import { RuleCategory } from '../../parser/common';
+import { LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
-// Export the rule
-export const RuleName = <LinterRule>{
+/**
+ * Fill this description with a short description of the rule.
+ */
+export const ExampleRule: LinterRule = {
+    // Define the metadata of the rule
     meta: {
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.error,
     },
+    // Define the events that the rule will listen to
     events: {
-        onStartFilterList: (context: GenericRuleContext) => {
+        // If you don't need to listen this event, you can remove it
+        onStartFilterList: (context) => {
             // Do something in the event...
         },
-        onRule: (context: GenericRuleContext) => {
-            // Get currently iterated rule as AST (abstract syntax tree). Linter uses the 
-            // built-in parser, so it automatically parses the rule into an AST, if possible.
-            // If the rule cannot be parsed, the linter will throw a fatal error and this
-            // event will not be called.
-            // Please note that the AST can be undefined (mainly in onFilterListStart /
-            // onEndFilterList events, since there are no concrete rules in these events).
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
+        onRule: (context): void => {
+            // Get actually iterated adblock rule
+            const ast = context.getActualAdblockRuleAst();
 
-            // Get currently iterated rule as raw text
-            const raw = <string>context.getActualAdblockRuleRaw();
-
-            // Get current line number
-            const line = context.getActualLine();
-
-            // Do something in the event with these informations...
+            // Do something with the rule AST...
+            // if (ast.category === RuleCategory.Cosmetic) { ... }
         },
-        onEndFilterList: (context: GenericRuleContext) => {
+        // If you don't need to listen this event, you can remove it
+        onEndFilterList: (context) => {
             // Do something in the event...
         },
-    }
-}
+    },
+};
 ```
 
 ### Using rule storage
@@ -75,133 +71,132 @@ Sometimes you need to store some data between events. In order to do that you ca
 
 To make the rule storage type safe you need to define a type for the storage object in your rule file:
 ```typescript
-import { GenericRuleContext } from "../index";
-import { LinterRule, LinterRuleSeverity } from "../rule";
+import { LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
-// Define rule storage type (it is only relevant for the rule itself)
-interface RuleStorage {
+/**
+ * Concreting the storage type definition (the linter only provides a
+ * general form where the value type is unknown)
+ */
+interface Storage {
     n: number;
 }
 
-// Merge the original context type (GenericRuleContext) with your custom rule
-// storage type (RuleStorage)
-type RuleContext = GenericRuleContext & {
-    storage: RuleStorage;
-};
-
-// Export the rule
-export const RuleName = <LinterRule>{
+/**
+ * Fill this description with a short description of the rule.
+ */
+export const ExampleRule: LinterRule<Storage> = {
     meta: {
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.error,
     },
     events: {
-        // Use the concretized type (and not the generic one)
-        onStartFilterList: (context: RuleContext) => {
+        onStartFilterList: (context): void => {
             // Initialize the storage (currently it is undefined)
             // Of course, if you want, you can use more complex data structures :)
             context.storage.n = 0;
-
-            // Do something else in the event...
         },
-        onRule: (context: RuleContext) => {
-            // Its value is 0 (because we initialized it in the previous event)
-            context.storage.n++;
-            // Its value is 1 (because we incremented it in the previous line)
+        onRule: (context) => {
+            context.storage.n += 1;
+            // context.storage.n is preserved between events, so it will be
+            // incremented for each rule
 
             // Do something else in the event...
         },
         // ...
     },
-}
+};
 ```
 
 ### Add config to the rule
 
 Sometimes you need to pass some configs to the rule. In order to do that you can use the `config` property of the context object. Similar to the rule storage, its type is unknown for the core, so you need to define it in your rule file:
 ```typescript
-import { GenericRuleContext } from "../index";
-import { LinterRule, LinterRuleSeverity } from "../rule";
-import ss from "superstruct";
+import ss from 'superstruct';
+import { LinterRule, LinterRuleStorage } from '../common';
+import { SEVERITY } from '../severity';
 
-// Define rule options type (it is only relevant for the rule itself)
-type RuleOptions = [number, string];
+// Define rule config type (it is only relevant for the rule itself)
+type RuleConfig = [number, string];
 
-// GenericRuleContext is not enough here, because it defines the config as unknown,
-// but we need to define it as our custom type (RuleOptions)
-type RuleContext = GenericRuleContext & {
-    options: RuleOptions;
-};
-
-// Export the rule
-export const RuleName = <LinterRule>{
+/**
+ * Fill this description with a short description of the rule.
+ */
+export const ExampleRule: LinterRule<LinterRuleStorage<unknown>, RuleConfig> = {
+    // Define the metadata of the rule
     meta: {
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.error,
+
         config: {
             // Define the default config
-            default: [1, "foo"],
+            default: [1, 'foo'],
 
             // Define the schema of the config
             schema: ss.tuple([
                 ss.number(),
                 ss.string(),
-            ]),
+            ]) as ss.Struct,
         },
     },
+    // Define the events that the rule will listen to
     events: {
-        onRule: (context: RuleContext) => {
+        onRule: (context): void => {
             // Get the first parameter (number)
-            const firstParameter = context.options[0];
+            const firstParameter = context.config[0];
 
             // Get the second parameter (string)
-            const secondParameter = context.options[1];
+            const secondParameter = context.config[1];
 
             // Do something else in the event with the parameters...
         },
-        // ...
     },
-}
+};
 ```
 
-*Note: of course you can use both the rule storage and the parameters at the same time.*
+> **Note**: You can use both the rule storage and the parameters at the same time.
 
 ### Report problems
 
-In order to report a problem you need to use the `report` method of the context object:
+In order to report a problem you need to use the `report` method of the `context` object:
 ```typescript
-import { GenericRuleContext } from "../index";
-import { LinterRule, LinterRuleSeverity } from "../rule";
+import { LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
-// Export the rule
-export const RuleName = <LinterRule>{
+/**
+ * Fill this description with a short description of the rule.
+ */
+export const ExampleRule: LinterRule = {
+    // Define the metadata of the rule
     meta: {
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.error,
     },
+    // Define the events that the rule will listen to
     events: {
-        onRule: (context: GenericRuleContext) => {
-            // Get currently iterated rule as raw text
-            const raw = <string>context.getActualAdblockRuleRaw();
+        onRule: (context): void => {
+            // Get actually iterated adblock rule
+            const ast = context.getActualAdblockRuleAst();
 
-            // Get the current line number
-            const line = context.getActualLine();
-
-            // Report a problem
+            // Report problem for the whole rule
+            // This will automatically detect the location of the rule
             context.report({
-                // The position of the problem (in most cases it only affects
-                // just one line, since adblock rules are one-line rules)
-                position: {
-                    startLine: line,
-                    startColumn: 0,
-                    endLine: line,
-                    endColumn: raw.length,
-                },
-
-                // The problem message
-                message: "Problem message",
+                node: ast,
+                message: 'Bad rule',
             });
+
+            // But if needed, you can also report problem for a specific
+            // location. For example for the first 10 characters of the
+            // rule in the first line:
+            // context.report({
+            //     position: {
+            //         startLine: 1,
+            //         startColumn: 0,
+            //         endLine: 1,
+            //         endColumn: 10,
+            //     },
+            //     message: 'Bad first 10 characters',
+            // });
         },
-        // ...
     },
-}
+};
 ```
 
 The problem severity automatically depends on the rule severity. If the rule severity is `error` then the problem severity is `error`, if the rule severity is `warning` then the problem severity is `warning`.
@@ -211,62 +206,55 @@ The problem severity automatically depends on the rule severity. If the rule sev
 If possible, you can suggest a fix for the problem. In order to do that you need to use the `fix` property of the `report` method:
 
 ```typescript
-import { GenericRuleContext } from "../index";
-import { LinterRule, LinterRuleSeverity } from "../rule";
+import { CommentMarker, CommentRuleType, RuleCategory } from '../../index';
+import { AdblockSyntax } from '../../utils/adblockers';
+import { LinterRule, LinterProblemReport } from '../common';
+import { SEVERITY } from '../severity';
 
 // Export the rule
-export const RuleName = <LinterRule>{
+export const RuleName: LinterRule = {
     meta: {
-        severity: LinterRuleSeverity.Warn,
+        severity: SEVERITY.warn,
     },
     events: {
-        onRule: (context: GenericRuleContext) => {
+        onRule: (context) => {
             // Get currently iterated rule as AST (abstract syntax tree)
-            const ast = <AnyRule>context.getActualAdblockRuleAst();
+            const ast = context.getActualAdblockRuleAst();
 
-            // Get currently iterated rule as raw text
-            const raw = <string>context.getActualAdblockRuleRaw();
-
-            // Get the current line number
-            const line = context.getActualLine();
-
-            // Detect some problem
-            if (...) {
-                // Common problem report
-                const report = <LinterProblemReport>{
-                    // The position of the problem
-                    position: {
-                        startLine: line,
-                        startColumn: 0,
-                        endLine: line,
-                        endColumn: raw.length,
-                    },
-
-                    // The problem message
-                    message: "Problem message",
+            // Detect some problem, for example don't allow cosmetic rules
+            if (ast.category === RuleCategory.Cosmetic) {
+                // Prepare the common data for the problem report
+                const report: LinterProblemReport = {
+                    node: ast,
+                    message: 'Cosmetic rules aren\'t allowed',
                 };
 
-                // It makes sense to suggest a fix only if the fixing is enabled, so
-                // we need to check it first (in order to avoid unnecessary work, because
-                // the linter will not use the fix anyway, and it will be a waste of time).
+                // If fixing is enabled, suggest a fix, otherwise just report
+                // the problem
                 if (context.fixingEnabled()) {
-                    // Do something with the AST...
-                    ast.something = ...;
-
-                    // Suggest a fix (fix can be a rule AST, or an array of rule ASTs). If you
-                    // specify an array of rule ASTs, then the linter will replace the original
-                    // rule with the first rule AST, and will insert the other rule ASTs after
-                    // the original rule.
-                    report.fix = ast;
+                    // Transform cosmetic rule AST to comment rule AST, and
+                    // suggest this AST as a fix
+                    report.fix = {
+                        category: RuleCategory.Comment,
+                        type: CommentRuleType.CommentRule,
+                        syntax: AdblockSyntax.Common,
+                        marker: {
+                            type: 'Value',
+                            value: CommentMarker.Hashmark,
+                        },
+                        text: {
+                            type: 'Value',
+                            value: context.getActualAdblockRuleRaw(),
+                        },
+                    };
                 } else {
-                    // Simply report the problem without suggesting a fix
                     context.report(report);
                 }
             }
         },
     },
     // ...
-}
+};
 ```
 
-*Note: if multiple fixes are suggested for the same problem, then the linter will ignore all of them in order to avoid conflicts.*
+> **Note**: If multiple fixes are suggested for the same problem, then the linter will ignore all of them in order to avoid conflicts.
