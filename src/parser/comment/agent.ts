@@ -1,5 +1,7 @@
-import valid from 'semver/functions/valid';
-import coerce from 'semver/functions/coerce';
+// eslint-disable-next-line import/extensions
+import valid from 'semver/functions/valid.js';
+// eslint-disable-next-line import/extensions
+import coerce from 'semver/functions/coerce.js';
 import { locRange } from '../../utils/location';
 import { EMPTY, SPACE } from '../../utils/constants';
 import { StringUtils } from '../../utils/string';
