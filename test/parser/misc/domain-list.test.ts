@@ -3,7 +3,52 @@ import { DomainList, DomainListSeparator } from '../../../src/parser/common';
 import { COMMA, EMPTY } from '../../../src/utils/constants';
 
 describe('DomainListParser', () => {
-    test('parse', () => {
+    test('parse should throw on invalid input', () => {
+        expect(() => DomainListParser.parse('~')).toThrowError('Empty domain specified');
+
+        expect(() => DomainListParser.parse('~~~')).toThrowError(
+            'Exception marker cannot be followed by another exception marker',
+        );
+
+        expect(() => DomainListParser.parse(' ~ ~ ~ ')).toThrowError(
+            'Exception marker cannot be followed by whitespace',
+        );
+
+        expect(() => DomainListParser.parse('~,~,~')).toThrowError(
+            'Exception marker cannot be followed by a separator',
+        );
+
+        expect(() => DomainListParser.parse('~  example.com')).toThrowError(
+            'Exception marker cannot be followed by whitespace',
+        );
+
+        // https://github.com/AdguardTeam/AGLint/issues/143
+        expect(() => DomainListParser.parse('example.com,')).toThrowError(
+            'Domain list cannot end with a separator',
+        );
+
+        expect(() => DomainListParser.parse('example.com  ,  ')).toThrowError(
+            'Domain list cannot end with a separator',
+        );
+
+        expect(() => DomainListParser.parse('example.com,example.net,')).toThrowError(
+            'Domain list cannot end with a separator',
+        );
+
+        expect(() => DomainListParser.parse(',')).toThrowError(
+            'Domain list cannot end with a separator',
+        );
+
+        expect(() => DomainListParser.parse('example.com,,')).toThrowError(
+            'Domain list cannot end with a separator',
+        );
+
+        expect(() => DomainListParser.parse('example.com , , ')).toThrowError(
+            'Domain list cannot end with a separator',
+        );
+    });
+
+    test('parse should work as expected on valid input', () => {
         // Empty
         expect(DomainListParser.parse(EMPTY)).toEqual<DomainList>(
             {
@@ -629,25 +674,6 @@ describe('DomainListParser', () => {
                 },
             ],
         });
-
-        // Invalid cases
-        expect(() => DomainListParser.parse('~')).toThrowError('Empty domain specified');
-
-        expect(() => DomainListParser.parse('~~~')).toThrowError(
-            'Exception marker cannot be followed by another exception marker',
-        );
-
-        expect(() => DomainListParser.parse(' ~ ~ ~ ')).toThrowError(
-            'Exception marker cannot be followed by whitespace',
-        );
-
-        expect(() => DomainListParser.parse('~,~,~')).toThrowError(
-            'Exception marker cannot be followed by a separator',
-        );
-
-        expect(() => DomainListParser.parse('~  example.com')).toThrowError(
-            'Exception marker cannot be followed by whitespace',
-        );
     });
 
     test('generate', () => {
