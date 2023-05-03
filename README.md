@@ -97,18 +97,19 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 - NPM or Yarn. NPM is installed with Node.js, so you don't need to install it separately. If you want to use `yarn` instead of `npm`, you can install it from [here](https://classic.yarnpkg.com/en/docs/install)
 
 ### Installation & Usage
-1. Install `AGLint` globally or locally. If you want to use just it in your project, we recommend installing it locally.
-   - NPM: 
-     - Globally: `npm install -g @adguard/aglint` 
-     - Locally: `npm install -D @adguard/aglint`
-   - Yarn:
-     - Globally: `yarn global add @adguard/aglint`
-     - Locally: `yarn add -D @adguard/aglint`
-2. Run AGlint **in your project folder**:
-   - NPM: `aglint` (or `npx aglint` if you installed it locally)
+1. Install `AGLint` to your project:
+   - NPM: `npm install -D @adguard/aglint`
+   - Yarn: `yarn add -D @adguard/aglint`
+2. Initialize the configuration file:
+   - NPM: `npx aglint init`
+   - Yarn: `yarn aglint init`
+3. Run AGlint:
+   - NPM: `npx aglint`
    - Yarn: `yarn aglint`
 
 That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
+
+You can also install `AGLint` globally, so you can use it without `npx` or `yarn`, but we recommend to install it locally to your project.
 
 If you want to lint just some specific files, you can pass them as arguments:
 `aglint path/to/file.txt path/to/another/file.txt`
