@@ -28,6 +28,7 @@ Table of Contents:
 - [Getting started](#getting-started)
   - [Pre-requisites](#pre-requisites)
   - [Installation \& Usage](#installation--usage)
+  - [Integrate AGLint into your project](#integrate-aglint-into-your-project)
 - [VSCode extension](#vscode-extension)
 - [Special comments (inline configuration)](#special-comments-inline-configuration)
   - [Ignore adblock rules](#ignore-adblock-rules)
@@ -38,9 +39,13 @@ Table of Contents:
 - [Ignoring files or folders](#ignoring-files-or-folders)
   - [Default ignores](#default-ignores)
 - [Configuration](#configuration)
-  - [Example configurations](#example-configurations)
-  - [Configuration hierarchy](#configuration-hierarchy)
-    - [Hierarchy](#hierarchy)
+  - [Create a configuration file](#create-a-configuration-file)
+  - [Configuration file name and format](#configuration-file-name-and-format)
+  - [Configuration file structure](#configuration-file-structure)
+  - [Configuration presets](#configuration-presets)
+  - [Default configuration file](#default-configuration-file)
+  - [Configuration cascading and hierarchy](#configuration-cascading-and-hierarchy)
+    - [Why the `root` option is important](#why-the-root-option-is-important)
 - [Linter rules](#linter-rules)
   - [`if-closed`](#if-closed)
   - [`single-selector`](#single-selector)
@@ -93,25 +98,30 @@ Mainly `AGLint` is a CLI tool, but it can also be used programmatically. Here is
 - NPM or Yarn. NPM is installed with Node.js, so you don't need to install it separately. If you want to use `yarn` instead of `npm`, you can install it from [here](https://classic.yarnpkg.com/en/docs/install)
 
 ### Installation & Usage
-1. Install `AGLint` globally or locally. If you want to use just it in your project, we recommend installing it locally.
-   - NPM: 
-     - Globally: `npm install -g @adguard/aglint` 
-     - Locally: `npm install -D @adguard/aglint`
-   - Yarn:
-     - Globally: `yarn global add @adguard/aglint`
-     - Locally: `yarn add -D @adguard/aglint`
-2. Run AGlint **in your project folder**:
-   - NPM: `aglint` (or `npx aglint` if you installed it locally)
+1. Install AGLint to your project:
+   - NPM: `npm install -D @adguard/aglint`
+   - Yarn: `yarn add -D @adguard/aglint`
+2. Initialize the configuration file for AGLint:
+   - NPM: `npx aglint init`
+   - Yarn: `yarn aglint init`
+3. Run AGLint:
+   - NPM: `npx aglint`
    - Yarn: `yarn aglint`
 
 That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
 
-If you want to lint just some specific files, you can pass them as arguments:
+> **Note**: You can also install AGLint globally, so you can use it without `npx` or `yarn`, but we recommend to install it locally to your project.
+
+> **Note**:  If you want to lint just some specific files, you can pass them as arguments:
 `aglint path/to/file.txt path/to/another/file.txt`
 
-To see all available options, run `aglint --help`.
+> **Note**: To see all available options, run `aglint --help`.
 
 *To customize the default configuration, see [Configuration](#configuration) for more info. If you want to use `AGLint` programmatically, see [Use programmatically](#use-programmatically).*
+
+### Integrate AGLint into your project
+
+If you would like to integrate AGLint into your project / filter list, please read our detailed [Integration guide](https://github.com/AdguardTeam/AGLint/blob/fix/140/docs/repo-integration.md) for more info.
 
 ## VSCode extension
 
@@ -199,11 +209,41 @@ Some "problematic" paths are ignored by default in order to avoid linting files 
 
 ## Configuration
 
-You can customize the default configuration by creating a file named `.aglintrc` in the root of your repo. You can also use `.aglintrc.yml`. If you have multiple folders, you can create a separate configuration file for each folder. If you have a configuration file in a subfolder, it will be used for that subfolder and all its subfolders, but not for the parent folder. It means that the results are always consistent, no matter where you run the linter.
+AGLint requires a configuration file to work. If you don't have a configuration file, the CLI will throw an error and ask you to create one.
+
+### Create a configuration file
+
+If you don't have a configuration file, you can create it by running `aglint init` **in the root directory of your project.** This command will create a `.aglintrc.yaml` file in the current directory.
+
+You can also create a configuration file manually, please check the section below for more info.
+
+> **Note**: We are planning to add a configuration wizard in the future, so you will be able to create a configuration file by answering a few questions.
+
+### Configuration file name and format
+
+Configuration file is a JSON or YAML file that contains the configuration for the linter and should be named as one of the following:
+- `.aglintrc` (JSON) *- not recommended*
+- `.aglintrc.json` (JSON)
+- `.aglintrc.yaml` (YAML)
+- `.aglintrc.yml` (YAML)
+
+We also plan to support `.aglintrc.js` (JavaScript) in the future.
+
+We recommend using `.aglintrc.yaml` or `.aglintrc.yml` because YAML is more compact and easier to read, and it supports comments.
+
+> **Warning**: If you have multiple configuration files in the same directory, the CLI will throw an error and ask you to fix it.
+
+> **Warning**: If your configuration file is syntactically invalid or contains unknown / invalid options, the CLI will throw an error and ask you to fix it.
+
+> **Warning**: If your configuration file is not named in one of the ways listed above, the CLI will ignore it (since it cannot recognize it as a configuration file).
+
+### Configuration file structure
 
 The configuration file should be a valid JSON or YAML file. The following options are available:
 
+- `root`: if `true`, the linter will stop searching for the configuration file in parent directories (default: `null`).
 - `allowInlineConfig`: enable or disable inline config comments. For example, `! aglint-disable-next-line` (default: `true`).
+- `extends`: an array of configuration presets to extend. For example, `["preset-1", "preset-2"]`. See [Configuration presets](#configuration-presets) for more info (default: `[]`, i.e. no presets).
 - `rules`: an object with linter rules. See [Linter rules](#linter-rules) for more info. A rule basically has the following structure:
   - The key is the name of the rule. For example, `rule-1`.
   - The value is the severity and the configuration of the rule. For example, `"error"` or `["error", { "option-1": "value-1" }]`.
@@ -242,75 +282,84 @@ The configuration file should be a valid JSON or YAML file. The following option
       }
       ```
 
-### Example configurations
+### Configuration presets
 
-Here is an example of a configuration file in JSON syntax (`.aglintrc`):
+Configuration presets are basically configuration files that you can use to extend your configuration. Currently, there are two built-in presets available (click on the name to see the source code):
+- [`aglint:recommended`](https://github.com/AdguardTeam/AGLint/blob/master/src/linter/config-presets/aglint-recommended.ts): a set of recommended rules that are enabled by default. It is enough to use this preset in most cases.
+- [`aglint:all`](https://github.com/AdguardTeam/AGLint/blob/master/src/linter/config-presets/aglint-all.ts): a set of **all** rules that are available in the linter. This option maybe too strict for most projects.
 
-```json
-{
-    "allowInlineConfig": true,
-    "rules": {
-        "rule-1": ["warn", { "option-1": "value-1" }],
-        "rule-2": ["error", { "option-2": "value-2" }],
-        "rule-3": ["off"]
-    }
-}
-```
+> **Note**: We are planning to add more presets in the future, and also allow users to create their own presets, but currently it is not possible.
 
-You can also use YAML syntax (`.aglintrc.yml`):
+### Default configuration file
 
-```yaml
-allowInlineConfig: true
-rules:
-  rule-1:
-    - warn
-    - option-1: value-1
-  rule-2:
-    - error
-    - option-2: value-2
-  rule-3:
-    - off
-```
+This configuration file is the same as created by `aglint init` command. It simply extends the `aglint:recommended` preset and specifies the `root` option.
 
-JavaScript and TypeScript configuration files aren't supported at the moment, but we will add support for them in the future.
+- YAML syntax (`.aglintrc.yaml`):
+  ```yaml
+  # Default configuration file for AGLint
+  root: true
+  allowInlineConfig: true
+  extends:
+    - aglint:recommended
+  ```
+- JSON syntax (`.aglintrc.json`):
+  ```json
+  {
+      "root": true,
+      "allowInlineConfig": true,
+      "extends": [
+          "aglint:recommended"
+      ]
+  }
+  ```
 
-### Configuration hierarchy
+> **Note**: JavaScript configuration files aren't supported at the moment, but we plan to add support for them in the future (CJS and ESM syntaxes).
 
-Basically the linter always uses the default configuration as a base. If the current working directory (alias `cwd` - the folder where you call the linter) has a configuration file, it will be merged with the default configuration. If you have a configuration file in a subfolder, it will be merged with the default configuration, but not with the configuration file from the parent folder. It means that the results are always consistent, no matter where you run the linter.
+### Configuration cascading and hierarchy
 
-Suppose your project has the following structure:
+AGLint follows the same configuration file search algorithm as ESLint ([learn more](https://eslint.org/docs/latest/use/configure/configuration-files#cascading-and-hierarchy)), so if you are familiar with ESLint, this section will be easy to understand.
+
+If you call AGLint in a directory (lets call it current directory / current working directory), it will search for a configuration file in this directory and all parent directories until it finds one configuration file with the `root` option set to `true` or reaches the root directory (the most top directory, which doesn't have a parent directory). If the linter doesn't find any configuration file at all, it will throw an error and ask you to fix it, because it cannot work without a configuration file.
+
+If the linter finds multiple configuration files in the same directory, it will also throw an error and ask you to fix it, because it is an inconsistent state, since the linter doesn't know which configuration file to use. ESLint uses a [name-based priority system](https://eslint.org/docs/latest/use/configure/configuration-files#configuration-file-formats) to resolve this issue, but AGLint throws an error instead, to keep things simple and clear.
+
+#### Why the `root` option is important
+
+Suppose you store your projects in the `my-projects` directory, and you have the following directory structure:
   
-  ```
-  project-root
-  ├── dir1
-  │   ├── list1.txt
-  │   ├── list2.txt
-  ├── dir2
-  │   ├── .aglintrc
-  │   ├── dir3
-  │   │   ├── list3.txt
-  │   │   ├── list4.txt
-  ├── list5.txt
-  ├── .aglintrc
-  ```
+```
+my-projects
+├── .aglintrc.yaml
+├── project-1
+│   ├── dir1
+│   │   ├── list1.txt
+│   │   ├── list2.txt
+│   ├── dir2
+│   │   ├── .aglintrc.yaml
+│   │   ├── dir3
+│   │   │   ├── list3.txt
+│   │   │   ├── list4.txt
+│   ├── list5.txt
+│   ├── .aglintrc.yaml
+├── project-2
+│   ├── ...
+├── ...
+```
 
-If you call the linter in the root folder (`project-root`), it will merge its default configuration with `.aglintrc` from the root folder.
-- Then it lints `dir1/list1.txt`, `dir1/list2.txt` and `list5.txt` with this merged configuration (default configuration + `project-root/.aglintrc`).
-- In the `dir2` folder, it will merge the default configuration with `.aglintrc` from the `dir2` folder, so it lints `dir2/dir3/list3.txt` and `dir2/dir3/list4.txt` with this merged configuration (default configuration + `project-root/dir2/.aglintrc`).
-- If inline configurations are enabled, then they will be the last in the hierarchy. For example, if you have the following configuration in `project-root/dir2/dir3/list3.txt`:
-  ```adblock
-  ! aglint "rule-1": "off"
-  ```
-  then the linter will use this configuration for linting the rest of `project-root/dir2/dir3/list3.txt` (default configuration + `project-root/dir2/.aglintrc` + inline configuration chain within the file).
+As you can see, the `my-projects` directory contains a configuration file, and the `project-1` directory also contains some configuration files.
 
-#### Hierarchy
+Let's assume that `my-projects/project-1/.aglintrc.yaml` doesn't have the `root` option set to `true`.
 
-So the hierarchy is the following:
+If you call AGLint in the `project-1` directory, it finds the configuration file in the `project-1`, but since it doesn't specify the `root` property, therefore the linter will continue to search for a configuration file in the parent directories. As a result, it will find the configuration file in the `my-projects` directory and merge these two configuration files into one configuration. This is a bad practice, since if you move your project to another directory, linting results may change, because `my-projects/.aglintrc` loses its effect. Projects should be handled as a single unit, and the `root` option is designed to solve this problem. If you set the `root` option to `true` in the configuration file from the `project-1` directory, the linter will stop searching for configuration files right after it finds the configuration file from the `project-1` directory, and will ignore the configuration file from the `my-projects` directory. This is how the `root` option works and why it is important.
 
-- Inline configuration (if enabled and present)
-- Middle configuration files (if any)
-- Configuration file in the current working directory (if any)
-- Default configuration (built-in)
+However, merging configurations is useful within a single project, so if you specify the main configuration in your project's root directory, but if you want to override some rules in some subdirectories, you can do it by creating a configuration file in this subdirectory. For example, if you want to disable the `rule-1` rule in the `dir2` directory, you can create the following configuration file in the `dir2` directory:
+```yaml
+# project-1/dir2/.aglintrc.yaml
+rules:
+  rule-1: "off"
+```
+
+And of course, at the top of this hierarchy, you can specify inlined configuration comments in your adblock filter list files, which will override the configuration from the configuration files (but only if `allowInlineConfig` option is enabled).
 
 ## Linter rules
 
