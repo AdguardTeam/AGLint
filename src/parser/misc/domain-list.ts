@@ -37,6 +37,17 @@ export class DomainListParser {
             children: [],
         };
 
+        // If the last character is a separator, then the domain list is invalid
+        // and no need to continue parsing
+        const realEndIndex = StringUtils.skipWSBack(raw);
+
+        if (raw[realEndIndex] === separator) {
+            throw new AdblockSyntaxError(
+                'Domain list cannot end with a separator',
+                locRange(loc, realEndIndex, realEndIndex + 1),
+            );
+        }
+
         let offset = 0;
 
         // Skip whitespace before the domain list
