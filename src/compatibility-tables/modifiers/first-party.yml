@@ -2,6 +2,7 @@ adg_any:
   name: first-party
   aliases:
     - 1p
+    # TODO: We need to figure out the right AST handling under the hood
     - ~third-party
   negatable: false
   # TODO: change link in docs to first-party modifier when it will be available
