@@ -4,7 +4,8 @@ adg_any:
     - 1p
     - ~third-party
   negatable: false
-  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#first-party-modifier
+  # TODO: change link in docs to first-party modifier when it will be available
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#third-party-modifier
   description: A restriction of first-party requests. Equal to ~third-party
 
 ubo_any:
