@@ -1,5 +1,5 @@
 adg_os_any:
-  name: _(noop)
+  name: _
   negatable: false
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#noop-modifier
   description: |-
@@ -8,7 +8,7 @@ adg_os_any:
     and can appear in a rule as many times as needed.
 
 adg_ext_any:
-  name: _(noop)
+  name: _
   negatable: false
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#noop-modifier
   description: |-
@@ -17,7 +17,7 @@ adg_ext_any:
     and can appear in a rule as many times as needed.
 
 adg_cb_ios:
-  name: _(noop)
+  name: _
   negatable: false
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#noop-modifier
   description: |-
@@ -26,7 +26,7 @@ adg_cb_ios:
     and can appear in a rule as many times as needed.
 
 adg_cb_safari:
-  name: _(noop)
+  name: _
   negatable: false
   docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#noop-modifier
   description: |-
@@ -35,7 +35,7 @@ adg_cb_safari:
     and can appear in a rule as many times as needed.
 
 ubo_ext_any:
-  name: _(noop)
+  name: _
   negatable: false
   docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#_-aka-noop
   description: |-
