@@ -1,0 +1,20 @@
+adg_os_any:
+  name: removeparam
+  assignable: true
+  negatable: false
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#removeparam-modifier
+  description: Rules with $removeparam modifier are intended to strip query parameters from requests' URLs.
+
+adg_ext_any:
+  name: removeparam
+  assignable: true
+  negatable: false
+  docs: https://adguard.com/kb/general/ad-filtering/create-own-filters/#removeparam-modifier
+  description: Rules with $removeparam modifier are intended to strip query parameters from requests' URLs.
+
+ubo_ext_any:
+  name: removeparam
+  assignable: true
+  negatable: false
+  docs: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#removeparam
+  description: Rules with $removeparam modifier are intended to strip query parameters from requests' URLs.
