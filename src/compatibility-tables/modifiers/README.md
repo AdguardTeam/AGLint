@@ -1,5 +1,9 @@
 # Modifiers compatibility tables
 
+> ⚠️ Modifiers compatibility tables has moved
+> to [AGTree](https://github.com/AdguardTeam/tsurlfilter/tree/master/packages/agtree/src/compatibility-tables/modifiers)
+> so if new modifiers should be added there, and AGLint compatibility tables will be removed in the future.
+
 Each file represents a specific modifier. The file name is the name of the modifier. For example, `third-party` is represented by the file `third-party.yml`.
 
 ## File structure

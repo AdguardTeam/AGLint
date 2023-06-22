@@ -3,6 +3,7 @@ dist
 *.log
 coverage
 .vscode
+.DS_Store
 
 # Release file for npm.
 release.tgz
