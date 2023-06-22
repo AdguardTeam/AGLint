@@ -590,6 +590,12 @@ You can use several parts of `AGLint` programmatically, but it is only recommend
 
 #### Parser
 
+> :warning: Parser has been moved to a separate package and is now available at the following links under the name AGTree:
+> - https://github.com/AdguardTeam/tsurlfilter/tree/master/packages/agtree
+> - https://www.npmjs.com/package/@adguard/agtree
+> 
+> In the next AGLint version, the internal parsing logic will be removed and AGTree will be used instead.
+
 AGLint includes a powerful, error-tolerant parser for all kinds of ad blocking rules. It fully supports AdGuard, uBlock Origin and Adblock Plus syntaxes, and provides a high-detail AST for all rules.
 
 Basically, the parser API has two main parts:
