@@ -1,6 +1,6 @@
 import { Linter } from '../../../src/linter';
 import { SingleSelector } from '../../../src/linter/rules/single-selector';
-import { NEWLINE } from '../../../src/utils/constants';
+import { NEWLINE } from '../../../src/common/constants';
 
 let linter: Linter;
 

@@ -1,8 +1,4 @@
-import {
-    CommentRuleType,
-    PreProcessorCommentRule,
-    RuleCategory,
-} from '../../parser/common';
+import { CommentRuleType, PreProcessorCommentRule, RuleCategory } from '@adguard/agtree';
 import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 

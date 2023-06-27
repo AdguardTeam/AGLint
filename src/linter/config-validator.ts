@@ -1,7 +1,7 @@
 import { StructError, assert } from 'superstruct';
 import { linterConfigSchema } from './config';
 import { LinterConfig } from './common';
-import { EMPTY } from '../utils/constants';
+import { EMPTY } from '../common/constants';
 
 /**
  * Validates the AGLint linter config object using Superstruct.

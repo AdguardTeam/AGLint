@@ -5,7 +5,7 @@
         <img alt="AGLint" src="https://cdn.adguard.com/website/github.com/AGLint/aglint_logo_lightmode.svg" width="350px">
     </picture>
 </p>
-<h3 align="center">Universal adblock filter list parser, linter and converter.</h3>
+<h3 align="center">Universal adblock filter list linter.</h3>
 <p align="center">
     Supported syntaxes:
 </p>
@@ -56,12 +56,8 @@ Table of Contents:
   - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
   - [`invalid-domain-list`](#invalid-domain-list)
   - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
+- [Compatibility](#compatibility)
 - [Use programmatically](#use-programmatically)
-    - [Parser](#parser)
-      - [Parsing rules](#parsing-rules)
-      - [Parsing filter lists](#parsing-filter-lists)
-  - [Linter](#linter)
-  - [Converter (WIP)](#converter-wip)
 - [Development \& Contribution](#development--contribution)
   - [Available commands](#available-commands)
 - [Ideas \& Questions](#ideas--questions)
@@ -70,7 +66,7 @@ Table of Contents:
 
 ## Introduction
 
-`AGLint` is a universal adblock filter list parser, linter and converter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
+`AGLint` is a universal adblock filter list linter. It supports all syntaxes currently in use: AdGuard, uBlock Origin and AdBlock / Adblock Plus. `AGLint` can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
 
 Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy to create and maintain filter lists.
 
@@ -363,7 +359,7 @@ And of course, at the top of this hierarchy, you can specify inlined configurati
 
 ## Linter rules
 
-The linter parses your filter list files with the built-in parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
+The linter parses your filter list files with the [AGTree](https://www.npmjs.com/package/@adguard/agtree) parser, then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with the linting rules.
 
 The linter rules documentation is written in the following schema:
 - *Short description of the rule in the first paragraph.*
@@ -584,202 +580,27 @@ Check if the hint platforms are targeted inconsistently. This means that the sam
   ```
   since the `ext_android_cb` platform is targeted in the `PLATFORM` hint, but excluded in the `NOT_PLATFORM` hint at the same time. In this case, you'll need to remove the `ext_android_cb` platform from some of the hints to make it's targeting consistent.
 
+## Compatibility
+
+The linter is compatible with all modern browsers and Node.js versions. Minimum required versions are:
+
+| Name              | Minimum version |
+| ----------------- | :-------------- |
+| Node.js           | ✅ 14           |
+| Chrome            | ✅ 88           |
+| Firefox           | ✅ 84           |
+| Edge              | ✅ 88           |
+| Opera             | ✅ 80           |
+| Safari            | ✅ 14           |
+| Internet Explorer | ❌              |
+
+Minimum required versions are determined by the [Node.js LTS schedule](https://nodejs.org/en/about/releases/) and the [ES6 compatibility table](https://kangax.github.io/compat-table/es6/).
+
+Maybe the linter will work in older browsers and Node.js versions, but it's not guaranteed we don't recommend using such old versions.
+
 ## Use programmatically
 
 You can use several parts of `AGLint` programmatically, but it is only recommended for advanced users who are familiar with Node.js, JavaScript, TypeScript and the basics of software development. Generally, the API are well documented with a lot of examples, but you can open a discussion if you have any questions, we will be happy to help you.
-
-#### Parser
-
-> :warning: Parser has been moved to a separate package and is now available at the following links under the name AGTree:
-> - https://github.com/AdguardTeam/tsurlfilter/tree/master/packages/agtree
-> - https://www.npmjs.com/package/@adguard/agtree
-> 
-> In the next AGLint version, the internal parsing logic will be removed and AGTree will be used instead.
-
-AGLint includes a powerful, error-tolerant parser for all kinds of ad blocking rules. It fully supports AdGuard, uBlock Origin and Adblock Plus syntaxes, and provides a high-detail AST for all rules.
-
-Basically, the parser API has two main parts:
-- Parser: parsing rules (string &#8594; AST)
-- Generator: serialization of ASTs (AST &#8594; string) 
-
-##### Parsing rules
-
-You can parse individual rules using the `RuleParser` class. It has a `parse` method that takes a rule string and returns an AST. For example, this code:
-```typescript
-import { RuleParser } from '@adguard/aglint';
-
-// RuleParser automatically determines the rule type
-const ast = RuleParser.parse('/ads.js^$script');
-```
-
-will gives you this AST:
-
-```json
-{
-    "type": "NetworkRule",
-    "category": "Network",
-    "syntax": "Common",
-    "exception": false,
-    "pattern": {
-        "type": "Value",
-        "value": "/ads.js^"
-    },
-    "modifiers": {
-        "type": "ModifierList",
-        "children": [
-            {
-                "type": "Modifier",
-                "modifier": {
-                    "type": "Value",
-                    "value": "script"
-                },
-                "exception": false
-            }
-        ]
-    }
-}
-```
-
-<details>
-
-<summary>Show full AST (with locations)</summary>
-
-```json
-{
-    "type": "NetworkRule",
-    "loc": {
-        "start": {
-            "offset": 0,
-            "line": 1,
-            "column": 1
-        },
-        "end": {
-            "offset": 15,
-            "line": 1,
-            "column": 16
-        }
-    },
-    "raws": {
-        "text": "/ads.js^$script"
-    },
-    "category": "Network",
-    "syntax": "Common",
-    "exception": false,
-    "pattern": {
-        "type": "Value",
-        "loc": {
-            "start": {
-                "offset": 0,
-                "line": 1,
-                "column": 1
-            },
-            "end": {
-                "offset": 8,
-                "line": 1,
-                "column": 9
-            }
-        },
-        "value": "/ads.js^"
-    },
-    "modifiers": {
-        "type": "ModifierList",
-        "loc": {
-            "start": {
-                "offset": 9,
-                "line": 1,
-                "column": 10
-            },
-            "end": {
-                "offset": 15,
-                "line": 1,
-                "column": 16
-            }
-        },
-        "children": [
-            {
-                "type": "Modifier",
-                "loc": {
-                    "start": {
-                        "offset": 9,
-                        "line": 1,
-                        "column": 10
-                    },
-                    "end": {
-                        "offset": 15,
-                        "line": 1,
-                        "column": 16
-                    }
-                },
-                "modifier": {
-                    "type": "Value",
-                    "loc": {
-                        "start": {
-                            "offset": 9,
-                            "line": 1,
-                            "column": 10
-                        },
-                        "end": {
-                            "offset": 15,
-                            "line": 1,
-                            "column": 16
-                        }
-                    },
-                    "value": "script"
-                },
-                "exception": false
-            }
-        ]
-    }
-}
-```
-
-</details>
-
-As you can see, this AST is very detailed and contains all the information about the rule: syntax, category, exception, modifiers, node locations, and so on. Locations are especially useful for linters, since they allow you to point to the exact place in the rule where the error occurred.
-
-And this code:
-```typescript
-RuleParser.generate(ast);
-```
-
-will generate the adblock rule from the AST (serialization):
-```adblock
-/ads.js^$script
-```
-
-Please keep in mind that the parser omits unnecessary whitespaces, so the generated rule may not match with the original rule character by character. Only the formatting can change, the rule itself remains the same. You can pass any rule to the parser, it automatically determines the type and category of the rule. If the rule is syntactically incorrect, the parser will throw an error.
-
-##### Parsing filter lists
-
-You can also parse complete filter lists using the `FilterListParser` class. It works the same way as the `RuleParser` class. Here is an example of parsing [EasyList](https://easylist.to/easylist/easylist.txt) and generating it back:
-
-```typescript
-import { FilterListParser } from '@adguard/aglint';
-import { writeFile } from 'fs/promises';
-// Requires installing "node-fetch" package
-import fetch from 'node-fetch';
-
-// Download EasyList
-const easyList = await (await fetch('https://easylist.to/easylist/easylist.txt')).text();
-
-// Or read it from file
-// const easyList = await readFile('easylist.txt', 'utf-8');
-
-// Parse EasyList to AST. By default, parser is very tolerant,
-// if it can't parse some rules, it will just mark them as "raw".
-// If you want to disable this behavior, you can pass the second
-// argument as "false" to the "parse" method, like this:
-// const ast = FilterListParser.parse(easyList, false);
-const ast = FilterListParser.parse(easyList);
-
-// Generate filter list from filter list AST
-const easyListGenerated = FilterListParser.generate(ast);
-
-// Write generated filter list to file
-await writeFile('easylist-generated.txt', easyListGenerated);
-```
-
-### Linter
 
 The linter is a tool that checks the rules for errors and bad practices. It is based on the parser, so it can parse all ADG, uBO and ABP rules currently in use. The linter API has two main parts:
 
@@ -823,19 +644,6 @@ Every event has a `context` parameter, which makes it possible to get the curren
 You can check the [`src/linter/rules`](src/linter/rules) directory for detailed examples.
 
 You can find the detailed linter rule documentation [here](src/linter/rules/README.md).
-
-### Converter (WIP)
-
-A tool for converting rules from one syntax to another. Sadly, this feature will only become available in a future version.
-
-A small summary of what to expect:
-- Compatibility tables for AdGuard, uBlock Origin and AdBlock / Adblock Plus
-  - Extended CSS elements
-  - Scriptlets
-  - Redirects
-  - etc. 
-- Rule converter (AST &#8594; AST)
-  - The rule converter allows you to convert from any syntax to any syntax, as long as the destination syntax supports the rule type. If it doesn't support the source rule type, an error will be thrown. For example, you cannot convert a CSS injection to AdBlock / Adblock Plus, since ABP simply doesn't support CSS injections.
 
 ## Development & Contribution
 

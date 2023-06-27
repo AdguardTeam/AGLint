@@ -1,7 +1,7 @@
 import equal from 'fast-deep-equal';
+import { CommentRuleType, Parameter, RuleCategory } from '@adguard/agtree';
 import { LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-import { CommentRuleType, Parameter, RuleCategory } from '../../parser/common';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
