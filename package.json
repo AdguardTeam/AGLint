@@ -1,16 +1,14 @@
 {
     "name": "@adguard/aglint",
     "version": "1.0.11",
-    "description": "Universal adblock filter list parser, linter and converter.",
+    "description": "Universal adblock filter list linter.",
     "keywords": [
         "adblock",
+        "adguard",
         "filter",
-        "list",
-        "parser",
-        "ast",
         "linter",
-        "converter",
-        "compatibility"
+        "list",
+        "ublock"
     ],
     "author": "AdGuard Software Ltd.",
     "license": "MIT",
