@@ -1,4 +1,6 @@
-/** Known adblock agents */
+/**
+ * Known adblock agents
+ */
 export const ADBLOCK_AGENTS = [
     'AdBlock',
     'Adblock Plus',

@@ -5,12 +5,20 @@
 import { assert } from 'superstruct';
 import cloneDeep from 'clone-deep';
 import {
-    defaultLinterConfig, mergeConfigs, linterRulesSchema,
-} from './config';
+    AnyRule,
+    CommentRuleType,
+    FilterList,
+    FilterListParser,
+    RuleCategory,
+} from '@adguard/agtree';
+import { defaultLinterConfig, mergeConfigs, linterRulesSchema } from './config';
 import { defaultLinterRules } from './rules';
 import { ConfigCommentType } from './inline-config';
 import {
-    SEVERITY, getSeverity, AnySeverity, isSeverity,
+    SEVERITY,
+    getSeverity,
+    AnySeverity,
+    isSeverity,
 } from './severity';
 import {
     AnyLinterRule,
@@ -23,10 +31,6 @@ import {
     LinterRuleEvents,
     LinterRuleStorage,
 } from './common';
-import {
-    AnyRule, CommentRuleType, FilterList, RuleCategory,
-} from '../parser/common';
-import { FilterListParser } from '../parser/filterlist';
 import { validateLinterConfig } from './config-validator';
 import { defaultConfigPresets } from './config-presets';
 

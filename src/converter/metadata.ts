@@ -1,4 +1,6 @@
-/** Known metadata headers */
+/**
+ * Known metadata headers
+ */
 export const METADATA_HEADERS = [
     'Checksum',
     'Description',

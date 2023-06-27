@@ -1,5 +1,8 @@
 import {
-    Struct, define, is, union,
+    Struct,
+    define,
+    is,
+    union,
 } from 'superstruct';
 import { severity } from './severity';
 import { LinterRuleConfigArray } from './common';

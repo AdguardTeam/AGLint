@@ -77,6 +77,7 @@ export async function configFinder(cwd: string, callback: ConfigFinderCallback):
  * @param cwd Current working directory
  * @throws If multiple config files are found in the same directory
  * @throws If a config file is found, but it is not valid
+ * @returns The path to the config file and the parsed config object or `null` if no config file was found
  */
 export async function findNextConfig(cwd: string): Promise<ConfigFinderResult | null> {
     let configPath: string | null = null;
@@ -117,6 +118,7 @@ export async function findNextConfig(cwd: string): Promise<ConfigFinderResult | 
  * @param cwd Current working directory
  * @throws If multiple config files are found in the same directory
  * @throws If a config file is found, but it is not valid
+ * @returns The path to the config file and the parsed config object or `null` if no config file was found
  */
 export async function findNextRootConfig(cwd: string): Promise<ConfigFinderResult | null> {
     let configPath: string | null = null;
