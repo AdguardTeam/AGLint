@@ -36,7 +36,6 @@
     "scripts": {
         "build": "yarn clean && yarn build-types && yarn rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && yarn clean-types",
         "build-types": "tsc --declaration --emitDeclarationOnly --outdir dist/types",
-        "check-compatibility-tables": "node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node scripts/check-compatibility-tables.ts",
         "check-types": "tsc --noEmit",
         "clean": "rimraf dist",
         "clean-types": "rimraf dist/types",
