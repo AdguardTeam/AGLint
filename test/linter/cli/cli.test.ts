@@ -4,7 +4,7 @@ import cloneDeep from 'clone-deep';
 import { readFile } from 'fs/promises';
 import { LinterCli } from '../../../src/linter/cli';
 import { LinterCliReporter } from '../../../src/linter/cli/reporter';
-import { LinterResult } from '../../../src';
+import { LinterResult } from '../../../src/linter';
 import { StringUtils } from '../../../src/utils/string';
 
 /**

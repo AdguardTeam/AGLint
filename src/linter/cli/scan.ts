@@ -2,7 +2,10 @@ import { readFile, readdir, stat } from 'fs/promises';
 import path, { ParsedPath } from 'path';
 import ignore, { Ignore } from 'ignore';
 import {
-    CONFIG_FILE_NAMES, IGNORE_FILE_NAME, PROBLEMATIC_PATHS, SUPPORTED_EXTENSIONS,
+    CONFIG_FILE_NAMES,
+    IGNORE_FILE_NAME,
+    PROBLEMATIC_PATHS,
+    SUPPORTED_EXTENSIONS,
 } from './constants';
 
 /**

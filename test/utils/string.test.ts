@@ -1,4 +1,4 @@
-import { EMPTY, ESCAPE_CHARACTER, SPACE } from '../../src/utils/constants';
+import { EMPTY, ESCAPE_CHARACTER, SPACE } from '../../src/common/constants';
 import { StringUtils } from '../../src/utils/string';
 
 describe('String utils', () => {

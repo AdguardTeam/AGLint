@@ -1,4 +1,6 @@
-/** Known ExtendedCSS elements */
+/**
+ * Known ExtendedCSS elements
+ */
 
 export const EXTCSS_PSEUDO_CLASSES = [
     // AdGuard
