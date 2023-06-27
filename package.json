@@ -41,7 +41,7 @@
         "clean": "rimraf dist",
         "clean-types": "rimraf dist/types",
         "coverage": "jest --coverage",
-        "lint": "eslint . --ext .ts",
+        "lint": "eslint . --cache --ext .ts",
         "prepare": "husky install",
         "test": "jest --runInBand"
     },
