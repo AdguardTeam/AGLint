@@ -1,6 +1,6 @@
 import { Linter } from '../../../src/linter';
 import { IfClosed } from '../../../src/linter/rules/if-closed';
-import { NEWLINE } from '../../../src/utils/constants';
+import { NEWLINE } from '../../../src/common/constants';
 
 let linter: Linter;
 

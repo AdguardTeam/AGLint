@@ -1,8 +1,10 @@
-node_modules
-dist
 *.log
-coverage
+.DS_Store
+.eslintcache
 .vscode
+coverage
+dist
+node_modules
 
 # Release file for npm.
 release.tgz

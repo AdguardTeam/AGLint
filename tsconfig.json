@@ -14,8 +14,20 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "rootDir": "./"
     },
-    "include": ["./src/"],
-    "exclude": ["./node_modules", "./dist"]
+    "include": [
+        "./src"
+    ],
+    "exclude": [
+        "./node_modules",
+        "./dist"
+    ],
+    "ts-node": {
+        "swc": true,
+        "compilerOptions": {
+            "module": "ESNext"
+        }
+    }
 }
