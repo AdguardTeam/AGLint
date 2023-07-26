@@ -105,6 +105,9 @@ on:
       - main
     paths:
       - "**/*.txt"
+      - ".aglintrc.*"
+      - "package.json"
+      - "package-lock.json"
   pull_request:
     branches:
       # TODO: If your default branch is not "main", you should
@@ -112,6 +115,9 @@ on:
       - main
     paths:
       - "**/*.txt"
+      - ".aglintrc.*"
+      - "package.json"
+      - "package-lock.json"
 
 jobs:
   lint:
