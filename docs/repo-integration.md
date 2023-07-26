@@ -91,7 +91,7 @@ name: AGLint
 
 # Change the Node.js version if you want
 env:
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 
 # AGLint will run on every push and pull request to "main" branch,
 # but only if the changed files contain .txt files
