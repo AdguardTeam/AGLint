@@ -100,11 +100,15 @@ env:
 on:
   push:
     branches:
+      # TODO: If your default branch is not "main", you should
+      # change this to your default branch name, for example: "master"
       - main
     paths:
       - "**/*.txt"
   pull_request:
     branches:
+      # TODO: If your default branch is not "main", you should
+      # change this to your default branch name, for example: "master"
       - main
     paths:
       - "**/*.txt"
