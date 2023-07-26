@@ -106,8 +106,6 @@ on:
   pull_request:
     branches:
       - main
-    types:
-      - opened
     paths:
       - "**/*.txt"
 
