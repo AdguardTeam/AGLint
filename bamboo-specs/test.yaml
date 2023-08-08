@@ -32,7 +32,10 @@ Build:
             # Fix mixed logs
             exec 2>&1
 
-            yarn install ${bamboo.varsYarn}
+            # swc core optional dependencies are needed for tests
+            # but `--ignore-optional` will not install them
+            # so we run `yarn install ${bamboo.varsYarn}` without `--ignore-optional`:
+            yarn install --silent --ignore-engines --ignore-platform --ignore-scripts
 
             yarn check-types
             yarn lint
