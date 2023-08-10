@@ -1,5 +1,6 @@
 // import path from 'path';
 import { join, relative, resolve } from 'path';
+
 import { configFinder, findNextConfig, findNextRootConfig } from '../../../src/linter/cli/config-finder';
 
 const projectRoot = resolve(__dirname, '../../../');

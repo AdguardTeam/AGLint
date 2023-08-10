@@ -1,6 +1,7 @@
 import { StructError, assert } from 'superstruct';
+
 import { linterConfigSchema } from './config';
-import { LinterConfig } from './common';
+import { type LinterConfig } from './common';
 import { EMPTY } from '../common/constants';
 
 /**

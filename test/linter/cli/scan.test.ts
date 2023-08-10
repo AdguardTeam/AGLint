@@ -1,4 +1,5 @@
 import path from 'path';
+
 import { scan } from '../../../src/linter/cli/scan';
 
 describe('scan', () => {

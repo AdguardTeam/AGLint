@@ -6,13 +6,13 @@
 
 // Core linter
 export {
-    LinterResult,
-    LinterProblem,
-    LinterRuleData,
+    type LinterResult,
+    type LinterProblem,
+    type LinterRuleData,
     Linter,
 } from './linter';
 
-export {
+export type {
     LinterRuleConfigObject,
     LinterConfig,
     LinterRuleConfigArray,

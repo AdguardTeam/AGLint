@@ -1,6 +1,7 @@
-import { ParsedPath } from 'path';
-import { LinterResult } from '../index';
-import { LinterConfig } from '../common';
+import { type ParsedPath } from 'path';
+
+import { type LinterResult } from '../index';
+import { type LinterConfig } from '../common';
 
 /**
  * Represents a reporter skeleton for the linter.

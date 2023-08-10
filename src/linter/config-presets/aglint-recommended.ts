@@ -3,7 +3,7 @@
  * which are useful for all projects.
  */
 
-import { LinterConfig } from '../common';
+import { type LinterConfig } from '../common';
 
 const config: LinterConfig = {
     rules: {

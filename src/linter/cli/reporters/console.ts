@@ -1,9 +1,10 @@
-import chalk, { Chalk, Options as ChalkOptions } from 'chalk';
+import chalk, { type Chalk, type Options as ChalkOptions } from 'chalk';
 import terminalLink from 'terminal-link';
 import stripAnsi from 'strip-ansi';
 import table from 'text-table';
 import { inflect } from 'inflection';
-import path, { ParsedPath } from 'path';
+import path, { type ParsedPath } from 'path';
+
 import {
     CLOSE_PARENTHESIS,
     COMMA,
@@ -16,8 +17,8 @@ import {
     REPO_URL,
     SPACE,
 } from '../../../common/constants';
-import { LinterProblem, LinterResult } from '../../index';
-import { LinterCliReporter } from '../reporter';
+import { type LinterProblem, type LinterResult } from '../../index';
+import { type LinterCliReporter } from '../reporter';
 
 const ALIGN_LEFT = 'l';
 const ALIGN_CENTER = 'c';

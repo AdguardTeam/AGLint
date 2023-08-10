@@ -1,6 +1,7 @@
-import { Struct } from 'superstruct';
-import { AnyRule, Node } from '@adguard/agtree';
-import { AnySeverity } from './severity';
+import { type Struct } from 'superstruct';
+import { type AnyRule, type Node } from '@adguard/agtree';
+
+import { type AnySeverity } from './severity';
 
 /**
  * Represents any linter rule

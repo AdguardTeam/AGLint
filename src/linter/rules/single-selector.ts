@@ -1,6 +1,7 @@
 import cloneDeep from 'clone-deep';
 import { CosmeticRuleType, RuleCategory } from '@adguard/agtree';
-import { LinterProblemReport, LinterRule } from '../common';
+
+import { type LinterProblemReport, type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**

@@ -1,5 +1,6 @@
 import cloneDeep from 'clone-deep';
-import { LinterConfig } from '../common';
+
+import { type LinterConfig } from '../common';
 import { mergeConfigs } from '../config';
 import { configFinder } from './config-finder';
 import { parseConfigFile } from './config-reader';

@@ -1,5 +1,6 @@
-import { CommentRuleType, PreProcessorCommentRule, RuleCategory } from '@adguard/agtree';
-import { LinterRule } from '../common';
+import { CommentRuleType, type PreProcessorCommentRule, RuleCategory } from '@adguard/agtree';
+
+import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 const IF_DIRECTIVE = 'if';

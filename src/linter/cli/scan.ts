@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from 'fs/promises';
-import path, { ParsedPath } from 'path';
-import ignore, { Ignore } from 'ignore';
+import path, { type ParsedPath } from 'path';
+import ignore, { type Ignore } from 'ignore';
+
 import {
     CONFIG_FILE_NAMES,
     IGNORE_FILE_NAME,

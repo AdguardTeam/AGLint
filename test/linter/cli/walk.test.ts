@@ -1,7 +1,8 @@
-import { join, parse, ParsedPath } from 'path';
+import { join, parse, type ParsedPath } from 'path';
+
 import { walk } from '../../../src/linter/cli/walk';
 import { scan } from '../../../src/linter/cli/scan';
-import { LinterConfig } from '../../../src/linter/common';
+import { type LinterConfig } from '../../../src/linter/common';
 import { defaultLinterConfig } from '../../../src/linter/config';
 
 /**

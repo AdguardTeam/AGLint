@@ -1,4 +1,4 @@
-import { Struct, define } from 'superstruct';
+import { type Struct, define } from 'superstruct';
 
 /**
  * Represents the possible severities of a linter rule

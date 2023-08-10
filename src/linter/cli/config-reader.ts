@@ -1,13 +1,14 @@
 import { readFile } from 'fs/promises';
 import { parse } from 'path';
 import yaml from 'js-yaml';
+
 import {
     EXT_JSON,
     EXT_YAML,
     EXT_YML,
     RC_CONFIG_FILE,
 } from './constants';
-import { LinterConfig } from '../common';
+import { type LinterConfig } from '../common';
 import { validateLinterConfig } from '../config-validator';
 
 /**

@@ -1,4 +1,5 @@
 import { assert } from 'superstruct';
+
 import { linterConfigSchema, mergeConfigs } from '../../src/linter/config';
 
 describe('Linter config', () => {

@@ -1,6 +1,7 @@
 import { CommentRuleType, RuleCategory } from '@adguard/agtree';
+
 import { SEVERITY } from '../severity';
-import { LinterRule } from '../common';
+import { type LinterRule } from '../common';
 
 const COMMON_PREPROCESSOR_DIRECTIVES = [
     'if',

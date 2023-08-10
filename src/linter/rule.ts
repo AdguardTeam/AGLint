@@ -1,11 +1,12 @@
 import {
-    Struct,
+    type Struct,
     define,
     is,
     union,
 } from 'superstruct';
+
 import { severity } from './severity';
-import { LinterRuleConfigArray } from './common';
+import { type LinterRuleConfigArray } from './common';
 
 /**
  * Own Superstruct type definition for the linter rule config array

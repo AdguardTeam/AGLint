@@ -1,4 +1,5 @@
 import path from 'path';
+
 import { buildConfigForDirectory } from '../../../src/linter/cli/config-builder';
 import { NoConfigError } from '../../../src/linter/cli/errors/no-config-error';
 

@@ -1,4 +1,4 @@
-import { AnyLinterRule } from '../common';
+import { type AnyLinterRule } from '../common';
 import { DuplicatedHintPlatforms } from './duplicated-hint-platforms';
 import { DuplicatedHints } from './duplicated-hints';
 import { UnknownHintsAndPlatforms } from './unknown-hints-and-platforms';

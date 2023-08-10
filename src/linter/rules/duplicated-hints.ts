@@ -1,5 +1,6 @@
 import { CommentRuleType, RuleCategory } from '@adguard/agtree';
-import { LinterRule } from '../common';
+
+import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**

@@ -11,8 +11,9 @@ import {
     record,
     string,
 } from 'superstruct';
+
 import { linterRuleConfigSchema } from './rule';
-import { LinterConfig } from './common';
+import { type LinterConfig } from './common';
 
 /**
  * Superstruct schema for the linter rules config object

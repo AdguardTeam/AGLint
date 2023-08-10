@@ -1,11 +1,12 @@
-import ss, { Struct } from 'superstruct';
+import ss, { type Struct } from 'superstruct';
 import merge from 'deepmerge';
-import { AnyRule, FilterListParser, RuleParser } from '@adguard/agtree';
-import { Linter, LinterRuleData } from '../../src/linter';
+import { type AnyRule, FilterListParser, RuleParser } from '@adguard/agtree';
+
+import { Linter, type LinterRuleData } from '../../src/linter';
 import { defaultLinterRules } from '../../src/linter/rules';
-import { SEVERITY, SeverityValue, SeverityName } from '../../src/linter/severity';
+import { SEVERITY, type SeverityValue, type SeverityName } from '../../src/linter/severity';
 import { EMPTY, NEWLINE } from '../../src/common/constants';
-import { LinterConfig, LinterRule } from '../../src/linter/common';
+import { type LinterConfig, type LinterRule } from '../../src/linter/common';
 
 const demoRule: LinterRule = {
     meta: {

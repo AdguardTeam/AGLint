@@ -10,14 +10,14 @@ export * from './index.common';
 // Linter CLI
 export { LinterCli } from './linter/cli';
 export { parseConfigFile } from './linter/cli/config-reader';
-export { LinterCliReporter } from './linter/cli/reporter';
+export type { LinterCliReporter } from './linter/cli/reporter';
 export { LinterConsoleReporter } from './linter/cli/reporters/console';
-export { ScannedDirectory, scan } from './linter/cli/scan';
-export { WalkEvent, walk } from './linter/cli/walk';
+export { type ScannedDirectory, scan } from './linter/cli/scan';
+export { type WalkEvent, walk } from './linter/cli/walk';
 export { buildConfigForDirectory } from './linter/cli/config-builder';
 export {
-    ConfigFinderCallback,
-    ConfigFinderResult,
+    type ConfigFinderCallback,
+    type ConfigFinderResult,
     configFinder,
     findNextConfig,
     findNextRootConfig,

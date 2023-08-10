@@ -6,6 +6,7 @@
 import { program } from 'commander';
 import { readdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+
 import { LinterCli, LinterConsoleReporter, version } from './index.node';
 import { CONFIG_FILE_NAMES } from './linter/cli/constants';
 

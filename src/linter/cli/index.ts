@@ -1,12 +1,13 @@
-import path, { ParsedPath } from 'path';
+import path, { type ParsedPath } from 'path';
 import { readFile, writeFile } from 'fs/promises';
 import { pathExists } from 'fs-extra';
 import cloneDeep from 'clone-deep';
+
 import { Linter } from '../index';
 import { walk } from './walk';
 import { scan } from './scan';
-import { LinterCliReporter } from './reporter';
-import { LinterConfig } from '../common';
+import { type LinterCliReporter } from './reporter';
+import { type LinterConfig } from '../common';
 import { buildConfigForDirectory } from './config-builder';
 import { NoConfigError } from './errors/no-config-error';
 

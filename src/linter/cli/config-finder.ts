@@ -1,8 +1,9 @@
 import { readdir } from 'fs/promises';
 import { resolve, join } from 'path';
+
 import { CONFIG_FILE_NAMES } from './constants';
 import { parseConfigFile } from './config-reader';
-import { LinterConfig } from '../common';
+import { type LinterConfig } from '../common';
 
 const UPPER_DIR = '..';
 

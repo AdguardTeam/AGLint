@@ -2,7 +2,7 @@
  * @file Configuration preset for AGLint that enables all rules.
  */
 
-import { LinterConfig } from '../common';
+import { type LinterConfig } from '../common';
 
 const config: LinterConfig = {
     rules: {

@@ -1,10 +1,11 @@
-import path, { ParsedPath } from 'path';
+import path, { type ParsedPath } from 'path';
 import fs from 'fs-extra';
 import cloneDeep from 'clone-deep';
 import { readFile } from 'fs/promises';
+
 import { LinterCli } from '../../../src/linter/cli';
-import { LinterCliReporter } from '../../../src/linter/cli/reporter';
-import { LinterResult } from '../../../src/linter';
+import { type LinterCliReporter } from '../../../src/linter/cli/reporter';
+import { type LinterResult } from '../../../src/linter';
 import { StringUtils } from '../../../src/utils/string';
 
 /**
