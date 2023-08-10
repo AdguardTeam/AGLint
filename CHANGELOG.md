@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog][keepachangelog], and this project
+adheres to [Semantic Versioning][semver].
+
+[keepachangelog]: https://keepachangelog.com/en/1.0.0/
+[semver]: https://semver.org/spec/v2.0.0.html
 
 ## [1.0.11] - 2023-04-21
 
@@ -23,7 +27,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added logical expression parser.
 - Added dedicated filter list parser.
-- Added support for uBO media queries (https://github.com/AdguardTeam/AGLint/issues/10).
+- Added support for uBO media queries
+  (https://github.com/AdguardTeam/AGLint/issues/10).
 
 ### Changed
 
@@ -51,7 +56,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Detailed error messages when linter config parsing fails.
-- Migrate from CSSTree to ECSSTree in order to fully support Extended CSS selectors parsing.
+- Migrate from CSSTree to ECSSTree in order to fully support Extended CSS
+  selectors parsing.
 - Changed license to MIT.
 
 ### Fixed
