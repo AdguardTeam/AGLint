@@ -2,17 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog][keepachangelog], and this project
-adheres to [Semantic Versioning][semver].
-
-[keepachangelog]: https://keepachangelog.com/en/1.0.0/
-[semver]: https://semver.org/spec/v2.0.0.html
+The format is based on [Keep a Changelog][keepachangelog],
+and this project adheres to [Semantic Versioning][semver].
 
 ## [1.0.11] - 2023-04-21
 
 ### Added
 
-- Added `aglint init` command to create a default config file.
+- `aglint init` command to create a default config file.
 - Config finder logic.
 - Extendable configs.
 
@@ -25,10 +22,9 @@ adheres to [Semantic Versioning][semver].
 
 ### Added
 
-- Added logical expression parser.
-- Added dedicated filter list parser.
-- Added support for uBO media queries
-  (https://github.com/AdguardTeam/AGLint/issues/10).
+- Logical expression parser.
+- Dedicated filter list parser.
+- Support for uBO media queries [#10].
 
 ### Changed
 
@@ -45,13 +41,13 @@ adheres to [Semantic Versioning][semver].
 
 ### Added
 
-- Added `unknown-preprocessor-directives` linter rule.
-- Added `inconsistent-hint-platforms` linter rule.
-- Added `invalid-domain-list` linter rule.
-- Added `unknown-hints-and-platforms` linter rule.
-- Added `duplicated-hints` linter rule.
-- Added `duplicated-hint-platforms` linter rule.
-- Added `exception` property to modifier list parser.
+- `unknown-preprocessor-directives` linter rule.
+- `inconsistent-hint-platforms` linter rule.
+- `invalid-domain-list` linter rule.
+- `unknown-hints-and-platforms` linter rule.
+- `duplicated-hints` linter rule.
+- `duplicated-hint-platforms` linter rule.
+- `exception` property to modifier list parser.
 
 ### Changed
 
@@ -77,15 +73,29 @@ adheres to [Semantic Versioning][semver].
 
 - CLI exit code is now 1 if there are any linter errors.
 
-## [1.0.6] - 2023-02-06
+## 1.0.6 - 2023-02-06
 
 ### Added
 
 - Export Linter CLI to public API.
 
-## [1.0.5] - 2023-01-30
+## 1.0.5 - 2023-01-30
 
 ### Added
 
 - Initial version of the linter and CLI.
 - Initial version of the adblock rule parser.
+
+
+[1.0.11]: https://github.com/AdguardTeam/AGLint/compare/v1.0.10...v1.0.11
+[1.0.10]: https://github.com/AdguardTeam/AGLint/compare/v1.0.9...v1.0.10
+[1.0.9]: https://github.com/AdguardTeam/AGLint/compare/v1.0.8...v1.0.9
+[1.0.8]: https://github.com/AdguardTeam/AGLint/compare/v1.0.7...v1.0.8
+[1.0.7]: https://github.com/AdguardTeam/AGLint/compare/v1.0.6...v1.0.7
+<!-- v1.0.6 is the "oldest" tag -->
+<!-- that's why the list of links starts with [1.0.7] -->
+<!-- i.e. it is impossible to create compare url for 1.0.5 and 1.0.6 -->
+
+[keepachangelog]: https://keepachangelog.com/en/1.0.0/
+[semver]: https://semver.org/spec/v2.0.0.html
+[#10]: https://github.com/AdguardTeam/AGLint/issues/10
