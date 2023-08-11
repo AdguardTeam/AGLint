@@ -34,8 +34,11 @@ jobs:
       - name: Check TypeScript types
         run: yarn check-types
 
+      - name: Run Markdownlint
+        run: yarn lint:md
+
       - name: Run ESLint
-        run: yarn lint
+        run: yarn lint:ts
 
       - name: Run Jest tests
         run: yarn test
