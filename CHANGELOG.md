@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
+## [2.0.0] - 2023-08-11
+
+### Added
+
+- Basic rule modifiers validation.
+- `invalid-modifiers` linter rule.
+
+### Changed
+
+- Updated `@adguard/agtree` to `v1.1.1`.
+
 ## [1.0.11] - 2023-04-21
 
 ### Added
@@ -85,6 +96,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the adblock rule parser.
 
 
+[2.0.0]: https://github.com/AdguardTeam/AGLint/compare/v1.0.11...v2.0.0
 [1.0.11]: https://github.com/AdguardTeam/AGLint/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/AdguardTeam/AGLint/compare/v1.0.9...v1.0.10
 [1.0.9]: https://github.com/AdguardTeam/AGLint/compare/v1.0.8...v1.0.9

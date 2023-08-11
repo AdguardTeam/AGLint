@@ -13,6 +13,7 @@ const config: LinterConfig = {
         'inconsistent-hint-platforms': 'error',
         'invalid-domain-list': 'error',
         'single-selector': 'warn',
+        'invalid-modifiers': 'error',
         'unknown-hints-and-platforms': 'error',
         'unknown-preprocessor-directives': 'error',
     },

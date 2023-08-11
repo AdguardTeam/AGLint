@@ -7,6 +7,7 @@ import { defaultLinterRules } from '../../src/linter/rules';
 import { SEVERITY, type SeverityValue, type SeverityName } from '../../src/linter/severity';
 import { EMPTY, NEWLINE } from '../../src/common/constants';
 import { type LinterConfig, type LinterRule } from '../../src/linter/common';
+import { InvalidModifiers } from '../../src/linter/rules/invalid-modifiers';
 
 const demoRule: LinterRule = {
     meta: {
@@ -918,6 +919,182 @@ describe('Linter', () => {
             warningCount: 0,
             errorCount: 0,
             fatalErrorCount: 4,
+        });
+    });
+
+    describe('lint detects invalid modifiers in network rules', () => {
+        it('no agent comment (common), not existent modifier', () => {
+            const linter = new Linter(false);
+            linter.addRule('invalid-modifiers', InvalidModifiers);
+
+            expect(
+                linter.lint(
+                    [
+                        // no agent comment -- common check
+                        'example.org##.ad',
+                        // Not existent modifier
+                        '||example.org^$protobuf',
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [
+                    {
+                        severity: SEVERITY.error,
+                        message:
+                            "Not existent modifier: 'protobuf'",
+                        position: {
+                            startLine: 2,
+                            startColumn: 15,
+                            endLine: 2,
+                            endColumn: 23,
+                        },
+                    },
+                ],
+                warningCount: 0,
+                errorCount: 1,
+                fatalErrorCount: 0,
+            });
+        });
+
+        it('specific agent comment, only exception modifier in blocking rule', () => {
+            const linter = new Linter(false);
+            linter.addRule('invalid-modifiers', InvalidModifiers);
+
+            expect(
+                linter.lint(
+                    [
+                        // specific agent comment
+                        '[AdGuard]',
+                        'example.org##.ad',
+                        // Only exception modifiers in blocking rule
+                        '||example.org^$generichide',
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [
+                    {
+                        severity: SEVERITY.error,
+                        message:
+                            "Only exception rules may contain the modifier: 'generichide'",
+                        position: {
+                            startLine: 3,
+                            startColumn: 15,
+                            endLine: 3,
+                            endColumn: 26,
+                        },
+                    },
+                ],
+                warningCount: 0,
+                errorCount: 1,
+                fatalErrorCount: 0,
+            });
+        });
+
+        it('specific agent comment, deprecated modifier', () => {
+            const linter = new Linter(false);
+            linter.addRule('invalid-modifiers', InvalidModifiers);
+
+            expect(
+                linter.lint(
+                    [
+                        // specific agent comment
+                        '[AdGuard]',
+                        'example.org##.ad',
+                        // deprecated modifier
+                        '||example.org^$mp4',
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [
+                    {
+                        severity: SEVERITY.warn,
+                        message:
+                            // eslint-disable-next-line max-len
+                            'Rules with `$mp4` are still supported and being converted into `$redirect=noopmp4-1s` now\nbut the support shall be removed in the future.',
+                        position: {
+                            startLine: 3,
+                            startColumn: 15,
+                            endLine: 3,
+                            endColumn: 18,
+                        },
+                    },
+                ],
+                warningCount: 1,
+                errorCount: 0,
+                fatalErrorCount: 0,
+            });
+        });
+
+        it('disable linter for network rule modifier validation', () => {
+            const linter = new Linter(false);
+            linter.addRule('invalid-modifiers', InvalidModifiers);
+
+            expect(
+                linter.lint(
+                    [
+                        '[AdGuard]',
+                        '! aglint-disable-next-line',
+                        '||example.org^$generichide', // Only exception modifiers in blocking rule
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [],
+                warningCount: 0,
+                errorCount: 0,
+                fatalErrorCount: 0,
+            });
+        });
+
+        it('disable specific rule for network rule modifier validation', () => {
+            const linter = new Linter(false);
+            linter.addRule('invalid-modifiers', InvalidModifiers);
+
+            expect(
+                linter.lint(
+                    [
+                        '[AdGuard]',
+                        '! aglint-disable-next-line invalid-modifiers',
+                        '||example.org^$generichide', // Only exception modifiers in blocking rule
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [],
+                warningCount: 0,
+                errorCount: 0,
+                fatalErrorCount: 0,
+            });
+        });
+
+        it('wrong aglint rule disabled for invalid modifier', () => {
+            const linter = new Linter(false);
+            linter.addRule('invalid-modifiers', InvalidModifiers);
+
+            expect(
+                linter.lint(
+                    [
+                        '[AdGuard]',
+                        '! aglint-disable-next-line invalid-domain-list',
+                        '||example.org^$generichide', // Only exception modifiers in blocking rule
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [
+                    {
+                        severity: SEVERITY.error,
+                        message:
+                            "Only exception rules may contain the modifier: 'generichide'",
+                        position: {
+                            startLine: 3,
+                            startColumn: 15,
+                            endLine: 3,
+                            endColumn: 26,
+                        },
+                    },
+                ],
+                warningCount: 0,
+                errorCount: 1,
+                fatalErrorCount: 0,
+            });
         });
     });
 

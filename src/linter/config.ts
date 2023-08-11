@@ -6,11 +6,13 @@ import merge from 'deepmerge';
 import {
     array,
     boolean,
+    enums,
     object,
     optional,
     record,
     string,
 } from 'superstruct';
+import { AdblockSyntax } from '@adguard/agtree';
 
 import { linterRuleConfigSchema } from './rule';
 import { type LinterConfig } from './common';
@@ -29,6 +31,12 @@ export const linterConfigPropsSchema = {
     root: optional(boolean()),
     extends: optional(array(string())),
     allowInlineConfig: optional(boolean()),
+    syntax: optional(array(enums([
+        AdblockSyntax.Common,
+        AdblockSyntax.Adg,
+        AdblockSyntax.Ubo,
+        AdblockSyntax.Abp,
+    ]))),
     rules: linterRulesSchema,
 };
 
@@ -42,6 +50,7 @@ export const linterConfigSchema = object(linterConfigPropsSchema);
  */
 export const defaultLinterConfig: LinterConfig = {
     allowInlineConfig: true,
+    syntax: [AdblockSyntax.Common],
 };
 
 /**

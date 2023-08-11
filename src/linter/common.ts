@@ -1,5 +1,5 @@
 import { type Struct } from 'superstruct';
-import { type AnyRule, type Node } from '@adguard/agtree';
+import { type AdblockSyntax, type AnyRule, type Node } from '@adguard/agtree';
 
 import { type AnySeverity } from './severity';
 
@@ -111,6 +111,19 @@ export interface LinterConfig {
      * Root configuration flag. If it's value is true, the configuration is root configuration.
      */
     root?: boolean;
+
+    // TODO: add ability to specify the syntax for files or directories
+    /**
+     * Specific adblock syntaxes to use for network rule modifiers validation.
+     * Array of strings:
+     * - `['Common']` (default)
+     * - or any combination of `['AdGuard', 'uBlockOrigin', 'AdblockPlus']`.
+     *
+     * Can be set in the configuration file
+     * or in the filter list as `Agent` type comment.
+     *
+     */
+    syntax?: AdblockSyntax[];
 
     /**
      * An array of configuration presets to extend
@@ -253,6 +266,13 @@ export interface LinterProblemReport {
      * Suggested fix for the problem
      */
     fix?: AnyRule | AnyRule[];
+
+    /**
+     * Severity of the problem, overrides the rule severity set in the meta property.
+     * Needed for modifiers validation, e.g. deprecated modifiers which are still supported
+     * but will not be supported in the future, so they are not recommended to use.
+     */
+    customSeverity?: AnySeverity;
 }
 
 /**

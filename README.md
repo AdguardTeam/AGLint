@@ -50,6 +50,7 @@ Table of Contents:
     - [Configuration cascading and hierarchy](#configuration-cascading-and-hierarchy)
         - [Why the `root` option is important](#why-the-root-option-is-important)
 - [Linter rules](#linter-rules)
+    <!-- TODO: maybe should be sorted alphabetically ? -->
     - [`if-closed`](#if-closed)
     - [`single-selector`](#single-selector)
     - [`duplicated-modifiers`](#duplicated-modifiers)
@@ -58,6 +59,7 @@ Table of Contents:
     - [`duplicated-hints`](#duplicated-hints)
     - [`unknown-hints-and-platforms`](#unknown-hints-and-platforms)
     - [`invalid-domain-list`](#invalid-domain-list)
+    - [`invalid-modifiers`](#invalid-modifiers)
     - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
 - [Compatibility](#compatibility)
 - [Use programmatically](#use-programmatically)
@@ -292,93 +294,133 @@ comments.
 
 The configuration file should be a valid JSON or YAML file. The following options are available:
 
-- `root`: if `true`, the linter will stop searching for the configuration fil in parent directories (default: `null`).
-- `allowInlineConfig`: enable or disable inline config comments. For example, `! aglint-disable-next-line` (default:
-   `true`).
-- `extends`: an array of configuration presets to extend. For example, `["preset-1", "preset-2"]`. See
-  [Configuration presets](#configuration-presets) for more info (default: `[]`, i.e. no presets).
-- `rules`: an object with linter rules. See [Linter rules](#linter-rules) for more info. A rule basically has the
-   following structure:
-    - The key is the name of the rule. For example, `rule-1`.
-    - The value is the severity and the configuration of the rule. For example, `"error"` or
-      `["error", { "option-1": "value-1" }]`.
-        - The severity always must be specified. It can be `off`, `warn`, `error` or `fatal`. If the rule doesn't have
-          any configuration, you can use a string with the severity. For example, `"error"`. You can also use severity
-          codes instead of severity names (0 = `off`, 1 = `warn`, 2 = `error`, 3 = `fatal`).
-        - If the rule has configuration, you must use an array with two elements. The first element is the severity and
-          the rest of the elements are the configuration. For example, `["error", { "option-1": "value-1" }]`.
-        - For example you can disable the `rule-1` rule by adding the following configuration:
-          ```json
-          {
-              "rules": {
-                  "rule-1": "off"
-              }
-          }
-          ```
-          but an array also can be used:
-          ```json
-          {
-              "rules": {
-                  "rule-1": ["off"]
-              }
-          }
-          ```
-          or you can change the severity of the `rule-2` rule to `warn`:
-          ```json
-          {
-              "rules": {
-                  "rule-2": ["warn"]
-              }
-          }
-          ```
-          or you can change the severity of the `rule-3` rule to `error` and add a configuration to it:
-          ```json
-          {
-              "rules": {
-                  "rule-3": ["error", { "option-3": "value-3" }]
-              }
-          }
-          ```
+- `root` — defaults to `false`, flag that indicates
+  whether the current configuration is the main config configuration which can be enabled by `true` value;
+  otherwise the linter will search for the configuration in parent directories.
+- `syntax` — array of strings, specifies the syntax of the filter lists.
+  If there is an `Agent` type comment in a filter list, the linter will use the syntax specified in the comment.
+  If not set, parsed by AGTree `syntax` value will be used.
+  Possible values:
+    - `Common` — Common filter list syntax (default);
+    - `AdGuard` — AdGuard filter list syntax;
+    - `UblockOrigin` — uBlock filter list syntax;
+    - `AdblockPlus` — Adblock Plus filter list syntax.
+- `allowInlineConfig` — enable or disable inline config comments, e.g. `! aglint-disable-next-line`;
+  defaults to `true`.
+- `extends` — an array of configuration presets to extend, e.g. `["preset-1", "preset-2"]`.
+  See [Configuration presets](#configuration-presets) for more info.
+  Defaults to `[]`, i.e. no presets.
+- `rules` — an object with configured [linter rules](#linter-rules)
+  due to [configuration rule structure](#configuration-rule-structure).
+
+#### <a name="configuration-rule-structure"></a> Configuration rule structure
+
+A rule basically has the following structure:
+
+<!-- TODO: use real rules as an examples -->
+- the key is the name of the rule, e.g. `rule-1`;
+- the value is the severity and the configuration of the rule,
+  e.g. `"error"` or `["error", { "option-1": "value-1" }]`.
+    - The severity always must be specified.
+      If the rule doesn't have any configuration, you can use a string with the severity, e.g. `"error"`.
+      Severity codes may also be used instead of severity names.
+      Default rule severity depends on the rule and may differ from rule to rule.
+      Possible values:
+        - `off` or `0` — nothing will be reported;
+          the linter rule does not runs its checks which means less resource usage;
+        - `warn` or `1` — throws a warning (deprecated syntax, formatting issues, redundant rules, etc.);
+        - `error` or `2` — throws an error (unknown scriptlets, unknown modifiers, etc.);
+        - `fatal` or `3` — throws a fatal error (syntax error during parsing).
+    - If the rule has configuration, you must use an array with two elements.
+      The first element is the severity and the rest of the elements are the configuration,
+      e.g. `["error", { "option-1": "value-1" }]`.
+
+##### Examples
+
+You can disable the `rule-1` rule by adding the following configuration:
+
+```json
+{
+    "rules": {
+        "rule-1": "off"
+    }
+}
+```
+
+but an array also can be used as well:
+
+```json
+{
+    "rules": {
+        "rule-1": ["off"]
+    }
+}
+```
+
+You can change the severity of the `rule-2` rule to `warn`:
+
+```json
+{
+    "rules": {
+        "rule-2": ["warn"]
+    }
+}
+```
+
+or change the severity of the `rule-3` rule to `error` and add a configuration for it:
+
+```json
+{
+    "rules": {
+        "rule-3": ["error", { "option-3": "value-3" }]
+    }
+}
+```
 
 ### Configuration presets
 
-Configuration presets are basically configuration files that you can use to extend your configuration. Currently, there
-are two built-in presets available (click on the name to see the source code):
+Configuration presets are basically configuration files that you can use to extend your configuration.
+Currently, there are two built-in presets available (click on the name to see the source code):
 
-- [`aglint:recommended`][aglint-recommended]: a set of recommended rules that are enabled by default. It is enough to
-  use this preset in most cases.
-- [`aglint:all`][aglint-all]: a set of **all** rules that are available in the linter. This option maybe too strict for
-  most projects.
+- [`aglint:recommended`][aglint-recommended] — a set of recommended rules that are enabled by default.
+  It is enough to use this preset in most cases.
+- [`aglint:all`][aglint-all] — a set of **all** rules that are available in the linter.
+  This option maybe too strict for most projects.
 
-> **Note**: We are planning to add more presets in the future, and also allow users to create their own presets, but
-> currently it is not possible.
+> **Note**: We are planning to add more presets in the future,
+> and also allow users to create their own presets but currently it is not possible.
 
 ### Default configuration file
 
-This configuration file is the same as created by `aglint init` command. It simply extends the `aglint:recommended`
-preset and specifies the `root` option.
+This configuration file is the same as created by `aglint init` command.
+It simply extends the `aglint:recommended` preset and specifies the `root` option.
 
-- YAML syntax (`.aglintrc.yaml`):
-  ```yaml
-  # Default configuration file for AGLint
-  root: true
-  allowInlineConfig: true
-  extends:
-    - aglint:recommended
-  ```
-- JSON syntax (`.aglintrc.json`):
-  ```json
-  {
-      "root": true,
-      "allowInlineConfig": true,
-      "extends": [
-          "aglint:recommended"
-      ]
-  }
-  ```
+- YAML syntax — `.aglintrc.yaml`:
 
-> **Note**: JavaScript configuration files aren't supported at the moment, but we plan to add support for them in the
-> future (CJS and ESM syntaxes).
+    ```yaml
+    # Default configuration file for AGLint
+    root: true
+    syntax: ['Common']
+    allowInlineConfig: true
+    extends:
+        - aglint:recommended
+    ```
+
+- JSON syntax — `.aglintrc.json`:
+
+    ```json
+    {
+        "root": true,
+        "syntax": ["Common"],
+        "allowInlineConfig": true,
+        "extends": [
+            "aglint:recommended"
+        ]
+    }
+    ```
+
+> **Note**: JavaScript configuration files aren't supported at the moment
+> but we plan to add support for them in the future (CJS and ESM syntaxes).
 
 ### Configuration cascading and hierarchy
 
@@ -399,7 +441,7 @@ keep things simple and clear.
 #### Why the `root` option is important
 
 Suppose you store your projects in the `my-projects` directory, and you have the following directory structure:
-  
+
 ```txt
 my-projects
 ├── .aglintrc.yaml
@@ -445,17 +487,17 @@ rules:
   rule-1: "off"
 ```
 
-And of course, at the top of this hierarchy, you can specify inlined configuration comments in your adblock filter list
-files, which will override the configuration from the configuration files (but only if `allowInlineConfig` option is
-enabled).
+And of course, at the top of this hierarchy, you can specify inlined configuration comments
+in your adblock filter list files, which will override the configuration from the configuration files
+but only if `allowInlineConfig` option is enabled.
 
-## Linter rules
+## <a name="linter-rules"></a> Linter rules
 
-The linter parses your filter list files with the [AGTree][agtree-pkg] parser, then it checks them against the linter
-rules. If a linter rule is violated, the linter will report an error or warning. If an adblock rule is syntactically
-incorrect (aka it cannot be parsed), the linter will report a fatal error and didn't run any other linter rules for that
-adblock rule, since it is not possible to check it without AST. The rest of the file (valid rules) will be checked with
-the linting rules.
+The linter parses your filter list files with the [AGTree][agtree-pkg] parser,
+then it checks them against the linter rules. If a linter rule is violated, the linter will report an error or warning.
+If an adblock rule is syntactically incorrect (aka it cannot be parsed), the linter will report a fatal error
+and didn't run any other linter rules for that adblock rule, since it is not possible to check it without AST.
+The rest of the file (valid rules) will be checked with the linting rules.
 
 The linter rules documentation is written in the following schema:
 
@@ -661,6 +703,24 @@ Checks for invalid domains in cosmetic rules.
         - Hostnames: `example`, `example-2`, `example-3`, etc.
         - IP addresses: `127.0.0.1`
 
+
+### `invalid-modifiers`
+
+Checks for invalid modifiers in [basic (network) rules][basic-rules-kb].
+
+- **Severity:** `error` (2) for invalid modifiers, `warn` (1) for deprecated modifiers
+- **Options:** none
+- **Fixable:** no
+- **Example:**
+    ```adblock
+    ||example.org^$elemhide
+    ```
+    will be reported as error:
+    ```txt
+    1:15  error  Only exception rules may contain the modifier: 'elemhide'
+    ```
+    since this modifier is not allowed for blocking rules.
+
 ### `inconsistent-hint-platforms`
 
 Check if the hint platforms are targeted inconsistently. This means that the same platform is targeted in the `PLATFORM`
@@ -807,6 +867,7 @@ resources, please let us know.
 [aglint-license]: https://github.com/AdguardTeam/AGLint/blob/master/LICENSE
 [aglint-recommended]: https://github.com/AdguardTeam/AGLint/blob/master/src/linter/config-presets/aglint-recommended.ts
 [agtree-pkg]: https://www.npmjs.com/package/@adguard/agtree
+[basic-rules-kb]: https://adguard.com/kb/general/ad-filtering/create-own-filters/#basic-rules
 [contributing-url]: https://github.com/AdguardTeam/AGLint/tree/master/CONTRIBUTING.md
 [css-tree-docs]: https://github.com/csstree/csstree/tree/master/docs
 [es6-compat-table]: https://kangax.github.io/compat-table/es6/

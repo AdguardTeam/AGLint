@@ -2,16 +2,18 @@
 # yarn lockfile v1
 
 
-"@adguard/agtree@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-1.0.1.tgz#15620f9148e03e5a03fad163b8fec803e4385e70"
-  integrity sha512-DK4MgRJv8jWHlLnzHbEul7xaKajRwNPD7rK4LIcyc1F9Njy0gijzqM8DUEI2rnYqaRdplDyBtwjRKstYhh2NIQ==
+"@adguard/agtree@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-1.1.1.tgz#b5af06fe0a0bbba2fd1b6e3221b41737b154ad94"
+  integrity sha512-Kf4eR4vXwaFrRqRWFHfIIOnOxVJ3MxpDDbOpYwJNx6qV0TGtXi6OIdB7RDgaR9W5Y9NqRJn5psF7sRvyHpYLlA==
   dependencies:
     "@adguard/ecss-tree" "^1.0.8"
+    "@adguard/scriptlets" "^1.9.61"
     clone-deep "^4.0.1"
-    json5 "^2.2.1"
-    semver "^7.5.1"
+    json5 "^2.2.3"
+    semver "^7.5.3"
     tldts "^5.7.112"
+    xregexp "^5.1.1"
 
 "@adguard/ecss-tree@^1.0.8":
   version "1.0.8"
@@ -19,6 +21,14 @@
   integrity sha512-Y5dfzWH5nnzEH9URuzOQ1RXl0bzmLiGO7Nt9Wc/na7uD5UHqoz4PlzVllFpO1bLA+Cqq5ebNrz+uWRKN3BxSTg==
   dependencies:
     css-tree "^2.3.1"
+
+"@adguard/scriptlets@^1.9.61":
+  version "1.9.62"
+  resolved "https://registry.yarnpkg.com/@adguard/scriptlets/-/scriptlets-1.9.62.tgz#f60b83bb928c160f59153989c9491504e510498b"
+  integrity sha512-uWSlfMnAJUmIVsChl7KrECBXDJotSfq/N94iNLtfwnJI7br9Q5Gl65iuH89rh0Fs62OwexKlj3cnrzHL4TEFyw==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    js-yaml "^3.13.1"
 
 "@ampproject/remapping@^2.2.0":
   version "2.2.1"
@@ -949,6 +959,21 @@
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
+
+"@babel/runtime-corejs3@^7.16.5":
+  version "7.22.10"
+  resolved "https://registry.yarnpkg.com/@babel/runtime-corejs3/-/runtime-corejs3-7.22.10.tgz#5ecc3d32faa70009f084cc2e087d79e5f5cdcca9"
+  integrity sha512-IcixfV2Jl3UrqZX4c81+7lVg5++2ufYJyAFW3Aux/ZTvY6LVYYhJ9rMgnbX0zGVq6eqfVpnoatTjZdVki/GmWA==
+  dependencies:
+    core-js-pure "^3.30.2"
+    regenerator-runtime "^0.14.0"
+
+"@babel/runtime@^7.20.13":
+  version "7.22.10"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.10.tgz#ae3e9631fd947cb7e3610d3e9d8fef5f76696682"
+  integrity sha512-21t/fkKLMZI4pqP2wlmsQAWnYW1PDyKyyUV4vCi+B25ydmdaYTKXPwCj0BzSUnZf4seIiYvSA3jcZ3gdsMFkLQ==
+  dependencies:
+    regenerator-runtime "^0.14.0"
 
 "@babel/runtime@^7.8.4":
   version "7.22.5"
@@ -2294,6 +2319,11 @@ core-js-compat@^3.30.1, core-js-compat@^3.30.2:
   integrity sha512-hM7YCu1cU6Opx7MXNu0NuumM0ezNeAeRKadixyiQELWY3vT3De9S4J5ZBMraWV2vZnrE1Cirl0GtFtDtMUXzPw==
   dependencies:
     browserslist "^4.21.5"
+
+core-js-pure@^3.30.2:
+  version "3.32.0"
+  resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.32.0.tgz#5d79f85da7a4373e9a06494ccbef995a4c639f8b"
+  integrity sha512-qsev1H+dTNYpDUEURRuOXMvpdtAnNEvQWS/FMJ2Vb5AY8ZP4rAPQldkE27joykZPJTe0+IVgHZYh1P5Xu1/i1g==
 
 create-require@^1.1.0:
   version "1.1.1"
@@ -3829,7 +3859,7 @@ json5@^1.0.2:
   dependencies:
     minimist "^1.2.0"
 
-json5@^2.2.1, json5@^2.2.2:
+json5@^2.2.2, json5@^2.2.3:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
@@ -4404,6 +4434,11 @@ regenerator-runtime@^0.13.11:
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.11.tgz#f6dca3e7ceec20590d07ada785636a90cdca17f9"
   integrity sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==
 
+regenerator-runtime@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.14.0.tgz#5e19d68eb12d486f797e15a3c6a918f7cec5eb45"
+  integrity sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==
+
 regenerator-transform@^0.15.1:
   version "0.15.1"
   resolved "https://registry.yarnpkg.com/regenerator-transform/-/regenerator-transform-0.15.1.tgz#f6c4e99fc1b4591f780db2586328e4d9a9d8dc56"
@@ -4569,6 +4604,13 @@ semver@^7.3.5, semver@^7.3.7, semver@^7.5.1:
   version "7.5.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.3.tgz#161ce8c2c6b4b3bdca6caadc9fa3317a4c4fe88e"
   integrity sha512-QBlUtyVk/5EeHbi7X0fw6liDZc7BBmEaSYn01fMU1OUYbf6GPsbTtd8WmnqbI20SeycoHSeiybkE/q1Q+qlThQ==
+  dependencies:
+    lru-cache "^6.0.0"
+
+semver@^7.5.3:
+  version "7.5.4"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.5.4.tgz#483986ec4ed38e1c6c48c34894a9182dbff68a6e"
+  integrity sha512-1bCSESV6Pv+i21Hvpxp3Dx+pSD8lIPt8uVjRrxAUt/nbswYc+tK6Y2btiULjd4+fnq15PX+nqQDC7Oft7WkwcA==
   dependencies:
     lru-cache "^6.0.0"
 
@@ -5111,6 +5153,13 @@ xmlcreate@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/xmlcreate/-/xmlcreate-2.0.4.tgz#0c5ab0f99cdd02a81065fa9cd8f8ae87624889be"
   integrity sha512-nquOebG4sngPmGPICTS5EnxqhKbCmz5Ox5hsszI2T6U5qdrJizBc+0ilYSEjTSzU0yZcmvppztXe/5Al5fUwdg==
+
+xregexp@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/xregexp/-/xregexp-5.1.1.tgz#6d3fe18819e3143aaf52f9284d34f49a59583ebb"
+  integrity sha512-fKXeVorD+CzWvFs7VBuKTYIW63YD1e1osxwQ8caZ6o1jg6pDAbABDG54LCIq0j5cy7PjRvGIq6sef9DYPXpncg==
+  dependencies:
+    "@babel/runtime-corejs3" "^7.16.5"
 
 y18n@^5.0.5:
   version "5.0.8"

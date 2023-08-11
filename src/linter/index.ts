@@ -6,6 +6,7 @@ import { assert } from 'superstruct';
 import cloneDeep from 'clone-deep';
 import {
     type AnyRule,
+    AdblockSyntax,
     CommentRuleType,
     type FilterList,
     FilterListParser,
@@ -614,7 +615,9 @@ export class Linter {
 
                 const genericContext: GenericRuleContext = Object.freeze({
                     // Deep copy of the linter configuration
-                    getLinterConfig: () => ({ ...this.config }),
+                    getLinterConfig: () => {
+                        return { ...this.config };
+                    },
 
                     // Currently linted filter list content
                     getFilterListContent: () => content,
@@ -633,7 +636,11 @@ export class Linter {
                         let severity = getSeverity(data.rule.meta.severity);
 
                         if (!nextLineEnabled.has(name)) {
-                            if (isSeverity(data.severityOverride)) {
+                            // rely on the result of network rules modifiers validation;
+                            // see src/linter/rules/invalid-modifiers.ts
+                            if (isSeverity(problem.customSeverity)) {
+                                severity = getSeverity(problem.customSeverity);
+                            } else if (isSeverity(data.severityOverride)) {
                                 severity = getSeverity(data.severityOverride);
                             }
                         }
@@ -865,6 +872,20 @@ export class Linter {
 
                     // Invoke onRule event for all rules (process actual adblock rule)
                     invokeEvent('onRule');
+
+                    // Check if filter list has Agent type comment
+                    // and if so, it will override the syntax property set in the config
+                    if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.AgentCommentRule) {
+                        const agents: AdblockSyntax[] = [];
+                        ast.children.forEach((child) => {
+                            if (child.type === 'Agent') {
+                                agents.push(child.syntax);
+                            }
+                        });
+                        this.config.syntax = agents.length > 0
+                            ? agents
+                            : [AdblockSyntax.Common];
+                    }
                 }
 
                 return 0;
