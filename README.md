@@ -387,6 +387,10 @@ Currently, there are two built-in presets available (click on the name to see th
 - [`aglint:all`][aglint-all] — a set of **all** rules that are available in the linter.
   This option maybe too strict for most projects.
 
+> **Note**: All presets have `syntax` property set to `Common` a default value.
+> You may need to specify it in your [configuration file](#configuration-file-structure)
+> for better linting, e.g. modifiers validation.
+
 > **Note**: We are planning to add more presets in the future,
 > and also allow users to create their own presets but currently it is not possible.
 

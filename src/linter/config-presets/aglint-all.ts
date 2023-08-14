@@ -2,9 +2,12 @@
  * @file Configuration preset for AGLint that enables all rules.
  */
 
+import { AdblockSyntax } from '@adguard/agtree';
+
 import { type LinterConfig } from '../common';
 
 const config: LinterConfig = {
+    syntax: [AdblockSyntax.Common],
     rules: {
         'duplicated-hint-platforms': 'error',
         'duplicated-hints': 'error',

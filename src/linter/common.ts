@@ -123,7 +123,7 @@ export interface LinterConfig {
      * or in the filter list as `Agent` type comment.
      *
      */
-    syntax?: AdblockSyntax[];
+    syntax: AdblockSyntax[];
 
     /**
      * An array of configuration presets to extend

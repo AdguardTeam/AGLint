@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
+## [Unreleased]
+
+### Changed
+
+- Make `syntax` property in the config required.
+
 ## [2.0.0] - 2023-08-11
 
 ### Added
@@ -96,6 +102,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the adblock rule parser.
 
 
+[Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v2.0.0...HEAD
 [2.0.0]: https://github.com/AdguardTeam/AGLint/compare/v1.0.11...v2.0.0
 [1.0.11]: https://github.com/AdguardTeam/AGLint/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/AdguardTeam/AGLint/compare/v1.0.9...v1.0.10

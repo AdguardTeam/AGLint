@@ -82,7 +82,7 @@ export const defaultLinterConfig: LinterConfig = {
  * }
  * ```
  */
-export function mergeConfigs(initial: LinterConfig, extend: LinterConfig): LinterConfig {
+export function mergeConfigs(initial: LinterConfig, extend: Partial<LinterConfig>): LinterConfig {
     return merge(initial, extend, {
         // https://github.com/TehShrike/deepmerge#options
         arrayMerge: (_, sourceArray) => sourceArray,

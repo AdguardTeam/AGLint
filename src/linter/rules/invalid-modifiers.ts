@@ -1,4 +1,4 @@
-import { AdblockSyntax, RuleCategory, modifierValidator } from '@adguard/agtree';
+import { RuleCategory, modifierValidator } from '@adguard/agtree';
 
 import { SEVERITY } from '../severity';
 import type { LinterRule, SpecificRuleContext } from '../common';
@@ -17,7 +17,7 @@ export const InvalidModifiers: LinterRule = {
 
             if (ast.category === RuleCategory.Network) {
                 // get lint of syntaxes to validate modifiers for
-                const validateSyntax = context.getLinterConfig().syntax || [AdblockSyntax.Common];
+                const validateSyntax = context.getLinterConfig().syntax;
 
                 // validate modifiers for every syntax and collect problems if any
                 validateSyntax.forEach((agent) => {
