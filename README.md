@@ -404,7 +404,8 @@ It simply extends the `aglint:recommended` preset and specifies the `root` optio
     ```yaml
     # Default configuration file for AGLint
     root: true
-    syntax: ['Common']
+    syntax:
+        - Common
     allowInlineConfig: true
     extends:
         - aglint:recommended

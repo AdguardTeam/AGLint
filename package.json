@@ -44,6 +44,7 @@
         "lint:md": "markdownlint .",
         "lint:ts": "eslint . --cache --ext .ts",
         "prepare": "husky install",
+        "increment": "yarn version --patch --no-git-tag-version",
         "test": "jest --runInBand"
     },
     "devDependencies": {
