@@ -131,7 +131,7 @@ describe('invalid-modifiers', () => {
                     rule: 'invalid-modifiers',
                     severity: 1,
                     // eslint-disable-next-line max-len
-                    message: 'Rules with `$empty` are still supported and being converted into `$redirect=nooptext` now\nbut the support shall be removed in the future.',
+                    message: 'Rules with `$empty` are still supported and being converted into `$redirect=nooptext` now but the support shall be removed in the future.',
                     position: {
                         startColumn: 15,
                         endColumn: 20,
