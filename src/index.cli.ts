@@ -3,12 +3,30 @@
  * @todo DEV run: node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/cli.ts
  */
 
+import { AdblockSyntax } from '@adguard/agtree';
 import { program } from 'commander';
+import checkbox from '@inquirer/checkbox';
+import select from '@inquirer/select';
 import { readdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import yaml from 'js-yaml';
 
-import { LinterCli, LinterConsoleReporter, version } from './index.node';
-import { CONFIG_FILE_NAMES } from './linter/cli/constants';
+import {
+    LinterCli,
+    type LinterConfig,
+    LinterConsoleReporter,
+    version,
+} from './index.node';
+import { CONFIG_FILE_NAMES, JSON_RC_CONFIG_FILE_NAME, YAML_RC_CONFIG_FILE_NAME } from './linter/cli/constants';
+import { NEWLINE } from './common/constants';
+
+/**
+ * Represents possible config file formats.
+ */
+enum ConfigFileFormat {
+    Yaml = 'yaml',
+    Json = 'json',
+}
 
 /**
  * Print error to the console, also handle unknown errors.
@@ -43,6 +61,114 @@ function printError(error: unknown): void {
     console.error(lines.join('\n'));
 }
 
+/**
+ * Creates a content of the config file.
+ *
+ * @param chosenFormat Format chosen by the user.
+ * @param chosenSyntaxes Syntaxes chosen by the user.
+ *
+ * @returns Config file content.
+ */
+const getConfigFileContent = (chosenFormat: ConfigFileFormat, chosenSyntaxes: AdblockSyntax[]): string => {
+    // Prepare config object
+    const preparedConfig: LinterConfig = {
+        root: true,
+        // set Common syntax as default if nothing is chosen
+        syntax: chosenSyntaxes.length === 0 ? [AdblockSyntax.Common] : chosenSyntaxes,
+        extends: [
+            'aglint:recommended',
+        ],
+    };
+
+    // Serialize config object to a string based on the chosen format
+    let serializedConfig: string;
+
+    switch (chosenFormat) {
+        case ConfigFileFormat.Yaml:
+            // YAML supports comments, so we can add some useful info to the beginning of the file
+            serializedConfig = [
+                '# AGLint config file',
+                '# Documentation: https://github.com/AdguardTeam/AGLint#configuration',
+            ].join(NEWLINE);
+            serializedConfig += NEWLINE;
+            // Serialize config object to YAML. This will add the final newline automatically
+            serializedConfig += yaml.dump(preparedConfig);
+            break;
+
+        case ConfigFileFormat.Json:
+            // Serialize config object to JSON
+            serializedConfig = JSON.stringify(preparedConfig, null, 2);
+            // Add final newline manually
+            serializedConfig += NEWLINE;
+            break;
+
+        default:
+            throw new Error(`Unsupported config file format "${chosenFormat}"`);
+    }
+
+    return serializedConfig;
+};
+
+/**
+ * Creates a config file in the current directory.
+ *
+ * TODO: This is a very basic implementation, we should implement a proper config file generator in the future.
+ *
+ * @param cwd Current working directory.
+ */
+const createConfig = async (cwd: string): Promise<void> => {
+    // Ask user to specify which config file format to use
+    const chosenFormat = await select({
+        message: 'Select which config file format you want to use.\n',
+        choices: [
+            { value: ConfigFileFormat.Yaml },
+            { value: ConfigFileFormat.Json },
+        ],
+    });
+
+    // Ask user to specify which syntaxes to use
+    const chosenSyntaxes = await checkbox({
+        message: 'Select which adblock syntax(es) you want to use.\n"Common" is to be used if none is chosen.\n',
+        choices: [
+            { value: AdblockSyntax.Abp },
+            { value: AdblockSyntax.Adg },
+            { value: AdblockSyntax.Ubo },
+        ],
+    });
+
+    // Generate config file content based on the chosen format and syntaxes
+    const configContent = getConfigFileContent(chosenFormat, chosenSyntaxes);
+
+    // Determine the config file name based on the chosen format
+    let configFileName: string;
+
+    switch (chosenFormat) {
+        case ConfigFileFormat.Yaml:
+            configFileName = YAML_RC_CONFIG_FILE_NAME;
+            break;
+
+        case ConfigFileFormat.Json:
+            configFileName = JSON_RC_CONFIG_FILE_NAME;
+            break;
+
+        default:
+            throw new Error(`Unsupported config file format "${chosenFormat}"`);
+    }
+
+    // Write the config file to the current working directory
+    await writeFile(join(cwd, configFileName), configContent);
+
+    // Notify the user that the config file was created successfully
+    // eslint-disable-next-line no-console
+    console.log(`Config file was created successfully in directory "${cwd}" as "${configFileName}"`);
+
+    // Notify user about root: true option
+    // eslint-disable-next-line no-console, max-len
+    console.log('Note: "root: true" option was added to the config file. Please make sure that the config file is located in the root directory of your project.');
+    // eslint-disable-next-line no-console
+    console.log('You can learn more at https://github.com/AdguardTeam/AGLint#why-the-root-option-is-important');
+};
+
 (async () => {
     try {
         // Set-up Commander
@@ -75,6 +201,9 @@ function printError(error: unknown): void {
 
         // "aglint init": initialize config file in the current directory (cwd)
         if (program.args[0] === 'init') {
+            // TODO: Move config init logic to a separate file:
+            // https://github.com/AdguardTeam/AGLint/issues/119
+
             // Don't allow to initialize config file if another config file already exists
             const cwdItems = await readdir(cwd);
 
@@ -87,19 +216,7 @@ function printError(error: unknown): void {
                 }
             }
 
-            // Create the config file
-            // TODO: This is a very basic implementation, we should implement a proper config
-            // file generator in the future
-            // eslint-disable-next-line max-len
-            await writeFile(join(cwd, '.aglintrc.yaml'), '# AGLint root config file\n# Documentation: https://github.com/AdguardTeam/AGLint#configuration\nroot: true\nextends:\n  - aglint:recommended\n');
-
-            // Notify the user that the config file was created successfully
-            // eslint-disable-next-line no-console
-            console.log(`Config file was created successfully in directory "${cwd}" as ".aglintrc.yaml"`);
-
-            // Notify user about root: true option
-            // eslint-disable-next-line no-console, max-len
-            console.log('Note: "root: true" option was added to the config file. Please make sure that the config file is located in the root directory of your project.');
+            await createConfig(cwd);
 
             // We should exit the process here, because we don't want to run the linter after
             // initializing the config file
