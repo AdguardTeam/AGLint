@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 ### Added
 
 - Config `syntax` handling during `aglint init`.
+- `no-short-rules` linter rule.
 
 ## [2.0.1] - 2023-08-14
 

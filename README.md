@@ -61,6 +61,7 @@ Table of Contents:
     - [`invalid-domain-list`](#invalid-domain-list)
     - [`invalid-modifiers`](#invalid-modifiers)
     - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
+    - [`no-short-rules`](#no-short-rules)
 - [Compatibility](#compatibility)
 - [Use programmatically](#use-programmatically)
 - [Development \& Contribution](#development--contribution)
@@ -746,6 +747,38 @@ hint, but excluded in the `NOT_PLATFORM` hint at the same time (or vice versa).
   since the `ext_android_cb` platform is targeted in the `PLATFORM` hint, but excluded in the `NOT_PLATFORM` hint at the
   same time. In this case, you'll need to remove the `ext_android_cb` platform from some of the hints to make it's
   targeting consistent.
+
+### `no-short-rules`
+
+Check if the rule length is less than the specified minimum threshold value, i.e. if the rule is too short.
+
+- **Severity:** `error` (2)
+- **Options:** none
+- **Fixable:** no
+- **Options:**
+    - `minLength` — minimum rule length (default: `4`)
+- **Example:**
+  ```adblock
+  ! Short rule
+  a
+  ```
+  will be reported as error:
+  ```txt
+    2:0  error  Too short rule: 'a'
+  ```
+  since the rule length is less than the default value (`4`).
+  If you want to change the minimum rule length, you can do it by specifying the `minLength` option in your
+  configuration file:
+  ```yaml
+  rules:
+    no-short-rules: ["error", { "minLength": 3 }]
+  ```
+  or via inline configuration comments:
+  ```adblock
+  ! This rule is too short because it's length is less than 10 characters
+  ! aglint "no-short-rules": ["error", { minLength: 10 }]
+  a$script
+  ```
 
 ## Compatibility
 

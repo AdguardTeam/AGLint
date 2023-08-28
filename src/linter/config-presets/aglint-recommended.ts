@@ -19,6 +19,7 @@ const config: LinterConfig = {
         'invalid-modifiers': 'error',
         'unknown-hints-and-platforms': 'error',
         'unknown-preprocessor-directives': 'error',
+        'no-short-rules': 'error',
     },
 };
 
