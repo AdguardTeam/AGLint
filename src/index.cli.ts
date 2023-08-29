@@ -73,11 +73,11 @@ const getConfigFileContent = (chosenFormat: ConfigFileFormat, chosenSyntaxes: Ad
     // Prepare config object
     const preparedConfig: LinterConfig = {
         root: true,
-        // set Common syntax as default if nothing is chosen
-        syntax: chosenSyntaxes.length === 0 ? [AdblockSyntax.Common] : chosenSyntaxes,
         extends: [
             'aglint:recommended',
         ],
+        // set Common syntax as default if nothing is chosen
+        syntax: chosenSyntaxes.length === 0 ? [AdblockSyntax.Common] : chosenSyntaxes,
     };
 
     // Serialize config object to a string based on the chosen format

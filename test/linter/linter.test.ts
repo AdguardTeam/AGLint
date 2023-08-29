@@ -1,6 +1,11 @@
 import ss, { type Struct } from 'superstruct';
 import merge from 'deepmerge';
-import { type AnyRule, FilterListParser, RuleParser } from '@adguard/agtree';
+import {
+    type AnyRule,
+    FilterListParser,
+    RuleParser,
+    AdblockSyntax,
+} from '@adguard/agtree';
 
 import { Linter, type LinterRuleData } from '../../src/linter';
 import { defaultLinterRules } from '../../src/linter/rules';
@@ -341,6 +346,7 @@ describe('Linter', () => {
     test('addConfigPreset & applyConfigExtensions', () => {
         // Prepare two demo presets
         const preset1: LinterConfig = {
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-1': 'off',
                 'rule-2': 'warn',
@@ -349,6 +355,7 @@ describe('Linter', () => {
         };
 
         const preset2: LinterConfig = {
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-3': 'off',
                 'rule-4': 'warn',
@@ -391,9 +398,9 @@ describe('Linter', () => {
                 extends: ['preset-1'],
                 allowInlineConfig: true,
             }),
-        ).toMatchObject({
-            extends: ['preset-1'],
+        ).toEqual({
             allowInlineConfig: true,
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-1': 'off',
                 'rule-2': 'warn',
@@ -406,9 +413,9 @@ describe('Linter', () => {
                 extends: ['preset-2'],
                 allowInlineConfig: true,
             }),
-        ).toMatchObject({
-            extends: ['preset-2'],
+        ).toEqual({
             allowInlineConfig: true,
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-3': 'off',
                 'rule-4': 'warn',
@@ -424,9 +431,10 @@ describe('Linter', () => {
                 extends: ['preset-1', 'preset-2'],
                 allowInlineConfig: true,
             }),
-        ).toMatchObject({
-            extends: ['preset-1', 'preset-2'],
+        ).toEqual({
+            // extends: ['preset-1', 'preset-2'],
             allowInlineConfig: true,
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-1': 'off',
                 'rule-2': 'warn',
@@ -436,7 +444,8 @@ describe('Linter', () => {
             },
         });
 
-        // Complicated case
+        // Complicated case: preset-2 override preset-1
+        // but user config's rules should override both presets
         expect(
             linter.applyConfigExtensions({
                 extends: ['preset-1', 'preset-2'],
@@ -446,16 +455,34 @@ describe('Linter', () => {
                     'rule-100': 'error',
                 },
             }),
-        ).toMatchObject({
-            extends: ['preset-1', 'preset-2'],
+        ).toEqual({
+            // extends: ['preset-1', 'preset-2'],
             allowInlineConfig: true,
+            syntax: [AdblockSyntax.Common],
             rules: {
-                'rule-1': 'off',
+                // overridden by the rules from the config
+                'rule-1': 'error',
                 'rule-100': 'error',
                 'rule-2': 'warn',
+                // overridden by preset-2
                 'rule-3': 'off',
                 'rule-4': 'warn',
                 'rule-5': 'error',
+            },
+        });
+
+        // Override the syntax
+        expect(
+            linter.applyConfigExtensions({
+                extends: ['preset-1'],
+                syntax: [AdblockSyntax.Adg],
+            }),
+        ).toEqual({
+            syntax: [AdblockSyntax.Adg],
+            rules: {
+                'rule-1': 'off',
+                'rule-2': 'warn',
+                'rule-3': 'error',
             },
         });
     });

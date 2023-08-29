@@ -13,7 +13,12 @@ import {
     RuleCategory,
 } from '@adguard/agtree';
 
-import { defaultLinterConfig, mergeConfigs, linterRulesSchema } from './config';
+import {
+    defaultLinterConfig,
+    mergeConfigs,
+    linterRulesSchema,
+    mergeConfigsReverse,
+} from './config';
 import { defaultLinterRules } from './rules';
 import { ConfigCommentType } from './inline-config';
 import {
@@ -273,40 +278,43 @@ export class Linter {
      * @throws If the config is invalid
      */
     public applyConfigExtensions(config: LinterConfig): LinterConfig {
-        // Validate the config (before we merge it with the config presets)
+        // Validate the provided config before applying the config presets
         validateLinterConfig(config);
 
-        // Make a deep copy of the config, so we don't modify the original one
-        // and we can safely merge it with the config presets
-        let result = cloneDeep(config);
+        // Clone the provided config object to avoid any side effects
+        let clonedConfig = cloneDeep(config);
 
-        // If config contains "extends", we should merge it with the corresponding
-        // config presets
-        if (config.extends) {
-            // Iterate over all entries in the "extends" array
-            for (const entry of config.extends) {
-                // Throw error if the config preset doesn't exist
-                if (!this.configPresets.has(entry)) {
-                    throw new Error(`Config preset "${entry}" doesn't exist`);
+        // If the provided config has "extends" property,
+        // presets should be merged in the same order they are specified in the "extends" array
+        let mergedPresets: Partial<LinterConfig> = {};
+
+        if (clonedConfig.extends) {
+            for (const presetName of clonedConfig.extends) {
+                const preset = this.configPresets.get(presetName);
+
+                // Preset should exist
+                if (!preset) {
+                    throw new Error(`Config preset "${presetName}" doesn't exist`);
                 }
-
-                // It's safe to use the non-null assertion operator here, because
-                // we already checked that the config preset exists
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const preset = this.configPresets.get(entry)!;
 
                 // TODO: Allow "extends" in config presets (recursively)?
                 // ! If the config preset extends itself, we'll get an infinite loop
 
-                // Merge the config preset into the result
-                result = mergeConfigs(result, preset);
+                // Merge the current preset with the previously merged presets
+                mergedPresets = mergeConfigsReverse(mergedPresets, preset);
             }
+
+            // Remove "extends" property from the cloned config, because we don't need it anymore
+            delete clonedConfig.extends;
         }
 
-        // Validate the result
-        validateLinterConfig(result);
+        // Override presets with the provided config
+        clonedConfig = mergeConfigsReverse(mergedPresets, clonedConfig);
 
-        return result;
+        // Validate the prepared config
+        validateLinterConfig(clonedConfig);
+
+        return clonedConfig;
     }
 
     /**

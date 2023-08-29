@@ -311,6 +311,7 @@ The configuration file should be a valid JSON or YAML file. The following option
 - `extends` — an array of configuration presets to extend, e.g. `["preset-1", "preset-2"]`.
   See [Configuration presets](#configuration-presets) for more info.
   Defaults to `[]`, i.e. no presets.
+  Preset's syntax and rules can be overridden by the user config.
 - `rules` — an object with configured [linter rules](#linter-rules)
   due to [configuration rule structure](#configuration-rule-structure).
 
@@ -380,13 +381,15 @@ or change the severity of the `rule-3` rule to `error` and add a configuration f
 
 ### Configuration presets
 
-Configuration presets are basically configuration files that you can use to extend your configuration.
+Configuration presets are basically configuration files that you can use to extend in your configuration.
 Currently, there are two built-in presets available (click on the name to see the source code):
 
 - [`aglint:recommended`][aglint-recommended] — a set of recommended rules that are enabled by default.
   It is enough to use this preset in most cases.
 - [`aglint:all`][aglint-all] — a set of **all** rules that are available in the linter.
   This option maybe too strict for most projects.
+
+> **Note**: Presets contain `syntax` and `rules` which shall be overridden if they are specified in the config.
 
 > **Note**: All presets have `syntax` property set to `Common` a default value.
 > You may need to specify it in your [configuration file](#configuration-file-structure)
@@ -405,11 +408,11 @@ It simply extends the `aglint:recommended` preset and specifies the `root` optio
     ```yaml
     # Default configuration file for AGLint
     root: true
-    syntax:
-        - Common
     allowInlineConfig: true
     extends:
         - aglint:recommended
+    syntax:
+        - Common
     ```
 
 - JSON syntax — `.aglintrc.json`:
@@ -417,11 +420,11 @@ It simply extends the `aglint:recommended` preset and specifies the `root` optio
     ```json
     {
         "root": true,
-        "syntax": ["Common"],
         "allowInlineConfig": true,
         "extends": [
             "aglint:recommended"
-        ]
+        ],
+        "syntax": ["Common"]
     }
     ```
 

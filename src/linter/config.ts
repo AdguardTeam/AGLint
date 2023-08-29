@@ -64,26 +64,52 @@ export const defaultLinterConfig: LinterConfig = {
  * If you have the following config (called `initial` parameter):
  * ```json
  * {
- *   "ignores": true,
- *   "fix": false
+ *   "syntax": ["Common"],
+ *   "rules": {
+ *     "rule1": "error",
+ *     "rule2": "warn"
+ *   }
  * }
  * ```
  * And you want to extend it with the following config (called `extend` parameter):
  * ```json
  * {
- *   "ignores": false
+ *   "syntax": ["AdGuard"],
+ *   "rules": {
+ *     "rule2": "off",
+ *   },
  * }
  * ```
  * The result will be:
  * ```json
  * {
- *   "ignores": false,
- *   "fix": false
+ *   "syntax": ["AdGuard"],
+ *   "rules": {
+ *     "rule1": "error",
+ *     "rule2": "off"
+ *   }
  * }
  * ```
  */
 export function mergeConfigs(initial: LinterConfig, extend: Partial<LinterConfig>): LinterConfig {
     return merge(initial, extend, {
+        // https://github.com/TehShrike/deepmerge#options
+        arrayMerge: (_, sourceArray) => sourceArray,
+    });
+}
+
+/**
+ * Merges two configuration objects using deepmerge.merge().
+ * Practically, this means that the `extend` object will be merged into the `initial` object.
+ *
+ * It is very similar to {@link mergeConfigs|mergeConfigs()} function, but the order of parameters is reversed.
+ *
+ * @param extend The config object to extend the initial config with
+ * @param initial The initial config object
+ * @returns The merged config object
+ */
+export function mergeConfigsReverse(extend: Partial<LinterConfig>, initial: LinterConfig): LinterConfig {
+    return merge(extend, initial, {
         // https://github.com/TehShrike/deepmerge#options
         arrayMerge: (_, sourceArray) => sourceArray,
     });

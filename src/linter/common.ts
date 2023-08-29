@@ -112,6 +112,21 @@ export interface LinterConfig {
      */
     root?: boolean;
 
+    /**
+     * Whether to allow inline configuration or not
+     *
+     * @example
+     * ```adblock
+     * ! aglint-disable-next-line
+     * ```
+     */
+    allowInlineConfig?: boolean;
+
+    /**
+     * An array of configuration presets to extend
+     */
+    extends?: string[];
+
     // TODO: add ability to specify the syntax for files or directories
     /**
      * Specific adblock syntaxes to use for network rule modifiers validation.
@@ -124,21 +139,6 @@ export interface LinterConfig {
      *
      */
     syntax: AdblockSyntax[];
-
-    /**
-     * An array of configuration presets to extend
-     */
-    extends?: string[];
-
-    /**
-     * Whether to allow inline configuration or not
-     *
-     * @example
-     * ```adblock
-     * ! aglint-disable-next-line
-     * ```
-     */
-    allowInlineConfig?: boolean;
 
     /**
      * A map of rule names to their configuration

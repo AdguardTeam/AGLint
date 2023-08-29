@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
+## [Unreleased]
+
+### Changed
+
+- Override `config.extends`'s presets by the user config.
+
 
 ## [2.0.3] - 2023-08-29
 
@@ -124,7 +130,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the linter and CLI.
 - Initial version of the adblock rule parser.
 
-
+[Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v2.0.3...HEAD
 [2.0.3]: https://github.com/AdguardTeam/AGLint/compare/v2.0.1...v2.0.3
 [2.0.1]: https://github.com/AdguardTeam/AGLint/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/AdguardTeam/AGLint/compare/v1.0.11...v2.0.0
