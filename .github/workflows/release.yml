@@ -63,5 +63,6 @@ jobs:
             dist/aglint.umd.min.js
           draft: false
           prerelease: false
+          body: See [CHANGELOG.md](./CHANGELOG.md) for the list of changes.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
