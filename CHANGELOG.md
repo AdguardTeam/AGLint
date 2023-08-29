@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
-## [Unreleased]
+
+## [2.0.3] - 2023-08-29
 
 ### Added
 
 - Config `syntax` handling during `aglint init`.
 - `no-short-rules` linter rule.
+- Validation of modifier values due to `value_format`.
+
+### Changed
+
+- Updated `@adguard/agtree` to `v1.1.3`.
+
 
 ## [2.0.1] - 2023-08-14
 
@@ -17,6 +24,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 - Make `syntax` property in the config required.
 - Updated `@adguard/agtree` to `v1.1.2`.
+
 
 ## [2.0.0] - 2023-08-11
 
@@ -28,6 +36,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 ### Changed
 
 - Updated `@adguard/agtree` to `v1.1.1`.
+
 
 ## [1.0.11] - 2023-04-21
 
@@ -41,6 +50,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 - Config files are now required to run the linter.
 - Locations are handled in linter rules.
+
 
 ## [1.0.10] - 2023-03-30
 
@@ -60,6 +70,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 ### Removed
 
 - Temporary removed `adg-scriptlet-quotes` linter rule.
+
 
 ## [1.0.9] - 2023-03-02
 
@@ -83,6 +94,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 - Network rule separator finder sometimes found the wrong separator.
 
+
 ## [1.0.8] - 2023-02-13
 
 ### Changed
@@ -90,17 +102,20 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Improved console reporter, shows linter rule name when reporting problems.
 - Detailed error messages when CSS parsing fails.
 
+
 ## [1.0.7] - 2023-02-10
 
 ### Fixed
 
 - CLI exit code is now 1 if there are any linter errors.
 
+
 ## 1.0.6 - 2023-02-06
 
 ### Added
 
 - Export Linter CLI to public API.
+
 
 ## 1.0.5 - 2023-01-30
 
@@ -110,7 +125,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the adblock rule parser.
 
 
-[Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v2.0.1...HEAD
+[2.0.3]: https://github.com/AdguardTeam/AGLint/compare/v2.0.1...v2.0.3
 [2.0.1]: https://github.com/AdguardTeam/AGLint/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/AdguardTeam/AGLint/compare/v1.0.11...v2.0.0
 [1.0.11]: https://github.com/AdguardTeam/AGLint/compare/v1.0.10...v1.0.11

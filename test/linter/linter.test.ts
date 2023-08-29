@@ -941,7 +941,7 @@ describe('Linter', () => {
                     {
                         severity: SEVERITY.error,
                         message:
-                            "Not existent modifier: 'protobuf'",
+                            "Non-existent modifier: 'protobuf'",
                         position: {
                             startLine: 2,
                             startColumn: 15,
@@ -1010,7 +1010,7 @@ describe('Linter', () => {
                         severity: SEVERITY.warn,
                         message:
                             // eslint-disable-next-line max-len
-                            'Rules with `$mp4` are still supported and being converted into `$redirect=noopmp4-1s` now\nbut the support shall be removed in the future.',
+                            'Rules with `$mp4` are still supported and being converted into `$redirect=noopmp4-1s` now but the support shall be removed in the future.',
                         position: {
                             startLine: 3,
                             startColumn: 15,

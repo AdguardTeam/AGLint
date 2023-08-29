@@ -27,7 +27,7 @@ describe('invalid-modifiers', () => {
                 expected: {
                     rule: 'invalid-modifiers',
                     severity: 2,
-                    message: "Not existent modifier: 'protobuf'",
+                    message: "Non-existent modifier: 'protobuf'",
                     position: {
                         startColumn: 15,
                         endColumn: 23,
@@ -39,7 +39,7 @@ describe('invalid-modifiers', () => {
                 expected: {
                     rule: 'invalid-modifiers',
                     severity: 2,
-                    message: "Not existent modifier: 'invalid'",
+                    message: "Non-existent modifier: 'invalid'",
                     position: {
                         startColumn: 15,
                         endColumn: 22,
@@ -82,7 +82,7 @@ describe('invalid-modifiers', () => {
                 expected: {
                     rule: 'invalid-modifiers',
                     severity: 2,
-                    message: "Not existent modifier: 'protobuf'",
+                    message: "Non-existent modifier: 'protobuf'",
                     position: {
                         startColumn: 15,
                         endColumn: 23,
@@ -131,10 +131,83 @@ describe('invalid-modifiers', () => {
                     rule: 'invalid-modifiers',
                     severity: 1,
                     // eslint-disable-next-line max-len
-                    message: 'Rules with `$empty` are still supported and being converted into `$redirect=nooptext` now\nbut the support shall be removed in the future.',
+                    message: 'Rules with `$empty` are still supported and being converted into `$redirect=nooptext` now but the support shall be removed in the future.',
                     position: {
                         startColumn: 15,
                         endColumn: 20,
+                    },
+                },
+            },
+            {
+                actual: '||example.com^$domain=example.org|',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: 'Value list cannot end with a separator',
+                    position: {
+                        startColumn: 15,
+                        endColumn: 34,
+                    },
+                },
+            },
+            {
+                actual: '||example.com^$domain=example.org|exam[le.com|example. org',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: "Invalid values for the modifier: 'domain': 'exam[le.com', 'example. org'",
+                    position: {
+                        startColumn: 15,
+                        endColumn: 58,
+                    },
+                },
+            },
+            {
+                actual: '||example.com^$denyallow=~example.org',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: "Values cannot be negated for the modifier: 'denyallow': 'example.org'",
+                    position: {
+                        startColumn: 15,
+                        endColumn: 37,
+                    },
+                },
+            },
+            {
+                actual: '||example.com^$app=|Example.exe',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: 'Empty value specified in the list',
+                    position: {
+                        startColumn: 15,
+                        endColumn: 31,
+                    },
+                },
+            },
+            {
+                actual: '||example.com^$method=get|head|~post',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    // eslint-disable-next-line max-len
+                    message: "Simultaneous usage of negated and not negated values is forbidden for the modifier: 'method': 'post'",
+                    position: {
+                        startColumn: 15,
+                        endColumn: 36,
+                    },
+                },
+            },
+            {
+                actual: '@@||example.com^$stealth=~push',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: "Values cannot be negated for the modifier: 'stealth': 'push'",
+                    position: {
+                        startColumn: 17,
+                        endColumn: 30,
                     },
                 },
             },
@@ -162,7 +235,7 @@ describe('invalid-modifiers', () => {
                 expected: {
                     rule: 'invalid-modifiers',
                     severity: 2,
-                    message: "Not existent modifier: 'protobuf'",
+                    message: "Non-existent modifier: 'protobuf'",
                     position: {
                         startColumn: 15,
                         endColumn: 23,
@@ -229,7 +302,7 @@ describe('invalid-modifiers', () => {
                 expected: {
                     rule: 'invalid-modifiers',
                     severity: 2,
-                    message: "Not existent modifier: 'protobuf'",
+                    message: "Non-existent modifier: 'protobuf'",
                     position: {
                         startColumn: 15,
                         endColumn: 23,

@@ -27,7 +27,7 @@ export const InvalidModifiers: LinterRule = {
 
                     ast.modifiers.children.forEach((modifier) => {
                         const validationResult = modifierValidator.validate(agent, modifier, ast.exception);
-                        if (validationResult.ok
+                        if (validationResult.valid
                             && !validationResult.warn) {
                             return;
                         }
