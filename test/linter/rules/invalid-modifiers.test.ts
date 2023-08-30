@@ -66,6 +66,8 @@ describe('invalid-modifiers', () => {
             '@@||example.com^$csp',
             '||example.com^$removeparam',
             '@@||example.com^$stealth',
+            '||example.com/gtm.js$domain=example.org,script,redirect=googletagmanager-gtm',
+            '||example.com^$replace=/window\\.location\\.replace\\(Link\\);//',
         ];
         test.each(validCases)('%s', (rule) => {
             expect(linter.lint(rule).problems).toHaveLength(0);
