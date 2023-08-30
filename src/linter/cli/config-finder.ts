@@ -52,7 +52,7 @@ export async function configFinder(cwd: string, callback: ConfigFinderCallback):
         const files = await readdir(dir);
 
         // Collect all config files in the current directory
-        const configFiles = files.filter((file) => CONFIG_FILE_NAMES.includes(file));
+        const configFiles = files.filter((file) => CONFIG_FILE_NAMES.has(file));
 
         if (configFiles.length === 1) {
             // If there is only one config file, call the callback with the path to the config file

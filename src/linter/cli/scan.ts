@@ -94,7 +94,7 @@ export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles =
             const parsedPath = path.parse(itemPath);
 
             // If the file is a config file
-            if (CONFIG_FILE_NAMES.includes(item)) {
+            if (CONFIG_FILE_NAMES.has(item)) {
                 // If a config file is already found, throw an error
                 if (result.configFile !== null) {
                     throw new Error(
@@ -107,7 +107,7 @@ export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles =
 
                 // Otherwise, set the config file for the current directory
                 result.configFile = parsedPath;
-            } else if (SUPPORTED_EXTENSIONS.includes(parsedPath.ext)) {
+            } else if (SUPPORTED_EXTENSIONS.has(parsedPath.ext)) {
                 // We only want to lint files with the supported extensions
                 result.lintableFiles.push(parsedPath);
             }

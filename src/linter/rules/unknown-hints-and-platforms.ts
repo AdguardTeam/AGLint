@@ -8,10 +8,14 @@ const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#hints
-const KNOWN_HINTS = [NOT_OPTIMIZED, PLATFORM, NOT_PLATFORM];
+const KNOWN_HINTS = new Set([
+    NOT_OPTIMIZED,
+    PLATFORM,
+    NOT_PLATFORM,
+]);
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints
-const KNOWN_PLATFORMS = [
+const KNOWN_PLATFORMS = new Set([
     'windows',
     'mac',
     'android',
@@ -23,7 +27,7 @@ const KNOWN_PLATFORMS = [
     'ext_safari',
     'ext_android_cb',
     'ext_ublock',
-];
+]);
 
 /**
  * Rule that checks if hints and platforms are known.
@@ -40,7 +44,7 @@ export const UnknownHintsAndPlatforms: LinterRule = {
             if (ast.category === RuleCategory.Comment && ast.type === CommentRuleType.HintCommentRule) {
                 for (const hint of ast.children) {
                     // Check if the hint name is known (case-sensitive)
-                    if (!KNOWN_HINTS.includes(hint.name.value)) {
+                    if (!KNOWN_HINTS.has(hint.name.value)) {
                         context.report({
                             message: `Unknown hint name "${hint.name.value}"`,
                             node: hint.name,
@@ -54,7 +58,7 @@ export const UnknownHintsAndPlatforms: LinterRule = {
                         } else {
                             for (const param of hint.params.children) {
                                 // Check if the platform is known (case sensitive)
-                                if (!KNOWN_PLATFORMS.includes(param.value)) {
+                                if (!KNOWN_PLATFORMS.has(param.value)) {
                                     context.report({
                                         message: `Unknown platform "${param.value}" in hint "${hint.name.value}"`,
                                         node: param,

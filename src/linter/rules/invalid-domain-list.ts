@@ -4,7 +4,7 @@ import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**
- * Rule that checks if a preprocessor directive is known
+ * Rule that checks validity of domains in cosmetic rules
  */
 export const InvalidDomainList: LinterRule = {
     meta: {

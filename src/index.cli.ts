@@ -208,7 +208,7 @@ const createConfig = async (cwd: string): Promise<void> => {
             const cwdItems = await readdir(cwd);
 
             for (const item of cwdItems) {
-                if (CONFIG_FILE_NAMES.includes(item)) {
+                if (CONFIG_FILE_NAMES.has(item)) {
                     // Show which config file is conflicting exactly
                     // eslint-disable-next-line no-console
                     console.error(`Config file already exists in directory "${cwd}" as "${item}"`);
