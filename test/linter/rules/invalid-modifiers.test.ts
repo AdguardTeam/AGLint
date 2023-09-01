@@ -213,6 +213,30 @@ describe('invalid-modifiers', () => {
                     },
                 },
             },
+            {
+                actual: '||example.com^$csp=default',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: "Invalid CSP directives for the modifier: 'csp': \"default\"",
+                    position: {
+                        startColumn: 15,
+                        endColumn: 26,
+                    },
+                },
+            },
+            {
+                actual: '||example.com^$csp=child-src',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: "No CSP value for the modifier and the directive: 'csp': 'child-src'",
+                    position: {
+                        startColumn: 15,
+                        endColumn: 26,
+                    },
+                },
+            },
         ];
 
         test.each(invalidCases)('$actual', ({ actual, expected }) => {
