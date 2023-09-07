@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
 
+## [2.0.5] - 2023-09-07
+
+### Changed
+
+- Updated `@adguard/agtree` to `v1.1.5`.
+
+
 ## [2.0.4] - 2023-08-30
 
 ### Changed
@@ -132,6 +139,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the linter and CLI.
 - Initial version of the adblock rule parser.
 
+[2.0.5]: https://github.com/AdguardTeam/AGLint/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/AdguardTeam/AGLint/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/AdguardTeam/AGLint/compare/v2.0.1...v2.0.3
 [2.0.1]: https://github.com/AdguardTeam/AGLint/compare/v2.0.0...v2.0.1
