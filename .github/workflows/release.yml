@@ -14,17 +14,23 @@ on:
       - v*
   # Make possible to run manually
   workflow_dispatch:
-    # warn before running manually
-    warning:
-      description: 'Should be run only for tags like `v*`'
-      required: true
-      type: boolean
+    inputs:
+      # warn before running manually
+      warning:
+        description: 'Should be run only for tags like `v*`'
+        required: false
+        type: boolean
 
+# Make sure that only one release workflow runs at a time.
+concurrency:
+  group: release
 
 jobs:
   release:
     name: Create NPM and GitHub release
     runs-on: ubuntu-latest
+    # Only run this job for v* tags
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
@@ -84,7 +90,7 @@ jobs:
       ${{ always() &&
         (
           github.event_name == 'push' ||
-          github.event.pull_request.head.repo.full_name == github.repository
+          github.event_name == 'workflow_dispatch'
         )
       }}
     runs-on: ubuntu-latest
