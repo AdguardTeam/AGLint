@@ -12,6 +12,14 @@ on:
   push:
     tags:
       - v*
+  # Make possible to run manually
+  workflow_dispatch:
+    # warn before running manually
+    warning:
+      description: 'Should be run only for tags like `v*`'
+      required: true
+      type: boolean
+
 
 jobs:
   release:
