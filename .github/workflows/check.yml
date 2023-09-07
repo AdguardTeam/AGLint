@@ -10,6 +10,8 @@ on:
   pull_request:
     branches:
       - master
+  # Make possible to run manually
+  workflow_dispatch:
 
 jobs:
   check_code:
