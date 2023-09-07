@@ -43,6 +43,7 @@ jobs:
         run: yarn test
 
   notify:
+    name: Send Slack notification
     needs:
       - check_code
 
