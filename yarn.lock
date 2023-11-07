@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@adguard/agtree@^1.1.5":
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-1.1.5.tgz#d3ebcad00a24ac1ee1675722daaff42748965f0b"
-  integrity sha512-On8UwTPhvJVm84i/Zz926pFyMH/V34dLDNeAY5pb+78d+GcDfFl59o79sUSRCgjjNcxmjtj84KD+dl8aDEx35Q==
+"@adguard/agtree@^1.1.7":
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/@adguard/agtree/-/agtree-1.1.7.tgz#0bafee0396da704958ba6014ad83565e57c5b279"
+  integrity sha512-xol2aSim0BYnxCk/OULE3qXFToSnadNsl4q6DDjhHkXvKTr0Y6hnfq4Ub3BGgEpyzGYYkN37BDz8IEUDdpRyew==
   dependencies:
     "@adguard/ecss-tree" "^1.0.8"
     "@adguard/scriptlets" "^1.9.61"

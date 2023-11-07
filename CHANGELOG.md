@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
 
-## [Unreleased]
+## [2.0.6] - 2023-11-07
 
 ### Added
 
 - Support of `!#else` preprocessor directive [#185].
+
+### Changed
+
+- Updated [@adguard/agtree] to `v1.1.7`.
 
 
 ## [2.0.5] - 2023-09-07
@@ -146,7 +150,8 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the linter and CLI.
 - Initial version of the adblock rule parser.
 
-[Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v2.0.5...HEAD
+
+[2.0.6]: https://github.com/AdguardTeam/AGLint/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/AdguardTeam/AGLint/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/AdguardTeam/AGLint/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/AdguardTeam/AGLint/compare/v2.0.1...v2.0.3

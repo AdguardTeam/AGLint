@@ -249,6 +249,18 @@ describe('invalid-modifiers', () => {
                     },
                 },
             },
+            {
+                actual: '||example.com^$referrerpolicy=no-origin',
+                expected: {
+                    rule: 'invalid-modifiers',
+                    severity: 2,
+                    message: "Invalid Referrer-Policy directive for the modifier: 'referrerpolicy': 'no-origin'",
+                    position: {
+                        startColumn: 15,
+                        endColumn: 39,
+                    },
+                },
+            },
         ];
 
         test.each(invalidCases)('$actual', ({ actual, expected }) => {
