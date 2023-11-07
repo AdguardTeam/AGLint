@@ -208,7 +208,8 @@ AGLint by adding `--no-verify` to your commit command.
 Next time you clone the repository, you'll only need to run `npm install` and it will install Husky automatically,
 because it automatically runs `prepare` script after installing dependencies.
 
-> **Note**: To make the hook work in Unix-like operating systems you may need to run
+> [!NOTE]
+> To make the hook work in Unix-like operating systems you may need to run
 > `chmod ug+x .husky/pre-commit`.
 
 ### <a name="post-merge"></a> Add post-merge hook
@@ -217,7 +218,8 @@ If AGLint is updated on the remote repository (in practice, `package.json` or `p
 you need to update AGLint version in your local repository. If you just clone the changes, that does not sync your
 dependencies in `node_modules` directory, so you need to run `npm install` to sync your dependencies manually.
 
-> :warning: **Warning**: If you do not sync your installed dependencies in your `node_modules` folder
+> [!WARNING]
+> If you do not sync your installed dependencies in your `node_modules` folder
 > after the `package.json` or `package-lock.json` is changed,
 > you may get errors when running AGLint or your CI may report different results than your local machine.
 
@@ -258,7 +260,8 @@ fi
 This script will check if `package.json` or `package-lock.json` is changed between the old HEAD and the new HEAD.
 If one of them is changed, it will run `npm install` to sync your dependencies, so you don't need to do that manually.
 
-> **Note**: To make the hook work in Unix-like operating systems you may need to run
+> [!NOTE]
+> To make the hook work in Unix-like operating systems you may need to run
 > `chmod ug+x .husky/post-merge`.
 
 

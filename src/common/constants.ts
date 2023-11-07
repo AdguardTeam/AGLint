@@ -204,6 +204,16 @@ export const PREPROCESSOR_MARKER = '!#';
 export const PREPROCESSOR_MARKER_LEN = PREPROCESSOR_MARKER.length;
 export const PREPROCESSOR_SEPARATOR = ' ';
 
-export const SAFARI_CB_AFFINITY = 'safari_cb_affinity';
-export const IF = 'if';
-export const INCLUDE = 'include';
+export const IF_DIRECTIVE = 'if';
+export const ELSE_DIRECTIVE = 'else';
+export const ENDIF_DIRECTIVE = 'endif';
+export const INCLUDE_DIRECTIVE = 'include';
+export const SAFARI_CB_AFFINITY_DIRECTIVE = 'safari_cb_affinity';
+
+export const SUPPORTED_PREPROCESSOR_DIRECTIVES = new Set([
+    ELSE_DIRECTIVE,
+    ENDIF_DIRECTIVE,
+    IF_DIRECTIVE,
+    INCLUDE_DIRECTIVE,
+    SAFARI_CB_AFFINITY_DIRECTIVE,
+]);

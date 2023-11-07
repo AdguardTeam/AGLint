@@ -2,13 +2,7 @@ import { CommentRuleType, RuleCategory } from '@adguard/agtree';
 
 import { SEVERITY } from '../severity';
 import { type LinterRule } from '../common';
-
-const COMMON_PREPROCESSOR_DIRECTIVES = new Set([
-    'if',
-    'endif',
-    'include',
-    'safari_cb_affinity',
-]);
+import { SUPPORTED_PREPROCESSOR_DIRECTIVES } from '../../common/constants';
 
 /**
  * Checks if a preprocessor directive is known
@@ -17,11 +11,13 @@ const COMMON_PREPROCESSOR_DIRECTIVES = new Set([
  * @returns `true` if the preprocessor directive is known, `false` otherwise
  */
 function isKnownPreProcessorDirective(name: string): boolean {
-    return COMMON_PREPROCESSOR_DIRECTIVES.has(name);
+    return SUPPORTED_PREPROCESSOR_DIRECTIVES.has(name);
 }
 
 /**
- * Rule that checks if a preprocessor directive is known
+ * Rule that checks if a preprocessor directive is known.
+ *
+ * Directives are case-sensitive, so `!#IF` is to be considered as invalid.
  */
 export const UnknownPreProcessorDirectives: LinterRule = {
     meta: {

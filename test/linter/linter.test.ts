@@ -13,6 +13,8 @@ import { SEVERITY, type SeverityValue, type SeverityName } from '../../src/linte
 import { EMPTY, NEWLINE } from '../../src/common/constants';
 import { type LinterConfig, type LinterRule } from '../../src/linter/common';
 import { InvalidModifiers } from '../../src/linter/rules/invalid-modifiers';
+import { IfClosed } from '../../src/linter/rules/if-closed';
+import { UnknownPreProcessorDirectives } from '../../src/linter/rules/unknown-preprocessor-directives';
 
 const demoRule: LinterRule = {
     meta: {
@@ -1120,6 +1122,91 @@ describe('Linter', () => {
                 ],
                 warningCount: 0,
                 errorCount: 1,
+                fatalErrorCount: 0,
+            });
+        });
+    });
+
+    describe('lint detects pre-processor directives', () => {
+        it('unknown ifelse directive', () => {
+            const linter = new Linter(false);
+            linter.addRule('if-closed', IfClosed);
+            linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
+
+            expect(
+                linter.lint(
+                    [
+                        'rule0',
+                        '!#if (condition1)',
+                        'rule1',
+                        '!#ifelse (condition2)',
+                        'rule2',
+                        '!#endif',
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [
+                    {
+                        rule: 'unknown-preprocessor-directives',
+                        severity: 2,
+                        message: 'Unknown preprocessor directive "ifelse"',
+                        position: {
+                            startLine: 4,
+                            startColumn: 2,
+                            endLine: 4,
+                            endColumn: 8,
+                        },
+                    },
+                ],
+                warningCount: 0,
+                errorCount: 1,
+                fatalErrorCount: 0,
+            });
+        });
+
+        it('invalid includes and unclosed if', () => {
+            const linter = new Linter(false);
+            linter.addRule('if-closed', IfClosed);
+            linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
+
+            expect(
+                linter.lint(
+                    [
+                        'rule0',
+                        '!#if (condition1)',
+                        '!#includes https://raw.example.com/file1.txt',
+                        'rule1',
+                        '!#else',
+                        'rule2',
+                    ].join(NEWLINE),
+                ),
+            ).toMatchObject({
+                problems: [
+                    {
+                        rule: 'unknown-preprocessor-directives',
+                        severity: 2,
+                        message: 'Unknown preprocessor directive "includes"',
+                        position: {
+                            startLine: 3,
+                            startColumn: 2,
+                            endLine: 3,
+                            endColumn: 10,
+                        },
+                    },
+                    {
+                        rule: 'if-closed',
+                        severity: 2,
+                        message: 'Unclosed "if" directive',
+                        position: {
+                            startLine: 2,
+                            startColumn: 0,
+                            endLine: 2,
+                            endColumn: 17,
+                        },
+                    },
+                ],
+                warningCount: 0,
+                errorCount: 2,
                 fatalErrorCount: 0,
             });
         });

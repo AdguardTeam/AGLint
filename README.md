@@ -125,13 +125,16 @@ it as a CLI tool with the default configuration.
 
 That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
 
-> **Note**: You can also install AGLint globally, so you can use it without `npx` or `yarn`, but we recommend to install
+> [!NOTE]
+> You can also install AGLint globally, so you can use it without `npx` or `yarn`, but we recommend to install
 > it locally to your project.
 
-> **Note**:  If you want to lint just some specific files, you can pass them as arguments:
+> [!NOTE]
+> If you want to lint just some specific files, you can pass them as arguments:
 > `aglint path/to/file.txt path/to/another/file.txt`
 
-> **Note**: To see all available options, run `aglint --help`.
+> [!NOTE]
+> To see all available options, run `aglint --help`.
 
 *To customize the default configuration, see [Configuration](#configuration) for more info. If you want to use AGLint
 programmatically, see [Use programmatically](#use-programmatically).*
@@ -264,7 +267,8 @@ project.** This command will create a `.aglintrc.yaml` file in the current direc
 
 You can also create a configuration file manually, please check the section below for more info.
 
-> **Note**: We are planning to add a configuration wizard in the future, so you will be able to create a configuration
+> [!NOTE]
+> We are planning to add a configuration wizard in the future, so you will be able to create a configuration
 > file by answering a few questions.
 
 ### Configuration file name and format
@@ -282,13 +286,16 @@ We also plan to support `.aglintrc.js` (JavaScript) in the future.
 We recommend using `.aglintrc.yaml` or `.aglintrc.yml` because YAML is more compact and easier to read, and it supports
 comments.
 
-> **Warning**: If you have multiple configuration files in the same directory, the CLI will throw an error and ask you
+> [!WARNING]
+> If you have multiple configuration files in the same directory, the CLI will throw an error and ask you
 > to fix it.
 
-> **Warning**: If your configuration file is syntactically invalid or contains unknown / invalid options, the CLI will
+> [!WARNING]
+> If your configuration file is syntactically invalid or contains unknown / invalid options, the CLI will
 > throw an error and ask you to fix it.
 
-> **Warning**: If your configuration file is not named in one of the ways listed above, the CLI will ignore it (since it
+> [!WARNING]
+> If your configuration file is not named in one of the ways listed above, the CLI will ignore it (since it
 > cannot recognize it as a configuration file).
 
 ### Configuration file structure
@@ -389,13 +396,16 @@ Currently, there are two built-in presets available (click on the name to see th
 - [`aglint:all`][aglint-all] — a set of **all** rules that are available in the linter.
   This option maybe too strict for most projects.
 
-> **Note**: Presets contain `syntax` and `rules` which shall be overridden if they are specified in the config.
+> [!NOTE]
+> Presets contain `syntax` and `rules` which shall be overridden if they are specified in the config.
 
-> **Note**: All presets have `syntax` property set to `Common` a default value.
+> [!NOTE]
+> All presets have `syntax` property set to `Common` a default value.
 > You may need to specify it in your [configuration file](#configuration-file-structure)
 > for better linting, e.g. modifiers validation.
 
-> **Note**: We are planning to add more presets in the future,
+> [!NOTE]
+> We are planning to add more presets in the future,
 > and also allow users to create their own presets but currently it is not possible.
 
 ### Default configuration file
@@ -428,7 +438,8 @@ It simply extends the `aglint:recommended` preset and specifies the `root` optio
     }
     ```
 
-> **Note**: JavaScript configuration files aren't supported at the moment
+> [!NOTE]
+> JavaScript configuration files aren't supported at the moment
 > but we plan to add support for them in the future (CJS and ESM syntaxes).
 
 ### Configuration cascading and hierarchy
@@ -522,7 +533,9 @@ Currently, the following linter rules are available (we will add more rules in t
 
 ### `if-closed`
 
-Checks if the `if` statement is closed and no unclosed `endif` statements are present.
+Checks if the `if` statement is closed and no unclosed `endif` or unopened `else` statements are present.
+It also checks whether `else` and `endif` statements are used correctly
+since they can only be used alone without other parameters or statements.
 
 - **Severity:** `error` (2)
 - **Options:** none
@@ -535,11 +548,14 @@ Checks if the `if` statement is closed and no unclosed `endif` statements are pr
   !#endif
   !#if (adguard_ext_firefox)
   example.org##.something
+  !#else if (adguard_ext_opera)
+  example.org##.operaBanner
   ```
   will be reported as error:
   ```txt
     1:0  error  Using an "endif" directive without an opening "if" directive
     5:0  error  Unclosed "if" directive
+    7:0  error  Invalid usage of preprocessor directive: "else"
   ```
   since the first `endif` are unnecessary, and the last `if` statement is not closed.
 
@@ -591,6 +607,9 @@ Checks if the same modifier is used multiple times in a single network rule.
 
 Checks if the used preprocessor directives are known.
 
+> [!IMPORTANT]
+> Preprocessor directives are case-sensitive, so `!#IF` is to be considered as invalid.
+
 - **Severity:** `error` (2)
 - **Options:** none
 - **Fixable:** no
@@ -606,6 +625,7 @@ Checks if the used preprocessor directives are known.
 - **Additional information:**
     - Currently, the following preprocessor directives are supported:
         - `if`: [reference][if-kb]
+        - `else`: [reference][if-kb]
         - `endif`: [reference][if-kb]
         - `include`: [reference][include-kb]
         - `safari_cb_affinity`: [reference][safari-cb-kb]

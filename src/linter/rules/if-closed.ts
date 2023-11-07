@@ -2,9 +2,7 @@ import { CommentRuleType, type PreProcessorCommentRule, RuleCategory } from '@ad
 
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-
-const IF_DIRECTIVE = 'if';
-const ENDIF_DIRECTIVE = 'endif';
+import { ELSE_DIRECTIVE, ENDIF_DIRECTIVE, IF_DIRECTIVE } from '../../common/constants';
 
 /**
  * Concreting the storage type definition (the linter only provides a general
@@ -35,12 +33,43 @@ export const IfClosed: LinterRule<Storage> = {
             const rule = context.getActualAdblockRuleAst();
 
             // Check adblock rule category and type
-            if (rule.category === RuleCategory.Comment && rule.type === CommentRuleType.PreProcessorCommentRule) {
-                // Check for "if" and "endif" directives
-                if (rule.name.value === IF_DIRECTIVE) {
+            if (rule.category !== RuleCategory.Comment
+                || rule.type !== CommentRuleType.PreProcessorCommentRule) {
+                return;
+            }
+
+            const directive = rule.name.value;
+            switch (directive) {
+                case IF_DIRECTIVE:
                     // Collect open "if"
                     context.storage.openIfs.push(rule);
-                } else if (rule.name.value === ENDIF_DIRECTIVE) {
+                    break;
+                case ELSE_DIRECTIVE:
+                    // '!#else' can only be used alone without any parameters
+                    if (rule.params) {
+                        context.report({
+                            message: `Invalid usage of preprocessor directive: "${ELSE_DIRECTIVE}"`,
+                            node: rule,
+                        });
+                    }
+                    // Check if there is an open "!#if" before "!#else"
+                    if (context.storage.openIfs.length === 0) {
+                        context.report({
+                            // eslint-disable-next-line max-len
+                            message: `Using an "${ELSE_DIRECTIVE}" directive without an opening "${IF_DIRECTIVE}" directive`,
+                            node: rule,
+                        });
+                    }
+                    // otherwise do nothing
+                    break;
+                case ENDIF_DIRECTIVE:
+                    // '!#endif' can only be used alone without any parameters
+                    if (rule.params) {
+                        context.report({
+                            message: `Invalid usage of preprocessor directive: "${ENDIF_DIRECTIVE}"`,
+                            node: rule,
+                        });
+                    }
                     if (context.storage.openIfs.length === 0) {
                         context.report({
                             // eslint-disable-next-line max-len
@@ -51,7 +80,11 @@ export const IfClosed: LinterRule<Storage> = {
                         // Mark "if" as closed (simply delete it from collection)
                         context.storage.openIfs.pop();
                     }
-                }
+                    break;
+                default:
+                    // unsupported directives should be reported by another rule - 'unknown-preprocessor-directives'
+                    // so do nothing
+                    break;
             }
         },
         onEndFilterList: (context): void => {

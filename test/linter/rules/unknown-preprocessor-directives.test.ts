@@ -14,7 +14,7 @@ describe('unknown-preprocessor-directives', () => {
         expect(linter.lint('!#include https://example.org/path/includedfile.txt')).toMatchObject({ problems: [] });
         expect(linter.lint('!#if (conditions)')).toMatchObject({ problems: [] });
         expect(linter.lint('!#if (conditions_2)')).toMatchObject({ problems: [] });
-        expect(linter.lint('!#endif')).toMatchObject({ problems: [] });
+        expect(linter.lint('!#else')).toMatchObject({ problems: [] });
         expect(linter.lint('!#endif')).toMatchObject({ problems: [] });
         expect(linter.lint('!#safari_cb_affinity')).toMatchObject({ problems: [] });
         expect(linter.lint('!#safari_cb_affinity()')).toMatchObject({ problems: [] });

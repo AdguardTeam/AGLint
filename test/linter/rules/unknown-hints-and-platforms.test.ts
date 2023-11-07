@@ -3,7 +3,7 @@ import { UnknownHintsAndPlatforms } from '../../../src/linter/rules/unknown-hint
 
 let linter: Linter;
 
-describe('unknown-preprocessor-directives', () => {
+describe('unknown-hints-and-platforms', () => {
     beforeAll(() => {
         // Configure linter with the rule
         linter = new Linter(false);

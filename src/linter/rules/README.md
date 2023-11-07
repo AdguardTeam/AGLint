@@ -167,7 +167,8 @@ export const ExampleRule: LinterRule<LinterRuleStorage<unknown>, RuleConfig> = {
 };
 ```
 
-> **Note**: You can use both the rule storage and the parameters at the same time.
+> [!NOTE]
+> You can use both the rule storage and the parameters at the same time.
 
 ### Report problems
 
@@ -275,7 +276,8 @@ export const RuleName: LinterRule = {
 };
 ```
 
-> **Note**: If multiple fixes are suggested for the same problem, then the linter will ignore all of them in order to
+> [!NOTE]
+> If multiple fixes are suggested for the same problem, then the linter will ignore all of them in order to
 > avoid conflicts.
 
 [main-readme-linter-rules]: ../../../README.md#linter-rules

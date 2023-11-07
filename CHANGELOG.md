@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
 
 
+## [Unreleased]
+
+### Added
+
+- Support of `!#else` preprocessor directive [#185].
+
+
 ## [2.0.5] - 2023-09-07
 
 ### Changed
 
-- Updated `@adguard/agtree` to `v1.1.5`.
+- Updated [@adguard/agtree] to `v1.1.5`.
 
 
 ## [2.0.4] - 2023-08-30
@@ -17,7 +24,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 ### Changed
 
 - Override `config.extends`'s presets by the user config.
-- Updated `@adguard/agtree` to `v1.1.4`.
+- Updated [@adguard/agtree] to `v1.1.4`.
 
 
 ## [2.0.3] - 2023-08-29
@@ -30,7 +37,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ### Changed
 
-- Updated `@adguard/agtree` to `v1.1.3`.
+- Updated [@adguard/agtree] to `v1.1.3`.
 
 
 ## [2.0.1] - 2023-08-14
@@ -38,7 +45,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 ### Changed
 
 - Make `syntax` property in the config required.
-- Updated `@adguard/agtree` to `v1.1.2`.
+- Updated [@adguard/agtree] to `v1.1.2`.
 
 
 ## [2.0.0] - 2023-08-11
@@ -50,7 +57,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ### Changed
 
-- Updated `@adguard/agtree` to `v1.1.1`.
+- Updated [@adguard/agtree] to `v1.1.1`.
 
 
 ## [1.0.11] - 2023-04-21
@@ -139,6 +146,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 - Initial version of the linter and CLI.
 - Initial version of the adblock rule parser.
 
+[Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v2.0.5...HEAD
 [2.0.5]: https://github.com/AdguardTeam/AGLint/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/AdguardTeam/AGLint/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/AdguardTeam/AGLint/compare/v2.0.1...v2.0.3
@@ -155,4 +163,7 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
+[@adguard/agtree]: https://github.com/AdguardTeam/tsurlfilter/blob/master/packages/agtree/CHANGELOG.md
+
 [#10]: https://github.com/AdguardTeam/AGLint/issues/10
+[#185]: https://github.com/AdguardTeam/AGLint/issues/185
