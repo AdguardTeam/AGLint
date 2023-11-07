@@ -34,8 +34,9 @@
         "node": ">=14"
     },
     "scripts": {
-        "build": "yarn clean && yarn build-types && yarn rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && yarn clean-types",
+        "build": "yarn clean && yarn build-txt && yarn build-types && yarn rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && yarn clean-types",
         "build-types": "tsc --declaration --emitDeclarationOnly --outdir dist/types",
+        "build-txt": "ts-node-esm tasks/build-txt.ts",
         "check-types": "tsc --noEmit",
         "clean": "rimraf dist",
         "clean-types": "rimraf dist/types",

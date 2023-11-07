@@ -4,8 +4,8 @@
     ".eslintrc.cjs",
     "jest.config.ts",
     "rollup.config.ts",
-    "scripts/**/*.ts",
     "src/**/*.ts",
+    "tasks/**/*.ts",
     "test/**/*.ts",
   ]
 }
