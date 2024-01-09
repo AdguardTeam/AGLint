@@ -37,10 +37,10 @@ Build:
 
             ls -laht
 
-            # Exclude '--ignore-platform' from yarn arguments to fix build
+            # Exclude '--ignore-optional' from yarn arguments
             # This is needed for installing swc core optional dependencies properly
             originalYarnArgs="$bamboo_varsYarn"
-            modifiedYarnArgs=$(echo "$originalYarnArgs" | sed 's/--ignore-platform//g')
+            modifiedYarnArgs=$(echo "$originalYarnArgs" | sed 's/--ignore-optional//g')
 
             # Install dependencies
             yarn install ${modifiedYarnArgs}
