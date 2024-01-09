@@ -446,8 +446,30 @@ describe('CLI tests', () => {
 
         const cli = new LinterCli(reporter);
 
-        await expect(cli.run(FIXTURE_PATH, ['dir1/dir1_file1.txt', 'dir100/dir100_file1.txt'])).rejects.toThrowError(
+        await expect(cli.run(FIXTURE_PATH, ['dir1/dir1_file1.txt', 'dir100/dir100_file1.txt'])).rejects.toThrow(
             `File "${path.join(FIXTURE_PATH, 'dir100/dir100_file1.txt')}" does not exist`,
+        );
+    });
+
+    test('handles absolute file paths correctly', async () => {
+        // should work if path exists
+        // make 'dir1/dir1_file1.txt' absolute
+        const absolutePath = path.resolve(path.join(FIXTURE_PATH, 'dir1/dir1_file1.txt'));
+        const reporter = new TestReporter();
+        const cli = new LinterCli(reporter);
+        await cli.run(FIXTURE_PATH, [absolutePath]);
+        const loggedEvents = reporter.getLoggedEvents();
+
+        // there are at least 4 events (onLintStart, onFileStart, onFileEnd, onLintEnd)
+        // no need to check the exact events here, we already did it in the previous test,
+        // we just want to make sure that the absolute path works
+        expect(loggedEvents.length).toBeGreaterThanOrEqual(4);
+
+        // should work if path does not exist
+        const absolutePathNotExists = path.resolve(path.join(FIXTURE_PATH, 'dir100/dir100_file1.txt'));
+
+        await expect(cli.run(FIXTURE_PATH, [absolutePathNotExists])).rejects.toThrow(
+            `File "${absolutePathNotExists}" does not exist`,
         );
     });
 });

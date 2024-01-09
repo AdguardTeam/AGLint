@@ -111,7 +111,17 @@ export class LinterCli {
         // If files are specified, use them instead of scanning the cwd
         if (files.length > 0) {
             for (const file of files) {
-                const fullPath = path.join(cwd, file);
+                let fullPath;
+
+                if (path.isAbsolute(file)) {
+                    // If file path is absolute, use it as is
+                    fullPath = file;
+                } else {
+                    // Otherwise, join relative path with cwd
+                    fullPath = path.join(cwd, file);
+                }
+
+                // TODO: Add support for glob patterns
 
                 // Check if the file exists
                 if (!(await pathExists(fullPath))) {
