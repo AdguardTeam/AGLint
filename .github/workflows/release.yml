@@ -1,36 +1,25 @@
-name: Release
+name: Create GitHub Release
 
 env:
   NODE_VERSION: 18
-
-# Workflow need write access to the repository to create
-# a GitHub release
-permissions:
-  contents: write
 
 on:
   push:
     tags:
       - v*
-  # Make possible to run manually
-  workflow_dispatch:
-    inputs:
-      # warn before running manually
-      warning:
-        description: 'Should be run only for tags like `v*`'
-        required: false
-        type: boolean
 
-# Make sure that only one release workflow runs at a time.
+# Workflow need write access to the repository to create a release
+permissions:
+  contents: write
+
+# Make sure that only one release workflow runs at a time
 concurrency:
   group: release
 
 jobs:
   release:
-    name: Create NPM and GitHub release
+    name: Create GitHub release
     runs-on: ubuntu-latest
-    # Only run this job for v* tags
-    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
@@ -62,11 +51,6 @@ jobs:
 
       - name: Pack files
         run: yarn pack --filename aglint.tgz
-
-      - name: Publish to NPM
-        run: yarn publish aglint.tgz --access=public --non-interactive
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release on GitHub
         uses: softprops/action-gh-release@v1

@@ -5,7 +5,7 @@ plan:
   key: AGLINTTEST
   name: aglint - tests
 variables:
-  dockerNode: adguard/node-ssh:18.13--0
+  dockerNode: adguard/node-ssh:18.13--1
 
 stages:
   - Build:
@@ -29,14 +29,21 @@ Build:
           - |-
             set -e
             set -x
+
             # Fix mixed logs
             exec 2>&1
 
-            # swc core optional dependencies are needed for tests
-            # but `--ignore-optional` will not install them
-            # so we run `yarn install ${bamboo.varsYarn}` without `--ignore-optional`:
-            yarn install --silent --ignore-engines --ignore-platform --ignore-scripts
+            ls -laht
 
+            # Exclude '--ignore-platform' from yarn arguments to fix build
+            # This is needed for installing swc core optional dependencies properly
+            originalYarnArgs="$bamboo_varsYarn"
+            modifiedYarnArgs=$(echo "$originalYarnArgs" | sed 's/--ignore-platform//g')
+
+            # Install dependencies
+            yarn install ${modifiedYarnArgs}
+
+            # Run checks
             yarn check-types
             yarn lint
             yarn test

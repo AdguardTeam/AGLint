@@ -5,7 +5,7 @@ plan:
   key: AGLINTBUILD
   name: aglint - build release
 variables:
-  dockerNode: adguard/node-ssh:18.13--0
+  dockerNode: adguard/node-ssh:18.13--1
 
 stages:
   - Build:
@@ -29,17 +29,34 @@ Build:
         interpreter: SHELL
         scripts:
           - |-
-            set -x
             set -e
-            ls -al
+            set -x
 
-            # Install common dependencies
-            # swc core optional dependencies are needed for tests
-            # but `--ignore-optional` will not install them
-            # so we run `yarn install ${bamboo.varsYarn}` without `--ignore-optional`:
-            yarn install --silent --ignore-engines --ignore-platform --ignore-scripts
+            # Fix mixed logs
+            exec 2>&1
 
-            yarn build-txt
+            ls -laht
+
+            # Exclude '--ignore-platform' from yarn arguments to fix build
+            # This is needed for installing swc core optional dependencies properly
+            originalYarnArgs="$bamboo_varsYarn"
+            modifiedYarnArgs=$(echo "$originalYarnArgs" | sed 's/--ignore-platform//g')
+
+            # Install dependencies
+            yarn install ${modifiedYarnArgs}
+
+            # Run checks
+            yarn check-types
+            yarn lint
+            yarn test
+
+            # Create build, this will also create build.txt file with build number
+            yarn build
+
+            # Pack build into tarball
+            yarn pack --filename aglint.tgz
+
+            ls -laht
 
             rm -rf node_modules
     - inject-variables:
@@ -51,6 +68,11 @@ Build:
         configuration:
           selectedRepository: defaultRepository
           tagName: v${bamboo.inject.version}
+  artifacts:
+    - name: aglint.tgz
+      pattern: aglint.tgz
+      shared: true
+      required: true
   requirements:
     - adg-docker: true
 
@@ -68,6 +90,8 @@ notifications:
       - webhook:
           name: Build webhook
           url: http://prod.jirahub.service.eu.consul/v1/webhook/bamboo
+
 labels: []
+
 other:
   concurrent-build-plugin: system-default
