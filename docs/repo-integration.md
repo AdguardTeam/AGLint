@@ -12,6 +12,7 @@ Table of contents:
 - [6. Use Husky hooks (optional)](#use-hooks)
     - [Add pre-commit hook](#pre-commit)
     - [Add post-merge hook](#post-merge)
+    - [Add lint-staged (optional)](#lint-staged)
 
 If you have a GitHub repository for adblock filters, you can integrate AGLint to your repository. In this document,
 we'll help you to do that.
@@ -264,8 +265,39 @@ If one of them is changed, it will run `npm install` to sync your dependencies, 
 > To make the hook work in Unix-like operating systems you may need to run
 > `chmod ug+x .husky/post-merge`.
 
+### <a name="lint-staged"></a> Add lint-staged (optional)
+
+In most cases, you don't need to lint all files in your repository in the `pre-commit` hook.
+You can lint only staged files that are going to be committed.
+
+To do that, you can use [lint-staged] package. You can install it by running the following command:
+
+```bash
+npm install -D lint-staged
+```
+
+After that, add the following content to your `package.json` file:
+
+```json
+"lint-staged": {
+  "*.txt": "aglint"
+}
+```
+
+(or simply run `npm pkg set lint-staged='{"*.txt": "aglint"}' --json`)
+
+This will tell lint-staged to run AGLint on all staged `.txt` files.
+You can customize this to fit your needs according to [lint-staged documentation][lint-staged-config].
+
+Also, don't forget to update your `pre-commit` hook to run `lint-staged` instead of `npm run lint`:
+
+```bash
+npx husky set .husky/pre-commit "npx lint-staged"
+```
 
 [git]: https://git-scm.com/
 [github-actions-docs]: https://docs.github.com/en/actions
 [husky]: https://www.npmjs.com/package/husky
+[lint-staged-config]: https://github.com/lint-staged/lint-staged#configuration
+[lint-staged]: https://www.npmjs.com/package/lint-staged
 [nodejs]: https://nodejs.org/en/
