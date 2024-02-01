@@ -100,6 +100,7 @@
         "ignore": "^5.2.4",
         "inflection": "^2.0.1",
         "js-yaml": "^4.1.0",
+        "regexp-tree": "^0.1.27",
         "strip-ansi": "6.0.1",
         "superstruct": "^1.0.3",
         "terminal-link": "2.1.1",
