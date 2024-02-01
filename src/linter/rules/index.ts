@@ -10,6 +10,7 @@ import { InconsistentHintPlatforms } from './inconsistent-hint-platforms';
 import { SingleSelector } from './single-selector';
 import { UnknownPreProcessorDirectives } from './unknown-preprocessor-directives';
 import { NoShortRules } from './no-short-rules';
+import { NoInvalidNetworkRulePattern } from './no-invalid-network-rule-pattern';
 
 export const defaultLinterRules = new Map<string, AnyLinterRule>([
     ['if-closed', IfClosed],
@@ -23,4 +24,5 @@ export const defaultLinterRules = new Map<string, AnyLinterRule>([
     ['invalid-modifiers', InvalidModifiers],
     ['inconsistent-hint-platforms', InconsistentHintPlatforms],
     ['no-short-rules', NoShortRules],
+    ['no-invalid-network-rule-pattern', NoInvalidNetworkRulePattern],
 ]);
