@@ -22,6 +22,7 @@ describe('no-invalid-network-rule-pattern', () => {
             '|example.com',
             'example.com|',
             '||example.com^$script,third-party',
+            '@@||example.com^$script', // exception rule
             '/[a-z]+-ads/$script', // valid regex
         ])("'%s'", (rule) => {
             expect(linter.lint(rule)).toMatchObject({ problems: [] });
