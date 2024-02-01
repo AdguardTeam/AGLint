@@ -55,7 +55,7 @@ export const NoInvalidNetworkRulePattern: LinterRule = {
                 }
 
                 // iterate over the pattern and check for invalid characters
-                while (i < end) {
+                while (i <= end) {
                     if (pattern[i] === PIPE) {
                         context.report({
                             message: 'Unexpected pipe character',
