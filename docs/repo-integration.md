@@ -12,6 +12,7 @@ Table of contents:
 - [6. Use Husky hooks (optional)](#use-hooks)
     - [Add pre-commit hook](#pre-commit)
     - [Add post-merge hook](#post-merge)
+    - [Do not run Husky hooks in CI](#no-husky-in-ci)
     - [Add lint-staged (optional)](#lint-staged)
 
 If you have a GitHub repository for adblock filters, you can integrate AGLint to your repository. In this document,
@@ -170,6 +171,10 @@ You can check the [GitHub Actions documentation][github-actions-docs] for more i
 
 ## <a name="use-hooks"></a> 6. Use Husky hooks (optional)
 
+> [!NOTE]
+> This step is optional. You can skip this step if you don't want to use Husky hooks.
+> Our guide written for Husky 9.
+
 If you want to check commits automatically, you can add AGLint to your pre-commit hook. This will run AGLint before each
 commit and will prevent you from committing if the linter found any errors. To do that, you can install [Husky][husky]
 with the following command:
@@ -180,34 +185,31 @@ npm install -D husky
 
 (`-D` is a shortcut for `--save-dev`, which will add Husky to `package.json` file under `devDependencies` section.)
 
-After installing Husky dependency, you'll need to add a `prepare` script to your `package.json` file by running the
-following command:
+After installing Husky, you'll need to initialize it by running the following command:
 
 ```bash
-npm pkg set scripts.prepare="husky install"
+npx husky init
 ```
 
-This will install Husky when you run `npm install` after re-cloning the repository, but for now you'll need to run the
-following command to install Husky:
+This will create a `.husky` directory in your repository directory and will add a `prepare` script to your
+`package.json` file.
+
+You only need to run `npx husky init` once, when you install Husky for the first time. If you clone the repository,
+**you don't need to run `npx husky init` again**. After installing dependencies, `prepare` script will set up Husky
+automatically.
+
+### <a name="pre-commit"></a> Set up pre-commit hook
+
+Husky already added a `pre-commit` hook to your `.husky` directory, but you need to change its content to run AGLint.
+
+To do that, run the following command:
 
 ```bash
-npm run prepare
-```
-
-### <a name="pre-commit"></a> Add pre-commit hook
-
-You can add AGLint to your pre-commit hook by running the following commands:
-
-```bash
-npx husky add .husky/pre-commit "npm run lint"
-git add .husky/pre-commit
+echo npx aglint > .husky/pre-commit
 ```
 
 Now AGLint will run before each commit and will prevent you from committing if AGLint found any errors, but you can skip
 AGLint by adding `--no-verify` to your commit command.
-
-Next time you clone the repository, you'll only need to run `npm install` and it will install Husky automatically,
-because it automatically runs `prepare` script after installing dependencies.
 
 > [!NOTE]
 > To make the hook work in Unix-like operating systems you may need to run
@@ -227,18 +229,9 @@ dependencies in `node_modules` directory, so you need to run `npm install` to sy
 If you use Husky hooks, you can add a `post-merge` hook to automatically sync your dependencies after each merge.
 This hook will run when you pull changes from the remote repository.
 
-To add the `post-merge` hook run the following command:
+Create a file named `post-merge` in the `.husky` directory with the following content:
 
 ```bash
-npx husky add .husky/post-merge
-```
-
-After that, add the following content to your `.husky/post-merge` file:
-
-```bash
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # See https://git-scm.com/docs/githooks#_post_merge
 
 # This function checks if a file has changed between the current HEAD and the previous HEAD
@@ -258,12 +251,40 @@ if changed "package.json" || changed "package-lock.json"; then
 fi
 ```
 
-This script will check if `package.json` or `package-lock.json` is changed between the old HEAD and the new HEAD.
+This script will check if `package.json` or `package-lock.json` is changed between the old HEAD and the new HEAD
+when you pull changes from the remote repository.
 If one of them is changed, it will run `npm install` to sync your dependencies, so you don't need to do that manually.
+
+This is an useful hook, because it guarantees that no one will forget to sync their dependencies and helps to prevent
+issues or inconsistencies caused by outdated dependencies.
 
 > [!NOTE]
 > To make the hook work in Unix-like operating systems you may need to run
 > `chmod ug+x .husky/post-merge`.
+
+### <a name="no-husky-in-ci"></a> Do not run Husky hooks in CI
+
+It is pointless to run Husky hooks in CI, because CI will run AGLint anyway.
+To prevent Husky hooks from running in CI, follow these steps:
+
+1. Create a file named `install.mjs` in the `.husky` directory with the following content:
+    ```js
+    // See: https://typicode.github.io/husky/how-to.html#ci-server-and-docker
+
+    // Do not initialize Husky in CI environments. GitHub Actions set the CI env variable automatically.
+    // See: https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+    if (process.env.CI === 'true') {
+        process.exit(0);
+    }
+
+    // Initialize Husky programmatically.
+    const husky = (await import('husky')).default;
+    console.log(husky());
+    ```
+2. Update `prepare` script in your `package.json` file to run `.husky/install.mjs` instead of calling `husky` command:
+    ```shell
+    npm pkg set scripts.prepare="node .husky/install.mjs"
+    ```
 
 ### <a name="lint-staged"></a> Add lint-staged (optional)
 
@@ -292,7 +313,7 @@ You can customize this to fit your needs according to [lint-staged documentation
 Also, don't forget to update your `pre-commit` hook to run `lint-staged` instead of `npm run lint`:
 
 ```bash
-npx husky set .husky/pre-commit "npx lint-staged"
+echo npx lint-staged > .husky/pre-commit
 ```
 
 [git]: https://git-scm.com/
