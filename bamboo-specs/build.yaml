@@ -57,8 +57,6 @@ Build:
             yarn pack --filename aglint.tgz
 
             ls -laht
-
-            rm -rf node_modules
     - inject-variables:
         file: dist/build.txt
         scope: RESULT
@@ -68,6 +66,22 @@ Build:
         configuration:
           selectedRepository: defaultRepository
           tagName: v${bamboo.inject.version}
+  final-tasks:
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            set -x
+            set -e
+
+            # Fix mixed logs
+            exec 2>&1
+
+            ls -la
+
+            echo "Size before cleanup:" && du -h | tail -n 1
+            rm -rf node_modules
+            echo "Size after cleanup:" && du -h | tail -n 1
   artifacts:
     - name: aglint.tgz
       pattern: aglint.tgz
