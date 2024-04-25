@@ -24,7 +24,7 @@ describe('parseConfigFile', () => {
             `Failed to parse config file "${path.join(
                 base,
                 'invalid-json.json',
-            )}": Unexpected token / in JSON at position 7`,
+            )}":`,
         );
 
         await expect(parseConfigFile(path.join(base, 'aglint.config.yaml'))).rejects.toThrowError();

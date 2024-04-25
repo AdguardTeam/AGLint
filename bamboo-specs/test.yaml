@@ -5,7 +5,7 @@ plan:
   key: AGLINTTEST
   name: aglint - tests
 variables:
-  dockerNode: adguard/node-ssh:18.13--1
+  dockerNode: adguard/node-ssh:21.7--1
 
 stages:
   - Build:
@@ -17,9 +17,9 @@ stages:
 Build:
   key: BUILD
   docker:
-    image: "${bamboo.dockerNode}"
+    image: '${bamboo.dockerNode}'
     volumes:
-      ${system.YARN_DIR}: "${bamboo.cacheYarn}"
+      ${system.YARN_DIR}: '${bamboo.cacheYarn}'
   tasks:
     - checkout:
         force-clean-build: true
