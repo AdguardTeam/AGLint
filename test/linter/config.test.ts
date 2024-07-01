@@ -1,5 +1,7 @@
 import { assert } from 'superstruct';
+import Ajv from 'ajv';
 
+import linterConfigJsonSchema from '../../src/linter/aglintrc-json-schema.json';
 import { linterConfigSchema, mergeConfigs } from '../../src/linter/config';
 
 describe('Linter config', () => {
@@ -84,15 +86,30 @@ describe('Linter config', () => {
         });
     });
 
-    test('check custom Superstruct validation', () => {
+    const assertSuperStruct = (value: unknown) => {
+        assert(value, linterConfigSchema);
+    };
+    const assertJsonSchema = (value: unknown): void => {
+        const ajv = new Ajv({ strictTuples: false });
+        const validate = ajv.compile(linterConfigJsonSchema);
+        const valid = validate(value);
+        if (!valid) {
+            throw new Error(`json schema validation failed: ${JSON.stringify(validate.errors, null, 2)}`);
+        }
+    };
+
+    test.each([
+        { assertFunc: assertSuperStruct, validatorType: 'Superstruct' },
+        { assertFunc: assertJsonSchema, validatorType: 'JSON schema' },
+    ])('check custom $validatorType validation', ({ assertFunc }) => {
         // Valid cases
-        expect(() => assert({}, linterConfigSchema)).not.toThrowError();
+        expect(() => assertFunc({})).not.toThrowError();
 
-        expect(() => assert({ allowInlineConfig: true }, linterConfigSchema)).not.toThrowError();
-        expect(() => assert({ allowInlineConfig: false }, linterConfigSchema)).not.toThrowError();
+        expect(() => assertFunc({ allowInlineConfig: true })).not.toThrowError();
+        expect(() => assertFunc({ allowInlineConfig: false })).not.toThrowError();
 
-        expect(() => assert({ rules: {} }, linterConfigSchema)).not.toThrowError();
-        expect(() => assert(
+        expect(() => assertFunc({ rules: {} })).not.toThrowError();
+        expect(() => assertFunc(
             {
                 rules: {
                     'rule-1': 'off',
@@ -101,20 +118,18 @@ describe('Linter config', () => {
                     'rule-4': ['error', { a: 'b', c: [{ d: 1, e: '2' }] }, 'aaa', NaN],
                 },
             },
-            linterConfigSchema,
         )).not.toThrowError();
 
         // Invalid cases
-        expect(() => assert(null, linterConfigSchema)).toThrowError();
+        expect(() => assertFunc(null)).toThrowError();
 
-        expect(() => assert({ allowInlineConfig: 'a' }, linterConfigSchema)).toThrowError();
-        expect(() => assert({ allowInlineConfig: 2 }, linterConfigSchema)).toThrowError();
+        expect(() => assertFunc({ allowInlineConfig: 'a' })).toThrowError();
+        expect(() => assertFunc({ allowInlineConfig: 2 })).toThrowError();
 
-        expect(() => assert(
+        expect(() => assertFunc(
             {
                 rules: 'aaa',
             },
-            linterConfigSchema,
         )).toThrowError();
     });
 });
