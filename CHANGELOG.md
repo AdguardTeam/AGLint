@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.0.10] - 2024-09-04
+
+### Added
+
+- `no-excluded-rules` linter rule [#214].
+
+[#214]: https://github.com/AdguardTeam/AGLint/issues/214
+[2.0.10]: https://github.com/AdguardTeam/AGLint/compare/v2.0.9...v2.0.10
+
 ## [2.0.9] - 2024-04-25
 
 ### Fixed

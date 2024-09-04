@@ -62,6 +62,7 @@ Table of Contents:
     - [`invalid-modifiers`](#invalid-modifiers)
     - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
     - [`no-short-rules`](#no-short-rules)
+    - [`no-excluded-rules`](#no-excluded-rules)
 - [Compatibility](#compatibility)
 - [Use programmatically](#use-programmatically)
 - [Development \& Contribution](#development--contribution)
@@ -776,7 +777,6 @@ hint, but excluded in the `NOT_PLATFORM` hint at the same time (or vice versa).
 Check if the rule length is less than the specified minimum threshold value, i.e. if the rule is too short.
 
 - **Severity:** `error` (2)
-- **Options:** none
 - **Fixable:** no
 - **Options:**
     - `minLength` — minimum rule length (default: `4`)
@@ -801,6 +801,37 @@ Check if the rule length is less than the specified minimum threshold value, i.e
   ! This rule is too short because it's length is less than 10 characters
   ! aglint "no-short-rules": ["error", { minLength: 10 }]
   a$script
+  ```
+
+### `no-excluded-rules`
+
+Check if a rule is excluded. With this linter rule, we can "ban" certain patterns from the filter lists.
+Requested in https://github.com/AdguardTeam/AGLint/issues/214
+
+- **Severity:** `error` (2)
+- **Fixable:** planned
+- **Options:**
+    - `regexp-patterns` — an array of regular expressions that will be used to check the rules
+- **Example:**
+  If you add `example\.com\/bad\/query\/` to the `regexp-patterns` option and run the linter with the following content:
+  ```adblock
+  example.com/good/query/
+  ! The following rule is excluded
+  example.com/bad/query/
+  example.com/another-not-bad/query/
+  ```
+  the linter will report an error:
+  ```txt
+    3:0  error  Rule matches an excluded pattern: /example\.com\/bad\/query\//
+  ```
+  since the `example.com/bad/query/` rule is excluded in your configuration file:
+  ```yaml
+  rules:
+    no-excluded-rules:
+      - error
+      - regexp-patterns:
+          # Do not forget to escape special regex characters
+          - example\.com\/bad\/query\/
   ```
 
 ## Compatibility
