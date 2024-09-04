@@ -1,4 +1,9 @@
-import ss from 'superstruct';
+import {
+    array,
+    object,
+    string,
+    type Struct,
+} from 'superstruct';
 
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
@@ -38,9 +43,9 @@ export const NoExcludedRules: LinterRule<RuleStorage, RuleConfig> = {
             },
 
             // Define the schema of the config
-            schema: ss.object({
-                'regexp-patterns': ss.array(ss.string()),
-            }) as ss.Struct,
+            schema: object({
+                'regexp-patterns': array(string()),
+            }) as Struct,
         },
     },
     // Define the events that the rule will listen to

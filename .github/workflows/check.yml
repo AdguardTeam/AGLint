@@ -42,6 +42,9 @@ jobs:
       - name: Run Jest tests
         run: yarn test
 
+      - name: Build should be successful
+        run: yarn build
+
   notify:
     name: Send Slack notification on failure
     needs: check_code

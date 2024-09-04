@@ -47,6 +47,9 @@ Build:
             yarn check-types
             yarn lint
             yarn test
+
+            # Build should be successful
+            yarn build
   final-tasks:
     - script:
         interpreter: SHELL
@@ -61,7 +64,7 @@ Build:
             ls -la
 
             echo "Size before cleanup:" && du -h | tail -n 1
-            rm -rf node_modules
+            rm -rf node_modules dist
             echo "Size after cleanup:" && du -h | tail -n 1
   requirements:
     - adg-docker: true
