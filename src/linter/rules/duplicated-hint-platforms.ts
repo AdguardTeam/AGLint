@@ -37,6 +37,10 @@ export const DuplicatedHintPlatforms: LinterRule = {
 
                     // Iterate over all platforms within the hint
                     for (const param of hint.params.children) {
+                        if (!param) {
+                            continue;
+                        }
+
                         const platform = param.value;
                         const platformToLowerCase = platform.toLowerCase();
 

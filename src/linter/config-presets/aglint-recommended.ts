@@ -10,6 +10,8 @@ import { type LinterConfig } from '../common';
 const config: LinterConfig = {
     syntax: [AdblockSyntax.Common],
     rules: {
+        'no-invalid-css-syntax': 'error',
+        'no-invalid-css-declaration': 'error',
         'duplicated-hint-platforms': 'error',
         'duplicated-hints': 'error',
         'duplicated-modifiers': 'error',

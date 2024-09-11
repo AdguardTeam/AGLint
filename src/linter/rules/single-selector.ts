@@ -1,8 +1,12 @@
 import cloneDeep from 'clone-deep';
 import { CosmeticRuleType, RuleCategory } from '@adguard/agtree';
+import { type Selector } from '@adguard/ecss-tree';
 
 import { type LinterProblemReport, type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
+import { isNull } from '../../utils/type-guards';
+import { CssTreeParsingContext } from '../helpers/css-tree-types';
+import { generateSelector } from '../helpers/css-generate';
 
 /**
  * Rule that checks if a cosmetic rule contains multiple selectors
@@ -18,8 +22,15 @@ export const SingleSelector: LinterRule = {
 
             // Check if the rule is an element hiding rule
             if (ast.category === RuleCategory.Cosmetic && ast.type === CosmeticRuleType.ElementHidingRule) {
+                const rawSelectorList = ast.body.selectorList;
+                const selectorListNode = context.getCssNode(rawSelectorList, CssTreeParsingContext.SelectorList);
+
+                if (isNull(selectorListNode)) {
+                    return;
+                }
+
                 // Only makes sense to check this, if there are at least two selectors within the rule
-                if (ast.body.selectorList.children.length < 2) {
+                if (selectorListNode.children.size < 2) {
                     return;
                 }
 
@@ -35,13 +46,13 @@ export const SingleSelector: LinterRule = {
                     report.fix = [];
 
                     // Iterate over all selectors in the current rule
-                    for (const selector of ast.body.selectorList.children) {
+                    for (const selector of selectorListNode.children) {
                         // Create a new rule with the same properties as the current rule.
                         const clone = cloneDeep(ast);
 
                         // Replace the selector list with a new selector list containing only
                         // the currently iterated selector
-                        clone.body.selectorList.children = [selector];
+                        clone.body.selectorList.value = generateSelector(selector as Selector);
 
                         // The only difference is that the new rule only contains one selector,
                         // which has the currently iterated selector in its body.

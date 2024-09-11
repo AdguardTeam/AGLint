@@ -10,7 +10,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import externals from 'rollup-plugin-node-externals';
 import dtsPlugin from 'rollup-plugin-dts';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
-import alias from '@rollup/plugin-alias';
 import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
@@ -72,32 +71,24 @@ const typeScriptPlugin = typescript({
 const commonPlugins = [
     json({ preferConst: true }),
     commonjs({ sourceMap: false }),
-    resolve({ preferBuiltins: false }),
     typeScriptPlugin,
 ];
 
 // Plugins for Node.js builds
 const nodePlugins = [
     ...commonPlugins,
+    resolve({ preferBuiltins: false }),
     externals(),
 ];
 
 // Plugins for browser builds
 const browserPlugins = [
     ...commonPlugins,
-    nodePolyfills(),
-    // The build of CSSTree is a bit complicated (patches, require "emulation", etc.),
-    // so here we only specify the pre-built version by an alias
-    alias({
-        entries: [
-            {
-                find: '@adguard/ecss-tree',
-                replacement: path.join(
-                    'node_modules/@adguard/ecss-tree/dist/ecsstree.umd.min.js',
-                ),
-            },
-        ],
+    resolve({
+        browser: true,
+        preferBuiltins: false,
     }),
+    nodePolyfills(),
     // Provide better browser compatibility with Babel
     getBabelOutputPlugin({
         presets: [
@@ -139,7 +130,7 @@ const cjs = {
     input: path.join(ROOT_DIR, 'src', 'index.node.ts'),
     output: [
         {
-            file: path.join(distDirLocation, `${BASE_FILE_NAME}.cjs`),
+            file: path.join(distDirLocation, `${BASE_FILE_NAME}.js`),
             format: 'cjs',
             exports: 'auto',
             sourcemap: false,
@@ -154,7 +145,10 @@ const cjs = {
                 [
                     '@babel/preset-env',
                     {
-                        targets: 'node >= 14',
+                        // at least Node.js 17
+                        targets: {
+                            node: '17',
+                        },
                     },
                 ],
             ],
@@ -169,7 +163,7 @@ const esm = {
     input: path.join(ROOT_DIR, 'src', 'index.node.ts'),
     output: [
         {
-            file: path.join(distDirLocation, `${BASE_FILE_NAME}.esm.js`),
+            file: path.join(distDirLocation, `${BASE_FILE_NAME}.esm.mjs`),
             format: 'esm',
             sourcemap: false,
             banner: BANNER,
@@ -192,11 +186,11 @@ const cli = {
     output: [
         {
             file: path.join(distDirLocation, `${BASE_FILE_NAME}.cli.js`),
-            format: 'esm',
+            format: 'cjs',
             sourcemap: false,
             // Replace import './index.node' with './aglint.esm.js'
             paths: {
-                [linterIndex]: path.join('./', `${BASE_FILE_NAME}.esm.js`),
+                [linterIndex]: path.join('./', `${BASE_FILE_NAME}.js`),
             },
             banner: `${SHEBANG}\n${BANNER}`,
         },

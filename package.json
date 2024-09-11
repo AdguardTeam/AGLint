@@ -1,6 +1,6 @@
 {
     "name": "@adguard/aglint",
-    "version": "2.0.10",
+    "version": "2.1.0",
     "description": "Universal adblock filter list linter.",
     "keywords": [
         "adblock",
@@ -20,18 +20,25 @@
         "url": "https://github.com/AdguardTeam/AGLint/issues"
     },
     "homepage": "https://github.com/AdguardTeam/AGLint#readme",
-    "type": "module",
-    "main": "dist/aglint.cjs",
-    "module": "dist/aglint.esm.js",
-    "browser": "dist/aglint.umd.min.js",
+    "main": "dist/aglint.js",
+    "module": "dist/aglint.esm.mjs",
     "types": "dist/aglint.d.ts",
     "bin": "dist/aglint.cli.js",
+    "exports": {
+        ".": {
+            "types": "./dist/aglint.d.ts",
+            "import": "./dist/aglint.esm.mjs",
+            "require": "./dist/aglint.js"
+        },
+        "./es": "./dist/aglint.esm.mjs",
+        "./iife": "./dist/aglint.iife.min.js",
+        "./umd": "./dist/aglint.umd.min.js"
+    },
     "files": [
-        "dist",
-        "src"
+        "dist"
     ],
     "engines": {
-        "node": ">=14"
+        "node": ">=17"
     },
     "scripts": {
         "build": "yarn clean && yarn build-txt && yarn build-types && yarn rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && yarn clean-types",
@@ -41,7 +48,7 @@
         "clean": "rimraf dist",
         "clean-types": "rimraf dist/types",
         "coverage": "jest --coverage",
-        "lint": "yarn lint:ts && yarn lint:md",
+        "lint": "yarn check-types && yarn lint:ts && yarn lint:md",
         "lint:md": "markdownlint .",
         "lint:ts": "eslint . --cache --ext .ts",
         "prepare": "node .husky/install.mjs",
@@ -51,11 +58,10 @@
     "devDependencies": {
         "@babel/core": "^7.22.5",
         "@babel/preset-env": "^7.22.5",
-        "@rollup/plugin-alias": "^5.0.0",
         "@rollup/plugin-babel": "^6.0.3",
         "@rollup/plugin-commonjs": "^25.0.2",
         "@rollup/plugin-json": "^6.0.0",
-        "@rollup/plugin-node-resolve": "^15.1.0",
+        "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-terser": "^0.4.3",
         "@rollup/plugin-typescript": "^11.1.1",
         "@swc/core": "^1.3.74",
@@ -89,7 +95,8 @@
         "typescript": "^4.9.5"
     },
     "dependencies": {
-        "@adguard/agtree": "^1.1.8",
+        "@adguard/agtree": "^2.0.2",
+        "@adguard/ecss-tree": "^1.1.0",
         "@inquirer/checkbox": "^1.3.7",
         "@inquirer/select": "^1.2.7",
         "chalk": "4.1.2",

@@ -57,6 +57,10 @@ export const UnknownHintsAndPlatforms: LinterRule = {
                             });
                         } else {
                             for (const param of hint.params.children) {
+                                if (!param) {
+                                    continue;
+                                }
+
                                 // Check if the platform is known (case sensitive)
                                 if (!KNOWN_PLATFORMS.has(param.value)) {
                                     context.report({

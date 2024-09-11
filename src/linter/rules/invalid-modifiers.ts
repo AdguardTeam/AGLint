@@ -1,4 +1,4 @@
-import { RuleCategory, modifierValidator } from '@adguard/agtree';
+import { NetworkRuleType, RuleCategory, modifierValidator } from '@adguard/agtree';
 
 import { SEVERITY } from '../severity';
 import type { LinterRule, SpecificRuleContext } from '../common';
@@ -15,7 +15,7 @@ export const InvalidModifiers: LinterRule = {
             // Get actually iterated adblock rule
             const ast = context.getActualAdblockRuleAst();
 
-            if (ast.category === RuleCategory.Network) {
+            if (ast.category === RuleCategory.Network && ast.type === NetworkRuleType.NetworkRule) {
                 // get lint of syntaxes to validate modifiers for
                 const validateSyntax = context.getLinterConfig().syntax;
 

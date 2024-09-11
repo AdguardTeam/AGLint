@@ -181,7 +181,7 @@ describe('invalid-modifiers', () => {
                 expected: {
                     rule: 'invalid-modifiers',
                     severity: 2,
-                    message: 'Empty value specified in the list',
+                    message: 'Value list cannot start with a separator',
                     position: {
                         startColumn: 15,
                         endColumn: 31,

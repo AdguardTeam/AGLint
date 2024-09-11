@@ -8,6 +8,33 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.1.0] - 2024-09-11
+
+### Added
+
+- Various CSSTree utilities.
+- [`@adguard/ecss-tree`][ecss-tree] library to work with CSS and Extended CSS syntax.
+- `no-invalid-css-syntax` linter rule to check CSS syntax in `adblock` rules.
+- `no-invalid-css-declaration` linter rule to check valid CSS declarations in `adblock` rules.
+
+### Changed
+
+- Since AGTree v2 no longer parses the full CSS syntax as AGTree v1 did,
+  we now use the [@adguard/ecss-tree][ecss-tree] library to maintain the same functionality.
+  Additionally, we provide a special layer for CSS handling in the linter core.
+- More semantic parsing error messages.
+- Changed module type to CJS.
+- Updated [@adguard/agtree] to `v2.0.2` [#215]. From this major version, AGTree no longer parses all CSS syntax,
+  so we need to use a separate library for this purpose in the linter.
+
+### Fixed
+
+- Improved exports in `package.json`.
+
+[#215]: https://github.com/AdguardTeam/AGLint/issues/215
+[ecss-tree]: https://github.com/AdguardTeam/ecsstree
+[2.1.0]: https://github.com/AdguardTeam/AGLint/compare/v2.0.10...v2.1.0
+
 ## [2.0.10] - 2024-09-04
 
 ### Added

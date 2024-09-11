@@ -89,8 +89,8 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                severity: 3,
-                                message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
+                                severity: 2,
+                                message: 'Cannot parse CSS due to the following error: Name is expected',
                                 position: {
                                     startLine: 2,
                                     startColumn: 14,
@@ -100,8 +100,8 @@ describe('CLI tests', () => {
                             },
                         ],
                         warningCount: 0,
-                        errorCount: 0,
-                        fatalErrorCount: 1,
+                        errorCount: 1,
+                        fatalErrorCount: 0,
                     },
                 },
             ],
@@ -115,7 +115,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,
@@ -153,7 +153,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,
@@ -164,7 +164,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 6,
                                     startColumn: 25,
@@ -230,8 +230,8 @@ describe('CLI tests', () => {
                     result: {
                         problems: [
                             {
-                                severity: 3,
-                                message: "AGLint parsing error: ECSSTree parsing error: 'Name is expected'",
+                                severity: 2,
+                                message: 'Cannot parse CSS due to the following error: Name is expected',
                                 position: {
                                     startLine: 2,
                                     startColumn: 14,
@@ -241,8 +241,8 @@ describe('CLI tests', () => {
                             },
                         ],
                         warningCount: 0,
-                        errorCount: 0,
-                        fatalErrorCount: 1,
+                        errorCount: 1,
+                        fatalErrorCount: 0,
                     },
                 },
             ],
@@ -256,7 +256,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,
@@ -281,7 +281,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,
@@ -319,7 +319,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,
@@ -330,7 +330,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 6,
                                     startColumn: 25,
@@ -422,7 +422,7 @@ describe('CLI tests', () => {
                             {
                                 severity: 3,
                                 // eslint-disable-next-line max-len
-                                message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                                message: "Cannot parse adblock rule due to the following error: Invalid ADG scriptlet call, no closing parentheses ')' found",
                                 position: {
                                     startLine: 2,
                                     startColumn: 25,

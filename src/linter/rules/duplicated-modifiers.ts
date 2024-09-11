@@ -26,7 +26,7 @@ export const DuplicatedModifiers: LinterRule = {
                 }
 
                 for (const modifier of ast.modifiers.children) {
-                    const name = modifier.modifier.value;
+                    const name = modifier.name.value;
                     const nameToLowerCase = name.toLowerCase();
 
                     if (!occurred.has(nameToLowerCase)) {

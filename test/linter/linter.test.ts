@@ -869,7 +869,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 5,
                         startColumn: 16,
@@ -893,7 +893,6 @@ describe('Linter', () => {
                     'example.com##+js(aopr, test', // Missing closing bracket
                     'example.com##+jsaopr, test)', // Missing opening bracket
                     'example.com##+js...', // Invalid scriptlet rule, missing opening bracket
-                    'example.com#$#body { padding 2px !important; }', // Invalid CSS rule (missing : after padding)
                     '! comment',
                     '||example.net^$third-party',
                 ].join(NEWLINE),
@@ -903,7 +902,7 @@ describe('Linter', () => {
                 {
                     severity: 3,
                     // eslint-disable-next-line max-len
-                    message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                    message: "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 4,
                         startColumn: 16,
@@ -914,7 +913,7 @@ describe('Linter', () => {
                 {
                     severity: 3,
                     // eslint-disable-next-line max-len
-                    message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
+                    message: "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no opening parentheses '(' found",
                     position: {
                         startLine: 5,
                         startColumn: 16,
@@ -925,7 +924,7 @@ describe('Linter', () => {
                 {
                     severity: 3,
                     // eslint-disable-next-line max-len
-                    message: "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no opening parentheses '(' found",
+                    message: "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no opening parentheses '(' found",
                     position: {
                         startLine: 6,
                         startColumn: 16,
@@ -933,21 +932,10 @@ describe('Linter', () => {
                         endColumn: 19,
                     },
                 },
-                {
-                    severity: 3,
-                    // eslint-disable-next-line max-len
-                    message: "AGLint parsing error: Invalid rule block, expected a declaration but got 'Raw' instead",
-                    position: {
-                        startLine: 7,
-                        startColumn: 21,
-                        endLine: 7,
-                        endColumn: 44,
-                    },
-                },
             ],
             warningCount: 0,
             errorCount: 0,
-            fatalErrorCount: 4,
+            fatalErrorCount: 3,
         });
     });
 
@@ -1235,7 +1223,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 6,
                         startColumn: 16,
@@ -1266,7 +1254,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 6,
                         startColumn: 16,
@@ -1361,7 +1349,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 7,
                         startColumn: 16,
@@ -1373,7 +1361,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 8,
                         startColumn: 16,
@@ -1416,7 +1404,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 10,
                         startColumn: 15,
@@ -1428,7 +1416,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 11,
                         startColumn: 15,
@@ -1440,7 +1428,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 17,
                         startColumn: 15,
@@ -1477,7 +1465,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 7,
                         startColumn: 16,
@@ -1489,7 +1477,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 10,
                         startColumn: 16,
@@ -1501,7 +1489,7 @@ describe('Linter', () => {
                     severity: SEVERITY.fatal,
                     message:
                         // eslint-disable-next-line max-len
-                        "AGLint parsing error: Invalid AdGuard/uBlock scriptlet call, no closing parentheses ')' found",
+                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
                     position: {
                         startLine: 11,
                         startColumn: 16,

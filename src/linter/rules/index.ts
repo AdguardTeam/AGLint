@@ -11,8 +11,12 @@ import { SingleSelector } from './single-selector';
 import { UnknownPreProcessorDirectives } from './unknown-preprocessor-directives';
 import { NoShortRules } from './no-short-rules';
 import { NoExcludedRules } from './no-excluded-rules';
+import { NoInvalidCssSyntax } from './no-invalid-css-syntax';
+import { NoInvalidCssDeclaration } from './no-invalid-css-declaration';
 
 export const defaultLinterRules = new Map<string, AnyLinterRule>([
+    ['no-invalid-css-syntax', NoInvalidCssSyntax],
+    ['no-invalid-css-declaration', NoInvalidCssDeclaration],
     ['if-closed', IfClosed],
     ['single-selector', SingleSelector],
     ['duplicated-modifiers', DuplicatedModifiers],

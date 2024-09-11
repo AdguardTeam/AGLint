@@ -1,7 +1,13 @@
 import { type Struct } from 'superstruct';
-import { type AdblockSyntax, type AnyRule, type Node } from '@adguard/agtree';
+import {
+    type Value,
+    type AdblockSyntax,
+    type AnyRule,
+    type Node,
+} from '@adguard/agtree';
 
 import { type AnySeverity } from './severity';
+import { type CssTreeParsingContext, type CssTreeParsingContextToNode } from './helpers/css-tree-types';
 
 /**
  * Represents any linter rule
@@ -147,6 +153,19 @@ export interface LinterConfig {
 }
 
 /**
+ * Type definition for the linter rule context getter function.
+ *
+ * @param rawValueNode The raw value node.
+ * @param context The context, see {@link CssTreeParsingContext}.
+ *
+ * @returns The CSS node or `null` if the CSS could not be parsed.
+ */
+type CssNodeGetter = <T extends CssTreeParsingContext>(
+    rawValueNode: Value<string>,
+    context: T
+) => CssTreeParsingContextToNode[T] | null;
+
+/**
  * Represents a linter context that is passed to the rules when their events are triggered
  */
 export interface GenericRuleContext<StorageType = LinterRuleStorage<unknown>, ConfigType = unknown> {
@@ -189,6 +208,21 @@ export interface GenericRuleContext<StorageType = LinterRuleStorage<unknown>, Co
      * @param problem - The problem to report
      */
     report: (problem: LinterProblemReport) => void;
+
+    /**
+     * Returns the CSS node for the given raw value node and context.
+     *
+     * @param rawValueNode - The raw value node
+     * @param context - The context, see {@link CssTreeParsingContext}.
+     * For more information, please check https://github.com/csstree/csstree/blob/master/docs/parsing.md#context
+     *
+     * @returns The CSS node or `null` if the CSS could not be parsed
+     *
+     * @note When you call this function from a rule and it cannot parse the CSS,
+     * it will automatically report a problem to the linter and marks your linter rule as the source.
+     * Reported problem will have the same severity as the rule.
+     */
+    getCssNode: CssNodeGetter;
 }
 
 /**
@@ -253,9 +287,25 @@ export interface LinterProblemReport {
     message: string;
 
     /**
-     * Node that caused the problem
+     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
      */
     node?: Node;
+
+    /**
+     * Relative start offset to the start of the node that caused the problem.
+     * Useful when you do not want to mark the whole node as problematic.
+     *
+     * @note Only takes effect when `node` is provided.
+     */
+    relativeNodeStartOffset?: number;
+
+    /**
+     * Relative start offset to the start of the node that caused the problem.
+     * Useful when you do not want to mark the whole node as problematic.
+     *
+     * @note Only takes effect when `node` is provided.
+     */
+    relativeNodeEndOffset?: number;
 
     /**
      * The location of the problem

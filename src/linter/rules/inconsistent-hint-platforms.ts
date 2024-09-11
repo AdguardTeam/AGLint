@@ -1,5 +1,5 @@
 import equal from 'fast-deep-equal';
-import { CommentRuleType, type Parameter, RuleCategory } from '@adguard/agtree';
+import { CommentRuleType, RuleCategory, type Value } from '@adguard/agtree';
 
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
@@ -27,14 +27,18 @@ export const InconsistentHintPlatforms: LinterRule = {
                 }
 
                 // Platforms targeted by a PLATFORM() hint
-                const platforms: Parameter[] = [];
+                const platforms: Value[] = [];
 
                 // Platforms excluded by a NOT_PLATFORM() hint
-                const notPlatforms: Parameter[] = [];
+                const notPlatforms: Value[] = [];
 
                 // Iterate over all hints within the hint comment rule
                 for (const hint of ast.children) {
                     for (const param of hint.params?.children ?? []) {
+                        if (!param) {
+                            continue;
+                        }
+
                         // Add actual platform (parameter) to the corresponding array
                         if (hint.name.value === PLATFORM) {
                             platforms.push(param);
@@ -46,29 +50,29 @@ export const InconsistentHintPlatforms: LinterRule = {
 
                 // Find platforms that are targeted by a PLATFORM() hint and excluded by a
                 // NOT_PLATFORM() hint at the same time, but take duplicates into account
-                const commonPlatforms: Parameter[] = [];
+                const commonPlatforms: Value[] = [];
 
                 for (const platform of platforms) {
                     for (const notPlatform of notPlatforms) {
                         if (platform.value === notPlatform.value) {
                             // Check if the platform is already in the array (loc property is unique
                             // and definietly exists, since we configured the parser to do so)
-                            if (!commonPlatforms.some((e) => equal(e.loc, platform.loc))) {
+                            if (!commonPlatforms.some((e) => equal(e.start, platform.start))) {
                                 commonPlatforms.push(platform);
                             }
 
-                            if (!commonPlatforms.some((e) => equal(e.loc, notPlatform.loc))) {
+                            if (!commonPlatforms.some((e) => equal(e.start, notPlatform.start))) {
                                 commonPlatforms.push(notPlatform);
                             }
                         }
                     }
                 }
 
-                // Sort platforms by their location (loc.start.offset) to get a consistent order
+                // Sort platforms by their location ("loc.start.offset") to get a consistent order
                 // It is safe to use the non-null assertion operator here, because the loc property
                 // is always defined for parameters, since we configured the parser to do so
                 // eslint-disable-next-line max-len, @typescript-eslint/no-non-null-assertion
-                const commonPlatformsOrdered = commonPlatforms.sort((a, b) => a.loc!.start.offset - b.loc!.start.offset);
+                const commonPlatformsOrdered = commonPlatforms.sort((a, b) => a.start! - b.start!);
 
                 // Report all platforms that are targeted by a PLATFORM() hint and excluded by a
                 // NOT_PLATFORM() hint at the same time

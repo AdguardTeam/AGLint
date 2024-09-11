@@ -2,6 +2,7 @@
  * @file AGLint core
  */
 
+import { type CssNode } from '@adguard/ecss-tree';
 import { assert } from 'superstruct';
 import cloneDeep from 'clone-deep';
 import {
@@ -11,6 +12,9 @@ import {
     type FilterList,
     FilterListParser,
     RuleCategory,
+    PositionProvider,
+    defaultParserOptions,
+    type Value,
 } from '@adguard/agtree';
 
 import {
@@ -40,6 +44,12 @@ import {
 } from './common';
 import { validateLinterConfig } from './config-validator';
 import { defaultConfigPresets } from './config-presets';
+import { isNull, isUndefined } from '../utils/type-guards';
+import { CssCache } from './helpers/css-cache';
+import { getErrorMessage } from '../utils/error';
+import { type CssTreeParsingContext } from './helpers/css-tree-types';
+import { isErrorContainingOffset } from './helpers/css-errors';
+import { parseCss } from './helpers/css-parse';
 
 /**
  * Represents a linter result that is returned by the `lint` method
@@ -579,6 +589,8 @@ export class Linter {
             fatalErrorCount: 0,
         };
 
+        const positionProvider = new PositionProvider(content);
+
         let isDisabled = false;
 
         // A set of linter rule names that are disabled on the next line
@@ -595,6 +607,9 @@ export class Linter {
         // Store the actual rule here for the context object
         let actualAdblockRuleAst: AnyRule;
         let actualAdblockRuleRaw: string;
+
+        // Shared CSS cache to avoid parsing the same CSS multiple times
+        const cssCache = new CssCache();
 
         /**
          * Invokes an event for all rules. This function is only used internally
@@ -621,6 +636,85 @@ export class Linter {
                     assert(data.configOverride || data.rule.meta.config.default, data.rule.meta.config.schema);
                 }
 
+                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                const report = (problem: LinterProblemReport) => {
+                    let severity = getSeverity(data.rule.meta.severity);
+
+                    if (!nextLineEnabled.has(name)) {
+                        // rely on the result of network rules modifiers validation;
+                        // see src/linter/rules/invalid-modifiers.ts
+                        if (isSeverity(problem.customSeverity)) {
+                            severity = getSeverity(problem.customSeverity);
+                        } else if (isSeverity(data.severityOverride)) {
+                            severity = getSeverity(data.severityOverride);
+                        }
+                    }
+
+                    // Default problem location: whole line
+                    let position: LinterPosition = {
+                        startLine: actualLine,
+                        startColumn: 0,
+                        endLine: actualLine,
+                        endColumn: actualAdblockRuleRaw.length,
+                    };
+
+                    if (problem.position) {
+                        position = problem.position;
+                    } else if (
+                        !isUndefined(problem.node)
+                        && !isUndefined(problem.node.start)
+                        && !isUndefined(problem.node.end)
+                    ) {
+                        let startOffset = problem.node.start;
+                        let endOffset = problem.node.end;
+
+                        const { relativeNodeStartOffset, relativeNodeEndOffset } = problem;
+
+                        if (!isUndefined(relativeNodeStartOffset)) {
+                            startOffset = Math.min(problem.node.start + relativeNodeStartOffset, problem.node.end);
+                        }
+
+                        if (!isUndefined(relativeNodeEndOffset)) {
+                            endOffset = Math.min(problem.node.start + relativeNodeEndOffset, problem.node.end);
+                        }
+
+                        const start = positionProvider.convertOffsetToPosition(startOffset);
+                        const end = positionProvider.convertOffsetToPosition(endOffset);
+
+                        if (!isNull(start) && !isNull(end)) {
+                            position = {
+                                startLine: start.line,
+                                startColumn: start.column - 1,
+                                endLine: end.line,
+                                endColumn: end.column - 1,
+                            };
+                        }
+                    }
+
+                    result.problems.push({
+                        rule: name,
+                        severity,
+                        message: problem.message,
+                        position,
+                        fix: problem.fix,
+                    });
+
+                    // Update problem counts
+                    switch (severity) {
+                        case SEVERITY.warn:
+                            result.warningCount += 1;
+                            break;
+                        case SEVERITY.error:
+                            result.errorCount += 1;
+                            break;
+                        case SEVERITY.fatal:
+                            result.fatalErrorCount += 1;
+                            break;
+                        default:
+                            break;
+                    }
+                };
+
                 const genericContext: GenericRuleContext = Object.freeze({
                     // Deep copy of the linter configuration
                     getLinterConfig: () => {
@@ -638,62 +732,54 @@ export class Linter {
                     // Rule configuration
                     config: data.configOverride || data.rule.meta.config?.default,
 
-                    // Reporter function
+                    report,
+
                     // eslint-disable-next-line @typescript-eslint/no-loop-func
-                    report: (problem: LinterProblemReport) => {
-                        let severity = getSeverity(data.rule.meta.severity);
+                    getCssNode: (rawValueNode: Value<string>, context: CssTreeParsingContext) => {
+                        const rawCss = rawValueNode.value;
+                        const possibleCssNode = cssCache.get(context, rawCss);
 
-                        if (!nextLineEnabled.has(name)) {
-                            // rely on the result of network rules modifiers validation;
-                            // see src/linter/rules/invalid-modifiers.ts
-                            if (isSeverity(problem.customSeverity)) {
-                                severity = getSeverity(problem.customSeverity);
-                            } else if (isSeverity(data.severityOverride)) {
-                                severity = getSeverity(data.severityOverride);
+                        const reportError = (error: Error) => {
+                            const problem: LinterProblemReport = {
+                                // eslint-disable-next-line max-len
+                                message: `Cannot parse CSS due to the following error: ${getErrorMessage(error)}`,
+                                node: rawValueNode,
+                            };
+
+                            if (isErrorContainingOffset(error)) {
+                                problem.relativeNodeStartOffset = error.offset;
                             }
-                        }
 
-                        // Default problem location: whole line
-                        let position: LinterPosition = {
-                            startLine: actualLine,
-                            startColumn: 0,
-                            endLine: actualLine,
-                            endColumn: actualAdblockRuleRaw.length,
+                            report(problem);
                         };
 
-                        if (problem.position) {
-                            position = problem.position;
-                        } else if (problem.node && problem.node.loc !== undefined) {
-                            position = {
-                                startLine: problem.node.loc.start.line,
-                                startColumn: problem.node.loc.start.column - 1,
-                                endLine: problem.node.loc.end.line,
-                                endColumn: problem.node.loc.end.column - 1,
-                            };
+                        if (!isUndefined(possibleCssNode)) {
+                            if (possibleCssNode instanceof Error) {
+                                reportError(possibleCssNode);
+                                return null;
+                            }
+
+                            return possibleCssNode;
                         }
 
-                        result.problems.push({
-                            rule: name,
-                            severity,
-                            message: problem.message,
-                            position,
-                            fix: problem.fix,
-                        });
+                        let cssNode: CssNode;
 
-                        // Update problem counts
-                        switch (severity) {
-                            case SEVERITY.warn:
-                                result.warningCount += 1;
-                                break;
-                            case SEVERITY.error:
-                                result.errorCount += 1;
-                                break;
-                            case SEVERITY.fatal:
-                                result.fatalErrorCount += 1;
-                                break;
-                            default:
-                                break;
+                        try {
+                            // https://github.com/csstree/csstree/blob/master/docs/parsing.md#parsesource-options
+                            cssNode = parseCss(rawCss, context);
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            cssCache.set(context, rawCss, cssNode as any);
+                        } catch (error: unknown) {
+                            cssCache.set(context, rawCss, error as Error);
+
+                            if (error instanceof Error) {
+                                reportError(error);
+                            }
+                            return null;
                         }
+
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        return cssNode as any;
                     },
                 });
 
@@ -732,7 +818,10 @@ export class Linter {
         invokeEvent('onStartFilterList');
 
         // Parse the filter list
-        const filterList = FilterListParser.parse(content);
+        const filterList = FilterListParser.parse(content, {
+            ...defaultParserOptions,
+            tolerant: true,
+        });
 
         // Iterate over all filter list adblock rules
         filterList.children.forEach((ast, index) => {
@@ -759,18 +848,21 @@ export class Linter {
                     // and we report the error for the entire line (from the beginning to the end).
 
                     /* eslint-disable @typescript-eslint/no-non-null-assertion */
+                    const start = positionProvider.convertOffsetToPosition(ast.error.start!);
+                    const end = positionProvider.convertOffsetToPosition(ast.error.end!);
+
                     const position: LinterPosition = {
-                        startLine: ast.error.loc!.start!.line,
-                        startColumn: ast.error.loc!.start!.column - 1,
-                        endLine: ast.error.loc!.end!.line,
-                        endColumn: ast.error.loc!.end!.column - 1,
+                        startLine: start!.line,
+                        startColumn: start!.column - 1,
+                        endLine: end!.line,
+                        endColumn: end!.column - 1,
                     };
                     /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
                     // Store the error in the result object
                     result.problems.push({
                         severity: SEVERITY.fatal,
-                        message: `AGLint parsing error: ${ast.error.message}`,
+                        message: `Cannot parse adblock rule due to the following error: ${ast.error.message}`,
                         position,
                     });
 
@@ -788,7 +880,7 @@ export class Linter {
                         // Process the inline config comment
                         switch (ast.command.value) {
                             case ConfigCommentType.Main: {
-                                if (ast.params && ast.params.type === 'Value') {
+                                if (ast.params && ast.params.type === 'ConfigNode') {
                                     assert(ast.params.value, linterRulesSchema);
 
                                     this.config = mergeConfigs(this.config, {
@@ -804,7 +896,9 @@ export class Linter {
                             case ConfigCommentType.Disable: {
                                 if (ast.params && ast.params.type === 'ParameterList') {
                                     for (const param of ast.params.children) {
-                                        this.disableRule(param.value);
+                                        if (param) {
+                                            this.disableRule(param.value);
+                                        }
                                     }
 
                                     break;
@@ -817,7 +911,9 @@ export class Linter {
                             case ConfigCommentType.Enable: {
                                 if (ast.params && ast.params.type === 'ParameterList') {
                                     for (const param of ast.params.children) {
-                                        this.enableRule(param.value);
+                                        if (param) {
+                                            this.enableRule(param.value);
+                                        }
                                     }
 
                                     break;
@@ -831,7 +927,9 @@ export class Linter {
                                 // Disable specific rules for the next line
                                 if (ast.params && ast.params.type === 'ParameterList') {
                                     for (const param of ast.params.children) {
-                                        nextLineDisabled.add(param.value);
+                                        if (param) {
+                                            nextLineDisabled.add(param.value);
+                                        }
                                     }
                                 } else {
                                     // Disable all rules for the next line
@@ -845,7 +943,9 @@ export class Linter {
                                 // Enable specific rules for the next line
                                 if (ast.params && ast.params.type === 'ParameterList') {
                                     for (const param of ast.params.children) {
-                                        nextLineEnabled.add(param.value);
+                                        if (param) {
+                                            nextLineEnabled.add(param.value);
+                                        }
                                     }
                                 } else {
                                     // Disable all rules for the next line

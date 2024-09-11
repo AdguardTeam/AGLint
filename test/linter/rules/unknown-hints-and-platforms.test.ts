@@ -63,7 +63,8 @@ describe('unknown-hints-and-platforms', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Missing closing parenthesis for hint "NOT_OPTIMIZED"',
+                    // eslint-disable-next-line max-len
+                    message: 'Cannot parse adblock rule due to the following error: Missing closing parenthesis for hint "NOT_OPTIMIZED"',
                     position: {
                         startColumn: 3,
                         endColumn: 17,
@@ -137,7 +138,8 @@ describe('unknown-hints-and-platforms', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Missing closing parenthesis for hint "PLATFORM"',
+                    // eslint-disable-next-line max-len
+                    message: 'Cannot parse adblock rule due to the following error: Missing closing parenthesis for hint "PLATFORM"',
                     position: {
                         startColumn: 3,
                         endColumn: 12,
@@ -220,7 +222,8 @@ describe('unknown-hints-and-platforms', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Missing closing parenthesis for hint "NOT_PLATFORM"',
+                    // eslint-disable-next-line max-len
+                    message: 'Cannot parse adblock rule due to the following error: Missing closing parenthesis for hint "NOT_PLATFORM"',
                     position: {
                         startColumn: 3,
                         endColumn: 16,
@@ -303,7 +306,8 @@ describe('unknown-hints-and-platforms', () => {
             problems: [
                 {
                     severity: 3,
-                    message: 'AGLint parsing error: Missing closing parenthesis for hint "HINT"',
+                    // eslint-disable-next-line max-len
+                    message: 'Cannot parse adblock rule due to the following error: Missing closing parenthesis for hint "HINT"',
                     position: {
                         startColumn: 3,
                         endColumn: 8,

@@ -63,6 +63,8 @@ Table of Contents:
     - [`inconsistent-hint-platforms`](#inconsistent-hint-platforms)
     - [`no-short-rules`](#no-short-rules)
     - [`no-excluded-rules`](#no-excluded-rules)
+    - [`no-invalid-css-syntax`](#no-invalid-css-syntax)
+    - [`no-invalid-css-declaration`](#no-invalid-css-declaration)
 - [Compatibility](#compatibility)
 - [Use programmatically](#use-programmatically)
 - [Development \& Contribution](#development--contribution)
@@ -833,6 +835,48 @@ Requested in https://github.com/AdguardTeam/AGLint/issues/214
           # Do not forget to escape special regex characters
           - example\.com\/bad\/query\/
   ```
+
+### `no-invalid-css-syntax`
+
+Check if a rule contains syntactically invalid CSS.
+It uses the [ECSSTree][ecss-tree] parser internally to check the CSS syntax.
+
+- **Severity:** `error` (2)
+- **Fixable:** no
+- **Options:** none
+- **Example:**
+  ```adblock
+  ##.#bar
+  ```
+  will be reported as error:
+  ```txt
+    1:4  error  Cannot parse CSS due to the following error: Name is expected
+  ```
+  since the `##.#bar` rule contains invalid CSS syntax, `.` should be followed by a valid class name.
+  Also works with CSS injection rules and their declaration lists.
+
+[ecss-tree]: https://github.com/AdguardTeam/ecsstree
+
+### `no-invalid-css-declaration`
+
+Checks whether a CSS injection rule contains any unknown properties or invalid values.
+This process utilizes the [CSSTree][css-tree] lexer, which is based on the [MDN Data][mdn-data] database.
+
+- **Severity:** `error` (2)
+- **Fixable:** no
+- **Options:** none
+- **Example:**
+  ```adblock
+  #$#.foo { color: bar; }
+  ```
+  will be reported as error:
+  ```txt
+    1:17  error  Invalid value for `color` property, mismatch with syntax <color>
+  ```
+  since `bar` is not a valid color value.
+
+[css-tree]: https://github.com/csstree/csstree
+[mdn-data]: https://github.com/mdn/data/tree/main
 
 ## Compatibility
 

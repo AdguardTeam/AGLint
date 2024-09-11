@@ -80,5 +80,13 @@ module.exports = {
                 fixMixedExportsWithInlineTypeSpecifier: true,
             },
         ],
+        'jsdoc/check-tag-names': [
+            'warn',
+            {
+                // Define additional tags
+                // https://github.com/gajus/eslint-plugin-jsdoc/blob/main/docs/rules/check-tag-names.md#definedtags
+                definedTags: ['note'],
+            },
+        ],
     },
 };
