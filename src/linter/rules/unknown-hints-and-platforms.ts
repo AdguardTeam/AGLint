@@ -20,6 +20,7 @@ const KNOWN_PLATFORMS = new Set([
     'mac',
     'android',
     'ios',
+    'ext_chromium_mv3',
     'ext_chromium',
     'ext_ff',
     'ext_edge',

@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.1.1] - 2024-09-20
+
+### Added
+
+- Support of `ext_chromium_mv3` as a known platform for `PLATFORM` and `NOT_PLATFORM` hints [#220].
+
+[2.1.1]: https://github.com/AdguardTeam/AGLint/compare/v2.1.0...v2.1.1
+[#220]: https://github.com/AdguardTeam/AGLint/issues/220
+
 ## [2.1.0] - 2024-09-11
 
 ### Added
