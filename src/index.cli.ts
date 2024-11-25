@@ -5,8 +5,6 @@
 
 import { AdblockSyntax } from '@adguard/agtree';
 import { program } from 'commander';
-import checkbox from '@inquirer/checkbox';
-import select from '@inquirer/select';
 import { readdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import yaml from 'js-yaml';
@@ -19,6 +17,12 @@ import {
 } from './index.node';
 import { CONFIG_FILE_NAMES, JSON_RC_CONFIG_FILE_NAME, YAML_RC_CONFIG_FILE_NAME } from './linter/cli/constants';
 import { NEWLINE } from './common/constants';
+
+// TODO: Change after switching to ESM (AG-37988), also need to check CLI with smoke tests (AG-35852)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const checkbox = require('@inquirer/checkbox').default;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const select = require('@inquirer/select').default;
 
 /**
  * Represents possible config file formats.

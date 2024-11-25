@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.1.2] - 2024-11-25
+
+### Fixed
+
+- `npx aglint init` does not work [#225].
+
+[2.1.2]: https://github.com/AdguardTeam/AGLint/compare/v2.1.1...v2.1.2
+[#225]: https://github.com/AdguardTeam/AGLint/issues/225
+
+
 ## [2.1.1] - 2024-09-20
 
 ### Added
