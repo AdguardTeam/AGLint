@@ -32,6 +32,20 @@ describe('no-invalid-css-syntax', () => {
         });
     });
 
+    test('support ABP syntax CSS injection', () => {
+        expect(
+            linter.lint(
+                [
+                    'example.com###banner {remove:true;}',
+                    'example.com###banner {display:none!important;}',
+                    'example.com###banner { background: pink !important; }',
+                ].join(NEWLINE),
+            ),
+        ).toMatchObject({
+            problems: [],
+        });
+    });
+
     test('should detect invalid CSS', () => {
         expect(
             linter.lint(

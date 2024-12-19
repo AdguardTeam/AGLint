@@ -8,6 +8,19 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.1.3] - 2024-12-19
+
+## Added
+
+- Support for ABP CSS injections [#224].
+
+## Changed
+
+- Updated [@adguard/agtree] to `v2.3.0`.
+
+[2.1.3]: https://github.com/AdguardTeam/AGLint/compare/v2.1.2...v2.1.3
+[#224]: https://github.com/AdguardTeam/AGLint/issues/224
+
 ## [2.1.2] - 2024-11-25
 
 ### Fixed
