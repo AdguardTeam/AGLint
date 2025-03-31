@@ -14,6 +14,9 @@ describe('unknown-hints-and-platforms', () => {
         // NOT_OPTIMIZED
         expect(linter.lint('!+ NOT_OPTIMIZED')).toMatchObject({ problems: [] });
 
+        // NOT_VALIDATE
+        expect(linter.lint('!+ NOT_VALIDATE')).toMatchObject({ problems: [] });
+
         // PLATFORM single
         expect(linter.lint('!+ PLATFORM(windows)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ PLATFORM(mac)')).toMatchObject({ problems: [] });
@@ -130,6 +133,81 @@ describe('unknown-hints-and-platforms', () => {
                     position: {
                         startColumn: 3,
                         endColumn: 16,
+                    },
+                },
+            ],
+        });
+
+        // syntax error
+        expect(linter.lint('!+ NOT_VALIDATE(')).toMatchObject({
+            problems: [
+                {
+                    severity: 3,
+                    // eslint-disable-next-line max-len
+                    message: 'Cannot parse adblock rule due to the following error: Missing closing parenthesis for hint "NOT_VALIDATE"',
+                    position: {
+                        startColumn: 3,
+                        endColumn: 16,
+                    },
+                },
+            ],
+        });
+
+        // NOT_VALIDATE should not have parameters
+        expect(linter.lint('!+ NOT_VALIDATE()')).toMatchObject({
+            problems: [
+                {
+                    rule: 'unknown-hints-and-platforms',
+                    severity: 2,
+                    message: 'Hint "NOT_VALIDATE" must not have any parameters',
+                    position: {
+                        startColumn: 3,
+                        endColumn: 17,
+                    },
+                },
+            ],
+        });
+
+        // NOT_VALIDATE should not have parameters
+        expect(linter.lint('!+ NOT_VALIDATE(aa)')).toMatchObject({
+            problems: [
+                {
+                    rule: 'unknown-hints-and-platforms',
+                    severity: 2,
+                    message: 'Hint "NOT_VALIDATE" must not have any parameters',
+                    position: {
+                        startColumn: 3,
+                        endColumn: 19,
+                    },
+                },
+            ],
+        });
+
+        // NOT_VALIDATE should not have parameters
+        expect(linter.lint('!+ NOT_VALIDATE(aa, bb)')).toMatchObject({
+            problems: [
+                {
+                    rule: 'unknown-hints-and-platforms',
+                    severity: 2,
+                    message: 'Hint "NOT_VALIDATE" must not have any parameters',
+                    position: {
+                        startColumn: 3,
+                        endColumn: 23,
+                    },
+                },
+            ],
+        });
+
+        // Hint name is case-sensitive
+        expect(linter.lint('!+ not_validate')).toMatchObject({
+            problems: [
+                {
+                    rule: 'unknown-hints-and-platforms',
+                    severity: 2,
+                    message: 'Unknown hint name "not_validate"',
+                    position: {
+                        startColumn: 3,
+                        endColumn: 15,
                     },
                 },
             ],

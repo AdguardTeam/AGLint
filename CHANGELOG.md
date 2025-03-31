@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.1.4] - 2025-03-31
+
+### Added
+
+- Support for `!+ NOT_VALIDATE` hint [#248].
+
+[2.1.4]: https://github.com/AdguardTeam/AGLint/compare/v2.1.3...v2.1.4
+[#248]: https://github.com/AdguardTeam/AGLint/issues/248
+
 ## [2.1.3] - 2024-12-19
 
 ## Added

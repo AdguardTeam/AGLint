@@ -6,12 +6,14 @@ import { SEVERITY } from '../severity';
 const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
+const NOT_VALIDATE = 'NOT_VALIDATE';
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#hints
 const KNOWN_HINTS = new Set([
     NOT_OPTIMIZED,
     PLATFORM,
     NOT_PLATFORM,
+    NOT_VALIDATE,
 ]);
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints
@@ -71,7 +73,7 @@ export const UnknownHintsAndPlatforms: LinterRule = {
                                 }
                             }
                         }
-                    } else if (hint.name.value === NOT_OPTIMIZED) {
+                    } else if (hint.name.value === NOT_OPTIMIZED || hint.name.value === NOT_VALIDATE) {
                         // If the hint has any parameters, it's invalid, including "NOT_OPTIMIZED()"
                         if (hint.params) {
                             context.report({
