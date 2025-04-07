@@ -41,18 +41,18 @@
         "node": ">=17"
     },
     "scripts": {
-        "build": "yarn clean && yarn build-txt && yarn build-types && yarn rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && yarn clean-types",
+        "build": "pnpm clean && pnpm build-txt && pnpm build-types && pnpm rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && pnpm clean-types",
         "build-types": "tsc --declaration --emitDeclarationOnly --outdir dist/types",
         "build-txt": "tsx tasks/build-txt.ts",
         "check-types": "tsc --noEmit",
         "clean": "rimraf dist",
         "clean-types": "rimraf dist/types",
         "coverage": "jest --coverage",
-        "lint": "yarn check-types && yarn lint:ts && yarn lint:md",
+        "lint": "pnpm check-types && pnpm lint:ts && pnpm lint:md",
         "lint:md": "markdownlint .",
         "lint:ts": "eslint . --cache --ext .ts",
         "prepare": "node .husky/install.mjs",
-        "increment": "yarn version --patch --no-git-tag-version",
+        "increment": "pnpm version --patch --no-git-tag-version",
         "test": "jest --runInBand"
     },
     "devDependencies": {

@@ -5,6 +5,7 @@
 coverage
 dist
 node_modules
+.pnpm-store/
 
 # Release file for npm.
 release.tgz

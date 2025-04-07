@@ -1,7 +1,7 @@
 /**
  * @file Rollup configurations for generating AGLint builds.
  *
- * ! Please ALWAYS use the "yarn build" command for building!
+ * ! Please ALWAYS use the "pnpm build" command for building!
  */
 
 import typescript from '@rollup/plugin-typescript';
@@ -62,7 +62,7 @@ const BANNER = `/*
 // Pre-configured TypeScript plugin
 const typeScriptPlugin = typescript({
     compilerOptions: {
-        // Don't emit declarations, we will do it in a separate command "yarn build-types"
+        // Don't emit declarations, we will do it in a separate command "pnpm build-types"
         declaration: false,
     },
 });

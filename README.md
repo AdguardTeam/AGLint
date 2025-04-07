@@ -29,7 +29,7 @@ Table of Contents:
 - [Introduction](#introduction)
 - [Features](#features)
 - [Getting started](#getting-started)
-    - [Pre-requisites](#pre-requisites)
+    - [Prerequisites](#prerequisites)
     - [Installation \& Usage](#installation--usage)
     - [Integrate AGLint into your project](#integrate-aglint-into-your-project)
 - [VSCode extension](#vscode-extension)
@@ -108,28 +108,34 @@ it easy to use AGLint as well.
 Mainly AGLint is a CLI tool, but it can also be used programmatically. Here is a very short instruction on how to use
 it as a CLI tool with the default configuration.
 
-### Pre-requisites
+### Prerequisites
 
-- Node.js 14 or higher: [nodejs.org][nodejs] (we recommend using the latest LTS version)
-- NPM or Yarn. NPM is installed with Node.js, so you don't need to install it separately. If you want to use `yarn`
-  instead of `npm`, you can install it from [here][yarn].
+Ensure that [Node.js][nodejs] is installed on your computer.
+Optionally, you can also install [pnpm][pnpm] or [Yarn][yarn] for package management.
+
+[nodejs]: https://nodejs.org/en/download
+[pnpm]: https://pnpm.io/installation
+[yarn]: https://classic.yarnpkg.com/en/docs/install
 
 ### Installation & Usage
 
 1. Install AGLint to your project:
    - NPM: `npm install -D @adguard/aglint`
+   - PNPM: `pnpm install -D @adguard/aglint`
    - Yarn: `yarn add -D @adguard/aglint`
-2. Initialize the configuration file for AGLint:
+1. Initialize the configuration file for AGLint:
    - NPM: `npx aglint init`
+   - PNPM: `pnpm aglint init`
    - Yarn: `yarn aglint init`
-3. Run AGLint:
+1. Run AGLint:
    - NPM: `npx aglint`
+   - PNPM: `pnpm aglint`
    - Yarn: `yarn aglint`
 
 That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
 
 > [!NOTE]
-> You can also install AGLint globally, so you can use it without `npx` or `yarn`, but we recommend to install
+> You can also install AGLint globally, so you can use it without `npx` or `pnpm`, but we recommend to install
 > it locally to your project.
 
 > [!NOTE]
@@ -1019,7 +1025,6 @@ resources, please let us know.
 [linter-rules-src]: https://github.com/AdguardTeam/AGLint/tree/master/src/linter/rules
 [mdn-css-selectors]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors
 [nodejs-schedule]: https://nodejs.org/en/about/releases/
-[nodejs]: https://nodejs.org/en/download/
 [not-optimized-kb]: https://adguard.com/kb/general/ad-filtering/create-own-filters/#not_optimized-hint
 [platform-kb]: https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints
 [safari-cb-kb]: https://adguard.com/kb/general/ad-filtering/create-own-filters/#safari-affinity-directive
@@ -1030,4 +1035,3 @@ resources, please let us know.
 [ubo-scriptlets]: https://github.com/gorhill/uBlock/wiki/Resources-Library#available-general-purpose-scriptlets
 [ubo-url]: https://github.com/gorhill/uBlock
 [vscode-extension]: https://marketplace.visualstudio.com/items?itemName=adguard.adblock
-[yarn]: https://yarnpkg.com/getting-started/install

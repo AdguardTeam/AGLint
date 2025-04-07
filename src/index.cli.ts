@@ -199,7 +199,7 @@ const createConfig = async (cwd: string): Promise<void> => {
             // Parse the arguments
             .parse(process.argv);
 
-        // This specifies in which folder the "npx aglint" / "yarn aglint" command was invoked
+        // This specifies in which folder the "npx aglint" / "pnpm aglint" command was invoked
         // and use "process.cwd" as fallback. This is the current working directory (cwd).
         const cwd = process.env.INIT_CWD || process.cwd();
 
@@ -249,6 +249,7 @@ const createConfig = async (cwd: string): Promise<void> => {
                 'AGLint couldn\'t find the config file. To set up a configuration file for this project, please run:',
                 '',
                 '    If you use NPM:\tnpx aglint init',
+                '    If you use PNPM:\tpnpm aglint init',
                 '    If you use Yarn:\tyarn aglint init',
                 '',
                 'IMPORTANT: The init command creates a root config file, so be sure to run it in the root directory of your project!',

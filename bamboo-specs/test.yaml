@@ -5,7 +5,7 @@ plan:
   key: AGLINTTEST
   name: aglint - tests
 variables:
-  dockerNode: adguard/node-ssh:21.7--1
+  dockerNode: adguard/node-ssh:22.14--0
 
 stages:
   - Build:
@@ -19,7 +19,7 @@ Build:
   docker:
     image: '${bamboo.dockerNode}'
     volumes:
-      ${system.YARN_DIR}: '${bamboo.cacheYarn}'
+      ${system.PNPM_DIR}: "${bamboo.cachePnpm}"
   tasks:
     - checkout:
         force-clean-build: true
@@ -35,21 +35,19 @@ Build:
 
             ls -laht
 
-            # Exclude '--ignore-optional' from yarn arguments
-            # This is needed for installing swc core optional dependencies properly
-            originalYarnArgs="$bamboo_varsYarn"
-            modifiedYarnArgs=$(echo "$originalYarnArgs" | sed 's/--ignore-optional//g')
+            # Set cache directory
+            pnpm config set store-dir ${bamboo.cachePnpm}
 
             # Install dependencies
-            yarn install ${modifiedYarnArgs}
+            pnpm install
 
             # Run checks
-            yarn check-types
-            yarn lint
-            yarn test
+            pnpm check-types
+            pnpm lint
+            pnpm test
 
             # Build should be successful
-            yarn build
+            pnpm build
   final-tasks:
     - script:
         interpreter: SHELL
