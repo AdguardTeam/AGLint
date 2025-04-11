@@ -52,7 +52,7 @@
         "lint:md": "markdownlint .",
         "lint:ts": "eslint . --cache --ext .ts",
         "prepare": "node .husky/install.mjs",
-        "increment": "pnpm version --patch --no-git-tag-version",
+        "increment": "pnpm version patch --no-git-tag-version",
         "test": "jest --runInBand"
     },
     "devDependencies": {
