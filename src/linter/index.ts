@@ -7,15 +7,14 @@ import { assert } from 'superstruct';
 import cloneDeep from 'clone-deep';
 import {
     type AnyRule,
-    AdblockSyntax,
     CommentRuleType,
     type FilterList,
-    FilterListParser,
     RuleCategory,
-    PositionProvider,
-    defaultParserOptions,
     type Value,
 } from '@adguard/agtree';
+import { FilterListParser, defaultParserOptions } from '@adguard/agtree/parser';
+import { AdblockSyntax, PositionProvider } from '@adguard/agtree/utils';
+import { FilterListGenerator } from '@adguard/agtree/generator';
 
 import {
     defaultLinterConfig,
@@ -1056,7 +1055,7 @@ export class Linter {
                 }
             }
 
-            result.fixed = FilterListParser.generate(fixedFilterList, true);
+            result.fixed = FilterListGenerator.generate(fixedFilterList, true);
         }
 
         // Return linting result

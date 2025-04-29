@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 [keepachangelog]: https://keepachangelog.com/en/1.0.0/
 [semver]: https://semver.org/spec/v2.0.0.html
 
+## [2.2.0] - 2025-04-30
+
+## Changed
+
+- Updated [@adguard/agtree] to `v3.1.3` [#247].
+
+[2.2.0]: https://github.com/AdguardTeam/AGLint/compare/v2.1.4...v2.2.0
+[#247]: https://github.com/AdguardTeam/AGLint/issues/247
+
 ## [2.1.4] - 2025-03-31
 
 ### Added

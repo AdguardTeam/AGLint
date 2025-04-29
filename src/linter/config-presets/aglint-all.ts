@@ -2,7 +2,7 @@
  * @file Configuration preset for AGLint that enables all rules.
  */
 
-import { AdblockSyntax } from '@adguard/agtree';
+import { AdblockSyntax } from '@adguard/agtree/utils';
 
 import { type LinterConfig } from '../common';
 

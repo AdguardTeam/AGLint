@@ -1,10 +1,10 @@
 import { type Struct } from 'superstruct';
 import {
     type Value,
-    type AdblockSyntax,
     type AnyRule,
     type Node,
 } from '@adguard/agtree';
+import { type AdblockSyntax } from '@adguard/agtree/utils';
 
 import { type AnySeverity } from './severity';
 import { type CssTreeParsingContext, type CssTreeParsingContextToNode } from './helpers/css-tree-types';

@@ -12,7 +12,7 @@ import {
     record,
     string,
 } from 'superstruct';
-import { AdblockSyntax } from '@adguard/agtree';
+import { AdblockSyntax } from '@adguard/agtree/utils';
 
 import { linterRuleConfigSchema } from './rule';
 import { type LinterConfig } from './common';

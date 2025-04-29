@@ -1,11 +1,8 @@
-import ss, { type Struct } from 'superstruct';
+import * as ss from 'superstruct';
 import merge from 'deepmerge';
-import {
-    type AnyRule,
-    FilterListParser,
-    RuleParser,
-    AdblockSyntax,
-} from '@adguard/agtree';
+import { type AnyRule } from '@adguard/agtree';
+import { RuleParser, FilterListParser } from '@adguard/agtree/parser';
+import { AdblockSyntax } from '@adguard/agtree/utils';
 
 import { Linter, type LinterRuleData } from '../../src/linter';
 import { defaultLinterRules } from '../../src/linter/rules';
@@ -27,7 +24,7 @@ const demoRule: LinterRule = {
             schema: ss.object({
                 a: ss.number(),
                 b: ss.number(),
-            }) as Struct,
+            }) as ss.Struct,
         },
     },
     events: {},
@@ -93,7 +90,7 @@ const demoRuleEverythingIsProblem3: LinterRule = {
             },
             schema: ss.object({
                 message: ss.string(),
-            }) as Struct,
+            }) as ss.Struct,
         },
     },
     events: {

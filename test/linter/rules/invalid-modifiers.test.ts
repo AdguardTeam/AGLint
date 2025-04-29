@@ -1,4 +1,4 @@
-import { AdblockSyntax } from '@adguard/agtree';
+import { AdblockSyntax } from '@adguard/agtree/utils';
 
 import { Linter } from '../../../src/linter';
 import { InvalidModifiers } from '../../../src/linter/rules/invalid-modifiers';

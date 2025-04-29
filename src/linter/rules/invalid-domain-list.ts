@@ -1,4 +1,5 @@
-import { DomainUtils, RuleCategory } from '@adguard/agtree';
+import { RuleCategory } from '@adguard/agtree';
+import { DomainUtils } from '@adguard/agtree/utils';
 
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';

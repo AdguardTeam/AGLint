@@ -3,7 +3,7 @@
  * which are useful for all projects.
  */
 
-import { AdblockSyntax } from '@adguard/agtree';
+import { AdblockSyntax } from '@adguard/agtree/utils';
 
 import { type LinterConfig } from '../common';
 
