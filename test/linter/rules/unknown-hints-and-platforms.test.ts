@@ -1,4 +1,9 @@
-import { beforeAll, describe, expect, test } from 'vitest';
+import {
+    beforeAll,
+    describe,
+    expect,
+    test,
+} from 'vitest';
 
 import { Linter } from '../../../src/linter';
 import { UnknownHintsAndPlatforms } from '../../../src/linter/rules/unknown-hints-and-platforms';
