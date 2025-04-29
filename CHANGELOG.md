@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ## [2.2.0] - 2025-04-30
 
-## Changed
+### Changed
 
 - Updated [@adguard/agtree] to `v3.1.3` [#247].
 
