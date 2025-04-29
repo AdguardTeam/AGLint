@@ -1,4 +1,5 @@
 import { assert } from 'superstruct';
+import { describe, expect, test } from 'vitest';
 
 import { linterRuleConfigSchema } from '../../src/linter/rule';
 

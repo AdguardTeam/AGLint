@@ -1,5 +1,6 @@
 // import path from 'path';
-import { join, relative, resolve } from 'path';
+import { join, relative, resolve } from 'node:path';
+import { describe, expect, test } from 'vitest';
 
 import { configFinder, findNextConfig, findNextRootConfig } from '../../../src/linter/cli/config-finder';
 

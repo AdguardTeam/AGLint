@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import * as ss from 'superstruct';
 import merge from 'deepmerge';
 import { type AnyRule } from '@adguard/agtree';
@@ -377,6 +378,7 @@ describe('Linter', () => {
         // Should throw error if preset doesn't exist
         expect(() => linter.applyConfigExtensions({
             extends: ['preset-100'],
+            syntax: [AdblockSyntax.Common],
             allowInlineConfig: true,
         })).toThrowError('Config preset "preset-100" doesn\'t exist');
 
@@ -384,6 +386,7 @@ describe('Linter', () => {
         // We need to disable the type check here because we're passing an invalid config
         expect(() => linter.applyConfigExtensions({
             extends: ['preset-1'],
+            syntax: [AdblockSyntax.Common],
             allowInlineConfig: true,
             someUnknownProperty: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -395,6 +398,7 @@ describe('Linter', () => {
         expect(
             linter.applyConfigExtensions({
                 extends: ['preset-1'],
+                syntax: [AdblockSyntax.Common],
                 allowInlineConfig: true,
             }),
         ).toEqual({
@@ -410,6 +414,7 @@ describe('Linter', () => {
         expect(
             linter.applyConfigExtensions({
                 extends: ['preset-2'],
+                syntax: [AdblockSyntax.Common],
                 allowInlineConfig: true,
             }),
         ).toEqual({
@@ -428,6 +433,7 @@ describe('Linter', () => {
         expect(
             linter.applyConfigExtensions({
                 extends: ['preset-1', 'preset-2'],
+                syntax: [AdblockSyntax.Common],
                 allowInlineConfig: true,
             }),
         ).toEqual({
@@ -448,6 +454,7 @@ describe('Linter', () => {
         expect(
             linter.applyConfigExtensions({
                 extends: ['preset-1', 'preset-2'],
+                syntax: [AdblockSyntax.Common],
                 allowInlineConfig: true,
                 rules: {
                     'rule-1': 'error',
@@ -510,6 +517,7 @@ describe('Linter', () => {
 
         // Set config
         linter.setConfig({
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-1': 'off',
                 'rule-2': 'warn',
@@ -937,7 +945,7 @@ describe('Linter', () => {
     });
 
     describe('lint detects invalid modifiers in network rules', () => {
-        it('no agent comment (common), not existent modifier', () => {
+        test('no agent comment (common), not existent modifier', () => {
             const linter = new Linter(false);
             linter.addRule('invalid-modifiers', InvalidModifiers);
 
@@ -970,7 +978,7 @@ describe('Linter', () => {
             });
         });
 
-        it('specific agent comment, only exception modifier in blocking rule', () => {
+        test('specific agent comment, only exception modifier in blocking rule', () => {
             const linter = new Linter(false);
             linter.addRule('invalid-modifiers', InvalidModifiers);
 
@@ -1004,7 +1012,7 @@ describe('Linter', () => {
             });
         });
 
-        it('specific agent comment, deprecated modifier', () => {
+        test('specific agent comment, deprecated modifier', () => {
             const linter = new Linter(false);
             linter.addRule('invalid-modifiers', InvalidModifiers);
 
@@ -1039,7 +1047,7 @@ describe('Linter', () => {
             });
         });
 
-        it('disable linter for network rule modifier validation', () => {
+        test('disable linter for network rule modifier validation', () => {
             const linter = new Linter(false);
             linter.addRule('invalid-modifiers', InvalidModifiers);
 
@@ -1059,7 +1067,7 @@ describe('Linter', () => {
             });
         });
 
-        it('disable specific rule for network rule modifier validation', () => {
+        test('disable specific rule for network rule modifier validation', () => {
             const linter = new Linter(false);
             linter.addRule('invalid-modifiers', InvalidModifiers);
 
@@ -1079,7 +1087,7 @@ describe('Linter', () => {
             });
         });
 
-        it('wrong aglint rule disabled for invalid modifier', () => {
+        test('wrong aglint rule disabled for invalid modifier', () => {
             const linter = new Linter(false);
             linter.addRule('invalid-modifiers', InvalidModifiers);
 
@@ -1113,7 +1121,7 @@ describe('Linter', () => {
     });
 
     describe('lint detects pre-processor directives', () => {
-        it('unknown ifelse directive', () => {
+        test('unknown ifelse directive', () => {
             const linter = new Linter(false);
             linter.addRule('if-closed', IfClosed);
             linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
@@ -1149,7 +1157,7 @@ describe('Linter', () => {
             });
         });
 
-        it('invalid includes and unclosed if', () => {
+        test('invalid includes and unclosed if', () => {
             const linter = new Linter(false);
             linter.addRule('if-closed', IfClosed);
             linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
@@ -1199,6 +1207,7 @@ describe('Linter', () => {
 
     test("lint ignores inline config comments if they aren't allowed in the linter config", () => {
         const linter = new Linter(false, {
+            syntax: [AdblockSyntax.Common],
             allowInlineConfig: false,
         });
 

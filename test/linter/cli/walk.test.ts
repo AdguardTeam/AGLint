@@ -1,4 +1,5 @@
-import { join, parse, type ParsedPath } from 'path';
+import { join, parse, type ParsedPath } from 'node:path';
+import { describe, expect, test } from 'vitest';
 
 import { walk } from '../../../src/linter/cli/walk';
 import { scan } from '../../../src/linter/cli/scan';

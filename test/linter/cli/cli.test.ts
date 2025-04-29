@@ -1,7 +1,14 @@
-import path, { type ParsedPath } from 'path';
+import path, { type ParsedPath } from 'node:path';
+import { readFile } from 'node:fs/promises';
 import fs from 'fs-extra';
 import cloneDeep from 'clone-deep';
-import { readFile } from 'fs/promises';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    test,
+} from 'vitest';
 
 import { LinterCli } from '../../../src/linter/cli';
 import { type LinterCliReporter } from '../../../src/linter/cli/reporter';

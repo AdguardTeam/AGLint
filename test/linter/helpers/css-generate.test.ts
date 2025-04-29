@@ -2,6 +2,7 @@
  * Migrated from https://github.com/AdguardTeam/tsurlfilter/blob/2144959e92f94e4738274ce577c2fe26e3a0c08b/packages/agtree/test/utils/csstree.test.ts
  */
 
+import { describe, expect, test } from 'vitest';
 import {
     type CssNode,
     find,

@@ -1,4 +1,6 @@
+import { describe, expect, test } from 'vitest';
 import { assert } from 'superstruct';
+import { AdblockSyntax } from '@adguard/agtree/utils';
 
 import { linterConfigSchema, mergeConfigs } from '../../src/linter/config';
 
@@ -8,6 +10,7 @@ describe('Linter config', () => {
             expect(
                 mergeConfigs(
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': ['warn', 'value-1', 'value-2'],
                             'rule-2': ['error', 'value-1', 'value-2'],
@@ -15,6 +18,7 @@ describe('Linter config', () => {
                         },
                     },
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': ['error', 'value-1', 'value-2'],
                             'rule-2': ['error', 'value-1', 'value-2'],
@@ -35,9 +39,11 @@ describe('Linter config', () => {
             expect(
                 mergeConfigs(
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {},
                     },
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': ['error', 'value-1', 'value-2'],
                             'rule-2': ['error', 'value-1', 'value-2'],
@@ -58,6 +64,7 @@ describe('Linter config', () => {
             expect(
                 mergeConfigs(
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': 'off',
                             'rule-2': ['warn'],
@@ -66,6 +73,7 @@ describe('Linter config', () => {
                         },
                     },
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': 'off',
                             'rule-5': ['warn', { a: 1, b: 2 }],

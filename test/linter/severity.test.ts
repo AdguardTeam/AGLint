@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { assert } from 'superstruct';
 
 import { getSeverity, isSeverity, severity } from '../../src/linter/severity';

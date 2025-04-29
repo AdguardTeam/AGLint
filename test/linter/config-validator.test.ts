@@ -1,3 +1,5 @@
+import { describe, expect, test } from 'vitest';
+
 import { validateLinterConfig } from '../../src/linter/config-validator';
 
 describe('validateLinterConfig', () => {
