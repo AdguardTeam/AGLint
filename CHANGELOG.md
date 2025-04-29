@@ -1,12 +1,11 @@
-<!-- markdownlint-disable MD024 -->
 # AGLint Changelog
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
+The format is based on [Keep a Changelog], and this project adheres to [Semantic Versioning].
 
-[keepachangelog]: https://keepachangelog.com/en/1.0.0/
-[semver]: https://semver.org/spec/v2.0.0.html
+[Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
+[Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
 ## [2.2.0] - 2025-04-30
 
@@ -28,11 +27,11 @@ The format is based on [Keep a Changelog][keepachangelog], and this project adhe
 
 ## [2.1.3] - 2024-12-19
 
-## Added
+### Added
 
 - Support for ABP CSS injections [#224].
 
-## Changed
+### Changed
 
 - Updated [@adguard/agtree] to `v2.3.0`.
 

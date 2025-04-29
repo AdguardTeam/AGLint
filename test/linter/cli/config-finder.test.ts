@@ -1,4 +1,3 @@
-// import path from 'path';
 import { join, relative, resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
