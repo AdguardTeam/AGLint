@@ -53,7 +53,7 @@ jobs:
       - name: Run ESLint
         run: pnpm lint:ts
 
-      - name: Run Jest tests
+      - name: Run Vitest tests
         run: pnpm test
 
       - name: Run Rollup build

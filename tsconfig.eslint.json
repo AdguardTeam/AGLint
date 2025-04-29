@@ -2,10 +2,10 @@
   "extends": "./tsconfig.json",
   "include": [
     ".eslintrc.cjs",
-    "jest.config.ts",
     "rollup.config.ts",
     "src/**/*.ts",
     "tasks/**/*.ts",
     "test/**/*.ts",
+    "vitest.config.ts",
   ]
 }
