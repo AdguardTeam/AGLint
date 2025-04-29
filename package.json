@@ -38,7 +38,7 @@
         "dist"
     ],
     "engines": {
-        "node": ">=22"
+        "node": ">=20"
     },
     "scripts": {
         "build": "pnpm clean && pnpm build-txt && pnpm build-types && pnpm rollup --config rollup.config.ts --configPlugin @rollup/plugin-json --configPlugin @rollup/plugin-typescript && pnpm clean-types",
