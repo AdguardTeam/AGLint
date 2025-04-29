@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { InconsistentHintPlatforms } from '../../../src/linter/rules/inconsistent-hint-platforms';
 
@@ -40,7 +42,7 @@ describe('inconsistent-hint-platforms', () => {
         });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         expect(linter.lint('!+ PLATFORM(windows) NOT_PLATFORM(windows)')).toMatchObject({
             problems: [
                 {

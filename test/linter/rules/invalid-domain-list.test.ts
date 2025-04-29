@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { InvalidDomainList } from '../../../src/linter/rules/invalid-domain-list';
 
@@ -62,7 +64,7 @@ describe('invalid-domain-list', () => {
         ).toMatchObject({ problems: [] });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         // Missed TLD
         expect(linter.lint('example.##.banner')).toMatchObject({
             problems: [

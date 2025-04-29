@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { IfClosed } from '../../../src/linter/rules/if-closed';
 import { NEWLINE } from '../../../src/common/constants';
@@ -249,7 +251,7 @@ describe('if-closed', () => {
         });
     });
 
-    it('no value for else and endif directives', () => {
+    test('no value for else and endif directives', () => {
         expect(
             linter.lint(
                 [

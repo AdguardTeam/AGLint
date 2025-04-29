@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { DuplicatedHints } from '../../../src/linter/rules/duplicated-hints';
 
@@ -39,7 +41,7 @@ describe('duplicated-hints', () => {
         expect(linter.lint('!+ PLATFORM(mac) NOT_PLATFORM(windows)')).toMatchObject({ problems: [] });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         expect(linter.lint('!+ PLATFORM(windows) PLATFORM(mac) NOT_PLATFORM(android) NOT_OPTIMIZED')).toMatchObject({
             problems: [
                 {

@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { UnknownPreProcessorDirectives } from '../../../src/linter/rules/unknown-preprocessor-directives';
 
@@ -22,7 +24,7 @@ describe('unknown-preprocessor-directives', () => {
         expect(linter.lint('!#safari_cb_affinity(general,privacy)')).toMatchObject({ problems: [] });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         expect(linter.lint('!#incl2ude https://example.org/path/includedfile.txt')).toMatchObject({
             problems: [
                 {

@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { SingleSelector } from '../../../src/linter/rules/single-selector';
 import { NEWLINE } from '../../../src/common/constants';
@@ -30,7 +32,7 @@ describe('single-selector', () => {
         });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         expect(
             linter.lint(
                 [

@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { UnknownHintsAndPlatforms } from '../../../src/linter/rules/unknown-hints-and-platforms';
 
@@ -62,7 +64,7 @@ describe('unknown-hints-and-platforms', () => {
         ).toMatchObject({ problems: [] });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         // syntax error
         expect(linter.lint('!+ NOT_OPTIMIZED(')).toMatchObject({
             problems: [

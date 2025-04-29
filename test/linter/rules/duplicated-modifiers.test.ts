@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { DuplicatedModifiers } from '../../../src/linter/rules/duplicated-modifiers';
 
@@ -18,7 +20,7 @@ describe('duplicated-modifiers', () => {
         expect(linter.lint('||example.com^$script,third-party')).toMatchObject({ problems: [] });
     });
 
-    it('should detect problematic cases', () => {
+    test('should detect problematic cases', () => {
         // 4x script
         expect(linter.lint('||example.com^$script,third-party,script,script,script')).toMatchObject({
             problems: [

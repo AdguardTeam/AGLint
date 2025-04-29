@@ -1,3 +1,5 @@
+import { beforeAll, describe, expect, test } from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { NEWLINE } from '../../../src/common/constants';
 import { NoExcludedRules } from '../../../src/linter/rules/no-excluded-rules';
