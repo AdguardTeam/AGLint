@@ -1,9 +1,5 @@
 import { type Struct } from 'superstruct';
-import {
-    type Value,
-    type AnyRule,
-    type Node,
-} from '@adguard/agtree';
+import { type Value, type AnyRule, type Node } from '@adguard/agtree';
 import { type AdblockSyntax } from '@adguard/agtree/utils';
 
 import { type AnySeverity } from './severity';
