@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 ### Changed
 
 - Updated [@adguard/agtree] to `v3.1.3` [#247].
+- Minimum required version of Node.js increased to 20.
 
 [2.2.0]: https://github.com/AdguardTeam/AGLint/compare/v2.1.4...v2.2.0
 [#247]: https://github.com/AdguardTeam/AGLint/issues/247
