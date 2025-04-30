@@ -3,7 +3,7 @@
  * @todo DEV run: node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/cli.ts
  */
 
-import { AdblockSyntax } from '@adguard/agtree';
+import { AdblockSyntax } from '@adguard/agtree/utils-adblockers';
 import { program } from 'commander';
 import { readdir, writeFile } from 'fs/promises';
 import { join } from 'path';

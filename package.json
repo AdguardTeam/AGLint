@@ -93,7 +93,7 @@
         "vitest": "^3.1.2"
     },
     "dependencies": {
-        "@adguard/agtree": "^3.1.3",
+        "@adguard/agtree": "https://github.com/AdguardTeam/tsurlfilter/raw/4d59e256c901e84e36064514afd2c1d88a303262/packages/agtree/agtree.tgz",
         "@adguard/ecss-tree": "^1.1.0",
         "@inquirer/checkbox": "^1.3.7",
         "@inquirer/select": "^1.2.7",
