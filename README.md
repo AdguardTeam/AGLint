@@ -979,21 +979,21 @@ resources, please let us know.
 
 <!--markdownlint-disable MD013-->
 - Syntax documentation:
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard: *How to create your own ad filters*][adg-filters]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin: *Static filter syntax*][ubo-filters]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus: *How to write filters*][abp-filters]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard: *How to create your own ad filters*][adg-filters]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin: *Static filter syntax*][ubo-filters]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus: *How to write filters*][abp-filters]
 - Extended CSS documentation:
     - [MDN: *CSS selectors*][mdn-css-selectors]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard: *Extended CSS capabilities*][adg-ext-css]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin: *Procedural cosmetic filters*][ubo-procedural]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus: *Extended CSS selectors*][abp-ext-css]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard: *Extended CSS capabilities*][adg-ext-css]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin: *Procedural cosmetic filters*][ubo-procedural]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus: *Extended CSS selectors*][abp-ext-css]
 - Scriptlets:
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard scriptlets][adg-scriptlets]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px"> [uBlock Origin scriptlets][ubo-scriptlets]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px"> [Adblock Plus snippets][abp-snippets]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard scriptlets][adg-scriptlets]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin scriptlets][ubo-scriptlets]
+    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus snippets][abp-snippets]
 - Third party libraries:
-    - <img src="https://raw.githubusercontent.com/csstree/csstree/master/assets/csstree-logo-rounded.svg" width="14px"> [CSSTree docs][css-tree-docs]
-- <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px"> [AdGuard's compatibility table][adg-compatibility-table]
+    - <img src="https://raw.githubusercontent.com/csstree/csstree/master/assets/csstree-logo-rounded.svg" width="14px" alt="CSSTree"> [CSSTree docs][css-tree-docs]
+- <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard's compatibility table][adg-compatibility-table]
 <!--markdownlint-enable MD013-->
 
 [ab-url]: https://getadblock.com
