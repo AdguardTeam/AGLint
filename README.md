@@ -888,9 +888,11 @@ This process utilizes the [CSSTree][css-tree] lexer, which is based on the [MDN 
 
 The linter is compatible with all modern browsers and Node.js versions. Minimum required versions are:
 
+<!-- NOTE: see MIN_SUPPORTED_VERSION in ./constants.ts -->
+
 | Name              | Minimum version |
 | ----------------- | :-------------- |
-| Node.js           | ✅ 14           |
+| Node.js           | ✅ 20           |
 | Chrome            | ✅ 88           |
 | Firefox           | ✅ 84           |
 | Edge              | ✅ 88           |

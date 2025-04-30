@@ -17,6 +17,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
 
+import { MIN_SUPPORTED_VERSION } from './constants';
+
 // Common constants
 const ROOT_DIR = './';
 const BASE_NAME = 'AGLint';
@@ -67,6 +69,21 @@ const typeScriptPlugin = typescript({
     },
 });
 
+const babelOutputPluginForNode = getBabelOutputPlugin({
+    presets: [
+        [
+            '@babel/preset-env',
+            {
+                targets: {
+                    node: MIN_SUPPORTED_VERSION.CLI_NODE,
+                },
+            },
+        ],
+    ],
+    allowAllFormats: true,
+    compact: false,
+});
+
 // Common plugins for all types of builds
 const commonPlugins = [
     json({ preferConst: true }),
@@ -79,6 +96,7 @@ const nodePlugins = [
     ...commonPlugins,
     resolve({ preferBuiltins: false }),
     externals(),
+    babelOutputPluginForNode,
 ];
 
 // Plugins for browser builds
@@ -103,11 +121,11 @@ const browserPlugins = [
                             'not dead',
 
                             // Specific versions
-                            'chrome >= 88',
-                            'firefox >= 84',
-                            'edge >= 88',
-                            'opera >= 80',
-                            'safari >= 14',
+                            `chrome >= ${MIN_SUPPORTED_VERSION.CHROME}`,
+                            `firefox >= ${MIN_SUPPORTED_VERSION.FIREFOX}`,
+                            `edge >= ${MIN_SUPPORTED_VERSION.EDGE}`,
+                            `opera >= ${MIN_SUPPORTED_VERSION.OPERA}`,
+                            `safari >= ${MIN_SUPPORTED_VERSION.SAFARI}`,
                         ],
                     },
                 },
@@ -137,25 +155,7 @@ const cjs = {
             banner: BANNER,
         },
     ],
-    plugins: [
-        ...nodePlugins,
-        // Provide better browser compatibility with Babel
-        getBabelOutputPlugin({
-            presets: [
-                [
-                    '@babel/preset-env',
-                    {
-                        // at least Node.js 17
-                        targets: {
-                            node: '17',
-                        },
-                    },
-                ],
-            ],
-            allowAllFormats: true,
-            compact: false,
-        }),
-    ],
+    plugins: nodePlugins,
 };
 
 // ECMAScript build configuration
@@ -188,7 +188,7 @@ const cli = {
             file: path.join(distDirLocation, `${BASE_FILE_NAME}.cli.js`),
             format: 'cjs',
             sourcemap: false,
-            // Replace import './index.node' with './aglint.esm.js'
+            // Replace import './index.node' with './aglint.js'
             paths: {
                 [linterIndex]: path.join('./', `${BASE_FILE_NAME}.js`),
             },
@@ -252,4 +252,11 @@ const dts = {
 };
 
 // Export build configs for Rollup
-export default [dts, cjs, esm, cli, umd, iife];
+export default [
+    dts,
+    cjs,
+    esm,
+    cli,
+    umd,
+    iife,
+];
