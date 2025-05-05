@@ -1,12 +1,20 @@
-<!-- markdownlint-disable MD024 -->
 # AGLint Changelog
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog][keepachangelog], and this project adheres to [Semantic Versioning][semver].
+The format is based on [Keep a Changelog], and this project adheres to [Semantic Versioning].
 
-[keepachangelog]: https://keepachangelog.com/en/1.0.0/
-[semver]: https://semver.org/spec/v2.0.0.html
+[Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
+[Semantic Versioning]: https://semver.org/spec/v2.0.0.html
+
+## [2.1.5] - 2025-05-05
+
+### Added
+
+- Support of `cli` platform [#251].
+
+[2.1.5]: https://github.com/AdguardTeam/AGLint/compare/v2.1.4...v2.1.5
+[#251]: https://github.com/AdguardTeam/AGLint/issues/251
 
 ## [2.1.4] - 2025-03-31
 

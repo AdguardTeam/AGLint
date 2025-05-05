@@ -20,6 +20,7 @@ const KNOWN_HINTS = new Set([
 const KNOWN_PLATFORMS = new Set([
     'windows',
     'mac',
+    'cli',
     'android',
     'ios',
     'ext_chromium_mv3',

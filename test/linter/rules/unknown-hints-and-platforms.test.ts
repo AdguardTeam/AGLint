@@ -20,6 +20,7 @@ describe('unknown-hints-and-platforms', () => {
         // PLATFORM single
         expect(linter.lint('!+ PLATFORM(windows)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ PLATFORM(mac)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ PLATFORM(cli)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ PLATFORM(android)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ PLATFORM(ios)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ PLATFORM(ext_chromium_mv3)')).toMatchObject({ problems: [] });
@@ -35,13 +36,14 @@ describe('unknown-hints-and-platforms', () => {
         expect(
             linter.lint(
                 // eslint-disable-next-line max-len
-                '!+ PLATFORM(windows, mac, android, ios, ext_chromium_mv3, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
+                '!+ PLATFORM(windows, mac, cli, android, ios, ext_chromium_mv3, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
             ),
         ).toMatchObject({ problems: [] });
 
         // NOT_PLATFORM single
         expect(linter.lint('!+ NOT_PLATFORM(windows)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ NOT_PLATFORM(mac)')).toMatchObject({ problems: [] });
+        expect(linter.lint('!+ NOT_PLATFORM(cli)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ NOT_PLATFORM(android)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ NOT_PLATFORM(ios)')).toMatchObject({ problems: [] });
         expect(linter.lint('!+ NOT_PLATFORM(ext_chromium_mv3)')).toMatchObject({ problems: [] });
@@ -57,7 +59,7 @@ describe('unknown-hints-and-platforms', () => {
         expect(
             linter.lint(
                 // eslint-disable-next-line max-len
-                '!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium_mv3, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
+                '!+ NOT_PLATFORM(windows, mac, cli, android, ios, ext_chromium_mv3, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
             ),
         ).toMatchObject({ problems: [] });
     });
