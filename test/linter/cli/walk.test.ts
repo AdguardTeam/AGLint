@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { join, parse, type ParsedPath } from 'path';
 
 import { walk } from '../../../src/linter/cli/walk';

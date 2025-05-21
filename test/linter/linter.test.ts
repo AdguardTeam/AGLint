@@ -1,4 +1,10 @@
-import ss, { type Struct } from 'superstruct';
+import {
+    describe,
+    test,
+    it,
+    expect,
+} from 'vitest';
+import * as ss from 'superstruct';
 import merge from 'deepmerge';
 import {
     type AnyRule,
@@ -6,6 +12,7 @@ import {
     RuleParser,
     AdblockSyntax,
 } from '@adguard/agtree';
+import { type Struct } from 'superstruct';
 
 import { Linter, type LinterRuleData } from '../../src/linter';
 import { defaultLinterRules } from '../../src/linter/rules';
@@ -379,6 +386,7 @@ describe('Linter', () => {
 
         // Should throw error if preset doesn't exist
         expect(() => linter.applyConfigExtensions({
+            syntax: [AdblockSyntax.Common],
             extends: ['preset-100'],
             allowInlineConfig: true,
         })).toThrowError('Config preset "preset-100" doesn\'t exist');
@@ -397,6 +405,7 @@ describe('Linter', () => {
         // Should merge presets properly if they exist
         expect(
             linter.applyConfigExtensions({
+                syntax: [AdblockSyntax.Common],
                 extends: ['preset-1'],
                 allowInlineConfig: true,
             }),
@@ -412,6 +421,7 @@ describe('Linter', () => {
 
         expect(
             linter.applyConfigExtensions({
+                syntax: [AdblockSyntax.Common],
                 extends: ['preset-2'],
                 allowInlineConfig: true,
             }),
@@ -430,6 +440,7 @@ describe('Linter', () => {
         // this is why the rule-3 severity is 'off' instead of 'error'
         expect(
             linter.applyConfigExtensions({
+                syntax: [AdblockSyntax.Common],
                 extends: ['preset-1', 'preset-2'],
                 allowInlineConfig: true,
             }),
@@ -450,6 +461,7 @@ describe('Linter', () => {
         // but user config's rules should override both presets
         expect(
             linter.applyConfigExtensions({
+                syntax: [AdblockSyntax.Common],
                 extends: ['preset-1', 'preset-2'],
                 allowInlineConfig: true,
                 rules: {
@@ -513,6 +525,7 @@ describe('Linter', () => {
 
         // Set config
         linter.setConfig({
+            syntax: [AdblockSyntax.Common],
             rules: {
                 'rule-1': 'off',
                 'rule-2': 'warn',
@@ -1202,6 +1215,7 @@ describe('Linter', () => {
 
     test("lint ignores inline config comments if they aren't allowed in the linter config", () => {
         const linter = new Linter(false, {
+            syntax: [AdblockSyntax.Common],
             allowInlineConfig: false,
         });
 

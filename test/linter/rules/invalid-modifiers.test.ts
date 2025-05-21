@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import { AdblockSyntax } from '@adguard/agtree';
 
 import { Linter } from '../../../src/linter';

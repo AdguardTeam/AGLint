@@ -57,7 +57,7 @@ export async function configFinder(cwd: string, callback: ConfigFinderCallback):
         if (configFiles.length === 1) {
             // If there is only one config file, call the callback with the path to the config file
             // If the callback returned `true`, stop the search
-            if (await callback(join(dir, configFiles[0])) === true) {
+            if (await callback(join(dir, configFiles[0]!)) === true) {
                 return;
             }
         } else if (configFiles.length > 1) {

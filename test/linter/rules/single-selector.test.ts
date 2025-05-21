@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { SingleSelector } from '../../../src/linter/rules/single-selector';
 import { NEWLINE } from '../../../src/common/constants';

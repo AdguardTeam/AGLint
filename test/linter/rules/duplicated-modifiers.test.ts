@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { DuplicatedModifiers } from '../../../src/linter/rules/duplicated-modifiers';
 

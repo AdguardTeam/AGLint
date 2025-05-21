@@ -19,7 +19,7 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     parserOptions: {
         tsconfigRootDir: join(__dirname),
-        project: 'tsconfig.eslint.json',
+        project: 'tsconfig.json',
     },
     plugins: ['import', '@typescript-eslint', 'import-newlines'],
     rules: {

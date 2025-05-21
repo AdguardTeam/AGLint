@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { UnknownHintsAndPlatforms } from '../../../src/linter/rules/unknown-hints-and-platforms';
 

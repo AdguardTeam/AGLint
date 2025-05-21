@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { IfClosed } from '../../../src/linter/rules/if-closed';
 import { NEWLINE } from '../../../src/common/constants';

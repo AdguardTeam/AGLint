@@ -38,16 +38,15 @@ During development, you can use the following commands (listed in `package.json`
 - `pnpm build-types` - build type definitions with [TypeScript][typescript] to the `dist/types` folder.
 - `pnpm check-types` - check types with [TypeScript][typescript]
 - `pnpm clean` - remove the `dist` folder.
-- `pnpm clean-types` - remove the `dist/types` folder.
 - `pnpm coverage` - print test coverage report
 - `pnpm lint` - run all linters.
 - `pnpm lint:md` - lint the markdown files with [markdownlint][markdownlint].
 - `pnpm lint:ts` - lint the code with [ESLint][eslint].
-- `pnpm test` - run tests with [Jest][jest] (you can also run a specific test with `pnpm test <test-name>`)
+- `pnpm test` - run tests with [Vitest][vitest] (you can also run a specific test with `pnpm test <test-name>`)
 
 [contribute]: https://adguard.com/contribute.html
 [eslint]: https://eslint.org/
-[jest]: https://jestjs.io/
+[vitest]: https://vitest.dev/
 [markdownlint]: https://github.com/DavidAnson/markdownlint
 [rollup]: https://rollupjs.org/
 [typescript]: https://www.typescriptlang.org/

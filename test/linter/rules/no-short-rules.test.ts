@@ -1,3 +1,10 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { NoShortRules } from '../../../src/linter/rules/no-short-rules';
 

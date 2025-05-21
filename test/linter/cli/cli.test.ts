@@ -1,3 +1,10 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeEach,
+    afterEach,
+} from 'vitest';
 import path, { type ParsedPath } from 'path';
 import fs from 'fs-extra';
 import cloneDeep from 'clone-deep';

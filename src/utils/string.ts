@@ -157,10 +157,10 @@ export class StringUtils {
                     || pattern[i] === REGEX_MARKER)
                 && pattern[i - 1] !== ESCAPE_CHARACTER
             ) {
-                if (open === pattern[i]) {
+                if (open === pattern[i]!) {
                     open = null;
                 } else if (open === null) {
-                    open = pattern[i];
+                    open = pattern[i]!;
                 }
             } else if (open === null && pattern[i] === searchedCharacter && pattern[i - 1] !== ESCAPE_CHARACTER) {
                 return i;
@@ -195,7 +195,7 @@ export class StringUtils {
                 (pattern[i] === SINGLE_QUOTE_MARKER || pattern[i] === DOUBLE_QUOTE_MARKER)
                 && pattern[i - 1] !== escapeCharacter
             ) {
-                if (!openQuote) openQuote = pattern[i];
+                if (!openQuote) openQuote = pattern[i]!;
                 else if (openQuote === pattern[i]) openQuote = null;
             } else if (pattern[i] === searchedCharacter && pattern[i - 1] !== escapeCharacter) {
                 // Unescaped character
@@ -397,7 +397,7 @@ export class StringUtils {
      */
     public static findFirstNonWhitespaceCharacter(pattern: string, start = 0): number {
         for (let i = start; i < pattern.length; i += 1) {
-            if (!StringUtils.isWhitespace(pattern[i])) {
+            if (!StringUtils.isWhitespace(pattern[i]!)) {
                 return i;
             }
         }
@@ -412,7 +412,7 @@ export class StringUtils {
      */
     public static findLastNonWhitespaceCharacter(pattern: string): number {
         for (let i = pattern.length - 1; i >= 0; i -= 1) {
-            if (!StringUtils.isWhitespace(pattern[i])) {
+            if (!StringUtils.isWhitespace(pattern[i]!)) {
                 return i;
             }
         }
@@ -428,7 +428,7 @@ export class StringUtils {
      */
     public static findNextWhitespaceCharacter(pattern: string, start = 0): number {
         for (let i = start; i < pattern.length; i += 1) {
-            if (StringUtils.isWhitespace(pattern[i])) {
+            if (StringUtils.isWhitespace(pattern[i]!)) {
                 return i;
             }
         }
@@ -483,7 +483,7 @@ export class StringUtils {
     public static skipWS(pattern: string, start = 0): number {
         let i = start;
 
-        while (i < pattern.length && StringUtils.isWhitespace(pattern[i])) {
+        while (i < pattern.length && StringUtils.isWhitespace(pattern[i]!)) {
             i += 1;
         }
 
@@ -500,7 +500,7 @@ export class StringUtils {
     public static skipWSBack(pattern: string, start = pattern.length - 1): number {
         let i = start;
 
-        while (i >= 0 && StringUtils.isWhitespace(pattern[i])) {
+        while (i >= 0 && StringUtils.isWhitespace(pattern[i]!)) {
             i -= 1;
         }
 
@@ -516,7 +516,7 @@ export class StringUtils {
      */
     public static findNextEOL(pattern: string, start = 0): number {
         for (let i = start; i < pattern.length; i += 1) {
-            if (StringUtils.isEOL(pattern[i])) {
+            if (StringUtils.isEOL(pattern[i]!)) {
                 return i;
             }
         }
@@ -600,7 +600,7 @@ export class StringUtils {
 
         // Iterate over each tuple in the input array
         for (let i = 0; i < input.length; i += 1) {
-            const [line, newLineType] = input[i];
+            const [line, newLineType] = input[i]!;
             // Add the line to the result string
             result += line;
 

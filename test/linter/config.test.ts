@@ -1,4 +1,6 @@
+import { describe, test, expect } from 'vitest';
 import { assert } from 'superstruct';
+import { AdblockSyntax } from '@adguard/agtree';
 
 import { linterConfigSchema, mergeConfigs } from '../../src/linter/config';
 
@@ -8,6 +10,7 @@ describe('Linter config', () => {
             expect(
                 mergeConfigs(
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': ['warn', 'value-1', 'value-2'],
                             'rule-2': ['error', 'value-1', 'value-2'],
@@ -35,6 +38,7 @@ describe('Linter config', () => {
             expect(
                 mergeConfigs(
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {},
                     },
                     {
@@ -58,6 +62,7 @@ describe('Linter config', () => {
             expect(
                 mergeConfigs(
                     {
+                        syntax: [AdblockSyntax.Common],
                         rules: {
                             'rule-1': 'off',
                             'rule-2': ['warn'],

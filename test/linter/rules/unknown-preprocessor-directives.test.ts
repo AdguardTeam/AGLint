@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { UnknownPreProcessorDirectives } from '../../../src/linter/rules/unknown-preprocessor-directives';
 

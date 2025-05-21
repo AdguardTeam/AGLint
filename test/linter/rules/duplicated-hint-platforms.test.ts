@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { DuplicatedHintPlatforms } from '../../../src/linter/rules/duplicated-hint-platforms';
 

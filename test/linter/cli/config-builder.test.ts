@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import path from 'path';
 
 import { buildConfigForDirectory } from '../../../src/linter/cli/config-builder';

@@ -1,16 +1,11 @@
 name: Check code
 
 env:
-  NODE_VERSION: 22
   PNPM_VERSION: 10.7.1
 
 on:
   push:
-    branches:
-      - master
   pull_request:
-    branches:
-      - master
   # Make possible to run manually
   workflow_dispatch:
 
@@ -18,6 +13,15 @@ jobs:
   check_code:
     name: Run type checking, linting, and testing
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # https://nodejs.org/en/about/previous-releases
+        node-version:
+          - 18.x
+          - 20.x
+          - 22.x
+
     steps:
       - name: Check out to repository
         uses: actions/checkout@v4
@@ -31,7 +35,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node-version }}
           cache: pnpm
 
       - name: Install dependencies
@@ -49,7 +53,7 @@ jobs:
       - name: Run ESLint
         run: pnpm lint:ts
 
-      - name: Run Jest tests
+      - name: Run tests
         run: pnpm test
 
       - name: Build should be successful

@@ -7,6 +7,27 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [3.0.0] - 2025-05-21
+
+### Changed
+
+- Project become ESM-only.
+- Minimum Node.js version is `v18`.
+- The build structure has been updated: files are no longer bundled. Users can handle bundling as needed.
+- Updated [@adguard/agtree] to `v3.1.4` [#247].
+
+### Fixed
+
+- zod vulnerability issue [#250].
+
+### Removed
+
+- Legacy `umd` and `iife` builds.
+
+[3.0.0]: https://github.com/AdguardTeam/AGLint/compare/v2.1.5...v3.0.0
+[#247]: https://github.com/AdguardTeam/AGLint/issues/247
+[#250]: https://github.com/AdguardTeam/AGLint/issues/250
+
 ## [2.1.5] - 2025-05-05
 
 ### Added

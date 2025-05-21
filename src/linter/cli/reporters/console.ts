@@ -91,7 +91,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
 
     onFileEnd = (file: ParsedPath, result: LinterResult) => {
         // Initialize the problems array for the file as empty
-        this.problems[path.join(file.dir, file.base)].push(...result.problems);
+        this.problems[path.join(file.dir, file.base)]?.push(...result.problems);
 
         // Count the problems
         this.warnings += result.warningCount;

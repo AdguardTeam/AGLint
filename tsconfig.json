@@ -1,33 +1,19 @@
 {
+    "extends": "./tsconfig.base.json",
     "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "node",
-        "types": [
-            "node",
-            "jest"
-        ],
-        "resolveJsonModule": true,
-        "allowJs": true,
-        "declaration": true,
-        "outDir": "./dist",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "skipLibCheck": true,
-        "rootDir": "./"
+        "noEmit": true,
     },
     "include": [
-        "./src"
+        ".eslintrc.cjs",
+        "vitest.config.ts",
+        "rollup.config.ts",
+        "tasks/**/*.ts",
+        "src/**/*.ts",
+        "test/**/*.ts",
     ],
     "exclude": [
         "./node_modules",
-        "./dist"
+        "./dist",
+        "./test/smoke"
     ],
-    "ts-node": {
-        "swc": true,
-        "compilerOptions": {
-            "module": "ESNext"
-        }
-    }
 }

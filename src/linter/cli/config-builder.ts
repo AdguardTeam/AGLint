@@ -52,7 +52,7 @@ export async function buildConfigForDirectory(dir: string): Promise<LinterConfig
 
     // If there is only one config file, just return it, no need to do anything else
     if (parsedConfigs.length === 1) {
-        return parsedConfigs[0];
+        return parsedConfigs[0]!;
     }
 
     // We should merge the config files from the root directory to the actual directory.

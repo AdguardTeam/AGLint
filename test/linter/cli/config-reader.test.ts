@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 import path from 'path';
 
 import { parseConfigFile } from '../../../src/linter/cli/config-reader';

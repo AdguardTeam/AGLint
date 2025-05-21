@@ -1,4 +1,4 @@
-// import path from 'path';
+import { describe, test, expect } from 'vitest';
 import { join, relative, resolve } from 'path';
 
 import { configFinder, findNextConfig, findNextRootConfig } from '../../../src/linter/cli/config-finder';

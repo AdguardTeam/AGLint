@@ -13,9 +13,10 @@ import {
     FilterListParser,
     RuleCategory,
     PositionProvider,
-    defaultParserOptions,
     type Value,
 } from '@adguard/agtree';
+import { defaultParserOptions } from '@adguard/agtree/parser';
+import { FilterListGenerator } from '@adguard/agtree/generator';
 
 import {
     defaultLinterConfig,
@@ -1052,11 +1053,11 @@ export class Linter {
                 if (matches === 1) {
                     fixedFilterList.children.push(...fixed);
                 } else {
-                    fixedFilterList.children.push(rule);
+                    fixedFilterList.children.push(rule!);
                 }
             }
 
-            result.fixed = FilterListParser.generate(fixedFilterList, true);
+            result.fixed = FilterListGenerator.generate(fixedFilterList, true);
         }
 
         // Return linting result

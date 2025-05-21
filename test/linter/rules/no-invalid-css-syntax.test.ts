@@ -1,3 +1,10 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { NEWLINE } from '../../../src/common/constants';
 import { NoInvalidCssSyntax } from '../../../src/linter/rules/no-invalid-css-syntax';

@@ -1,3 +1,11 @@
+import {
+    describe,
+    test,
+    expect,
+    beforeAll,
+    it,
+} from 'vitest';
+
 import { Linter } from '../../../src/linter';
 import { InconsistentHintPlatforms } from '../../../src/linter/rules/inconsistent-hint-platforms';
 
