@@ -7,5 +7,8 @@ dist
 node_modules
 .pnpm-store/
 
+# npmjs token
+.npmrc
+
 # Release file for npm.
-release.tgz
+*.tgz
