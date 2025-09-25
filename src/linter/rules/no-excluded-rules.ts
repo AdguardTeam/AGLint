@@ -5,23 +5,23 @@ import {
     type Struct,
 } from 'superstruct';
 
+import { StringUtils } from '../../utils/string';
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-import { StringUtils } from '../../utils/string';
 
 // Define rule config type (it is only relevant for the rule itself)
 type RuleConfig = {
     // TODO: Add other options to exclude rules if needed
-    'regexp-patterns': string[],
+    'regexp-patterns': string[];
 };
 
 /**
  * Concreting the storage type definition (the linter only provides a general
- * form where the value type is unknown)
+ * form where the value type is unknown).
  */
 interface RuleStorage {
     /**
-     * Array of all exclude patterns, in RegExp form
+     * Array of all exclude patterns, in RegExp form.
      */
     'regexp-patterns': RegExp[];
 }

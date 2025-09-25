@@ -1,13 +1,15 @@
-import { StructError, assert } from 'superstruct';
+import { assert, StructError } from 'superstruct';
 
-import { linterConfigSchema } from './config';
-import { type LinterConfig } from './common';
 import { EMPTY } from '../common/constants';
+
+import { type LinterConfig } from './common';
+import { linterConfigSchema } from './config';
 
 /**
  * Validates the AGLint linter config object using Superstruct.
  *
- * @param config Config object to validate
+ * @param config Config object to validate.
+ *
  * @throws If the config object is not valid according to the config schema.
  */
 export function validateLinterConfig(config: unknown): asserts config is LinterConfig {

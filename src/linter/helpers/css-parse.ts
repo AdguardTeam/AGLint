@@ -1,6 +1,6 @@
 import { parse, type SyntaxParseError } from '@adguard/ecss-tree';
 
-import { type CssTreeParsingContextToNode, type CssTreeParsingContext } from './css-tree-types';
+import { type CssTreeParsingContext, type CssTreeParsingContextToNode } from './css-tree-types';
 
 /**
  * Helper function to parse CSS string into CSSTree node by using proper settings for the linter.

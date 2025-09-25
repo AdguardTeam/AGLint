@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest';
-import { assert } from 'superstruct';
 import { AdblockSyntax } from '@adguard/agtree';
+import { assert } from 'superstruct';
+import { describe, expect, test } from 'vitest';
 
 import { linterConfigSchema, mergeConfigs } from '../../src/linter/config';
 

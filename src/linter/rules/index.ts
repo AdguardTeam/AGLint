@@ -1,18 +1,19 @@
 import { type AnyLinterRule } from '../common';
+
 import { DuplicatedHintPlatforms } from './duplicated-hint-platforms';
 import { DuplicatedHints } from './duplicated-hints';
-import { UnknownHintsAndPlatforms } from './unknown-hints-and-platforms';
 import { DuplicatedModifiers } from './duplicated-modifiers';
 import { IfClosed } from './if-closed';
+import { InconsistentHintPlatforms } from './inconsistent-hint-platforms';
 import { InvalidDomainList } from './invalid-domain-list';
 import { InvalidModifiers } from './invalid-modifiers';
-import { InconsistentHintPlatforms } from './inconsistent-hint-platforms';
-import { SingleSelector } from './single-selector';
-import { UnknownPreProcessorDirectives } from './unknown-preprocessor-directives';
-import { NoShortRules } from './no-short-rules';
 import { NoExcludedRules } from './no-excluded-rules';
-import { NoInvalidCssSyntax } from './no-invalid-css-syntax';
 import { NoInvalidCssDeclaration } from './no-invalid-css-declaration';
+import { NoInvalidCssSyntax } from './no-invalid-css-syntax';
+import { NoShortRules } from './no-short-rules';
+import { SingleSelector } from './single-selector';
+import { UnknownHintsAndPlatforms } from './unknown-hints-and-platforms';
+import { UnknownPreProcessorDirectives } from './unknown-preprocessor-directives';
 
 export const defaultLinterRules = new Map<string, AnyLinterRule>([
     ['no-invalid-css-syntax', NoInvalidCssSyntax],

@@ -1,14 +1,14 @@
 import { CosmeticRuleType, RuleCategory } from '@adguard/agtree';
 import { type CssNode, type Declaration } from '@adguard/ecss-tree';
 
-import { type LinterRule } from '../common';
-import { SEVERITY } from '../severity';
 import { isUndefined } from '../../utils/type-guards';
+import { type LinterRule } from '../common';
 import { CssTreeParsingContext } from '../helpers/css-tree-types';
 import { validateDeclaration } from '../helpers/css-validator';
+import { SEVERITY } from '../severity';
 
 /**
- * Rule that checks if CSS declarations are valid
+ * Rule that checks if CSS declarations are valid.
  */
 export const NoInvalidCssDeclaration: LinterRule = {
     meta: {

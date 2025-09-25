@@ -1,27 +1,28 @@
-import {
-    describe,
-    test,
-    expect,
-    beforeEach,
-    afterEach,
-} from 'vitest';
-import path, { type ParsedPath } from 'path';
-import fs from 'fs-extra';
-import cloneDeep from 'clone-deep';
-import { readFile } from 'fs/promises';
+import { readFile } from 'node:fs/promises';
+import path, { type ParsedPath } from 'node:path';
 
+import cloneDeep from 'clone-deep';
+import fs from 'fs-extra';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    test,
+} from 'vitest';
+
+import { type LinterResult } from '../../../src/linter';
 import { LinterCli } from '../../../src/linter/cli';
 import { type LinterCliReporter } from '../../../src/linter/cli/reporter';
-import { type LinterResult } from '../../../src/linter';
 import { StringUtils } from '../../../src/utils/string';
 
 /**
- * Path to the `test/fixtures/cli` directory
+ * Path to the `test/fixtures/cli` directory.
  */
 const FIXTURE_SOURCE = path.join('test/fixtures', 'cli');
 
 /**
- * Path to the `test/fixtures/cli-temporary` directory
+ * Path to the `test/fixtures/cli-temporary` directory.
  */
 const FIXTURE_PATH = path.join('test/fixtures', 'cli-temporary');
 
@@ -34,20 +35,40 @@ type LoggedEvent = [string, unknown];
  * Reporter for testing purposes.
  */
 class TestReporter implements LinterCliReporter {
+    /**
+     * Logged events.
+     */
     private events: LoggedEvent[] = [];
 
+    /**
+     * Called when linting starts.
+     */
     onLintStart = () => {
         this.events.push(['onLintStart', null]);
     };
 
+    /**
+     * Called when a file starts being linted.
+     *
+     * @param file The file that is being linted.
+     */
     onFileStart = (file: ParsedPath) => {
         this.events.push(['onFileStart', file]);
     };
 
+    /**
+     * Called when a file ends being linted.
+     *
+     * @param file The file that has been linted.
+     * @param result The result of the linting.
+     */
     onFileEnd = (file: ParsedPath, result: LinterResult) => {
         this.events.push(['onFileEnd', { file, result }]);
     };
 
+    /**
+     * Called when linting ends.
+     */
     onLintEnd = () => {
         this.events.push(['onLintEnd', null]);
     };

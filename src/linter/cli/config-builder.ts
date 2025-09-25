@@ -2,6 +2,7 @@ import cloneDeep from 'clone-deep';
 
 import { type LinterConfig } from '../common';
 import { mergeConfigs } from '../config';
+
 import { configFinder } from './config-finder';
 import { parseConfigFile } from './config-reader';
 import { NoConfigError } from './errors/no-config-error';
@@ -14,11 +15,13 @@ import { NoConfigError } from './errors/no-config-error';
  * to the actual directory after each other. This will results the corresponding
  * config object for the given directory. Works same as ESLint.
  *
- * @param dir Base directory
- * @returns Config object
- * @throws If no config file was found
- * @throws If a config file is found, but it is not valid
- * @throws If multiple config files are found in the same directory
+ * @param dir Base directory.
+ *
+ * @returns Config object.
+ *
+ * @throws If no config file was found.
+ * @throws If a config file is found, but it is not valid.
+ * @throws If multiple config files are found in the same directory.
  */
 export async function buildConfigForDirectory(dir: string): Promise<LinterConfig> {
     const parsedConfigs: LinterConfig[] = [];

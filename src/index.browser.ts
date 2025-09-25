@@ -1,7 +1,7 @@
 /**
- * @file AGLint exports for browsers
+ * @file AGLint exports for browsers.
  *
- * ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.)
+ * ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.).
  */
 
 // Re-export everything from the common entry point

@@ -1,15 +1,17 @@
-import path, { type ParsedPath } from 'path';
-import { readFile, writeFile } from 'fs/promises';
-import { pathExists } from 'fs-extra';
-import cloneDeep from 'clone-deep';
+import { readFile, writeFile } from 'node:fs/promises';
+import path, { type ParsedPath } from 'node:path';
 
-import { Linter } from '../index';
-import { walk } from './walk';
-import { scan } from './scan';
-import { type LinterCliReporter } from './reporter';
+import cloneDeep from 'clone-deep';
+import { pathExists } from 'fs-extra';
+
 import { type LinterConfig } from '../common';
+import { Linter } from '../index';
+
 import { buildConfigForDirectory } from './config-builder';
 import { NoConfigError } from './errors/no-config-error';
+import { type LinterCliReporter } from './reporter';
+import { scan } from './scan';
+import { walk } from './walk';
 
 /**
  * Implements CLI functionality for the linter. Typically used by the `aglint` command in Node.js environment.
@@ -20,18 +22,27 @@ export class LinterCli {
      */
     private readonly reporter: LinterCliReporter;
 
+    /**
+     * Whether to fix fixable problems automatically.
+     */
     private fix: boolean;
 
+    /**
+     * Whether to use `.aglintignore` files.
+     */
     private ignore: boolean;
 
+    /**
+     * Whether any errors were found.
+     */
     private errors: boolean;
 
     /**
      * Creates a new `LinterCli` instance.
      *
-     * @param reporter The reporter to be used for the CLI
-     * @param fix Fix fixable problems automatically
-     * @param ignore Use `.aglintignore` files
+     * @param reporter The reporter to be used for the CLI.
+     * @param fix Fix fixable problems automatically.
+     * @param ignore Use `.aglintignore` files.
      */
     constructor(reporter: LinterCliReporter, fix = false, ignore = true) {
         this.reporter = reporter;
@@ -44,8 +55,8 @@ export class LinterCli {
      * Lints a file with the given config. Also compatible with the `WalkEvent` type,
      * so it can be used with the `walk` function.
      *
-     * @param file The file to be linted
-     * @param config The active linter config (merged from parent directories)
+     * @param file The file to be linted.
+     * @param config The active linter config (merged from parent directories).
      */
     private lintFile = async (file: ParsedPath, config: LinterConfig) => {
         // Create a new linter instance and add the default rules
@@ -90,7 +101,7 @@ export class LinterCli {
     /**
      * Returns true if the linter found any errors.
      *
-     * @returns `true` if the linter found any errors, `false` otherwise
+     * @returns `true` if the linter found any errors, `false` otherwise.
      */
     public hasErrors = (): boolean => {
         return this.errors;
@@ -99,8 +110,8 @@ export class LinterCli {
     /**
      * Lints the current working directory. If you specify files, it will only lint those files.
      *
-     * @param cwd The current working directory
-     * @param files The files to be linted (if not specified, it will scan the cwd)
+     * @param cwd The current working directory.
+     * @param files The files to be linted (if not specified, it will scan the cwd).
      */
     public run = async (cwd: string, files: string[] = []): Promise<void> => {
         // If the reporter has an onLintStart event, call it
@@ -124,6 +135,7 @@ export class LinterCli {
                 // TODO: Add support for glob patterns
 
                 // Check if the file exists
+                // eslint-disable-next-line no-await-in-loop
                 if (!(await pathExists(fullPath))) {
                     throw new Error(`File "${fullPath}" does not exist`);
                 }
@@ -132,9 +144,11 @@ export class LinterCli {
                 const parsedFile = path.parse(fullPath);
 
                 // Get config for the directory where the file is located
+                // eslint-disable-next-line no-await-in-loop
                 const config = await buildConfigForDirectory(parsedFile.dir);
 
                 // Lint the file
+                // eslint-disable-next-line no-await-in-loop
                 await this.lintFile(parsedFile, config);
             }
         } else {

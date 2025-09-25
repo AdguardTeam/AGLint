@@ -1,9 +1,10 @@
+import path, { type ParsedPath } from 'node:path';
+
 import chalk, { type Chalk, type Options as ChalkOptions } from 'chalk';
-import terminalLink from 'terminal-link';
-import stripAnsi from 'strip-ansi';
-import table from 'text-table';
 import { inflect } from 'inflection';
-import path, { type ParsedPath } from 'path';
+import stripAnsi from 'strip-ansi';
+import terminalLink from 'terminal-link';
+import table from 'text-table';
 
 import {
     CLOSE_PARENTHESIS,
@@ -46,24 +47,24 @@ export class LinterConsoleReporter implements LinterCliReporter {
     private chalk: Chalk;
 
     /**
-     * Total number of warnings
+     * Total number of warnings.
      */
     private warnings = 0;
 
     /**
-     * Total number of errors
+     * Total number of errors.
      */
     private errors = 0;
 
     /**
-     * Total number of fatal errors
+     * Total number of fatal errors.
      */
     private fatals = 0;
 
     /**
      * Creates a new console reporter instance.
      *
-     * @param colors Whether to use colors in the console output or not
+     * @param colors Whether to use colors in the console output or not.
      */
     constructor(colors = true) {
         // By default, Chalk determines the color support automatically, but we
@@ -79,16 +80,19 @@ export class LinterConsoleReporter implements LinterCliReporter {
      */
     private problems: CollectedProblems = {};
 
+    /** @inheritdoc */
     onLintStart = () => {
         // Save the start time
         this.startTime = performance.now();
     };
 
+    /** @inheritdoc */
     onFileStart = (file: ParsedPath) => {
         // Initialize the problems array for the file as empty
         this.problems[path.join(file.dir, file.base)] = [];
     };
 
+    /** @inheritdoc */
     onFileEnd = (file: ParsedPath, result: LinterResult) => {
         // Initialize the problems array for the file as empty
         this.problems[path.join(file.dir, file.base)]?.push(...result.problems);
@@ -99,6 +103,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
         this.fatals += result.fatalErrorCount;
     };
 
+    /** @inheritdoc */
     onLintEnd = () => {
         // Calculate the linting time
         // eslint-disable-next-line max-len

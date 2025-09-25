@@ -1,5 +1,6 @@
-import { describe, test, expect } from 'vitest';
-import { join, relative, resolve } from 'path';
+import { join, relative, resolve } from 'node:path';
+
+import { describe, expect, test } from 'vitest';
 
 import { configFinder, findNextConfig, findNextRootConfig } from '../../../src/linter/cli/config-finder';
 
@@ -10,8 +11,9 @@ const projectRoot = resolve(__dirname, '../../../');
  * This is needed because we may find a config file outside of the project root
  * directory, which can break these tests if we don't check for that.
  *
- * @param path Path to the config file
- * @returns `true` if the config file is located outside of the project root directory
+ * @param path Path to the config file.
+ *
+ * @returns `true` if the config file is located outside of the project root directory.
  */
 function isExternalPath(path: string): boolean {
     // Get the relative path from the project root directory to the config file

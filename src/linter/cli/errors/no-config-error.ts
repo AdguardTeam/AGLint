@@ -4,6 +4,11 @@
  * when using the CLI tool.
  */
 export class NoConfigError extends Error {
+    /**
+     * Creates an instance of NoConfigError.
+     *
+     * @param dir The directory for which no config file was found.
+     */
     constructor(dir: string) {
         super(`No config file found for ${dir}`);
 

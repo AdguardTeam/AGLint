@@ -1,17 +1,20 @@
-#!/usr/bin/env node
+/* eslint-disable n/no-process-exit */
 /**
- * @file AGLint CLI
- * @todo DEV run: node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/cli.ts
+ * @file AGLint CLI.
+ *
+ * @todo DEV run: node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/cli.ts.
  */
 
+import { readdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { AdblockSyntax } from '@adguard/agtree';
-import { program } from 'commander';
-import { readdir, writeFile } from 'fs/promises';
-import { join } from 'path';
-import yaml from 'js-yaml';
 import checkbox from '@inquirer/checkbox';
 import select from '@inquirer/select';
+import { program } from 'commander';
+import yaml from 'js-yaml';
 
+import { NEWLINE } from './common/constants';
 import {
     LinterCli,
     type LinterConfig,
@@ -19,7 +22,6 @@ import {
     version,
 } from './index.node';
 import { CONFIG_FILE_NAMES, JSON_RC_CONFIG_FILE_NAME, YAML_RC_CONFIG_FILE_NAME } from './linter/cli/constants';
-import { NEWLINE } from './common/constants';
 
 /**
  * Represents possible config file formats.
@@ -32,7 +34,7 @@ enum ConfigFileFormat {
 /**
  * Print error to the console, also handle unknown errors.
  *
- * @param error Error to print
+ * @param error Error to print.
  */
 function printError(error: unknown): void {
     const lines = [

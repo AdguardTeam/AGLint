@@ -1,6 +1,10 @@
-import { readFile } from 'fs/promises';
-import { parse } from 'path';
+import { readFile } from 'node:fs/promises';
+import { parse } from 'node:path';
+
 import yaml from 'js-yaml';
+
+import { type LinterConfig } from '../common';
+import { validateLinterConfig } from '../config-validator';
 
 import {
     EXT_JSON,
@@ -8,14 +12,14 @@ import {
     EXT_YML,
     RC_CONFIG_FILE,
 } from './constants';
-import { type LinterConfig } from '../common';
-import { validateLinterConfig } from '../config-validator';
 
 /**
  * Reads and parses supported configuration files.
  *
- * @param filePath - The name of the configuration file to be read and parsed.
+ * @param filePath The name of the configuration file to be read and parsed.
+ *
  * @returns The parsed config object.
+ *
  * @throws If the file not found or the file extension is not supported.
  * @throws If the file contents are not valid JSON or YAML.
  * @throws If the file contents are not valid according to the config schema.

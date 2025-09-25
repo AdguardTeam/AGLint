@@ -1,8 +1,8 @@
 import {
-    describe,
-    test,
-    expect,
     beforeAll,
+    describe,
+    expect,
+    test,
 } from 'vitest';
 
 import { Linter } from '../../../src/linter';

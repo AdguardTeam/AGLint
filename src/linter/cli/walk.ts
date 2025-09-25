@@ -1,17 +1,19 @@
-import path, { type ParsedPath } from 'path';
+import path, { type ParsedPath } from 'node:path';
+
 import cloneDeep from 'clone-deep';
 
-import { type ScannedDirectory } from './scan';
-import { parseConfigFile } from './config-reader';
-import { mergeConfigs } from '../config';
 import { type LinterConfig } from '../common';
+import { mergeConfigs } from '../config';
+
+import { parseConfigFile } from './config-reader';
+import { type ScannedDirectory } from './scan';
 
 /**
  * An event that is performed on a file or directory.
  *
- * @param path The path of the file or directory
- * @param config The active linter config
- * @param fix Fix fixable problems automatically
+ * @param path The path of the file or directory.
+ * @param config The active linter config.
+ * @param fix Fix fixable problems automatically.
  */
 export type WalkEvent = (path: ParsedPath, config: LinterConfig, fix: boolean) => Promise<void>;
 
@@ -27,10 +29,10 @@ interface WalkEvents {
  * Walks a `ScannedDirectory` object and performs an action on each file and directory
  * in the tree.
  *
- * @param scannedDirectory The `ScannedDirectory` object to be walked
- * @param events The events to be performed on each file and directory
- * @param config The CLI config
- * @param fix Fix fixable problems automatically
+ * @param scannedDirectory The `ScannedDirectory` object to be walked.
+ * @param events The events to be performed on each file and directory.
+ * @param config The CLI config.
+ * @param fix Fix fixable problems automatically.
  */
 export async function walk(
     scannedDirectory: ScannedDirectory,
@@ -60,11 +62,13 @@ export async function walk(
 
     // Perform the file action on each lintable file
     for (const file of scannedDirectory.lintableFiles) {
+        // eslint-disable-next-line no-await-in-loop
         await events.file(file, configDeepClone, fix);
     }
 
     // Recursively walk each subdirectory
     for (const subDir of scannedDirectory.subdirectories) {
+        // eslint-disable-next-line no-await-in-loop
         await walk(subDir, events, configDeepClone, fix);
     }
 }

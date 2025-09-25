@@ -1,22 +1,22 @@
 import { CommentRuleType, type PreProcessorCommentRule, RuleCategory } from '@adguard/agtree';
 
+import { ELSE_DIRECTIVE, ENDIF_DIRECTIVE, IF_DIRECTIVE } from '../../common/constants';
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
-import { ELSE_DIRECTIVE, ENDIF_DIRECTIVE, IF_DIRECTIVE } from '../../common/constants';
 
 /**
  * Concreting the storage type definition (the linter only provides a general
- * form where the value type is unknown)
+ * form where the value type is unknown).
  */
 interface Storage {
     /**
-     * Array of all open if directives
+     * Array of all open if directives.
      */
     openIfs: PreProcessorCommentRule[];
 }
 
 /**
- * Rule that checks if all if directives are closed
+ * Rule that checks if all if directives are closed.
  */
 export const IfClosed: LinterRule<Storage> = {
     meta: {

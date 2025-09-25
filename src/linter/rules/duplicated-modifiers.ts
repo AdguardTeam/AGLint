@@ -4,7 +4,7 @@ import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';
 
 /**
- * Rule that checks if a network rule contains multiple same modifiers
+ * Rule that checks if a network rule contains multiple same modifiers.
  */
 export const DuplicatedModifiers: LinterRule = {
     meta: {

@@ -1,14 +1,15 @@
-import { describe, test, expect } from 'vitest';
-import { join, parse, type ParsedPath } from 'path';
+import { join, parse, type ParsedPath } from 'node:path';
 
-import { walk } from '../../../src/linter/cli/walk';
+import { describe, expect, test } from 'vitest';
+
 import { scan } from '../../../src/linter/cli/scan';
+import { walk } from '../../../src/linter/cli/walk';
 import { type LinterConfig } from '../../../src/linter/common';
 import { defaultLinterConfig } from '../../../src/linter/config';
 
 /**
  * Represents an event that is emitted by the walk function,
- * just for testing purposes
+ * just for testing purposes.
  */
 interface StoredEvent {
     event: 'dir' | 'file';

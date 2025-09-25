@@ -1,9 +1,9 @@
 /**
- * @file Output the version number to a build.txt file
+ * @file Output the version number to a build.txt file.
  */
-import fs from 'fs';
-import path from 'path';
-import * as url from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import * as url from 'node:url';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));

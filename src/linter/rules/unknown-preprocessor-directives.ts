@@ -1,14 +1,15 @@
 import { CommentRuleType, RuleCategory } from '@adguard/agtree';
 
-import { SEVERITY } from '../severity';
-import { type LinterRule } from '../common';
 import { SUPPORTED_PREPROCESSOR_DIRECTIVES } from '../../common/constants';
+import { type LinterRule } from '../common';
+import { SEVERITY } from '../severity';
 
 /**
- * Checks if a preprocessor directive is known
+ * Checks if a preprocessor directive is known.
  *
- * @param name Preprocessor directive name to check
- * @returns `true` if the preprocessor directive is known, `false` otherwise
+ * @param name Preprocessor directive name to check.
+ *
+ * @returns `true` if the preprocessor directive is known, `false` otherwise.
  */
 function isKnownPreProcessorDirective(name: string): boolean {
     return SUPPORTED_PREPROCESSOR_DIRECTIVES.has(name);

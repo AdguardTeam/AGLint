@@ -1,7 +1,7 @@
 /**
- * @file AGLint common exports (used in both Node.js and browsers)
+ * @file AGLint common exports (used in both Node.js and browsers).
  *
- * ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.)
+ * ! DO NOT EXPORT NODE SPECIFIC MODULES HERE (e.g. fs, path, etc.).
  */
 
 // Core linter

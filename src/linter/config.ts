@@ -1,7 +1,8 @@
 /**
- * Linter configuration
+ * Linter configuration.
  */
 
+import { AdblockSyntax } from '@adguard/agtree';
 import merge from 'deepmerge';
 import {
     array,
@@ -12,13 +13,12 @@ import {
     record,
     string,
 } from 'superstruct';
-import { AdblockSyntax } from '@adguard/agtree';
 
-import { linterRuleConfigSchema } from './rule';
 import { type LinterConfig } from './common';
+import { linterRuleConfigSchema } from './rule';
 
 /**
- * Superstruct schema for the linter rules config object
+ * Superstruct schema for the linter rules config object.
  */
 export const linterRulesSchema = optional(record(string(), linterRuleConfigSchema));
 
@@ -41,12 +41,12 @@ export const linterConfigPropsSchema = {
 };
 
 /**
- * Superstruct schema for the linter rule config (used for validation)
+ * Superstruct schema for the linter rule config (used for validation).
  */
 export const linterConfigSchema = object(linterConfigPropsSchema);
 
 /**
- * Default linter configuration
+ * Default linter configuration.
  */
 export const defaultLinterConfig: LinterConfig = {
     allowInlineConfig: true,
@@ -57,9 +57,11 @@ export const defaultLinterConfig: LinterConfig = {
  * Merges two configuration objects using deepmerge. Practically, this means that
  * the `extend` object will be merged into the `initial` object.
  *
- * @param initial The initial config object
- * @param extend The config object to extend the initial config with
- * @returns The merged config object
+ * @param initial The initial config object.
+ * @param extend The config object to extend the initial config with.
+ *
+ * @returns The merged config object.
+ *
  * @example
  * If you have the following config (called `initial` parameter):
  * ```json
@@ -104,9 +106,10 @@ export function mergeConfigs(initial: LinterConfig, extend: Partial<LinterConfig
  *
  * It is very similar to {@link mergeConfigs|mergeConfigs()} function, but the order of parameters is reversed.
  *
- * @param extend The config object to extend the initial config with
- * @param initial The initial config object
- * @returns The merged config object
+ * @param extend The config object to extend the initial config with.
+ * @param initial The initial config object.
+ *
+ * @returns The merged config object.
  */
 export function mergeConfigsReverse(extend: Partial<LinterConfig>, initial: LinterConfig): LinterConfig {
     return merge(extend, initial, {

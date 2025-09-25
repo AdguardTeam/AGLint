@@ -4,13 +4,14 @@
  * ! Please ALWAYS use the "pnpm build" command for building!
  */
 
-import typescript from '@rollup/plugin-typescript';
-import resolve from '@rollup/plugin-node-resolve';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import commonjs from '@rollup/plugin-commonjs';
-import externals from 'rollup-plugin-node-externals';
 import json from '@rollup/plugin-json';
-import path from 'path';
-import { readFileSync } from 'fs';
+import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
+import externals from 'rollup-plugin-node-externals';
 
 // Common constants
 const ROOT_DIR = './';

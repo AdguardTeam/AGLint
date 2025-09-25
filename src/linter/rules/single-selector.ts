@@ -1,15 +1,15 @@
-import cloneDeep from 'clone-deep';
 import { CosmeticRuleType, RuleCategory } from '@adguard/agtree';
 import { type Selector } from '@adguard/ecss-tree';
+import cloneDeep from 'clone-deep';
 
-import { type LinterProblemReport, type LinterRule } from '../common';
-import { SEVERITY } from '../severity';
 import { isNull } from '../../utils/type-guards';
-import { CssTreeParsingContext } from '../helpers/css-tree-types';
+import { type LinterProblemReport, type LinterRule } from '../common';
 import { generateSelector } from '../helpers/css-generate';
+import { CssTreeParsingContext } from '../helpers/css-tree-types';
+import { SEVERITY } from '../severity';
 
 /**
- * Rule that checks if a cosmetic rule contains multiple selectors
+ * Rule that checks if a cosmetic rule contains multiple selectors.
  */
 export const SingleSelector: LinterRule = {
     meta: {

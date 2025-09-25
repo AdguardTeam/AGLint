@@ -1,5 +1,5 @@
-import equal from 'fast-deep-equal';
 import { CommentRuleType, RuleCategory, type Value } from '@adguard/agtree';
+import equal from 'fast-deep-equal';
 
 import { type LinterRule } from '../common';
 import { SEVERITY } from '../severity';

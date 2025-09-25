@@ -1,5 +1,5 @@
 /**
- * @file AGLint version
+ * @file AGLint version.
  */
 
 import { version as importedVersion } from '../package.json';

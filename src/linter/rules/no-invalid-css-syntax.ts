@@ -1,12 +1,12 @@
 import { CosmeticRuleType, RuleCategory } from '@adguard/agtree';
 
-import { type LinterRule } from '../common';
-import { SEVERITY } from '../severity';
 import { isUndefined } from '../../utils/type-guards';
+import { type LinterRule } from '../common';
 import { CssTreeParsingContext } from '../helpers/css-tree-types';
+import { SEVERITY } from '../severity';
 
 /**
- * Rule that checks if all CSS is syntactically valid
+ * Rule that checks if all CSS is syntactically valid.
  */
 export const NoInvalidCssSyntax: LinterRule = {
     meta: {

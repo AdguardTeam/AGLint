@@ -1,7 +1,8 @@
-import { lexer, property as getPropertyDescriptor, type Declaration } from '@adguard/ecss-tree';
+import { type Declaration, property as getPropertyDescriptor, lexer } from '@adguard/ecss-tree';
+
+import { isString } from '../../utils/type-guards';
 
 import { isCssTreeSyntaxError } from './css-errors';
-import { isString } from '../../utils/type-guards';
 import { getCssTreeStartAndEndOffsetsFromObject } from './css-loc-extractor';
 
 /**
@@ -26,9 +27,9 @@ interface CssValidatorError {
 
 /**
  * Helper function to validate CSS declaration.
- * Idea from https://github.com/csstree/validator/blob/38e7319d7b049c190f04665df77c836646f3b35e/lib/validate.js#L99-L121
+ * Idea from https://github.com/csstree/validator/blob/38e7319d7b049c190f04665df77c836646f3b35e/lib/validate.js#L99-L121.
  *
- * @param declarationNode - CSS declaration node to validate.
+ * @param declarationNode CSS declaration node to validate.
  *
  * @returns Array of syntax errors.
  */

@@ -1,23 +1,24 @@
 /**
  * @file Helper file for CSSTree to provide better compatibility with TypeScript.
+ *
  * @see {@link https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/62536}
  */
 
 import {
-    type DeclarationList as DeclarationListNode,
-    type Selector as SelectorNode,
-    type SelectorList as SelectorListNode,
-    type StyleSheet as StyleSheetNode,
     type Atrule as AtruleNode,
     type AtrulePrelude as AtrulePreludeNode,
+    type Block as BlockNode,
+    type CssLocation,
+    type CssNodeCommon,
+    type DeclarationList as DeclarationListNode,
+    type Declaration as DeclarationNode,
     type MediaQueryList as MediaQueryListNode,
     type MediaQuery as MediaQueryNode,
     type Rule as RuleNode,
-    type Block as BlockNode,
-    type Declaration as DeclarationNode,
+    type SelectorList as SelectorListNode,
+    type Selector as SelectorNode,
+    type StyleSheet as StyleSheetNode,
     type Value as ValueNode,
-    type CssNodeCommon,
-    type CssLocation,
 } from '@adguard/ecss-tree';
 
 /**

@@ -1,27 +1,27 @@
 import {
-    describe,
-    test,
-    it,
-    expect,
-} from 'vitest';
-import * as ss from 'superstruct';
-import merge from 'deepmerge';
-import {
+    AdblockSyntax,
     type AnyRule,
     FilterListParser,
     RuleParser,
-    AdblockSyntax,
 } from '@adguard/agtree';
+import merge from 'deepmerge';
+import * as ss from 'superstruct';
 import { type Struct } from 'superstruct';
+import {
+    describe,
+    expect,
+    it,
+    test,
+} from 'vitest';
 
-import { Linter, type LinterRuleData } from '../../src/linter';
-import { defaultLinterRules } from '../../src/linter/rules';
-import { SEVERITY, type SeverityValue, type SeverityName } from '../../src/linter/severity';
 import { EMPTY, NEWLINE } from '../../src/common/constants';
+import { Linter, type LinterRuleData } from '../../src/linter';
 import { type LinterConfig, type LinterRule } from '../../src/linter/common';
-import { InvalidModifiers } from '../../src/linter/rules/invalid-modifiers';
+import { defaultLinterRules } from '../../src/linter/rules';
 import { IfClosed } from '../../src/linter/rules/if-closed';
+import { InvalidModifiers } from '../../src/linter/rules/invalid-modifiers';
 import { UnknownPreProcessorDirectives } from '../../src/linter/rules/unknown-preprocessor-directives';
+import { SEVERITY, type SeverityName, type SeverityValue } from '../../src/linter/severity';
 
 const demoRule: LinterRule = {
     meta: {

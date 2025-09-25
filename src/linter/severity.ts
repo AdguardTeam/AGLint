@@ -1,11 +1,11 @@
-import { type Struct, define } from 'superstruct';
+import { define, type Struct } from 'superstruct';
 
 /**
- * Represents the possible severities of a linter rule
+ * Represents the possible severities of a linter rule.
  */
 export const SEVERITY = Object.freeze({
     /**
-     * Rule is disabled, nothing happens
+     * Rule is disabled, nothing happens.
      */
     off: 0,
 
@@ -32,35 +32,36 @@ export const SEVERITY = Object.freeze({
 });
 
 /**
- * Names of the possible severities
+ * Names of the possible severities.
  */
 export const SEVERITY_NAMES = Object.freeze(Object.keys(SEVERITY));
 
 /**
- * Values of the possible severities
+ * Values of the possible severities.
  */
 export const SEVERITY_VALUES = Object.freeze(Object.values(SEVERITY));
 
 /**
- * Type for the possible severity names
+ * Type for the possible severity names.
  */
 export type SeverityName = keyof typeof SEVERITY;
 
 /**
- * Type for the possible severity values
+ * Type for the possible severity values.
  */
 export type SeverityValue = typeof SEVERITY[SeverityName];
 
 /**
- * Type for the possible severities
+ * Type for the possible severities.
  */
 export type AnySeverity = SeverityName | SeverityValue;
 
 /**
  * Always returns the severity value. Typically used to get the severity value from a string.
  *
- * @param value The value to get the severity value from
- * @returns The severity value
+ * @param value The value to get the severity value from.
+ *
+ * @returns The severity value.
  */
 export function getSeverity(value: AnySeverity): SeverityValue {
     if (typeof value === 'string') {
@@ -70,10 +71,11 @@ export function getSeverity(value: AnySeverity): SeverityValue {
 }
 
 /**
- * Checks whether the given value is a valid severity
+ * Checks whether the given value is a valid severity.
  *
- * @param value The value to check
- * @returns Whether the value is a valid severity
+ * @param value The value to check.
+ *
+ * @returns Whether the value is a valid severity.
  */
 export function isSeverity(value: unknown): value is AnySeverity {
     if (typeof value === 'string') {
@@ -86,10 +88,11 @@ export function isSeverity(value: unknown): value is AnySeverity {
 }
 
 /**
- * Superstruct type definition for the linter rule severity
+ * Superstruct type definition for the linter rule severity.
  *
- * @returns Defined struct
  * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
+ *
+ * @returns Defined struct.
  */
 export function severity(): Struct<AnySeverity, null> {
     // TODO: Fix possible type error

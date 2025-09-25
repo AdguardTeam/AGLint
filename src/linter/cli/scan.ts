@@ -1,5 +1,6 @@
-import { readFile, readdir, stat } from 'fs/promises';
-import path, { type ParsedPath } from 'path';
+import { readdir, readFile, stat } from 'node:fs/promises';
+import path, { type ParsedPath } from 'node:path';
+
 import ignore, { type Ignore } from 'ignore';
 
 import {
@@ -10,32 +11,32 @@ import {
 } from './constants';
 
 /**
- * Ignore instance for the default ignores
+ * Ignore instance for the default ignores.
  */
 const defaultIgnores = ignore().add(PROBLEMATIC_PATHS);
 
 /**
- * Represents the result of a scan
+ * Represents the result of a scan.
  */
 export interface ScannedDirectory {
     /**
-     * Data about the current directory
+     * Data about the current directory.
      */
     dir: ParsedPath;
 
     /**
      * Only one config file is allowed in a directory, it may be null if no config file is found in
-     * the directory
+     * the directory.
      */
     configFile: ParsedPath | null;
 
     /**
-     * Lintable files in the directory (if any)
+     * Lintable files in the directory (if any).
      */
     lintableFiles: ParsedPath[];
 
     /**
-     * Subdirectories in the directory (if any)
+     * Subdirectories in the directory (if any).
      */
     subdirectories: ScannedDirectory[];
 }
@@ -47,11 +48,13 @@ export interface ScannedDirectory {
  * It will ignore files and directories that are ignored by the ignore file at any level.
  * `.aglintignore` works exactly like `.gitignore`.
  *
- * @param dir Directory to search in
- * @param ignores File ignores
- * @param useIgnoreFiles Use ignore files or not (default: true)
- * @returns The result of the scan (`ScannedDirectory` object)
- * @throws If multiple config files are found in the given directory
+ * @param dir Directory to search in.
+ * @param ignores File ignores.
+ * @param useIgnoreFiles Use ignore files or not (default: true).
+ *
+ * @returns The result of the scan (`ScannedDirectory` object).
+ *
+ * @throws If multiple config files are found in the given directory.
  */
 export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles = true): Promise<ScannedDirectory> {
     // Initialize an empty result
@@ -87,6 +90,7 @@ export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles =
         // Get the full path of the current item within the directory structure,
         // then get the stats of the item
         const itemPath = path.join(dir, item);
+        // eslint-disable-next-line no-await-in-loop
         const stats = await stat(itemPath);
 
         if (stats.isFile()) {
@@ -114,6 +118,7 @@ export async function scan(dir: string, ignores: Ignore[] = [], useIgnoreFiles =
         } else if (stats.isDirectory()) {
             // If the current item is a directory, recursively scan it, then
             // merge the subdirectory result into the current result
+            // eslint-disable-next-line no-await-in-loop
             result.subdirectories.push(await scan(itemPath, ignores, useIgnoreFiles));
         }
     }

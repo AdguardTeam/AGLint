@@ -1,37 +1,26 @@
 /**
- * @file AGLint core
+ * @file AGLint core.
  */
 
-import { type CssNode } from '@adguard/ecss-tree';
-import { assert } from 'superstruct';
-import cloneDeep from 'clone-deep';
 import {
-    type AnyRule,
     AdblockSyntax,
+    type AnyRule,
     CommentRuleType,
     type FilterList,
     FilterListParser,
-    RuleCategory,
     PositionProvider,
+    RuleCategory,
     type Value,
 } from '@adguard/agtree';
-import { defaultParserOptions } from '@adguard/agtree/parser';
 import { FilterListGenerator } from '@adguard/agtree/generator';
+import { defaultParserOptions } from '@adguard/agtree/parser';
+import { type CssNode } from '@adguard/ecss-tree';
+import cloneDeep from 'clone-deep';
+import { assert } from 'superstruct';
 
-import {
-    defaultLinterConfig,
-    mergeConfigs,
-    linterRulesSchema,
-    mergeConfigsReverse,
-} from './config';
-import { defaultLinterRules } from './rules';
-import { ConfigCommentType } from './inline-config';
-import {
-    SEVERITY,
-    getSeverity,
-    type AnySeverity,
-    isSeverity,
-} from './severity';
+import { getErrorMessage } from '../utils/error';
+import { isNull, isUndefined } from '../utils/type-guards';
+
 import {
     type AnyLinterRule,
     type GenericRuleContext,
@@ -43,36 +32,48 @@ import {
     type LinterRuleEvents,
     type LinterRuleStorage,
 } from './common';
-import { validateLinterConfig } from './config-validator';
+import {
+    defaultLinterConfig,
+    linterRulesSchema,
+    mergeConfigs,
+    mergeConfigsReverse,
+} from './config';
 import { defaultConfigPresets } from './config-presets';
-import { isNull, isUndefined } from '../utils/type-guards';
+import { validateLinterConfig } from './config-validator';
 import { CssCache } from './helpers/css-cache';
-import { getErrorMessage } from '../utils/error';
-import { type CssTreeParsingContext } from './helpers/css-tree-types';
 import { isErrorContainingOffset } from './helpers/css-errors';
 import { parseCss } from './helpers/css-parse';
+import { type CssTreeParsingContext } from './helpers/css-tree-types';
+import { ConfigCommentType } from './inline-config';
+import { defaultLinterRules } from './rules';
+import {
+    type AnySeverity,
+    getSeverity,
+    isSeverity,
+    SEVERITY,
+} from './severity';
 
 /**
- * Represents a linter result that is returned by the `lint` method
+ * Represents a linter result that is returned by the `lint` method.
  */
 export interface LinterResult {
     /**
-     * Array of problems detected by the linter
+     * Array of problems detected by the linter.
      */
     problems: LinterProblem[];
 
     /**
-     * Count of warnings (just for convenience, can be calculated from problems array)
+     * Count of warnings (just for convenience, can be calculated from problems array).
      */
     warningCount: number;
 
     /**
-     * Count of errors (just for convenience, can be calculated from problems array)
+     * Count of errors (just for convenience, can be calculated from problems array).
      */
     errorCount: number;
 
     /**
-     * Count of fatal errors (just for convenience, can be calculated from problems array)
+     * Count of fatal errors (just for convenience, can be calculated from problems array).
      */
     fatalErrorCount: number;
 
@@ -83,31 +84,31 @@ export interface LinterResult {
 }
 
 /**
- * Represents a problem given by the linter
+ * Represents a problem given by the linter.
  */
 export interface LinterProblem {
     /**
-     * Name of the linter rule that generated this problem
+     * Name of the linter rule that generated this problem.
      */
     rule?: string;
 
     /**
-     * The severity of this problem (it practically inherits the rule severity)
+     * The severity of this problem (it practically inherits the rule severity).
      */
     severity: AnySeverity;
 
     /**
-     * Text description of the problem
+     * Text description of the problem.
      */
     message: string;
 
     /**
-     * The location of the problem
+     * The location of the problem.
      */
     position: LinterPosition;
 
     /**
-     * Suggested fix for the problem (if available)
+     * Suggested fix for the problem (if available).
      */
     fix?: AnyRule | AnyRule[];
 }
@@ -130,32 +131,32 @@ export interface LinterRuleData {
     storage: LinterRuleStorage;
 
     /**
-     * Custom config for the rule (it overrides the default config if provided)
+     * Custom config for the rule (it overrides the default config if provided).
      */
     configOverride?: unknown;
 
     /**
-     * Custom severity for the rule (it overrides the default severity if provided)
+     * Custom severity for the rule (it overrides the default severity if provided).
      */
     severityOverride?: AnySeverity;
 }
 
 /**
- * Core linter logic
+ * Core linter logic.
  */
 export class Linter {
     /**
-     * A map of rule names to `LinterRule` objects
+     * A map of rule names to `LinterRule` objects.
      */
     private readonly rules: Map<string, LinterRuleData> = new Map();
 
     /**
-     * The linter configuration
+     * The linter configuration.
      */
     private config: LinterConfig = defaultLinterConfig;
 
     /**
-     * Config presets
+     * Config presets.
      */
     private configPresets: Map<string, LinterConfig> = new Map();
 
@@ -163,8 +164,8 @@ export class Linter {
      * Creates a new linter instance.
      *
      * @param defaultRules Add default linter rules and config presets to the linter
-     * (by default it adds them)
-     * @param config Linter config to use (by default it uses the default config)
+     * (by default it adds them).
+     * @param config Linter config to use (by default it uses the default config).
      */
     constructor(defaultRules = true, config: LinterConfig = defaultLinterConfig) {
         if (defaultRules) {
@@ -196,11 +197,12 @@ export class Linter {
     /**
      * Sets the config for a given rule. It just overrides the default config.
      *
-     * @param ruleName The name of the rule to set the config for
-     * @param ruleConfig The config to set
-     * @throws If the rule doesn't exist
-     * @throws If the rule severity / config is invalid
-     * @throws If the rule doesn't support config
+     * @param ruleName The name of the rule to set the config for.
+     * @param ruleConfig The config to set.
+     *
+     * @throws If the rule doesn't exist.
+     * @throws If the rule severity / config is invalid.
+     * @throws If the rule doesn't support config.
      */
     public setRuleConfig(ruleName: string, ruleConfig: LinterRuleConfig): void {
         const entry = this.rules.get(ruleName);
@@ -243,7 +245,7 @@ export class Linter {
     /**
      * This method applies the configuration "rules" part to the linter.
      *
-     * @param rulesConfig Rules config object
+     * @param rulesConfig Rules config object.
      */
     public applyRulesConfig(rulesConfig: LinterRuleConfigObject) {
         for (const [ruleName, ruleConfig] of Object.entries(rulesConfig)) {
@@ -254,7 +256,7 @@ export class Linter {
     /**
      * Gets the linter configuration.
      *
-     * @returns The linter configuration
+     * @returns The linter configuration.
      */
     public getConfig(): LinterConfig {
         return cloneDeep(this.config);
@@ -263,9 +265,10 @@ export class Linter {
     /**
      * Adds a new config preset to the linter.
      *
-     * @param name Config preset name, e.g. "aglint:recommended"
-     * @param config Related config object
-     * @throws If the config preset already exists
+     * @param name Config preset name, e.g. "aglint:recommended".
+     * @param config Related config object.
+     *
+     * @throws If the config preset already exists.
      */
     public addConfigPreset(name: string, config: LinterConfig): void {
         // Don't allow to override existing config presets
@@ -283,10 +286,12 @@ export class Linter {
      * Applies the config presets to the config object (extends the config
      * with the given presets if they exist).
      *
-     * @param config Config object
-     * @returns Extended config object
-     * @throws If the config preset doesn't exist
-     * @throws If the config is invalid
+     * @param config Config object.
+     *
+     * @returns Extended config object.
+     *
+     * @throws If the config preset doesn't exist.
+     * @throws If the config is invalid.
      */
     public applyConfigExtensions(config: LinterConfig): LinterConfig {
         // Validate the provided config before applying the config presets
@@ -332,10 +337,11 @@ export class Linter {
      * Sets the linter configuration. If `reset` is set to `true`, all rule
      * configurations are reset to their default values (removing overrides).
      *
-     * @param config Core linter configuration
-     * @param reset Whether to reset all rule configs
-     * @throws If any of the config presets doesn't exist
-     * @throws If the rule config is invalid in any way
+     * @param config Core linter configuration.
+     * @param reset Whether to reset all rule configs.
+     *
+     * @throws If any of the config presets doesn't exist.
+     * @throws If the rule config is invalid in any way.
      */
     public setConfig(config: LinterConfig, reset = true): void {
         // Merge the given config with the default config, but before that
@@ -365,9 +371,10 @@ export class Linter {
     /**
      * Adds a new rule to the linter.
      *
-     * @param name The name of the rule
-     * @param rule The rule itself
-     * @throws If the rule name is already taken
+     * @param name The name of the rule.
+     * @param rule The rule itself.
+     *
+     * @throws If the rule name is already taken.
      */
     public addRule(name: string, rule: AnyLinterRule): void {
         this.addRuleEx(name, {
@@ -381,11 +388,12 @@ export class Linter {
     /**
      * Adds a new rule to the linter, but you can specify the rule data.
      *
-     * @param name The name of the rule
-     * @param data The rule data, see `LinterRuleData` interface for more details
-     * @throws If the rule name is already taken
-     * @throws If the rule severity is invalid
-     * @throws If the rule config is invalid
+     * @param name The name of the rule.
+     * @param data The rule data, see `LinterRuleData` interface for more details.
+     *
+     * @throws If the rule name is already taken.
+     * @throws If the rule severity is invalid.
+     * @throws If the rule config is invalid.
      */
     public addRuleEx(name: string, data: LinterRuleData): void {
         if (this.rules.has(name)) {
@@ -423,9 +431,10 @@ export class Linter {
     /**
      * Resets default config for the rule with the specified name.
      *
-     * @param name The name of the rule
-     * @throws If the rule doesn't exist
-     * @throws If the rule doesn't support config
+     * @param name The name of the rule.
+     *
+     * @throws If the rule doesn't exist.
+     * @throws If the rule doesn't support config.
      */
     public resetRuleConfig(name: string): void {
         // Find the rule
@@ -448,11 +457,13 @@ export class Linter {
     /**
      * Gets the current config for the rule with the specified name.
      *
-     * @param name The name of the rule
+     * @param name The name of the rule.
+     *
      * @returns The currently active config for the rule. If no override is set,
      * the default config is returned.
-     * @throws If the rule doesn't exist
-     * @throws If the rule doesn't support config
+     *
+     * @throws If the rule doesn't exist.
+     * @throws If the rule doesn't support config.
      */
     public getRuleConfig(name: string): LinterRuleConfig {
         // Find the rule
@@ -476,8 +487,9 @@ export class Linter {
     /**
      * Returns the `LinterRule` object with the specified name.
      *
-     * @param name - The name of the rule
-     * @returns The `LinterRule` object, or `undefined` if no such rule exists
+     * @param name The name of the rule.
+     *
+     * @returns The `LinterRule` object, or `undefined` if no such rule exists.
      */
     public getRule(name: string): AnyLinterRule | undefined {
         return cloneDeep(this.rules.get(name)?.rule);
@@ -486,7 +498,7 @@ export class Linter {
     /**
      * Returns the map of all rules in the repository.
      *
-     * @returns The map of rule names to `LinterRule` objects
+     * @returns The map of rule names to `LinterRule` objects.
      */
     public getRules(): Map<string, LinterRuleData> {
         return cloneDeep(this.rules);
@@ -495,8 +507,9 @@ export class Linter {
     /**
      * Returns whether a rule with the specified name exists in the repository.
      *
-     * @param name - The name of the rule
-     * @returns `true` if the rule exists, `false` otherwise
+     * @param name The name of the rule.
+     *
+     * @returns `true` if the rule exists, `false` otherwise.
      */
     public hasRule(name: string): boolean {
         return this.rules.has(name);
@@ -505,7 +518,7 @@ export class Linter {
     /**
      * Removes a rule from the repository.
      *
-     * @param name - The name of the rule
+     * @param name The name of the rule.
      */
     public removeRule(name: string): void {
         if (!this.rules.has(name)) {
@@ -518,8 +531,9 @@ export class Linter {
     /**
      * Disables a rule by name.
      *
-     * @param name - The name of the rule
-     * @throws If the rule does not exist
+     * @param name The name of the rule.
+     *
+     * @throws If the rule does not exist.
      */
     public disableRule(name: string): void {
         const entry = this.rules.get(name);
@@ -535,10 +549,11 @@ export class Linter {
     }
 
     /**
-     * Enables a rule
+     * Enables a rule.
      *
-     * @param name - The name of the rule
-     * @throws If the rule does not exist
+     * @param name The name of the rule.
+     *
+     * @throws If the rule does not exist.
      */
     public enableRule(name: string): void {
         const entry = this.rules.get(name);
@@ -556,8 +571,9 @@ export class Linter {
     /**
      * Returns whether a rule is disabled.
      *
-     * @param name - The name of the rule
-     * @returns `true` if the rule is disabled, `false` otherwise
+     * @param name The name of the rule.
+     *
+     * @returns `true` if the rule is disabled, `false` otherwise.
      */
     public isRuleDisabled(name: string): boolean {
         const entry = this.rules.get(name);
@@ -576,10 +592,11 @@ export class Linter {
     /**
      * Lints the list of rules (typically this is the content of a filter list).
      *
-     * @param content - Filter list content
-     * @param fix - Include fixes in the result. Please note that if more than one fix
+     * @param content Filter list content.
+     * @param fix Include fixes in the result. Please note that if more than one fix
      * is available for a single problem, then the line will be skipped.
-     * @returns Linter result
+     *
+     * @returns Linter result.
      */
     public lint(content: string, fix = false): LinterResult {
         // Prepare linting result
@@ -619,7 +636,7 @@ export class Linter {
          * The context is dependent on the actual linting environment, so we create
          * a new context object for each event within this function.
          *
-         * @param event - The event to invoke (e.g. `onRule`)
+         * @param event The event to invoke (e.g. `onRule`).
          */
         const invokeEvent = (event: keyof LinterRuleEvents): void => {
             for (const [name, data] of this.rules) {

@@ -1,10 +1,10 @@
-import { NetworkRuleType, RuleCategory, modifierValidator } from '@adguard/agtree';
+import { modifierValidator, NetworkRuleType, RuleCategory } from '@adguard/agtree';
 
-import { SEVERITY } from '../severity';
 import type { LinterRule, SpecificRuleContext } from '../common';
+import { SEVERITY } from '../severity';
 
 /**
- * Rule that checks modifiers validity for basic (network) rules
+ * Rule that checks modifiers validity for basic (network) rules.
  */
 export const InvalidModifiers: LinterRule = {
     meta: {

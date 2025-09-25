@@ -1,14 +1,14 @@
 import {
-    describe,
-    test,
-    expect,
     beforeAll,
+    describe,
+    expect,
     it,
+    test,
 } from 'vitest';
 
+import { NEWLINE } from '../../../src/common/constants';
 import { Linter } from '../../../src/linter';
 import { SingleSelector } from '../../../src/linter/rules/single-selector';
-import { NEWLINE } from '../../../src/common/constants';
 
 let linter: Linter;
 

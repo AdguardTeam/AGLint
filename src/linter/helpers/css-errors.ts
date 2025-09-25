@@ -27,7 +27,7 @@ export const isErrorContainingOffset = (possibleError: unknown): possibleError i
 /**
  * Check if the error is an instance of SyntaxError, SyntaxMatchError or SyntaxReferenceError.
  *
- * Based on https://github.com/csstree/validator/blob/38e7319d7b049c190f04665df77c836646f3b35e/lib/validate.js#L5-L17
+ * Based on https://github.com/csstree/validator/blob/38e7319d7b049c190f04665df77c836646f3b35e/lib/validate.js#L5-L17.
  *
  * @param possibleError Error to check.
  *

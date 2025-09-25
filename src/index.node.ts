@@ -1,5 +1,5 @@
 /**
- * @file AGLint exports for Node.js
+ * @file AGLint exports for Node.js.
  */
 
 // Re-export everything from the common entry point

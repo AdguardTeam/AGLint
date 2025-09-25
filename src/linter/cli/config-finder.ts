@@ -1,9 +1,10 @@
-import { readdir } from 'fs/promises';
-import { resolve, join } from 'path';
+import { readdir } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
 
-import { CONFIG_FILE_NAMES } from './constants';
-import { parseConfigFile } from './config-reader';
 import { type LinterConfig } from '../common';
+
+import { parseConfigFile } from './config-reader';
+import { CONFIG_FILE_NAMES } from './constants';
 
 const UPPER_DIR = '..';
 
@@ -12,22 +13,23 @@ const UPPER_DIR = '..';
  * If you want to stop the search, return `true` from the callback, otherwise
  * return `false`.
  *
- * @param path Path to the config file
- * @returns `true` if the search should be stopped, `false` otherwise
+ * @param path Path to the config file.
+ *
+ * @returns `true` if the search should be stopped, `false` otherwise.
  */
 export type ConfigFinderCallback = (path: string) => boolean | Promise<boolean>;
 
 /**
- * Result of the config finder
+ * Result of the config finder.
  */
 export type ConfigFinderResult = {
     /**
-     * Path to the config file
+     * Path to the config file.
      */
     path: string;
 
     /**
-     * Parsed config object
+     * Parsed config object.
      */
     config: LinterConfig;
 };
@@ -37,10 +39,11 @@ export type ConfigFinderResult = {
  * It only checks file names, not the contents of the files, so it doesn't validate the config files.
  * If you didn't abort the search meanwhile, it will scan until it reaches the root directory.
  *
- * @param cwd Current working directory
+ * @param cwd Current working directory.
  * @param callback Callback function that will be called with the path to the config file
- * if it is found
- * @throws If multiple config files are found in the same directory
+ * if it is found.
+ *
+ * @throws If multiple config files are found in the same directory.
  */
 export async function configFinder(cwd: string, callback: ConfigFinderCallback): Promise<void> {
     // Start with the current working directory
@@ -49,6 +52,7 @@ export async function configFinder(cwd: string, callback: ConfigFinderCallback):
     // Keep searching for a config file until we reach the root directory
     do {
         // Get the list of files in the current directory
+        // eslint-disable-next-line no-await-in-loop
         const files = await readdir(dir);
 
         // Collect all config files in the current directory
@@ -57,6 +61,7 @@ export async function configFinder(cwd: string, callback: ConfigFinderCallback):
         if (configFiles.length === 1) {
             // If there is only one config file, call the callback with the path to the config file
             // If the callback returned `true`, stop the search
+            // eslint-disable-next-line no-await-in-loop
             if (await callback(join(dir, configFiles[0]!)) === true) {
                 return;
             }
@@ -75,10 +80,12 @@ export async function configFinder(cwd: string, callback: ConfigFinderCallback):
  * Finds the next config file in the current working directory and its parent directories.
  * It just searches for the first config file and returns its path.
  *
- * @param cwd Current working directory
- * @throws If multiple config files are found in the same directory
- * @throws If a config file is found, but it is not valid
- * @returns The path to the config file and the parsed config object or `null` if no config file was found
+ * @param cwd Current working directory.
+ *
+ * @returns The path to the config file and the parsed config object or `null` if no config file was found.
+ *
+ * @throws If multiple config files are found in the same directory.
+ * @throws If a config file is found, but it is not valid.
  */
 export async function findNextConfig(cwd: string): Promise<ConfigFinderResult | null> {
     let configPath: string | null = null;
@@ -116,10 +123,12 @@ export async function findNextConfig(cwd: string): Promise<ConfigFinderResult | 
  * If it doesn't find a root config file, but it finds a config file, it will return the first
  * config file.
  *
- * @param cwd Current working directory
- * @throws If multiple config files are found in the same directory
- * @throws If a config file is found, but it is not valid
- * @returns The path to the config file and the parsed config object or `null` if no config file was found
+ * @param cwd Current working directory.
+ *
+ * @returns The path to the config file and the parsed config object or `null` if no config file was found.
+ *
+ * @throws If multiple config files are found in the same directory.
+ * @throws If a config file is found, but it is not valid.
  */
 export async function findNextRootConfig(cwd: string): Promise<ConfigFinderResult | null> {
     let configPath: string | null = null;

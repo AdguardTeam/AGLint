@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest';
 import { AdblockSyntax } from '@adguard/agtree';
+import { describe, expect, test } from 'vitest';
 
 import { Linter } from '../../../src/linter';
 import { InvalidModifiers } from '../../../src/linter/rules/invalid-modifiers';

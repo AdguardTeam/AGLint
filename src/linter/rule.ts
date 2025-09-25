@@ -1,18 +1,19 @@
 import {
-    type Struct,
     define,
     is,
+    type Struct,
     union,
 } from 'superstruct';
 
-import { severity } from './severity';
 import { type LinterRuleConfigArray } from './common';
+import { severity } from './severity';
 
 /**
- * Own Superstruct type definition for the linter rule config array
+ * Own Superstruct type definition for the linter rule config array.
  *
- * @returns Defined struct
  * @see {@link https://github.com/ianstormtaylor/superstruct/blob/main/src/structs/types.ts}
+ *
+ * @returns Defined struct.
  */
 function configArray(): Struct<LinterRuleConfigArray, null> {
     return define('configArray', (value) => {
@@ -29,11 +30,11 @@ function configArray(): Struct<LinterRuleConfigArray, null> {
 }
 
 /**
- * Superstruct schema for the linter rule config (used for validation)
+ * Superstruct schema for the linter rule config (used for validation).
  *
  * Possible values:
  * - severity itself (number or string): `severity`
  * - one-element array with severity as the first element: `[severity]`
- * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`
+ * - n-element array with severity as the first element and other options as the rest: `[severity, ...options]`.
  */
 export const linterRuleConfigSchema = union([severity(), configArray()]);

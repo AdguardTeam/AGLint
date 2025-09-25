@@ -1,7 +1,7 @@
 import { RuleCategory } from '@adguard/agtree';
-import { type Struct, number, object } from 'superstruct';
+import { number, object, type Struct } from 'superstruct';
 
-import { type LinterRuleStorage, type LinterRule } from '../common';
+import { type LinterRule, type LinterRuleStorage } from '../common';
 import { SEVERITY } from '../severity';
 
 type RuleConfig = {
@@ -11,7 +11,7 @@ type RuleConfig = {
 const DEFAULT_MIN_RULE_LENGTH = 4;
 
 /**
- * Rule that checks if a rule is too short
+ * Rule that checks if a rule is too short.
  */
 export const NoShortRules: LinterRule<LinterRuleStorage<unknown>, RuleConfig> = {
     meta: {

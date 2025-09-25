@@ -1,4 +1,5 @@
 import { type LinterConfig } from '../common';
+
 import aglintAll from './aglint-all';
 import aglintRecommended from './aglint-recommended';
 

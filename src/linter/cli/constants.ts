@@ -14,7 +14,7 @@ export const YAML_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_YAML}`;
 export const YML_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_YML}`;
 
 /**
- * Possible names of the config file
+ * Possible names of the config file.
  */
 export const CONFIG_FILE_NAMES = new Set([
     // aglint.config stuff
@@ -30,7 +30,7 @@ export const CONFIG_FILE_NAMES = new Set([
 ]);
 
 /**
- * Name of the ignore file
+ * Name of the ignore file.
  */
 export const IGNORE_FILE_NAME = '.aglintignore';
 

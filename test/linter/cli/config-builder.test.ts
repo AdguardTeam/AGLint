@@ -1,5 +1,6 @@
-import { describe, test, expect } from 'vitest';
-import path from 'path';
+import path from 'node:path';
+
+import { describe, expect, test } from 'vitest';
 
 import { buildConfigForDirectory } from '../../../src/linter/cli/config-builder';
 import { NoConfigError } from '../../../src/linter/cli/errors/no-config-error';

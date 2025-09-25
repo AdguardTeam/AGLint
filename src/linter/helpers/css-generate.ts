@@ -1,5 +1,5 @@
 /**
- * Migrated from https://github.com/AdguardTeam/tsurlfilter/blob/2144959e92f94e4738274ce577c2fe26e3a0c08b/packages/agtree/src/utils/csstree.ts
+ * Migrated from https://github.com/AdguardTeam/tsurlfilter/blob/2144959e92f94e4738274ce577c2fe26e3a0c08b/packages/agtree/src/utils/csstree.ts.
  *
  * We implement our custom generate logic for some CSS nodes because CSSTree's default
  * generator does not add spaces, just in some edge cases, but we want to show some formatted code.
@@ -32,13 +32,15 @@ import {
     SEMICOLON,
     SPACE,
 } from '../../common/constants';
+
 import { CssTreeNodeType } from './css-tree-types';
 
 /**
  * Generates string representation of the media query.
  *
- * @param mediaQueryNode Media query AST
- * @returns String representation of the media query
+ * @param mediaQueryNode Media query AST.
+ *
+ * @returns String representation of the media query.
  */
 export const generateMediaQuery = (mediaQueryNode: MediaQuery): string => {
     let result = EMPTY;
@@ -78,8 +80,9 @@ export const generateMediaQuery = (mediaQueryNode: MediaQuery): string => {
 /**
  * Generates string representation of the media query list.
  *
- * @param mediaQueryListNode Media query list AST
- * @returns String representation of the media query list
+ * @param mediaQueryListNode Media query list AST.
+ *
+ * @returns String representation of the media query list.
  */
 export const generateMediaQueryList = (mediaQueryListNode: MediaQueryList): string => {
     let result = EMPTY;
@@ -108,8 +111,9 @@ export const generateMediaQueryList = (mediaQueryListNode: MediaQueryList): stri
  * Selector generation based on CSSTree's AST. This is necessary because CSSTree
  * only adds spaces in some edge cases.
  *
- * @param selectorNode CSS Tree AST
- * @returns CSS selector as string
+ * @param selectorNode CSS Tree AST.
+ *
+ * @returns CSS selector as string.
  */
 export const generateSelector = (selectorNode: Selector): string => {
     let result = EMPTY;
@@ -294,8 +298,9 @@ export const generateSelector = (selectorNode: Selector): string => {
 /**
  * Generates string representation of the selector list.
  *
- * @param selectorListNode SelectorList AST
- * @returns String representation of the selector list
+ * @param selectorListNode SelectorList AST.
+ *
+ * @returns String representation of the selector list.
  */
 export const generateSelectorList = (selectorListNode: SelectorList): string => {
     let result = EMPTY;
@@ -323,8 +328,9 @@ export const generateSelectorList = (selectorListNode: SelectorList): string => 
 /**
  * Block generation based on CSSTree's AST. This is necessary because CSSTree only adds spaces in some edge cases.
  *
- * @param declarationListNode CSS Tree AST
- * @returns CSS selector as string
+ * @param declarationListNode CSS Tree AST.
+ *
+ * @returns CSS selector as string.
  */
 export const generateDeclarationList = (declarationListNode: DeclarationList): string => {
     let result = EMPTY;
@@ -374,10 +380,12 @@ export const generateDeclarationList = (declarationListNode: DeclarationList): s
 
 /**
  * Helper function to generate a raw string from a pseudo-class
- * selector's children
+ * selector's children.
  *
- * @param node Pseudo-class selector node
- * @returns Generated pseudo-class value
+ * @param node Pseudo-class selector node.
+ *
+ * @returns Generated pseudo-class value.
+ *
  * @example
  * - `:nth-child(2n+1)` -> `2n+1`
  * - `:matches-path(/foo/bar)` -> `/foo/bar`
@@ -409,10 +417,12 @@ export const generatePseudoClassValue = (node: PseudoClassSelector): string => {
 };
 
 /**
- * Helper function to generate a raw string from a function selector's children
+ * Helper function to generate a raw string from a function selector's children.
  *
- * @param node Function node
- * @returns Generated function value
+ * @param node Function node.
+ *
+ * @returns Generated function value.
+ *
  * @example `responseheader(name)` -> `name`
  */
 export const generateFunctionValue = (node: FunctionNode): string => {
