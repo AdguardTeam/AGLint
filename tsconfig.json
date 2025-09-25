@@ -5,11 +5,12 @@
     },
     "include": [
         ".eslintrc.cjs",
-        "vitest.config.ts",
+        ".lintstagedrc.js",
         "rollup.config.ts",
-        "tasks/**/*.ts",
         "src/**/*.ts",
+        "tasks/**/*.ts",
         "test/**/*.ts",
+        "vitest.config.ts",
     ],
     "exclude": [
         "./node_modules",
