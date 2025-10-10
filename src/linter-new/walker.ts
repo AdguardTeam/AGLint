@@ -1,10 +1,12 @@
 import esquery from 'esquery';
 
+import { EsQueryUtils } from './esquery-utils';
+
 /**
  * Represents an object with string keys and unknown values.
  * This is a basic type to represent AST nodes.
  */
-type AnyObject = Record<string, unknown>;
+export type AnyObject = Record<string, unknown>;
 
 /**
  * Represents the traversal phase for a node.
@@ -60,7 +62,7 @@ type SelectorVisitorHandler = {
     /**
      * Candidate node types extracted from the selector, or `null` if universal.
      */
-    candidateTypes: string[] | null;
+    candidateTypes: Set<string> | null;
 };
 
 /**
@@ -117,49 +119,6 @@ export class LinterWalker {
     }
 
     /**
-     * Extracts candidate node types from a selector AST.
-     * This is an optimization to reduce the number of selectors that need to be
-     * checked for a given node. For example, a selector `IfStatement > BlockStatement`
-     * will only be checked for `IfStatement` nodes.
-     * If no types can be extracted (e.g., for a universal selector `*`),
-     * it returns `null`, and the selector will be checked for all nodes.
-     *
-     * @param selAst The selector AST to analyze.
-     * @returns An array of candidate node types, or `null` if no specific types can be determined.
-     */
-    public static collectCandidateTypes(selAst: unknown): string[] | null {
-        const out = new Set<string>();
-
-        const visit = (node: unknown): void => {
-            if (!node || typeof node !== 'object' || Array.isArray(node)) return;
-
-            const obj = node as Record<string, unknown>;
-
-            if (
-                (obj.type === 'identifier' || obj.type === 'type')
-                && typeof obj.value === 'string'
-            ) {
-                out.add(obj.value);
-            }
-
-            // Recursively scan all subnodes
-            for (const value of Object.values(obj)) {
-                if (value && typeof value === 'object') {
-                    if (Array.isArray(value)) {
-                        for (const v of value) visit(v);
-                    } else {
-                        visit(value);
-                    }
-                }
-            }
-        };
-
-        visit(selAst);
-
-        return out.size > 0 ? Array.from(out) : null;
-    }
-
-    /**
      * Builds a fast lookup index of selectors, categorized by node type.
      * This allows the walker to quickly retrieve only the relevant selectors
      * for a given node type, avoiding unnecessary checks.
@@ -191,7 +150,7 @@ export class LinterWalker {
                 );
             };
 
-            const candidateTypes = LinterWalker.collectCandidateTypes(ast);
+            const candidateTypes = EsQueryUtils.getCandidateTypes(ast);
 
             const item: SelectorVisitorHandler = {
                 ast,

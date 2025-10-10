@@ -30,34 +30,6 @@ describe('LinterWalker', () => {
         walker = new LinterWalker();
     });
 
-    describe('collectCandidateTypes', () => {
-        it('extracts node types from a selector AST', () => {
-            const ast = esquery.parse('IfStatement, BlockStatement');
-            const result = LinterWalker.collectCandidateTypes(ast);
-            expect(result).toContain('IfStatement');
-            expect(result).toContain('BlockStatement');
-        });
-
-        it('returns null if no type nodes exist', () => {
-            const ast = esquery.parse('[name="name"]');
-            const result = LinterWalker.collectCandidateTypes(ast);
-            expect(result).toBeNull();
-        });
-
-        it('handles deeply nested selectors and ignores arrays', () => {
-            const ast = esquery.parse('CallExpression[callee]');
-            const result = LinterWalker.collectCandidateTypes(ast);
-            expect(result).toEqual(['CallExpression']);
-        });
-
-        it('returns null for non-object input', () => {
-            expect(LinterWalker.collectCandidateTypes(null)).toBeNull();
-            expect(LinterWalker.collectCandidateTypes(undefined)).toBeNull();
-            expect(LinterWalker.collectCandidateTypes('string')).toBeNull();
-            expect(LinterWalker.collectCandidateTypes(42)).toBeNull();
-        });
-    });
-
     describe('getParsed', () => {
         it('parses a selector string and caches it', () => {
             const spy = vi.spyOn(esquery, 'parse');
