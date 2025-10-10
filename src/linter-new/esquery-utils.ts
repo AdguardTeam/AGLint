@@ -1,9 +1,14 @@
-import type esquery from 'esquery';
+import esquery from 'esquery';
 
 /**
  * Utilities for working with EsQuery ASTs.
  */
 export class EsQueryUtils {
+    /**
+     * Cache of parsed selectors.
+     */
+    private static readonly selectorCache = new Map<string, esquery.Selector>();
+
     /**
      * Extract a narrowed set of candidate ESTree node types for the subject of a selector.
      * Returns null if the selector does not narrow the subject (e.g. "*", :class, regex/unknown type).
@@ -190,5 +195,22 @@ export class EsQueryUtils {
         }
 
         return out;
+    }
+
+    /**
+     * Parses a selector string into an EsQuery AST and caches the result.
+     *
+     * @param selector The selector string to parse.
+     * @returns The parsed EsQuery AST.
+     */
+    public static parse(selector: string): esquery.Selector {
+        if (this.selectorCache.has(selector)) {
+            return this.selectorCache.get(selector) as esquery.Selector;
+        }
+
+        const parsed = esquery.parse(selector);
+        this.selectorCache.set(selector, parsed);
+
+        return parsed;
     }
 }
