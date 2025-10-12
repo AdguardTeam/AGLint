@@ -383,6 +383,7 @@ export class LinterSourceCode {
                 parser.childNodeKey,
                 parser.nodeTypeKey,
                 parser.nodeTransformer,
+                [...ancestry, hostNode],
             );
         };
 
@@ -412,7 +413,9 @@ export class LinterSourceCode {
             for (let i = 0; i < candidates.length; i += 1) {
                 const [parser, selectorAst] = candidates[i]!;
 
-                if (esquery.matches(node as any, selectorAst as any, ancestry as any, { nodeTypeKey: 'type' })) {
+                if (esquery.matches(node as any, selectorAst as any, ancestry as any, {
+                    nodeTypeKey: 'type',
+                })) {
                     parseAndWalkSub(node, ancestry, parser);
                 }
             }

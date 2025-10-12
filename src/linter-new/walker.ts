@@ -191,17 +191,24 @@ export class LinterWalker {
         selectors: Record<string, Visitor> = {},
         childrenKey: string = 'children',
         typeKey: string = 'type',
+        nodeTransformer?: (node: AnyObject) => AnyObject,
+        initialAncestry?: AnyObject[],
     ): void {
         if (!this.cachedIndex) {
             this.cachedIndex = this.buildIndex(selectors, typeKey);
         }
 
         const index = this.cachedIndex;
-        const ancestors: AnyObject[] = [];
+        const ancestors: AnyObject[] = initialAncestry ?? [];
 
         const visit = (node: AnyObject, parent: AnyObject | null): void => {
             const nodeType = node[typeKey] as string | undefined;
             const candidatesTyped = nodeType ? index.typeHandlers.get(nodeType) : undefined;
+
+            if (nodeTransformer) {
+                // eslint-disable-next-line no-param-reassign
+                node = nodeTransformer(node);
+            }
 
             // ENTER phase
             if (candidatesTyped) {
@@ -222,7 +229,7 @@ export class LinterWalker {
             }
 
             // Traverse children
-            ancestors.push(node);
+            ancestors.unshift(node);
             const list = (node as any)[childrenKey];
             if (Array.isArray(list)) {
                 for (let i = 0; i < list.length; i += 1) {
@@ -250,7 +257,7 @@ export class LinterWalker {
                     }
                 });
             }
-            ancestors.pop();
+            ancestors.shift();
 
             // LEAVE phase
             if (candidatesTyped) {
@@ -271,6 +278,7 @@ export class LinterWalker {
             }
         };
 
-        visit(root, null);
+        const parent = ancestors.length > 0 ? ancestors[ancestors.length - 1]! : null;
+        visit(root, parent);
     }
 }
