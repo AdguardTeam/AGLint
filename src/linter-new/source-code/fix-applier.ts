@@ -1,7 +1,6 @@
 import { EMPTY } from '../../common/constants';
 
 import { type LinterFixCommand } from './fixer';
-import { type LinterSourceCode } from './source-code';
 
 /**
  * The result of applying a list of fixes to the source code.
@@ -37,14 +36,14 @@ export class FixApplier {
     /**
      * The source code being fixed.
      */
-    private readonly sourceCode: LinterSourceCode;
+    private readonly sourceCode: string;
 
     /**
      * Constructs a new FixApplier instance.
      *
      * @param sourceCode The source code being fixed.
      */
-    constructor(sourceCode: LinterSourceCode) {
+    constructor(sourceCode: string) {
         this.sourceCode = sourceCode;
     }
 
@@ -80,7 +79,7 @@ export class FixApplier {
             }
 
             // Append unchanged content before the fix
-            output += this.sourceCode.getSlicedPart(currentIndex, start);
+            output += this.sourceCode.slice(currentIndex, start);
 
             // Apply the fix text
             output += fix.text;
@@ -95,7 +94,7 @@ export class FixApplier {
         }
 
         // Append the remaining content after the last fix
-        output += this.sourceCode.getSlicedPart(currentIndex);
+        output += this.sourceCode.slice(currentIndex);
 
         return {
             fixedSource: output,

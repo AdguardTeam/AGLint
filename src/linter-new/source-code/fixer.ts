@@ -4,7 +4,7 @@
 import { EMPTY } from '../../common/constants';
 import { isNull } from '../../utils/type-guards';
 
-import { type LinterSourceCode, type LinterOffsetRange } from './source-code';
+import { type LinterOffsetRange, type LinterSourceCode } from './source-code';
 
 /**
  * Represents a command to fix a linting issue.
