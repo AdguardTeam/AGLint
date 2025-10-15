@@ -32,6 +32,9 @@ importers:
       deepmerge:
         specifier: ^4.3.1
         version: 4.3.1
+      esquery:
+        specifier: ^1.6.0
+        version: 1.6.0
       fast-deep-equal:
         specifier: ^3.1.3
         version: 3.1.3
@@ -47,6 +50,9 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
+      micromustache:
+        specifier: ^8.0.3
+        version: 8.0.3
       strip-ansi:
         specifier: 6.0.1
         version: 6.0.1
@@ -59,6 +65,9 @@ importers:
       text-table:
         specifier: ^0.2.0
         version: 0.2.0
+      valibot:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.8.3)
     devDependencies:
       '@adguard/eslint-plugin-logger-context':
         specifier: ^1.0.1
@@ -87,6 +96,9 @@ importers:
       '@types/clone-deep':
         specifier: ^4.0.1
         version: 4.0.4
+      '@types/esquery':
+        specifier: ^1.5.4
+        version: 1.5.4
       '@types/fs-extra':
         specifier: ^11.0.1
         version: 11.0.4
@@ -1174,6 +1186,9 @@ packages:
 
   '@types/clone-deep@4.0.4':
     resolution: {integrity: sha512-vXh6JuuaAha6sqEbJueYdh5zNBPPgG1OYumuz2UvLvriN6ABHDSW8ludREGWJb1MLIzbwZn4q4zUbUCerJTJfA==}
+
+  '@types/esquery@1.5.4':
+    resolution: {integrity: sha512-yYO4Q8H+KJHKW1rEeSzHxcZi90durqYgWVfnh5K6ZADVBjBv2e1NEveYX5yT2bffgN7RqzH3k9930m+i2yBoMA==}
 
   '@types/estree@1.0.7':
     resolution: {integrity: sha512-w28IoSUCJpidD/TGviZwwMJckNESJZXFu7NBZ5YJ4mEUnNraUn9Pm8HSZm/jDF1pDWYKspWE7oVphigUPRakIQ==}
@@ -2428,6 +2443,10 @@ packages:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
 
+  micromustache@8.0.3:
+    resolution: {integrity: sha512-SXjrEPuYNtWq0reR9LR2nHdzdQx/3re9HPcDGjm00L7hi2RsH5KMRBhYEBvPdyQC51RW/2TznjwX/sQLPPyHNw==}
+    engines: {node: '>=8'}
+
   mimic-function@5.0.1:
     resolution: {integrity: sha512-VP79XUPxV2CigYP3jWwAUFSku2aKqBH7uTAapFWCBqutsbmDo96KY5o8uh6U+/YSIn5OxJnXp73beVkpqMIGhA==}
     engines: {node: '>=18'}
@@ -3051,6 +3070,14 @@ packages:
 
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
+
+  valibot@1.1.0:
+    resolution: {integrity: sha512-Nk8lX30Qhu+9txPYTwM0cFlWLdPFsFr6LblzqIySfbZph9+BFsAHsNvHOymEviUepeIW6KFHzpX8TKhbptBXXw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   vite-node@3.1.3:
     resolution: {integrity: sha512-uHV4plJ2IxCl4u1up1FQRrqclylKAogbtBfOTwcuJ28xFi+89PZ57BRh+naIRvH70HPwxy5QHYzg1OrEaC7AbA==}
@@ -4249,6 +4276,10 @@ snapshots:
   '@tsconfig/node16@1.0.4': {}
 
   '@types/clone-deep@4.0.4': {}
+
+  '@types/esquery@1.5.4':
+    dependencies:
+      '@types/estree': 1.0.7
 
   '@types/estree@1.0.7': {}
 
@@ -5688,6 +5719,8 @@ snapshots:
       braces: 3.0.3
       picomatch: 2.3.1
 
+  micromustache@8.0.3: {}
+
   mimic-function@5.0.1: {}
 
   minimatch@3.1.2:
@@ -6338,6 +6371,10 @@ snapshots:
       punycode: 2.3.1
 
   v8-compile-cache-lib@3.0.1: {}
+
+  valibot@1.1.0(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
 
   vite-node@3.1.3(@types/node@18.19.86)(terser@5.39.0)(tsx@4.19.3)(yaml@2.8.1):
     dependencies:

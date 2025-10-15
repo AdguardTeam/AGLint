@@ -1,4 +1,9 @@
-import { type Declaration, property as getPropertyDescriptor, lexer } from '@adguard/ecss-tree';
+import {
+    type Declaration,
+    type DeclarationPlain,
+    property as getPropertyDescriptor,
+    lexer,
+} from '@adguard/ecss-tree';
 
 import { isString } from '../../utils/type-guards';
 
@@ -33,7 +38,7 @@ interface CssValidatorError {
  *
  * @returns Array of syntax errors.
  */
-export const validateDeclaration = (declarationNode: Declaration): CssValidatorError[] => {
+export const validateDeclaration = (declarationNode: Declaration | DeclarationPlain): CssValidatorError[] => {
     const errors: CssValidatorError[] = [];
 
     const { property, value } = declarationNode;
@@ -56,7 +61,8 @@ export const validateDeclaration = (declarationNode: Declaration): CssValidatorE
             end: declarationNode.loc?.end.offset,
         });
     } else {
-        possibleError = lexer.matchProperty(property, value).error;
+        // FIXME: double check this any cast if its safe or not
+        possibleError = lexer.matchProperty(property, value as any).error;
 
         if (isCssTreeSyntaxError(possibleError)) {
             let message = `Invalid value for '${property}' property`;
