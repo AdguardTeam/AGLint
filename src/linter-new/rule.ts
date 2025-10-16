@@ -1,7 +1,7 @@
 import { type AdblockSyntax } from '@adguard/agtree';
 import * as v from 'valibot';
 
-import { type LinterFixCommand, type LinterRuleFixer } from './source-code/fixer';
+import { type LinterFixCommand, type LinterFixGenerator } from './source-code/fix-generator';
 import { type LinterOffsetRange, type LinterPositionRange, type LinterSourceCode } from './source-code/source-code';
 import { type Visitor } from './source-code/visitor-collection';
 
@@ -165,7 +165,7 @@ export type WithMessages<T extends {} = {}> = T & {
 };
 
 // eslint-disable-next-line max-len
-type FixerFunction = (fixer: LinterRuleFixer) => LinterFixCommand | null;
+type FixerFunction = (fixer: LinterFixGenerator) => LinterFixCommand | null;
 
 /**
  * Represents a problem report (this must be passed to context.report from the rules).

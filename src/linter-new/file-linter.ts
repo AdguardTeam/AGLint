@@ -19,7 +19,7 @@ import { type LinterRuleInstance } from './rule-registry/rule-instance';
 import { type LinterRuleLoader } from './rule-registry/rule-loader';
 import { LinterRuleRegistry } from './rule-registry/rule-registry';
 import { type LinterSourceCodeError } from './source-code/error';
-import { LinterRuleFixer } from './source-code/fixer';
+import { LinterFixGenerator } from './source-code/fix-generator';
 import { type LinterOffsetRange, type LinterPositionRange, LinterSourceCode } from './source-code/source-code';
 import { LinterSourceCodeWalker } from './source-code/source-code-walker';
 import { LinterVisitorCollection } from './source-code/visitor-collection';
@@ -47,12 +47,6 @@ export interface LinterResult {
      * Count of fatal errors (just for convenience, can be calculated from problems array).
      */
     fatalErrorCount: number;
-
-    /**
-     * Source code with all possible fixes applied. Note that some fixes may be ignored due to conflicts,
-     * and needs to be applied in another round.
-     */
-    fixedSource?: string;
 }
 
 type LinterDisableComment = {
@@ -83,7 +77,7 @@ export class FileLinter {
 
     private readonly baseRuleContext: LinterRuleBaseContext;
 
-    private readonly fixer: LinterRuleFixer;
+    private readonly fixGenerator: LinterFixGenerator;
 
     constructor(
         fileProps: LinterFileProps,
@@ -101,7 +95,7 @@ export class FileLinter {
             this.onParseError.bind(this),
         );
 
-        this.fixer = new LinterRuleFixer(this.sourceCode);
+        this.fixGenerator = new LinterFixGenerator(this.sourceCode);
 
         this.sourceCodeWalker = new LinterSourceCodeWalker(
             this.sourceCode,
@@ -216,7 +210,7 @@ export class FileLinter {
                 );
             }
 
-            const fix = report.fix(this.fixer);
+            const fix = report.fix(this.fixGenerator);
 
             if (!isNull(fix)) {
                 problem.fix = fix;
@@ -234,7 +228,7 @@ export class FileLinter {
             problem.suggestions = [];
 
             for (const suggestion of report.suggest) {
-                const fix = suggestion.fix(this.fixer);
+                const fix = suggestion.fix(this.fixGenerator);
 
                 if (isNull(fix)) {
                     continue;

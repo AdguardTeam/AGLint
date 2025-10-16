@@ -24,7 +24,7 @@ export interface LinterFixCommand {
 /**
  * A utility class for creating fixes to linting issues in source code.
  */
-export class LinterRuleFixer {
+export class LinterFixGenerator {
     /**
      * The source code being fixed.
      */
@@ -84,7 +84,7 @@ export class LinterRuleFixer {
             return null;
         }
 
-        return LinterRuleFixer.createInsertCommand(range[0], text);
+        return LinterFixGenerator.createInsertCommand(range[0], text);
     }
 
     /**
@@ -102,7 +102,7 @@ export class LinterRuleFixer {
             return null;
         }
 
-        return LinterRuleFixer.createInsertCommand(range[1], text);
+        return LinterFixGenerator.createInsertCommand(range[1], text);
     }
 
     /**

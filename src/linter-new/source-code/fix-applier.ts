@@ -1,6 +1,6 @@
 import { EMPTY } from '../../common/constants';
 
-import { type LinterFixCommand } from './fixer';
+import { type LinterFixCommand } from './fix-generator';
 
 /**
  * The result of applying a list of fixes to the source code.

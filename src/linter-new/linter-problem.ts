@@ -1,5 +1,5 @@
 import { type LinterRuleSeverity, type WithMessages } from './rule';
-import { type LinterFixCommand } from './source-code/fixer';
+import { type LinterFixCommand } from './source-code/fix-generator';
 import { type LinterPositionRange } from './source-code/source-code';
 
 type SuggestionBase = {
