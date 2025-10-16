@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { FixApplier } from '../../src/linter-new/source-code/fix-applier';
-import { type LinterFixCommand } from '../../src/linter-new/source-code/fix-generator';
+import { FixApplier } from '../../../src/linter-new/source-code/fix-applier';
+import { type LinterFixCommand } from '../../../src/linter-new/source-code/fix-generator';
 
 const fix = (start: number, end: number, text: string): LinterFixCommand => ({
     range: [start, end],

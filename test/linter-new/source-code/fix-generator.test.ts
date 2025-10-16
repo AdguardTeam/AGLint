@@ -6,7 +6,7 @@ import {
     vi,
 } from 'vitest';
 
-import { type LinterFixCommand, LinterFixGenerator } from '../../src/linter-new/source-code/fix-generator';
+import { type LinterFixCommand, LinterFixGenerator } from '../../../src/linter-new/source-code/fix-generator';
 
 const EMPTY = '';
 
