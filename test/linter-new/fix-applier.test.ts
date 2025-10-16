@@ -1,4 +1,3 @@
-// tests/fix-applier.spec.ts
 import { describe, expect, it } from 'vitest';
 
 import { FixApplier } from '../../src/linter-new/source-code/fix-applier';
