@@ -1,4 +1,4 @@
-import { type Hint, type Value } from '@adguard/agtree';
+import { type Hint, type ParameterList, type Value } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../rule';
 
@@ -16,6 +16,7 @@ export default defineRule({
         messages: {
             duplicatedHintPlatforms: 'Duplicated platform "{{platform}}"',
         },
+        hasFix: true,
     },
     create: (context) => {
         let history: Set<string> | null = null;
@@ -33,7 +34,7 @@ export default defineRule({
             'Hint:exit': () => {
                 history = null;
             },
-            'Hint > ParameterList > Value': (node: Value) => {
+            'Hint > ParameterList > Value': (node: Value, parent: ParameterList) => {
                 if (!history) {
                     return;
                 }
@@ -52,7 +53,41 @@ export default defineRule({
                         platform,
                     },
                     node,
-                    // TODO: Add suggestion to remove the duplicated platform
+                    fix(fixer) {
+                        const range = context.getOffsetRangeForNode(node);
+
+                        if (!range) {
+                            return null;
+                        }
+
+                        const parentRange = context.getOffsetRangeForNode(parent);
+
+                        if (!parentRange) {
+                            return null;
+                        }
+
+                        const precedingCommaIndex = context.sourceCode.findPreviousUnescapedChar(
+                            range[0],
+                            ',',
+                            parentRange[0],
+                        );
+
+                        if (precedingCommaIndex !== null) {
+                            return fixer.remove([precedingCommaIndex, range[1]]);
+                        }
+
+                        const followingCommaIndex = context.sourceCode.findNextUnescapedChar(
+                            range[1],
+                            ',',
+                            parentRange[1],
+                        );
+
+                        if (followingCommaIndex !== null) {
+                            return fixer.remove([range[0], followingCommaIndex]);
+                        }
+
+                        return fixer.remove(range);
+                    },
                 });
             },
         };
