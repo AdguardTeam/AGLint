@@ -7,8 +7,8 @@ import {
     vi,
 } from 'vitest';
 
-import type { AnyNode, SelectorsWithVisitors, Visitor } from '../../src/linter-new/source-code/visitor-collection';
-import { LinterWalker } from '../../src/linter-new/source-code/walker';
+import type { AnyNode, SelectorsWithVisitors, Visitor } from '../../../src/linter-new/source-code/visitor-collection';
+import { LinterWalker } from '../../../src/linter-new/source-code/walker';
 
 // Mock EsQueryUtils so we can control candidate typing/globality while using real esquery.parse
 type SelectorAst = esquery.Selector;
@@ -268,7 +268,7 @@ describe('LinterWalker', () => {
     });
 
     it('reuses selector index when selectors are unchanged (caching)', async () => {
-        const { EsQueryUtils } = await import('../../src/linter-new/source-code/esquery-utils');
+        const { EsQueryUtils } = await import('../../../src/linter-new/source-code/esquery-utils');
         const parseSpy = vi.spyOn(EsQueryUtils, 'parse');
 
         const f1: Visitor = () => {};

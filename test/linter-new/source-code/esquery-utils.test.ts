@@ -1,7 +1,7 @@
 import * as esquery from 'esquery';
 import { describe, expect, it } from 'vitest';
 
-import { EsQueryUtils } from '../../src/linter-new/source-code/esquery-utils';
+import { EsQueryUtils } from '../../../src/linter-new/source-code/esquery-utils';
 
 /**
  * Helper to normalize the `Set<string> | null` into a sorted array or `null`.
