@@ -1,5 +1,3 @@
-import { EMPTY } from '../../common/constants';
-
 import { type LinterFixCommand } from './fix-generator';
 
 /**
@@ -55,49 +53,33 @@ export class FixApplier {
      * @returns An object containing the fixed source code and ignored fixes.
      */
     public applyFixes(fixes: LinterFixCommand[]): FixApplicationResult {
-        // Sort fixes by their starting position
-        const sortedFixes = fixes.sort((a, b) => a.range[0] - b.range[0]);
+        const sorted = [...fixes].sort((a, b) => a.range[0] - b.range[0] || a.range[1] - b.range[1]);
 
         const appliedFixes: LinterFixCommand[] = [];
         const remainingFixes: LinterFixCommand[] = [];
 
-        let output = EMPTY;
-        let currentIndex = 0;
-        let offsetShift = 0;
+        let last = 0;
+        let out = '';
 
-        for (const fix of sortedFixes) {
-            let [start, end] = fix.range;
+        for (const fix of sorted) {
+            const [start, end] = fix.range;
 
-            // Adjust the fix's range based on the current offset shift
-            start += offsetShift;
-            end += offsetShift;
-
-            // Check for conflicts
-            if (start < currentIndex) {
+            if (start < last) {
                 remainingFixes.push(fix);
                 continue;
             }
 
-            // Append unchanged content before the fix
-            output += this.sourceCode.slice(currentIndex, start);
-
-            // Apply the fix text
-            output += fix.text;
-
-            // Calculate the offset shift introduced by this fix
-            offsetShift += fix.text.length - (end - start);
-
-            // Update the current index
-            currentIndex = end;
+            out += this.sourceCode.slice(last, start);
+            out += fix.text;
+            last = end;
 
             appliedFixes.push(fix);
         }
 
-        // Append the remaining content after the last fix
-        output += this.sourceCode.slice(currentIndex);
+        out += this.sourceCode.slice(last);
 
         return {
-            fixedSource: output,
+            fixedSource: out,
             appliedFixes,
             remainingFixes,
         };
