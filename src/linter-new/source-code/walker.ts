@@ -212,8 +212,7 @@ export class LinterWalker {
             const candidatesTyped = nodeType ? index.typeHandlers.get(nodeType) : undefined;
 
             if (nodeTransformer) {
-                // eslint-disable-next-line no-param-reassign
-                node = nodeTransformer(node);
+                nodeTransformer(node);
             }
 
             // ENTER phase

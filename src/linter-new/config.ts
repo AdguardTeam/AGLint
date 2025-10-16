@@ -48,7 +48,7 @@ const nodeTransformerFunctionSchema = v.pipe(
         // node
         v.pipe(anyNodeSchema),
     ])),
-    v.returns(anyNodeSchema),
+    v.returns(v.void()),
 );
 
 export type NodeTransformerFunction = v.InferOutput<typeof nodeTransformerFunctionSchema>;

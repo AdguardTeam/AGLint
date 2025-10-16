@@ -246,21 +246,16 @@ export class LinterSourceCodeWalker {
                     perParserWalkers.set(parser, walker);
                 }
 
-                this.nodeParserMap.set(sub.ast as AnyNode, parser);
-
                 walker.walk(
                     sub.ast as AnyNode,
                     selectors,
                     parser.childNodeKey,
                     parser.nodeTypeKey,
-                    // FIXME
-                    // parser.nodeTransformer,
                     (node: any) => {
-                        this.nodeParserMap.set(node, parser);
                         if (parser.nodeTransformer) {
-                            return parser.nodeTransformer(node);
+                            parser.nodeTransformer(node);
                         }
-                        return node;
+                        this.nodeParserMap.set(node, parser);
                     },
                     [...ancestry, hostNode],
                 );

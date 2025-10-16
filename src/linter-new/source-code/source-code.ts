@@ -437,7 +437,7 @@ export class LinterSourceCode {
      * @returns True if the line is valid, false otherwise.
      */
     private isLineValid(zeroBasedLine: number): boolean {
-        return zeroBasedLine >= 0 && zeroBasedLine < this.lineMeta.lineStartOffsets.length - 1;
+        return zeroBasedLine >= 0 && zeroBasedLine <= this.lineMeta.lineStartOffsets.length;
     }
 
     /**
