@@ -54,6 +54,13 @@ describe('no-duplicated-hint-platforms', () => {
                         line: 1,
                     },
                 },
+                fix: {
+                    range: [
+                        19,
+                        28,
+                    ],
+                    text: '',
+                },
             },
         ]);
 
@@ -74,6 +81,13 @@ describe('no-duplicated-hint-platforms', () => {
                         column: 32,
                         line: 1,
                     },
+                },
+                fix: {
+                    range: [
+                        23,
+                        32,
+                    ],
+                    text: '',
                 },
             },
         ]);
@@ -102,6 +116,13 @@ describe('no-duplicated-hint-platforms', () => {
                         line: 1,
                     },
                 },
+                fix: {
+                    range: [
+                        38,
+                        47,
+                    ],
+                    text: '',
+                },
             },
             {
                 ruleId: 'no-duplicated-hint-platforms',
@@ -120,6 +141,13 @@ describe('no-duplicated-hint-platforms', () => {
                         line: 1,
                     },
                 },
+                fix: {
+                    range: [
+                        47,
+                        56,
+                    ],
+                    text: '',
+                },
             },
             {
                 ruleId: 'no-duplicated-hint-platforms',
@@ -137,6 +165,13 @@ describe('no-duplicated-hint-platforms', () => {
                         column: 139,
                         line: 1,
                     },
+                },
+                fix: {
+                    range: [
+                        127,
+                        139,
+                    ],
+                    text: '',
                 },
             },
         ]);
@@ -165,6 +200,13 @@ describe('no-duplicated-hint-platforms', () => {
                         line: 1,
                     },
                 },
+                fix: {
+                    range: [
+                        42,
+                        51,
+                    ],
+                    text: '',
+                },
             },
             {
                 ruleId: 'no-duplicated-hint-platforms',
@@ -183,6 +225,13 @@ describe('no-duplicated-hint-platforms', () => {
                         line: 1,
                     },
                 },
+                fix: {
+                    range: [
+                        51,
+                        60,
+                    ],
+                    text: '',
+                },
             },
             {
                 ruleId: 'no-duplicated-hint-platforms',
@@ -200,6 +249,13 @@ describe('no-duplicated-hint-platforms', () => {
                         column: 143,
                         line: 1,
                     },
+                },
+                fix: {
+                    range: [
+                        131,
+                        143,
+                    ],
+                    text: '',
                 },
             },
         ]);
