@@ -173,7 +173,16 @@ export class FileLinter {
         if (report.position) {
             position = report.position;
         } else {
-            position = this.sourceCode.getLinterPositionRangeFromOffsetRange(this.getOffsetRangeForNode(report.node)!)!;
+            const range = this.getOffsetRangeForNode(report.node);
+            if (!range) {
+                throw new Error('Node has no offset range');
+            }
+
+            const pos = this.sourceCode.getLinterPositionRangeFromOffsetRange(range);
+            if (!pos) {
+                throw new Error('Node has no position');
+            }
+            position = pos;
         }
 
         let messages: WithMessages;
@@ -271,13 +280,12 @@ export class FileLinter {
 
         this.sourceCodeWalker.walk(this.visitorCollection.getVisitors());
 
-        // FIXME: handle disable comments
-        // const applier = new LinterInlineDisableApplier(this.disableComments, {
-        //     keepFatal: true,
-        //     // sameLineTakesEffect: true,
-        // });
+        const applier = new LinterInlineDisableApplier(this.disableComments, {
+            keepFatal: true,
+            // sameLineTakesEffect: true,
+        });
 
-        // applier.filterInPlace(this.problems);
+        applier.filterInPlace(this.problems);
 
         return this.summarizeProblems();
     }

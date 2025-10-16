@@ -426,7 +426,7 @@ export class LinterSourceCode {
      * @returns True if the offset is valid, false otherwise.
      */
     public isOffsetValid(offset: number): boolean {
-        return offset >= 0 && offset < this.source.length;
+        return offset >= 0 && offset <= this.source.length;
     }
 
     /**
