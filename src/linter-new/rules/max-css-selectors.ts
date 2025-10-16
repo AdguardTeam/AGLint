@@ -41,6 +41,11 @@ export default defineRule({
                 node,
                 fix(fixer) {
                     const lineRange = context.sourceCode.getLineRange(node.loc!.start.line, true);
+                    const lineBreakType = context.sourceCode.getLinebreakType(node.loc!.start.line);
+
+                    if (!lineRange) {
+                        return null;
+                    }
 
                     const ruleTextBeforeSelectorList = context.sourceCode.getSlicedPart(
                         lineRange![0],
@@ -52,15 +57,25 @@ export default defineRule({
                         lineRange![1],
                     );
 
-                    let fix = '';
+                    const rules: string[] = [];
 
                     for (const selector of node.children) {
-                        fix += ruleTextBeforeSelectorList;
-                        fix += context.sourceCode.getSlicedPart(
+                        let rule = ruleTextBeforeSelectorList;
+                        rule += context.sourceCode.getSlicedPart(
                             selector.loc!.start.offset,
                             selector.loc!.end.offset,
                         );
-                        fix += ruleTextAfterSelectorList;
+                        rule += ruleTextAfterSelectorList;
+                        rules.push(rule);
+                    }
+
+                    let fix: string;
+
+                    // e.g. last line without line break
+                    if (lineBreakType === null) {
+                        fix = rules.join(context.sourceCode.getDominantLineBreak());
+                    } else {
+                        fix = rules.join('');
                     }
 
                     return fixer.replaceWithText(lineRange!, fix);
