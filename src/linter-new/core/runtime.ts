@@ -1,4 +1,4 @@
-import { type LinterConfig } from '../config';
+import { type LinterConfigParsed, type LinterSubParsersConfig } from '../config';
 import { type LinterFileProps } from '../file-props';
 import { type LinterProblem } from '../linter-problem';
 import { type LinterRuleBaseContext, LinterRuleSeverity } from '../rule';
@@ -24,8 +24,9 @@ export type LinterRuntime = {
 
 export function createLinterRuntime(
     file: LinterFileProps,
-    config: LinterConfig,
+    config: LinterConfigParsed,
     loadRule: LinterRuleLoader,
+    subParsers: LinterSubParsersConfig,
 ): LinterRuntime {
     const problems: LinterProblem[] = [];
 
@@ -39,7 +40,7 @@ export function createLinterRuntime(
     };
 
     const sourceCode = new LinterSourceCode(file.content, onParseError);
-    const walker = new LinterSourceCodeWalker(sourceCode, config.subParsers, onParseError);
+    const walker = new LinterSourceCodeWalker(sourceCode, subParsers, onParseError);
     const visitors = new LinterVisitorCollection();
     const fixGen = new LinterFixGenerator(sourceCode);
 

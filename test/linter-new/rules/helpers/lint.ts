@@ -1,12 +1,12 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { type LinterRulesConfig } from '../../../../src/linter-new/config';
+import { type LinterRulesConfig, type LinterSubParsersConfig } from '../../../../src/linter-new/config';
 import { LinterFixer, type LinterFixerResult } from '../../../../src/linter-new/fixer';
 import { Linter, type LinterResult } from '../../../../src/linter-new/linter';
 import { type LinterRuleLoader } from '../../../../src/linter-new/rule-registry/rule-loader';
 
-import { commonLinterConfig } from './common-linter-config';
+import { commonLinterConfig, commonSubParsers } from './common-linter-config';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -15,7 +15,11 @@ const ruleLoader: LinterRuleLoader = async (ruleName) => {
     return (await import(join(__dirname, `../../../../src/linter-new/rules/${ruleName}`))).default;
 };
 
-export const lint = (content: string, rulesConfig: LinterRulesConfig): Promise<LinterResult> => {
+export const lint = (
+    content: string,
+    rulesConfig: LinterRulesConfig,
+    subParsers?: LinterSubParsersConfig,
+): Promise<LinterResult> => {
     return Linter.lint(
         {
             content,
@@ -25,10 +29,18 @@ export const lint = (content: string, rulesConfig: LinterRulesConfig): Promise<L
             rules: rulesConfig,
         },
         ruleLoader,
+        {
+            ...commonSubParsers,
+            ...subParsers,
+        },
     );
 };
 
-export const lintWithFix = (content: string, rulesConfig: LinterRulesConfig): Promise<LinterFixerResult> => {
+export const lintWithFix = (
+    content: string,
+    rulesConfig: LinterRulesConfig,
+    subParsers?: LinterSubParsersConfig,
+): Promise<LinterFixerResult> => {
     return LinterFixer.lint(
         {
             content,
@@ -38,5 +50,9 @@ export const lintWithFix = (content: string, rulesConfig: LinterRulesConfig): Pr
             rules: rulesConfig,
         },
         ruleLoader,
+        {
+            ...commonSubParsers,
+            ...subParsers,
+        },
     );
 };

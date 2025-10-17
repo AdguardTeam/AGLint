@@ -1,4 +1,6 @@
-import { type LinterConfig } from './config';
+import * as v from 'valibot';
+
+import { type LinterConfig, linterConfigSchema, type LinterSubParsersConfig } from './config';
 import { createReportFn } from './core/report';
 import { createLinterRuntime } from './core/runtime';
 import { type LinterFileProps } from './file-props';
@@ -40,8 +42,10 @@ export class Linter {
         fileProps: LinterFileProps,
         config: LinterConfig,
         loadRule: LinterRuleLoader,
+        subParsers: LinterSubParsersConfig = {},
     ) {
-        const runtime = createLinterRuntime(fileProps, config, loadRule);
+        const parsedConfig = v.parse(linterConfigSchema, config);
+        const runtime = createLinterRuntime(fileProps, parsedConfig, loadRule, subParsers);
 
         const report = createReportFn(runtime);
         runtime.ruleRegistry.setReporter(report);

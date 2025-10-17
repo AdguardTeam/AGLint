@@ -1,4 +1,4 @@
-import { type LinterConfig, type LinterRulesConfig } from '../config';
+import { type LinterConfigParsed, type LinterRulesConfig } from '../config';
 import { type LinterReporter } from '../core/report';
 import { type LinterRuleBaseContext, LinterRuleSeverity } from '../rule';
 import { type LinterVisitorCollection } from '../source-code/visitor-collection';
@@ -9,7 +9,7 @@ import { type LinterRuleLoader } from './rule-loader';
 export class LinterRuleRegistry {
     private rules: Map<string, LinterRuleInstance>;
 
-    private config: LinterConfig;
+    private config: LinterConfigParsed;
 
     private visitorCollection: LinterVisitorCollection;
 
@@ -20,7 +20,7 @@ export class LinterRuleRegistry {
     private reporter?: LinterReporter;
 
     constructor(
-        config: LinterConfig,
+        config: LinterConfigParsed,
         visitorCollection: LinterVisitorCollection,
         baseRuleContext: LinterRuleBaseContext,
         loadRule: LinterRuleLoader,

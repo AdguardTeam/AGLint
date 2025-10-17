@@ -134,10 +134,11 @@ const adblockSyntaxSchema = v.enum(AdblockSyntax);
 
 export const linterConfigSchema = v.object({
     rules: linterRulesConfigSchema,
-    subParsers: linterSubParsersConfigSchema,
     allowInlineConfig: v.optional(v.boolean()),
     syntax: v.optional(v.array(adblockSyntaxSchema)),
     reportUnusedDisableDirectives: v.optional(v.boolean()),
 });
 
-export type LinterConfig = v.InferOutput<typeof linterConfigSchema>;
+export type LinterConfig = v.InferInput<typeof linterConfigSchema>;
+
+export type LinterConfigParsed = v.InferOutput<typeof linterConfigSchema>;

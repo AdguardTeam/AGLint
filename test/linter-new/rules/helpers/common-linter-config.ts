@@ -2,7 +2,7 @@ import { defaultParserOptions, DomainListParser } from '@adguard/agtree/parser';
 import { AdblockSyntax } from '@adguard/agtree/utils';
 import { type CssNode, List, parse } from '@adguard/ecss-tree';
 
-import { type LinterConfig, type Parser } from '../../../../src/linter-new/config';
+import { type LinterConfigParsed, type LinterSubParsersConfig, type Parser } from '../../../../src/linter-new/config';
 
 const cssParser: Parser = {
     name: '@adguard/ecss-tree',
@@ -36,24 +36,25 @@ const cssParser: Parser = {
     },
 };
 
-export const commonLinterConfig: Omit<LinterConfig, 'rules'> = {
-    subParsers: {
-        'ElementHidingRuleBody > Value.selectorList': cssParser,
-        'CssInjectionRuleBody > Value.selectorList': cssParser,
-        'Modifier[name.value="domain"] > Value.value': {
-            name: '@adguard/agtree',
-            parse: ((source: string, offset: number) => {
-                return DomainListParser.parse(
-                    source,
-                    defaultParserOptions,
-                    offset,
-                    '|',
-                );
-            }),
-            nodeTypeKey: 'type',
-            childNodeKey: 'children',
-        },
+export const commonSubParsers: LinterSubParsersConfig = {
+    'ElementHidingRuleBody > Value.selectorList': cssParser,
+    'CssInjectionRuleBody > Value.selectorList': cssParser,
+    'Modifier[name.value="domain"] > Value.value': {
+        name: '@adguard/agtree',
+        parse: ((source: string, offset: number) => {
+            return DomainListParser.parse(
+                source,
+                defaultParserOptions,
+                offset,
+                '|',
+            );
+        }),
+        nodeTypeKey: 'type',
+        childNodeKey: 'children',
     },
+};
+
+export const commonLinterConfig: Omit<LinterConfigParsed, 'rules'> = {
     syntax: [
         AdblockSyntax.Adg,
     ],

@@ -1,4 +1,4 @@
-import { type LinterConfig } from './config';
+import { type LinterConfig, type LinterSubParsersConfig } from './config';
 import { type LinterFileProps } from './file-props';
 import { type LinterResult } from './linter';
 import { Linter } from './linter';
@@ -19,6 +19,7 @@ export class LinterFixer {
         fileProps: LinterFileProps,
         config: LinterConfig,
         loadRule: LinterRuleLoader,
+        subParsers: LinterSubParsersConfig = {},
         maxFixRounds: number = FixApplier.MAX_FIX_ROUNDS,
         categories: Set<LinterRuleType> = new Set([LinterRuleType.Problem, LinterRuleType.Layout]),
     ): Promise<LinterFixerResult> {
@@ -38,6 +39,7 @@ export class LinterFixer {
                 },
                 config,
                 loadRule,
+                subParsers,
             );
             const fixApplier = new FixApplier(actualSource);
             const fixesToApply: LinterFixCommand[] = [];
