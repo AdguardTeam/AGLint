@@ -11,6 +11,7 @@ import {
     linterRuleConfigSchema,
     type LinterRuleContext,
     type LinterRuleSeverity,
+    type LinterRuleType,
     type LinterRuleVisitors,
 } from '../rule';
 
@@ -49,6 +50,10 @@ export class LinterRuleInstance {
 
     public hasSuggestions(): boolean {
         return !!this.rule.meta.hasSuggestions;
+    }
+
+    public getType(): LinterRuleType {
+        return this.rule.meta.type;
     }
 
     public setConfig(config: LinterRuleConfig): void {

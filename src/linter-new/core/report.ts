@@ -55,6 +55,8 @@ export function createReportFn(rt: LinterRuntime): LinterReporter {
             }
         }
 
+        problem.category = ruleInstance.getType();
+
         rt.problems.push(problem);
     };
 }

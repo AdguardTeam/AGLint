@@ -38,6 +38,7 @@ describe('no-duplicated-hint-platforms', () => {
     it('should detect problematic cases', async () => {
         expect((await lint('!+ PLATFORM(windows, windows)', rulesConfig)).problems).toStrictEqual([
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -66,6 +67,7 @@ describe('no-duplicated-hint-platforms', () => {
 
         expect((await lint('!+ NOT_PLATFORM(windows, windows)', rulesConfig)).problems).toStrictEqual([
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -100,6 +102,7 @@ describe('no-duplicated-hint-platforms', () => {
             )).problems,
         ).toStrictEqual([
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -125,6 +128,7 @@ describe('no-duplicated-hint-platforms', () => {
                 },
             },
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -150,6 +154,7 @@ describe('no-duplicated-hint-platforms', () => {
                 },
             },
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -184,6 +189,7 @@ describe('no-duplicated-hint-platforms', () => {
             )).problems,
         ).toStrictEqual([
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -209,6 +215,7 @@ describe('no-duplicated-hint-platforms', () => {
                 },
             },
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {
@@ -234,6 +241,7 @@ describe('no-duplicated-hint-platforms', () => {
                 },
             },
             {
+                category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
                 severity: LinterRuleSeverity.Error,
                 data: {

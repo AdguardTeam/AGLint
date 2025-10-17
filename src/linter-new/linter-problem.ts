@@ -1,4 +1,4 @@
-import { type LinterRuleSeverity, type WithMessages } from './rule';
+import { type LinterRuleSeverity, type LinterRuleType, type WithMessages } from './rule';
 import { type LinterFixCommand } from './source-code/fix-generator';
 import { type LinterPositionRange } from './source-code/source-code';
 
@@ -12,6 +12,11 @@ type LinterSuggestion = WithMessages<SuggestionBase>;
  * Represents a problem given by the linter.
  */
 type LinterProblemBase = {
+    /**
+     * The category of this problem.
+     */
+    category?: LinterRuleType;
+
     /**
      * Name of the linter rule that generated this problem.
      */
