@@ -2,6 +2,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { type LinterRulesConfig } from '../../../../src/linter-new/config';
+import { LinterFixer, type LinterFixerResult } from '../../../../src/linter-new/fixer';
 import { Linter, type LinterResult } from '../../../../src/linter-new/linter';
 import { type LinterRuleLoader } from '../../../../src/linter-new/rule-registry/rule-loader';
 
@@ -16,6 +17,19 @@ const ruleLoader: LinterRuleLoader = async (ruleName) => {
 
 export const lint = (content: string, rulesConfig: LinterRulesConfig): Promise<LinterResult> => {
     return Linter.lint(
+        {
+            content,
+        },
+        {
+            ...commonLinterConfig,
+            rules: rulesConfig,
+        },
+        ruleLoader,
+    );
+};
+
+export const lintWithFix = (content: string, rulesConfig: LinterRulesConfig): Promise<LinterFixerResult> => {
+    return LinterFixer.lint(
         {
             content,
         },

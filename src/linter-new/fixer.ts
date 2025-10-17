@@ -7,7 +7,7 @@ import { type LinterRuleLoader } from './rule-registry/rule-loader';
 import { FixApplier } from './source-code/fix-applier';
 import { type LinterFixCommand } from './source-code/fix-generator';
 
-type LinterFixerResult = LinterResult & {
+export type LinterFixerResult = LinterResult & {
     appliedFixesCount: number;
     remainingFixesCount: number;
     fixRoundsCount: number;

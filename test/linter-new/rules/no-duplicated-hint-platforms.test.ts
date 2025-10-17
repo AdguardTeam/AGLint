@@ -8,7 +8,7 @@ import {
 import { type LinterRulesConfig } from '../../../src/linter-new/config';
 import { LinterRuleSeverity } from '../../../src/linter-new/rule';
 
-import { lint } from './helpers/lint';
+import { lint, lintWithFix } from './helpers/lint';
 
 const rulesConfig: LinterRulesConfig = {
     'no-duplicated-hint-platforms': LinterRuleSeverity.Error,
@@ -267,5 +267,16 @@ describe('no-duplicated-hint-platforms', () => {
                 },
             },
         ]);
+    });
+
+    it('should fix problematic cases properly', async () => {
+        expect(
+            (await lintWithFix(
+                // eslint-disable-next-line max-len
+                '!+ NOT_PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
+                rulesConfig,
+            )),
+        // eslint-disable-next-line max-len
+        ).toHaveProperty('fixedSource', '!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)');
     });
 });
