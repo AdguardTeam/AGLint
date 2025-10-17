@@ -41,7 +41,7 @@ export const lintWithFix = (
     rulesConfig: LinterRulesConfig,
     subParsers?: LinterSubParsersConfig,
 ): Promise<LinterFixerResult> => {
-    return LinterFixer.lint({
+    return LinterFixer.lintWithFixes({
         fileProps: {
             content,
         },

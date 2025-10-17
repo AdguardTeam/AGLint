@@ -24,6 +24,11 @@ export type LinterFixerResult = LinterResult & {
     fixRoundsCount: number;
 
     /**
+     * Whether the maximum number of fix rounds was reached.
+     */
+    maxFixRoundsReached: boolean;
+
+    /**
      * Fixed source code.
      */
     fixedSource: string;
@@ -36,7 +41,7 @@ export type LinterFixerRunOptions = LinterRunOptions & {
 };
 
 export class LinterFixer {
-    public static async lint(options: LinterFixerRunOptions): Promise<LinterFixerResult> {
+    public static async lintWithFixes(options: LinterFixerRunOptions): Promise<LinterFixerResult> {
         const maxFixRounds = options.maxFixRounds ?? FixApplier.MAX_FIX_ROUNDS;
 
         let source = options.fileProps.content;
@@ -86,21 +91,24 @@ export class LinterFixer {
         } while (remainingFixesCount > 0 && fixRoundsCount < maxFixRounds);
 
         // Final verification lint, ensures offsets match the fixed source
-        linterResult = await Linter.lint({
-            fileProps: {
-                ...options.fileProps,
-                content: source,
-            },
-            config: options.config,
-            loadRule: options.loadRule,
-            subParsers: options.subParsers,
-        });
+        if (appliedFixesCount > 0) {
+            linterResult = await Linter.lint({
+                fileProps: {
+                    ...options.fileProps,
+                    content: source,
+                },
+                config: options.config,
+                loadRule: options.loadRule,
+                subParsers: options.subParsers,
+            });
+        }
 
         return {
             ...linterResult,
             appliedFixesCount,
             remainingFixesCount,
             fixRoundsCount,
+            maxFixRoundsReached: fixRoundsCount >= maxFixRounds,
             fixedSource: source,
         };
     }
