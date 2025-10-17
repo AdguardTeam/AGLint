@@ -2,7 +2,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { type LinterRulesConfig } from '../../../../src/linter-new/config';
-import { FileLinter, type LinterResult } from '../../../../src/linter-new/file-linter';
+import { Linter, type LinterResult } from '../../../../src/linter-new/linter';
 import { type LinterRuleLoader } from '../../../../src/linter-new/rule-registry/rule-loader';
 
 import { commonLinterConfig } from './common-linter-config';
@@ -15,7 +15,7 @@ const ruleLoader: LinterRuleLoader = async (ruleName) => {
 };
 
 export const lint = (content: string, rulesConfig: LinterRulesConfig): Promise<LinterResult> => {
-    return FileLinter.lint(
+    return Linter.lint(
         {
             content,
         },

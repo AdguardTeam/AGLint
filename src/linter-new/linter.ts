@@ -33,7 +33,7 @@ export interface LinterResult {
     fatalErrorCount: number;
 }
 
-export class FileLinter {
+export class Linter {
     private static readonly CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
 
     public static async lint(
@@ -51,7 +51,7 @@ export class FileLinter {
         const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
 
         if (config.allowInlineConfig) {
-            runtime.visitors.addVisitor(FileLinter.CONFIG_COMMENT_SELECTOR, onConfigComment);
+            runtime.visitors.addVisitor(Linter.CONFIG_COMMENT_SELECTOR, onConfigComment);
         }
 
         runWalk(runtime);

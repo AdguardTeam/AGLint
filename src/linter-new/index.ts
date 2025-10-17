@@ -1,1 +1,1 @@
-export { FileLinter } from './file-linter';
+export { Linter } from './linter';
