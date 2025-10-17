@@ -23,7 +23,7 @@ export class LinterFixer {
         maxFixRounds: number = FixApplier.MAX_FIX_ROUNDS,
         categories: Set<LinterRuleType> = new Set([LinterRuleType.Problem, LinterRuleType.Layout]),
     ): Promise<LinterFixerResult> {
-        let actualSource = fileProps.content;
+        let source = fileProps.content;
         let remainingFixes: LinterFixCommand[] = [];
         let fixRoundsCount = 0;
         let appliedFixesCount = 0;
@@ -33,38 +33,39 @@ export class LinterFixer {
         do {
             // eslint-disable-next-line no-await-in-loop
             linterResult = await Linter.lint(
-                {
-                    ...fileProps,
-                    content: actualSource,
-                },
+                { ...fileProps, content: source },
                 config,
                 loadRule,
                 subParsers,
             );
-            const fixApplier = new FixApplier(actualSource);
-            const fixesToApply: LinterFixCommand[] = [];
-
-            for (const problem of linterResult.problems) {
-                if (problem.fix && problem.category && categories.has(problem.category)) {
-                    fixesToApply.push(problem.fix);
-                }
-            }
+            const fixApplier = new FixApplier(source);
+            const fixesToApply = linterResult.problems
+                .filter((problem) => problem.fix && categories.has(problem.category ?? LinterRuleType.Problem))
+                .map((problem) => problem.fix!);
 
             const fixApplicationResult = fixApplier.applyFixes(fixesToApply);
 
             remainingFixes = fixApplicationResult.remainingFixes;
-            actualSource = fixApplicationResult.fixedSource;
+            source = fixApplicationResult.fixedSource;
             appliedFixesCount += fixApplicationResult.appliedFixes.length;
             remainingFixesCount = remainingFixes.length;
             fixRoundsCount += 1;
         } while (remainingFixesCount > 0 && fixRoundsCount < maxFixRounds);
+
+        // Final verification lint, ensures offsets match the fixed source
+        linterResult = await Linter.lint(
+            { ...fileProps, content: source },
+            config,
+            loadRule,
+            subParsers,
+        );
 
         return {
             ...linterResult,
             appliedFixesCount,
             remainingFixesCount,
             fixRoundsCount,
-            fixedSource: actualSource,
+            fixedSource: source,
         };
     }
 }
