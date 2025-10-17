@@ -35,17 +35,24 @@ export interface LinterResult {
     fatalErrorCount: number;
 }
 
+export type LinterRunOptions = {
+    fileProps: LinterFileProps;
+    config: LinterConfig;
+    loadRule: LinterRuleLoader;
+    subParsers?: LinterSubParsersConfig;
+};
+
 export class Linter {
     private static readonly CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
 
-    public static async lint(
-        fileProps: LinterFileProps,
-        config: LinterConfig,
-        loadRule: LinterRuleLoader,
-        subParsers: LinterSubParsersConfig = {},
-    ) {
-        const parsedConfig = v.parse(linterConfigSchema, config);
-        const runtime = createLinterRuntime(fileProps, parsedConfig, loadRule, subParsers);
+    public static async lint(options: LinterRunOptions) {
+        const parsedConfig = v.parse(linterConfigSchema, options.config);
+        const runtime = createLinterRuntime(
+            options.fileProps,
+            parsedConfig,
+            options.loadRule,
+            options.subParsers ?? {},
+        );
 
         const report = createReportFn(runtime);
         runtime.ruleRegistry.setReporter(report);
@@ -54,7 +61,7 @@ export class Linter {
 
         const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
 
-        if (config.allowInlineConfig) {
+        if (options.config.allowInlineConfig) {
             runtime.visitors.addVisitor(Linter.CONFIG_COMMENT_SELECTOR, onConfigComment);
         }
 

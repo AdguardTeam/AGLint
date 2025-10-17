@@ -20,20 +20,20 @@ export const lint = (
     rulesConfig: LinterRulesConfig,
     subParsers?: LinterSubParsersConfig,
 ): Promise<LinterResult> => {
-    return Linter.lint(
-        {
+    return Linter.lint({
+        fileProps: {
             content,
         },
-        {
+        config: {
             ...commonLinterConfig,
             rules: rulesConfig,
         },
-        ruleLoader,
-        {
+        loadRule: ruleLoader,
+        subParsers: {
             ...commonSubParsers,
             ...subParsers,
         },
-    );
+    });
 };
 
 export const lintWithFix = (
@@ -41,18 +41,18 @@ export const lintWithFix = (
     rulesConfig: LinterRulesConfig,
     subParsers?: LinterSubParsersConfig,
 ): Promise<LinterFixerResult> => {
-    return LinterFixer.lint(
-        {
+    return LinterFixer.lint({
+        fileProps: {
             content,
         },
-        {
+        config: {
             ...commonLinterConfig,
             rules: rulesConfig,
         },
-        ruleLoader,
-        {
+        loadRule: ruleLoader,
+        subParsers: {
             ...commonSubParsers,
             ...subParsers,
         },
-    );
+    });
 };
