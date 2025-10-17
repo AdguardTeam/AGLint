@@ -1,5 +1,6 @@
 import { type LinterConfig, type LinterRulesConfig } from '../config';
-import { type LinterProblemReport, type LinterRuleBaseContext, LinterRuleSeverity } from '../rule';
+import { type LinterReporter } from '../core/report';
+import { type LinterRuleBaseContext, LinterRuleSeverity } from '../rule';
 import { type LinterVisitorCollection } from '../source-code/visitor-collection';
 
 import { LinterRuleInstance } from './rule-instance';
@@ -16,13 +17,12 @@ export class LinterRuleRegistry {
 
     private baseRuleContext: LinterRuleBaseContext;
 
-    private reporter: (report: LinterProblemReport, ruleInstance: LinterRuleInstance) => void;
+    private reporter?: LinterReporter;
 
     constructor(
         config: LinterConfig,
         visitorCollection: LinterVisitorCollection,
         baseRuleContext: LinterRuleBaseContext,
-        reporter: (report: LinterProblemReport, ruleInstance: LinterRuleInstance) => void,
         loadRule: LinterRuleLoader,
     ) {
         this.rules = new Map();
@@ -31,8 +31,11 @@ export class LinterRuleRegistry {
         this.visitorCollection = visitorCollection;
         this.baseRuleContext = baseRuleContext;
 
-        this.reporter = reporter;
         this.loadRule = loadRule;
+    }
+
+    public setReporter(reporter: LinterReporter): void {
+        this.reporter = reporter;
     }
 
     /**

@@ -1,6 +1,7 @@
 import { render } from 'micromustache';
 import * as v from 'valibot';
 
+import { type LinterReporter } from '../core/report';
 import {
     type LinterProblemReport,
     type LinterRule,
@@ -105,14 +106,14 @@ export class LinterRuleInstance {
      */
     public createVisitors(
         baseContext: LinterRuleBaseContext,
-        reporter: (report: LinterProblemReport, ruleInstance: LinterRuleInstance) => void,
+        reporter?: LinterReporter,
     ): LinterRuleVisitors {
         const context: LinterRuleContext = {
             ...baseContext,
             id: this.id,
             config: this.config,
             report: (problem) => {
-                reporter(problem, this);
+                reporter?.(problem, this);
             },
         };
 

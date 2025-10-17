@@ -15,7 +15,7 @@ const ruleLoader: LinterRuleLoader = async (ruleName) => {
 };
 
 export const lint = (content: string, rulesConfig: LinterRulesConfig): Promise<LinterResult> => {
-    const linter = new FileLinter(
+    return FileLinter.lint(
         {
             content,
         },
@@ -25,6 +25,4 @@ export const lint = (content: string, rulesConfig: LinterRulesConfig): Promise<L
         },
         ruleLoader,
     );
-
-    return linter.lint();
 };
