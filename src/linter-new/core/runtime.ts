@@ -15,14 +15,14 @@ export type LinterRuntime = {
     sourceCode: LinterSourceCode;
     walker: LinterSourceCodeWalker;
     visitors: LinterVisitorCollection;
-    fixGen: LinterFixGenerator;
+    fixGenerator: LinterFixGenerator;
     ruleRegistry: LinterRuleRegistry;
     problems: LinterProblem[];
     onParseError: (e: LinterSourceCodeError) => void;
     getOffsetRangeForNode: (node: any) => LinterOffsetRange | null;
 };
 
-export function buildRuntime(
+export function createLinterRuntime(
     file: LinterFileProps,
     config: LinterConfig,
     loadRule: LinterRuleLoader,
@@ -70,7 +70,7 @@ export function buildRuntime(
         sourceCode,
         walker,
         visitors,
-        fixGen,
+        fixGenerator: fixGen,
         ruleRegistry,
         problems,
         onParseError,

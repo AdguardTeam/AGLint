@@ -1,6 +1,6 @@
 import { type LinterConfig } from './config';
 import { createReportFn } from './core/report';
-import { buildRuntime } from './core/runtime';
+import { createLinterRuntime } from './core/runtime';
 import { type LinterFileProps } from './file-props';
 import { type LinterProblem } from './linter-problem';
 import { makeConfigCommentVisitor } from './phase/inline-config';
@@ -41,7 +41,7 @@ export class Linter {
         config: LinterConfig,
         loadRule: LinterRuleLoader,
     ) {
-        const runtime = buildRuntime(fileProps, config, loadRule);
+        const runtime = createLinterRuntime(fileProps, config, loadRule);
 
         const report = createReportFn(runtime);
         runtime.ruleRegistry.setReporter(report);
