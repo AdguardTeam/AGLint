@@ -1,8 +1,9 @@
-import { type FilterList, FilterListParser } from '@adguard/agtree';
+import { AdblockSyntaxError, type FilterList, FilterListParser } from '@adguard/agtree';
 import { defaultParserOptions } from '@adguard/agtree/parser';
 
 import { CR, FF, LF } from '../../common/constants';
 
+import { LinterSourceCodeError } from './error';
 import { type OnParseError } from './types';
 
 /**
@@ -117,8 +118,24 @@ export class LinterSourceCode {
         this.ast = FilterListParser.parse(this.source, {
             ...defaultParserOptions,
             tolerant: true,
-            // FIXME: wait for Liza's fix
-            // onParseError: this.onParseError,
+            onParseError: (error: unknown) => {
+                if (!this.onParseError) {
+                    return;
+                }
+
+                if (error instanceof AdblockSyntaxError) {
+                    this.onParseError(new LinterSourceCodeError(
+                        error.message,
+                        this.getLinterPositionRangeFromOffsetRange([
+                            error.start,
+                            error.end,
+                        ])!,
+                    ));
+                    return;
+                }
+
+                this.onParseError(error);
+            },
         });
 
         this.lineMeta = LinterSourceCode.computeLineMetadata(this.source);

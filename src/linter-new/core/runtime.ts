@@ -4,7 +4,7 @@ import { type LinterProblem } from '../linter-problem';
 import { type LinterRuleBaseContext, LinterRuleSeverity } from '../rule';
 import { type LinterRuleLoader } from '../rule-registry/rule-loader';
 import { LinterRuleRegistry } from '../rule-registry/rule-registry';
-import { type LinterSourceCodeError } from '../source-code/error';
+import { LinterSourceCodeError } from '../source-code/error';
 import { LinterFixGenerator } from '../source-code/fix-generator';
 import { type LinterOffsetRange } from '../source-code/source-code';
 import { LinterSourceCode } from '../source-code/source-code';
@@ -30,7 +30,12 @@ export function createLinterRuntime(
 ): LinterRuntime {
     const problems: LinterProblem[] = [];
 
-    const onParseError = (error: LinterSourceCodeError) => {
+    const onParseError = (error: unknown) => {
+        if (!(error instanceof LinterSourceCodeError)) {
+            // Unknown error, we cannot extract position from it
+            throw error;
+        }
+
         problems.push({
             message: error.message,
             position: error.location,
