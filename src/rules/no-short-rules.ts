@@ -1,7 +1,7 @@
 import { type CosmeticRule, type NetworkRule } from '@adguard/agtree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleType } from '../rule';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 const DEFAULT_MIN_RULE_LENGTH = 4;
 

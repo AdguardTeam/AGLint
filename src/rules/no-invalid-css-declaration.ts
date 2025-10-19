@@ -1,7 +1,7 @@
 import { type DeclarationPlain } from '@adguard/ecss-tree';
 
-import { validateDeclaration } from '../../linter/helpers/css-validator';
-import { defineRule, LinterRuleType } from '../rule';
+import { validateDeclaration } from '../linter/helpers/css-validator';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 export default defineRule({
     meta: {

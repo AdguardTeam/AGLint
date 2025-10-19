@@ -1,8 +1,8 @@
 import { type AnyRule } from '@adguard/agtree';
 import * as v from 'valibot';
 
-import { StringUtils } from '../../utils/string';
-import { defineRule, LinterRuleType } from '../rule';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
+import { StringUtils } from '../utils/string';
 
 export default defineRule({
     meta: {
@@ -72,9 +72,13 @@ export default defineRule({
         };
 
         return {
+            // FIXME, https://eslint.org/docs/latest/extend/code-path-analysis#events
+            // onRule(node: AnyRule) {
+            //     handler(node);
+            // },
             // FIXME: Add all types
             NetworkRule: handler,
-            CosmeticRule: handler,
+            // CosmeticRule: handler,
         };
     },
 });

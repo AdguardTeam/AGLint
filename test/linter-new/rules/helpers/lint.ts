@@ -12,7 +12,7 @@ import { commonLinterConfig, commonSubParsers } from './common-linter-config';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const ruleLoader: LinterRuleLoader = async (ruleName) => {
-    return (await import(join(__dirname, `../../../../src/linter-new/rules/${ruleName}`))).default;
+    return (await import(join(__dirname, `../../../../src/rules/${ruleName}`))).default;
 };
 
 export const lint = (

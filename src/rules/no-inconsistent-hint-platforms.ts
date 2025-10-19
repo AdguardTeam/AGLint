@@ -1,6 +1,6 @@
 import { type Value } from '@adguard/agtree';
 
-import { defineRule, LinterRuleType } from '../rule';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 export default defineRule({
     meta: {

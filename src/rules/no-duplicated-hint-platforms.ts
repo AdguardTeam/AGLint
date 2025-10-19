@@ -1,6 +1,6 @@
 import { type Hint, type ParameterList, type Value } from '@adguard/agtree';
 
-import { defineRule, LinterRuleType } from '../rule';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';

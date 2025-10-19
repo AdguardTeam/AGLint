@@ -1,7 +1,7 @@
 import { type SelectorListPlain } from '@adguard/ecss-tree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleType } from '../rule';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 export default defineRule({
     meta: {

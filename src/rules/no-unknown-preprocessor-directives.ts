@@ -1,7 +1,7 @@
 import { type PreProcessorCommentRule } from '@adguard/agtree';
 
-import { SUPPORTED_PREPROCESSOR_DIRECTIVES } from '../../common/constants';
-import { defineRule, LinterRuleType } from '../rule';
+import { SUPPORTED_PREPROCESSOR_DIRECTIVES } from '../common/constants';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 export default defineRule({
     meta: {

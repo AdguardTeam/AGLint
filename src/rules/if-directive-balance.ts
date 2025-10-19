@@ -1,7 +1,7 @@
 import { type PreProcessorCommentRule } from '@adguard/agtree';
 
-import { ELSE_DIRECTIVE, ENDIF_DIRECTIVE, IF_DIRECTIVE } from '../../common/constants';
-import { defineRule, LinterRuleType } from '../rule';
+import { ELSE_DIRECTIVE, ENDIF_DIRECTIVE, IF_DIRECTIVE } from '../common/constants';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 export default defineRule({
     meta: {

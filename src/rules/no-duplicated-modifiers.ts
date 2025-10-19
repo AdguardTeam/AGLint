@@ -1,27 +1,27 @@
-import { type Hint } from '@adguard/agtree';
+import { type Modifier } from '@adguard/agtree';
 
-import { defineRule, LinterRuleType } from '../rule';
+import { defineRule, LinterRuleType } from '../linter-new/rule';
 
 export default defineRule({
     meta: {
         type: LinterRuleType.Problem,
         docs: {
-            name: 'no-duplicated-hints',
-            description: 'Checks if hints are duplicated within the same hint comment rule',
+            name: 'no-duplicated-modifiers',
+            description: 'Checks if a network rule contains multiple same modifiers',
             recommended: true,
         },
         messages: {
-            duplicatedHints: 'Duplicated hint "{{hint}}"',
+            duplicatedModifiers: 'Duplicated modifier "{{modifier}}"',
         },
     },
     create: (context) => {
-        const history: Set<string> = new Set();
+        const history = new Set<string>();
 
         return {
-            'HintCommentRule:exit': () => {
+            'ModifierList:exit': () => {
                 history.clear();
             },
-            Hint: (node: Hint) => {
+            Modifier: (node: Modifier) => {
                 const name = node.name.value;
                 const nameToLowerCase = name.toLowerCase();
 
@@ -31,12 +31,12 @@ export default defineRule({
                 }
 
                 context.report({
-                    messageId: 'duplicatedHints',
+                    messageId: 'duplicatedModifiers',
                     data: {
-                        hint: name,
+                        modifier: name,
                     },
                     node,
-                    // TODO: Add suggestion to remove the duplicated hint
+                    // TODO: Add suggestion to remove the duplicated modifier
                 });
             },
         };
