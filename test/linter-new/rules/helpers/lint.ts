@@ -36,7 +36,7 @@ export const lint = (
     });
 };
 
-export const lintWithFix = (
+export const lintWithFixes = (
     content: string,
     rulesConfig: LinterRulesConfig,
     subParsers?: LinterSubParsersConfig,

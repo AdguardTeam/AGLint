@@ -8,7 +8,7 @@ import {
 import { type LinterRulesConfig } from '../../../src/linter-new/config';
 import { LinterRuleSeverity } from '../../../src/linter-new/rule';
 
-import { lint, lintWithFix } from './helpers/lint';
+import { lint, lintWithFixes } from './helpers/lint';
 
 const rulesConfig: LinterRulesConfig = {
     'no-duplicated-hint-platforms': LinterRuleSeverity.Error,
@@ -271,7 +271,7 @@ describe('no-duplicated-hint-platforms', () => {
 
     it('should fix problematic cases properly', async () => {
         expect(
-            (await lintWithFix(
+            (await lintWithFixes(
                 // eslint-disable-next-line max-len
                 '!+ NOT_PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
                 rulesConfig,
