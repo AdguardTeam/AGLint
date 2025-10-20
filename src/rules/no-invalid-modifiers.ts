@@ -1,4 +1,4 @@
-import { type Modifier, modifierValidator } from '@adguard/agtree';
+import { type Modifier, modifierValidator, type NetworkRule } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter-new/rule';
 
@@ -11,26 +11,34 @@ export default defineRule({
             recommended: true,
         },
         messages: {
-            invalidModifier: 'Invalid modifier: "{{modifier}}"',
+            invalidModifier: 'Invalid modifier: "{{modifier}}", got "{{validationError}}"',
         },
     },
     create: (context) => {
+        let isExceptionRule = false;
+
         return {
+            NetworkRule: (node: NetworkRule) => {
+                isExceptionRule = node.exception;
+            },
+            'ExceptionRule:exit': () => {
+                isExceptionRule = false;
+            },
             'NetworkRule Modifier': (node: Modifier) => {
                 if (!context.syntax) {
                     return;
                 }
 
                 context.syntax.forEach((syntax) => {
-                    const validationResult = modifierValidator.validate(syntax, node, node.exception);
+                    const validationResult = modifierValidator.validate(syntax, node, isExceptionRule);
 
                     if (validationResult.valid && !validationResult.warn) {
                         return;
                     }
 
-                    // FIXME: Include warnings somewhere else
+                    // TODO (David): Include warnings somewhere else.
                     // We validate too many things in validator at once thus
-                    // its hard to split it to multiple linter rules
+                    // its hard to split it to multiple linter rules.
                     if (validationResult.warn) {
                         return;
                     }
@@ -38,7 +46,8 @@ export default defineRule({
                     context.report({
                         messageId: 'invalidModifier',
                         data: {
-                            modifier: node.value,
+                            modifier: node.name.value,
+                            validationError: validationResult.error,
                         },
                         node,
                     });

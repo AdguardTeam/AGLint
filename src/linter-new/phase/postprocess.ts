@@ -19,14 +19,12 @@ export function summarize(problems: LinterProblem[]) {
     let fatalErrorCount = 0;
 
     for (const problem of problems) {
-        if (problem.severity === LinterRuleSeverity.Warning) {
+        if (problem.fatal) {
+            fatalErrorCount += 1;
+        } else if (problem.severity === LinterRuleSeverity.Warning) {
             warningCount += 1;
         } else if (problem.severity === LinterRuleSeverity.Error) {
             errorCount += 1;
-        }
-
-        if (problem.fatal) {
-            fatalErrorCount += 1;
         }
     }
     return {

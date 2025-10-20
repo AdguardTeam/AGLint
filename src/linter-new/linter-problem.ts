@@ -1,17 +1,18 @@
-import { type LinterRuleSeverity, type LinterRuleType, type WithMessages } from './rule';
+import { type LinterRuleSeverity, type LinterRuleType } from './rule';
 import { type LinterFixCommand } from './source-code/fix-generator';
 import { type LinterPositionRange } from './source-code/source-code';
 
-type SuggestionBase = {
+export type LinterSuggestion = {
     fix: LinterFixCommand;
+    message: string;
+    messageId?: string;
+    data?: Record<string, unknown>;
 };
-
-type LinterSuggestion = WithMessages<SuggestionBase>;
 
 /**
  * Represents a problem given by the linter.
  */
-type LinterProblemBase = {
+export type LinterProblem = {
     /**
      * The category of this problem.
      */
@@ -21,6 +22,12 @@ type LinterProblemBase = {
      * Name of the linter rule that generated this problem.
      */
     ruleId?: string;
+
+    message: string;
+
+    messageId?: string;
+
+    data?: Record<string, unknown>;
 
     /**
      * The severity of this problem.
@@ -49,5 +56,3 @@ type LinterProblemBase = {
      */
     suggestions?: LinterSuggestion[];
 };
-
-export type LinterProblem = WithMessages<LinterProblemBase>;

@@ -36,7 +36,7 @@ describe('no-duplicated-hint-platforms', () => {
     });
 
     it('should detect problematic cases', async () => {
-        expect((await lint('!+ PLATFORM(windows, windows)', rulesConfig)).problems).toStrictEqual([
+        expect((await lint('!+ PLATFORM(windows, windows)', rulesConfig)).problems).toMatchObject([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
@@ -65,7 +65,7 @@ describe('no-duplicated-hint-platforms', () => {
             },
         ]);
 
-        expect((await lint('!+ NOT_PLATFORM(windows, windows)', rulesConfig)).problems).toStrictEqual([
+        expect((await lint('!+ NOT_PLATFORM(windows, windows)', rulesConfig)).problems).toMatchObject([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
@@ -100,7 +100,7 @@ describe('no-duplicated-hint-platforms', () => {
                 '!+ PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
                 rulesConfig,
             )).problems,
-        ).toStrictEqual([
+        ).toMatchObject([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
@@ -187,7 +187,7 @@ describe('no-duplicated-hint-platforms', () => {
                 '!+ NOT_PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
                 rulesConfig,
             )).problems,
-        ).toStrictEqual([
+        ).toMatchObject([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',

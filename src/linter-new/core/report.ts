@@ -1,7 +1,7 @@
 // core/report.ts
 import { isNull } from '../../utils/type-guards';
-import { type LinterProblem } from '../linter-problem';
-import { type LinterProblemReport, LinterRuleSeverity, type WithMessages } from '../rule';
+import { type LinterProblem, type LinterSuggestion } from '../linter-problem';
+import { type LinterProblemReport, LinterRuleSeverity } from '../rule';
 import { type LinterRuleInstance } from '../rule-registry/rule-instance';
 import { type LinterPositionRange } from '../source-code/source-code';
 
@@ -34,28 +34,17 @@ export function createReportFn(runtime: LinterRuntime): LinterReporter {
             position = pos;
         }
 
-        let messages: WithMessages;
-
-        if (report.message) {
-            messages = {
-                message: report.message,
-            };
-        } else if (report.messageId) {
-            messages = {
-                messageId: report.messageId,
-                data: report.data,
-            };
-        } else {
-            // This should never happen if the report is properly constructed
-            throw new Error('Report must have either message or messageId');
-        }
-
         const problem: LinterProblem = {
             ruleId: ruleInstance.getId(),
             severity: ruleInstance.getSeverity(),
             position,
-            ...messages,
+            message: ruleInstance.getMessage(report),
         };
+
+        if (process.env.NODE_ENV === 'test') {
+            problem.messageId = report.messageId;
+            problem.data = report.data;
+        }
 
         if (report.fix) {
             if (!ruleInstance.hasFix()) {
@@ -82,17 +71,24 @@ export function createReportFn(runtime: LinterRuntime): LinterReporter {
 
             problem.suggestions = [];
 
-            for (const suggestion of report.suggest) {
-                const fix = suggestion.fix(runtime.fixGenerator);
+            for (const suggest of report.suggest) {
+                const fix = suggest.fix(runtime.fixGenerator);
 
                 if (isNull(fix)) {
                     continue;
                 }
 
-                problem.suggestions.push({
-                    ...suggestion,
+                const suggestion: LinterSuggestion = {
+                    message: ruleInstance.getMessage(suggest),
                     fix,
-                });
+                };
+
+                if (process.env.NODE_ENV === 'test') {
+                    suggestion.messageId = suggest.messageId;
+                    suggestion.data = suggest.data;
+                }
+
+                problem.suggestions.push(suggestion);
             }
         }
 
