@@ -5,8 +5,8 @@ import {
     test,
 } from 'vitest';
 
-import { type LinterRulesConfig } from '../../../src/linter-new/config';
-import { LinterRuleSeverity } from '../../../src/linter-new/rule';
+import { type LinterRulesConfig } from '../../src/linter-new/config';
+import { LinterRuleSeverity } from '../../src/linter-new/rule';
 
 import { lint, lintWithFixes } from './helpers/lint';
 

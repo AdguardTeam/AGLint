@@ -1,10 +1,10 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { type LinterRulesConfig, type LinterSubParsersConfig } from '../../../../src/linter-new/config';
-import { LinterFixer, type LinterFixerResult } from '../../../../src/linter-new/fixer';
-import { Linter, type LinterResult } from '../../../../src/linter-new/linter';
-import { type LinterRuleLoader } from '../../../../src/linter-new/rule-registry/rule-loader';
+import { type LinterRulesConfig, type LinterSubParsersConfig } from '../../../src/linter-new/config';
+import { LinterFixer, type LinterFixerResult } from '../../../src/linter-new/fixer';
+import { Linter, type LinterResult } from '../../../src/linter-new/linter';
+import { type LinterRuleLoader } from '../../../src/linter-new/rule-registry/rule-loader';
 
 import { commonLinterConfig, commonSubParsers } from './common-linter-config';
 
@@ -12,7 +12,7 @@ import { commonLinterConfig, commonSubParsers } from './common-linter-config';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const ruleLoader: LinterRuleLoader = async (ruleName) => {
-    return (await import(join(__dirname, `../../../../src/rules/${ruleName}`))).default;
+    return (await import(join(__dirname, `../../../src/rules/${ruleName}`))).default;
 };
 
 export const lint = (
