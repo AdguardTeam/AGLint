@@ -212,9 +212,17 @@ export class LinterSourceCodeWalker {
                     );
                 } catch (e) {
                     if (this.onParseError) {
+                        let message = 'Failed to parse sub-AST';
+
+                        if (parser.name) {
+                            message += ` with '${parser.name}'`;
+                        }
+
+                        message += `, got error: ${getErrorMessage(e)}`;
+
                         this.onParseError(
                             new LinterSourceCodeError(
-                                getErrorMessage(e),
+                                message,
                                 this.sourceCode.getLinterPositionRangeFromOffsetRange([
                                     start,
                                     end,
