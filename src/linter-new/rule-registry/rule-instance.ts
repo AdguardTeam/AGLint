@@ -4,7 +4,6 @@ import * as v from 'valibot';
 import { getErrorMessage } from '../../utils/error';
 import { type LinterReporter } from '../core/report';
 import {
-    type LinterProblemReport,
     type LinterRule,
     type LinterRuleBaseConfig,
     type LinterRuleBaseContext,
@@ -14,6 +13,7 @@ import {
     type LinterRuleSeverity,
     type LinterRuleType,
     type LinterRuleVisitors,
+    type WithMessages,
 } from '../rule';
 
 export class LinterRuleInstance {
@@ -96,7 +96,7 @@ export class LinterRuleInstance {
         }
     }
 
-    public getMessage(report: LinterProblemReport): string {
+    public getMessage(report: WithMessages): string {
         let message = '';
 
         if (report.messageId) {
