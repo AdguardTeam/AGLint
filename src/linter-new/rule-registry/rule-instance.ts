@@ -1,6 +1,7 @@
 import { render } from 'micromustache';
 import * as v from 'valibot';
 
+import { getErrorMessage } from '../../utils/error';
 import { type LinterReporter } from '../core/report';
 import {
     type LinterProblemReport,
@@ -72,10 +73,17 @@ export class LinterRuleInstance {
                     throw new Error(`Rule '${this.rule.meta.docs.name}' does not have a configuration schema`);
                 }
 
-                const parsedRestConfig = v.parse(
-                    this.rule.meta.configSchema,
-                    parsedConfig.slice(1),
-                );
+                let parsedRestConfig;
+
+                try {
+                    parsedRestConfig = v.parse(
+                        this.rule.meta.configSchema,
+                        parsedConfig.slice(1),
+                    );
+                } catch (e) {
+                    // eslint-disable-next-line max-len
+                    throw new Error(`Rule '${this.rule.meta.docs.name}' has invalid configuration: ${getErrorMessage(e)}`);
+                }
 
                 // Empty the config array, but keep the reference,
                 // because we pass the array to the visitors context
