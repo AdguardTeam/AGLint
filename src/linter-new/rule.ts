@@ -167,25 +167,7 @@ export type WithMessages<T extends {} = {}> = T & {
 // eslint-disable-next-line max-len
 type FixerFunction = (fixer: LinterFixGenerator) => LinterFixCommand | null;
 
-/**
- * Represents a problem report (this must be passed to context.report from the rules).
- */
-type LinterProblemReportBase = {
-    /**
-     * Placeholders for the message.
-     */
-    data?: Record<string, unknown>;
-
-    /**
-     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
-     */
-    node?: any;
-
-    /**
-     * The location of the problem.
-     */
-    position?: LinterPositionRange;
-
+type LinterProblemReportFixes = {
     /**
      * Fix for the problem.
      *
@@ -205,13 +187,45 @@ type LinterProblemReportBase = {
     suggest?: Suggestion[];
 };
 
+type LinterProblemReportPositions = {
+    /**
+     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
+     */
+    node: any;
+
+    /**
+     * The location of the problem.
+     */
+    position?: LinterPositionRange;
+} | {
+    /**
+     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
+     */
+    node?: any;
+
+    /**
+     * The location of the problem.
+     */
+    position: LinterPositionRange;
+} | {
+    /**
+     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
+     */
+    node: any;
+
+    /**
+     * The location of the problem.
+     */
+    position: LinterPositionRange;
+};
+
+export type LinterProblemReport = WithMessages<LinterProblemReportFixes & LinterProblemReportPositions>;
+
 type SuggestionBase = {
     fix: FixerFunction;
 };
 
 type Suggestion = WithMessages<SuggestionBase>;
-
-export type LinterProblemReport = WithMessages<LinterProblemReportBase>;
 
 type ConfigOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
   v.InferOutput<TupleOf<Elements>>;
