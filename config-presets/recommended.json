@@ -1,0 +1,25 @@
+{
+  "syntax": [
+    "Common"
+  ],
+  "rules": {
+    "if-directive-balance": "error",
+    "no-duplicated-hint-platforms": "error",
+    "no-duplicated-hints": "error",
+    "no-duplicated-modifiers": "error",
+    "no-inconsistent-hint-platforms": "error",
+    "no-invalid-css-declaration": "error",
+    "no-invalid-domains": "error",
+    "no-invalid-hint-params": "error",
+    "no-invalid-modifiers": "error",
+    "no-short-rules": [
+      "error",
+      {
+        "minLength": 3
+      }
+    ],
+    "no-unknown-hint-platforms": "error",
+    "no-unknown-hints": "error",
+    "no-unknown-preprocessor-directives": "error"
+  }
+}
