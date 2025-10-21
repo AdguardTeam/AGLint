@@ -15,7 +15,7 @@ export default defineRule({
             multipleSelectors: 'This selector list contains {{count}} selectors, but only {{maxSelectors}} are allowed',
         },
         configSchema: v.tuple([
-            v.object({
+            v.strictObject({
                 maxSelectors: v.pipe(
                     v.fallback(v.number(), 1),
                     v.minValue(1),

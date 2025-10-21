@@ -17,7 +17,7 @@ export default defineRule({
         },
         // TODO: Improve schema with transformation: https://github.com/AdguardTeam/AGLint/issues/217)
         configSchema: v.tuple([
-            v.object({
+            v.strictObject({
                 regExpPatterns: v.pipe(
                     v.fallback(v.array(v.string()), []),
                 ),
@@ -61,10 +61,17 @@ export default defineRule({
                             pattern: pattern.source,
                         },
                         fix(fixer) {
-                            const lineNumber = context.sourceCode.getLineNumberForOffset(node.start!)!;
-                            const lineRange = context.sourceCode.getLineRange(lineNumber, true)!;
+                            const lineNumber = context.sourceCode.getLineNumberForOffset(node.start!);
+                            if (!lineNumber) {
+                                return null;
+                            }
+                            const lineRange = context.sourceCode.getLineRange(lineNumber, true);
+                            if (!lineRange) {
+                                return null;
+                            }
                             return fixer.remove(lineRange);
                         },
+                        node,
                     });
                     break;
                 }
