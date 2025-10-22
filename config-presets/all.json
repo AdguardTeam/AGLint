@@ -10,6 +10,7 @@
         "maxSelectors": 1
       }
     ],
+    "no-duplicated-css-declaration-props": "error",
     "no-duplicated-hint-platforms": "error",
     "no-duplicated-hints": "error",
     "no-duplicated-modifiers": "error",
