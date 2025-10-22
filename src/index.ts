@@ -12,6 +12,8 @@ export { LinterRuleSeverity } from './linter/rule';
 export { CONFIG_FILE_NAMES } from './cli/config-file/config-file';
 export { IGNORE_FILE_NAME } from './cli/constants';
 
+export { defaultSubParsers } from './linter/default-subparsers';
+
 export {
     type FileSystemAdapter,
     type FileStats,

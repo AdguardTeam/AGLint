@@ -1,7 +1,5 @@
-// import { defaultParserOptions, DomainListParser } from '@adguard/agtree/parser';
-import { type CssNode, List, parse as parseCss } from '@adguard/ecss-tree';
-
-import { type LinterConfig, type LinterSubParsersConfig, type Parser } from '../linter/config';
+import { type LinterConfig } from '../linter/config';
+import { defaultSubParsers } from '../linter/default-subparsers';
 import { type AnyLinterResult, LinterFixer } from '../linter/fixer';
 import { Linter, type LinterRunOptions } from '../linter/linter';
 import { type LinterRule } from '../linter/rule';
@@ -32,59 +30,6 @@ export type LinterWorkerResult = {
 
 export type LinterWorkerResults = {
     results: LinterWorkerResult[];
-};
-
-const cssParser: Parser = {
-    name: '@adguard/ecss-tree',
-    parse: ((source: string, offset: number, line: number, lineStartOffset: number) => {
-        return parseCss(source, {
-            context: 'selectorList',
-            positions: true,
-            offset,
-            line,
-            column: offset - lineStartOffset,
-        });
-    }),
-    nodeTypeKey: 'type',
-    childNodeKey: 'children',
-    nodeTransformer: (node: CssNode) => {
-        if ('children' in node) {
-            const maybeChildren = (node as { children?: unknown }).children;
-
-            if (maybeChildren instanceof List) {
-                // eslint-disable-next-line no-param-reassign
-                (node as { children: unknown }).children = maybeChildren.toArray();
-            }
-        }
-        return node;
-    },
-    getStartOffset: (node: CssNode) => {
-        return node.loc!.start.offset;
-    },
-    getEndOffset: (node: CssNode) => {
-        return node.loc!.end.offset;
-    },
-};
-
-export const commonSubParsers: LinterSubParsersConfig = {
-    'ElementHidingRuleBody > Value.selectorList': cssParser,
-    'CssInjectionRuleBody > Value.selectorList': cssParser,
-    // Problematic with regex values in domain modifiers,
-    // their parsing should be improved, see https://github.com/AdguardTeam/tsurlfilter/issues/121
-
-    // 'Modifier[name.value="domain"] > Value.value': {
-    //     name: '@adguard/agtree',
-    //     parse: ((source: string, offset: number) => {
-    //         return DomainListParser.parse(
-    //             source,
-    //             defaultParserOptions,
-    //             offset,
-    //             '|',
-    //         );
-    //     }),
-    //     nodeTypeKey: 'type',
-    //     childNodeKey: 'children',
-    // },
 };
 
 const ruleCache = new Map<string, LinterRule>();
@@ -157,7 +102,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
 
                 return rule;
             },
-            subParsers: commonSubParsers,
+            subParsers: defaultSubParsers,
         };
 
         if (tasks.cliConfig.fix) {
