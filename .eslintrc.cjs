@@ -25,10 +25,6 @@ const ESLINT_RULES = {
             ignoreUrls: true,
             ignoreTrailingComments: false,
             ignoreComments: false,
-            /**
-             * Ignore calls to logger, e.g. logger.error(), because of the long string.
-             */
-            ignorePattern: 'logger\\.',
         },
     ],
     // Sort members of import statements, e.g. `import { B, A } from 'module';` -> `import { A, B } from 'module';`
@@ -221,6 +217,20 @@ const N_PLUGIN_RULES = {
     // Prefer `/promises` API for `fs` and `dns` modules, if the corresponding imports are used.
     'n/prefer-promises/fs': 'error',
     'n/prefer-promises/dns': 'error',
+
+    'n/hashbang': [
+        'error',
+        {
+            // This rule reads the bin property from package.json, and only allows shebangs for that file.
+            // But since we transform the source files to the dist folder, we need to convert the paths.
+            convertPath: [
+                {
+                    include: ['src/**/*.ts'],
+                    replace: ['^src/(.+)\\.ts$', 'dist/$1.js'],
+                },
+            ],
+        },
+    ],
 };
 
 /**
@@ -240,18 +250,6 @@ const BOUNDARIES_PLUGIN_RULES = {
             },
             // TODO: Add more rules, like helpers only can import helpers, etc.
         ],
-    }],
-};
-
-/**
- * Logger context plugin rules.
- *
- * @see {@link https://github.com/AdguardTeam/tsurlfilter/tree/master/packages/eslint-plugin-logger-context#readme}
- */
-const LOGGER_CONTEXT_PLUGIN_RULES = {
-    // Check that every logger call has a context tag.
-    '@adguard/logger-context/require-logger-context': ['error', {
-        contextModuleName: 'tsurl',
     }],
 };
 
@@ -285,7 +283,6 @@ module.exports = {
     plugins: [
         'import',
         'import-newlines',
-        '@adguard/logger-context',
         '@typescript-eslint',
         'n',
         'boundaries',
@@ -323,6 +320,5 @@ module.exports = {
         // JSDOC_PLUGIN_RULES,
         N_PLUGIN_RULES,
         BOUNDARIES_PLUGIN_RULES,
-        LOGGER_CONTEXT_PLUGIN_RULES,
     ),
 };

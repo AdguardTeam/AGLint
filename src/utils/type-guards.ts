@@ -63,3 +63,7 @@ export const isString = (value: unknown): value is string => {
 export const isArrayOfUint8Arrays = (value: unknown): value is Uint8Array[] => {
     return Array.isArray(value) && value.every((chunk) => chunk instanceof Uint8Array);
 };
+
+export const isObject = (value: unknown): value is Record<string, unknown> => {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+};

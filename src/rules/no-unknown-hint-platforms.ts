@@ -1,6 +1,6 @@
 import { type Value } from '@adguard/agtree';
 
-import { defineRule, LinterRuleType } from '../linter-new/rule';
+import { defineRule, LinterRuleType } from '../linter/rule';
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints
 const KNOWN_PLATFORMS = new Set([

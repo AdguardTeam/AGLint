@@ -2,7 +2,7 @@ import { defaultParserOptions, DomainListParser } from '@adguard/agtree/parser';
 import { AdblockSyntax } from '@adguard/agtree/utils';
 import { type CssNode, List, parse } from '@adguard/ecss-tree';
 
-import { type LinterConfigParsed, type LinterSubParsersConfig, type Parser } from '../../../src/linter-new/config';
+import { type LinterConfigParsed, type LinterSubParsersConfig, type Parser } from '../../../src/linter/config';
 
 const cssParser: Parser = {
     name: '@adguard/ecss-tree',

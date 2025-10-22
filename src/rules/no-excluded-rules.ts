@@ -1,8 +1,7 @@
-import { type AnyRule } from '@adguard/agtree';
+import { type AnyRule, RegExpUtils } from '@adguard/agtree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleType } from '../linter-new/rule';
-import { StringUtils } from '../utils/string';
+import { defineRule, LinterRuleType } from '../linter/rule';
 
 export default defineRule({
     meta: {
@@ -38,7 +37,7 @@ export default defineRule({
             const regexps: RegExp[] = patterns.map(
                 (pattern) => {
                     let processedRawPattern = pattern;
-                    if (StringUtils.isRegexPattern(pattern)) {
+                    if (RegExpUtils.isRegexPattern(pattern)) {
                         processedRawPattern = pattern.slice(1, -1);
                     }
                     return new RegExp(processedRawPattern);

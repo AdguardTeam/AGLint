@@ -51,6 +51,9 @@ Build:
             # Create build, this will also create build.txt file with build number
             pnpm build
 
+            # Create build.txt file with version number
+            npx tsx tasks/build-txt.ts
+
             # Pack build into tarball
             pnpm pack --out aglint.tgz
 

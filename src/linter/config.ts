@@ -1,119 +1,146 @@
-/**
- * Linter configuration.
- */
-
 import { AdblockSyntax } from '@adguard/agtree';
-import merge from 'deepmerge';
-import {
-    array,
-    boolean,
-    enums,
-    object,
-    optional,
-    record,
-    string,
-} from 'superstruct';
+import * as v from 'valibot';
 
-import { type LinterConfig } from './common';
 import { linterRuleConfigSchema } from './rule';
+import { anyNodeSchema } from './source-code/visitor-collection';
+
+export const DEFAULT_TYPE_KEY = 'type';
+export const DEFAULT_CHILD_KEY = 'children';
+
+const parseFunctionSchema = v.pipe(
+    v.function(),
+    v.args(v.tuple([
+        // source
+        v.pipe(v.string()),
+        // offset
+        v.pipe(v.number()),
+        // line
+        v.pipe(v.number()),
+        // lineStartOffset
+        v.pipe(v.number()),
+    ])),
+    v.returns(anyNodeSchema),
+);
+
+const getOffsetFromNodeSchema = v.pipe(
+    v.function(),
+    v.args(v.tuple([
+        // node
+        v.pipe(anyNodeSchema),
+    ])),
+    v.returns(v.number()),
+);
 
 /**
- * Superstruct schema for the linter rules config object.
+ * Retrieves a character offset (either start or end) from a given AST node.
+ *
+ * Used by sub-parsers to determine which portion of the main source
+ * corresponds to a particular node.
+ *
+ * @param node The AST node from which to extract the offset.
+ * @returns The absolute character offset within the source code.
  */
-export const linterRulesSchema = optional(record(string(), linterRuleConfigSchema));
+export type GetOffsetFromNode = v.InferOutput<typeof getOffsetFromNodeSchema>;
+
+const nodeTransformerFunctionSchema = v.pipe(
+    v.function(),
+    v.args(v.tuple([
+        // node
+        v.pipe(anyNodeSchema),
+    ])),
+    v.returns(v.void()),
+);
+
+export type NodeTransformerFunction = v.InferOutput<typeof nodeTransformerFunctionSchema>;
+
+const parserSchema = v.object({
+    /**
+     * Optional human-readable name of the parser.
+     * Used primarily for debugging and logging.
+     */
+    name: v.optional(v.string()),
+
+    /**
+     * The function used to parse a given source slice into a sub-AST.
+     */
+    parse: parseFunctionSchema,
+
+    /**
+     * The key used to identify node types within the sub-AST.
+     * For example, "type" for ESTree-like ASTs.
+     */
+    nodeTypeKey: v.string(),
+
+    /**
+     * The key used to access arrays of child nodes within the sub-AST.
+     * For example, "children" or "body".
+     */
+    childNodeKey: v.string(),
+
+    /**
+     * Optional function that returns the start offset of a node in the main source.
+     * Used to determine the slice of code passed to the sub-parser.
+     */
+    getStartOffset: v.optional(getOffsetFromNodeSchema),
+
+    /**
+     * Optional function that returns the end offset of a node in the main source.
+     * Used to determine the slice of code passed to the sub-parser.
+     */
+    getEndOffset: v.optional(getOffsetFromNodeSchema),
+
+    /**
+     * Optional transformer applied to each node of the sub-AST before traversal.
+     * Useful for normalizing node shapes or adding metadata.
+     *
+     * @param node The node to transform.
+     * @returns The transformed node object.
+     */
+    nodeTransformer: v.optional(nodeTransformerFunctionSchema),
+});
 
 /**
- * Superstruct schema for the linter config object properties. It is necessary to
- * separate this from the schema for the whole config object because we reuse it
- * in the CLI config object.
+ * Defines a sub-parser configuration, which describes how a specific parser
+ * should process a subset of the main AST.
+ *
+ * Each parser is associated with a unique `namespace` and is invoked
+ * when a node matches a registered selector.
  */
-export const linterConfigPropsSchema = {
-    root: optional(boolean()),
-    extends: optional(array(string())),
-    allowInlineConfig: optional(boolean()),
-    syntax: optional(array(enums([
-        AdblockSyntax.Common,
-        AdblockSyntax.Adg,
-        AdblockSyntax.Ubo,
-        AdblockSyntax.Abp,
-    ]))),
-    rules: linterRulesSchema,
-};
+export type Parser = v.InferOutput<typeof parserSchema>;
 
 /**
- * Superstruct schema for the linter rule config (used for validation).
+ * Defines the signature of a sub-parser function.
+ * A sub-parser takes a source code slice and contextual offset information,
+ * and returns an AST object representing the parsed structure.
+ *
+ * @param source The portion of source code to parse.
+ * @param offset The absolute start offset of the source slice in the original file.
+ * @param line The zero-based line number corresponding to the slice start position.
+ * @param lineStartOffset The absolute offset of the line start that contains the slice start.
+ *
+ * @returns The parsed AST object.
  */
-export const linterConfigSchema = object(linterConfigPropsSchema);
+export type ParseFunction = v.InferOutput<typeof parseFunctionSchema>;
 
-/**
- * Default linter configuration.
- */
-export const defaultLinterConfig: LinterConfig = {
-    allowInlineConfig: true,
-    syntax: [AdblockSyntax.Common],
-};
+export const linterRulesConfigSchema = v.record(v.string(), linterRuleConfigSchema);
 
-/**
- * Merges two configuration objects using deepmerge. Practically, this means that
- * the `extend` object will be merged into the `initial` object.
- *
- * @param initial The initial config object.
- * @param extend The config object to extend the initial config with.
- *
- * @returns The merged config object.
- *
- * @example
- * If you have the following config (called `initial` parameter):
- * ```json
- * {
- *   "syntax": ["Common"],
- *   "rules": {
- *     "rule1": "error",
- *     "rule2": "warn"
- *   }
- * }
- * ```
- * And you want to extend it with the following config (called `extend` parameter):
- * ```json
- * {
- *   "syntax": ["AdGuard"],
- *   "rules": {
- *     "rule2": "off",
- *   },
- * }
- * ```
- * The result will be:
- * ```json
- * {
- *   "syntax": ["AdGuard"],
- *   "rules": {
- *     "rule1": "error",
- *     "rule2": "off"
- *   }
- * }
- * ```
- */
-export function mergeConfigs(initial: LinterConfig, extend: Partial<LinterConfig>): LinterConfig {
-    return merge(initial, extend, {
-        // https://github.com/TehShrike/deepmerge#options
-        arrayMerge: (_, sourceArray) => sourceArray,
-    });
-}
+export type LinterRulesConfig = v.InferOutput<typeof linterRulesConfigSchema>;
 
-/**
- * Merges two configuration objects using deepmerge.merge().
- * Practically, this means that the `extend` object will be merged into the `initial` object.
- *
- * It is very similar to {@link mergeConfigs|mergeConfigs()} function, but the order of parameters is reversed.
- *
- * @param extend The config object to extend the initial config with.
- * @param initial The initial config object.
- *
- * @returns The merged config object.
- */
-export function mergeConfigsReverse(extend: Partial<LinterConfig>, initial: LinterConfig): LinterConfig {
-    return merge(extend, initial, {
-        // https://github.com/TehShrike/deepmerge#options
-        arrayMerge: (_, sourceArray) => sourceArray,
-    });
-}
+export const linterSubParsersConfigSchema = v.record(v.string(), parserSchema);
+
+export type LinterSubParsersConfig = v.InferOutput<typeof linterSubParsersConfigSchema>;
+
+const adblockSyntaxSchema = v.enum(AdblockSyntax);
+
+export const syntaxArraySchema = v.array(adblockSyntaxSchema);
+
+export const linterConfigSchema = v.object({
+    rules: linterRulesConfigSchema,
+    allowInlineConfig: v.optional(v.boolean()),
+    syntax: v.optional(syntaxArraySchema),
+    reportUnusedDisableDirectives: v.optional(v.boolean()),
+});
+
+export type LinterConfig = v.InferInput<typeof linterConfigSchema>;
+
+export type LinterConfigParsed = v.InferOutput<typeof linterConfigSchema>;

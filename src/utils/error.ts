@@ -49,3 +49,31 @@ function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 export function getErrorMessage(error: unknown): string {
     return toErrorWithMessage(error).message;
 }
+
+/**
+ * Formats error to the string.
+ *
+ * @param error Error to format.
+ *
+ * @returns Formatted error.
+ */
+export function getFormattedError(error: unknown): string {
+    const lines: string[] = [];
+
+    if (error instanceof Error) {
+        const { message, stack } = error;
+
+        lines.push(message || 'No error message provided');
+        lines.push('');
+
+        // Very basic stack trace formatting
+        lines.push(
+            ...(stack || '').split('\n').map((line) => `  ${line}`),
+        );
+    } else {
+        // Convert any unknown error to string
+        lines.push(String(error));
+    }
+
+    return lines.join('\n');
+}

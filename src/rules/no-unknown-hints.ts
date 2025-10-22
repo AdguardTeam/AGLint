@@ -1,6 +1,6 @@
 import { type Hint } from '@adguard/agtree';
 
-import { defineRule, LinterRuleType } from '../linter-new/rule';
+import { defineRule, LinterRuleType } from '../linter/rule';
 
 const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
 const PLATFORM = 'PLATFORM';

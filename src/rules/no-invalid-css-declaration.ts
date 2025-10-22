@@ -1,7 +1,7 @@
 import { type DeclarationPlain } from '@adguard/ecss-tree';
 
-import { validateDeclaration } from '../linter/helpers/css-validator';
-import { defineRule, LinterRuleType } from '../linter-new/rule';
+import { defineRule, LinterRuleType } from '../linter/rule';
+import { validateDeclaration } from '../utils/css-utils/css-validator';
 
 export default defineRule({
     meta: {
@@ -16,12 +16,18 @@ export default defineRule({
         return {
             Declaration: (node: DeclarationPlain) => {
                 validateDeclaration(node).forEach((error) => {
+                    const position = context.sourceCode.getLinterPositionRangeFromOffsetRange([
+                        node.loc!.start.offset + error.start!,
+                        node.loc!.start.offset + error.end!,
+                    ]);
+
+                    if (!position) {
+                        return;
+                    }
+
                     context.report({
                         message: error.message,
-                        position: context.sourceCode.getLinterPositionRangeFromOffsetRange([
-                            node.loc!.start.offset + error.start!,
-                            node.loc!.start.offset + error.end!,
-                        ])!,
+                        position,
                     });
                 });
             },

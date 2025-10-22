@@ -1,6 +1,6 @@
 import { type Modifier } from '@adguard/agtree';
 
-import { defineRule, LinterRuleType } from '../linter-new/rule';
+import { defineRule, LinterRuleType } from '../linter/rule';
 
 export default defineRule({
     meta: {
