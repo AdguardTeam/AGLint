@@ -22,13 +22,13 @@
     },
     "homepage": "https://github.com/AdguardTeam/AGLint#readme",
     "bin": "dist/cli/cli.js",
-    "main": "dist/linter/index.js",
-    "module": "dist/linter/index.js",
-    "types": "dist/linter/index.d.ts",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/types/index.d.ts",
     "exports": {
         ".": {
-            "types": "./dist/linter/index.d.ts",
-            "import": "./dist/linter/index.js"
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/index.js"
         },
         "./config-presets/all": "./config-presets/all.json",
         "./config-presets/recommended": "./config-presets/recommended.json"
@@ -114,6 +114,5 @@
         "text-table": "^0.2.0",
         "valibot": "^1.1.0",
         "yaml": "^2.8.1"
-    },
-    "packageManager": "pnpm@10.18.1+sha512.77a884a165cbba2d8d1c19e3b4880eee6d2fcabd0d879121e282196b80042351d5eb3ca0935fa599da1dc51265cc68816ad2bddd2a2de5ea9fdf92adbec7cd34"
+    }
 }

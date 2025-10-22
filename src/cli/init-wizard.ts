@@ -7,6 +7,7 @@ import select from '@inquirer/select';
 import { stringify as yamlStringify } from 'yaml';
 
 import { NEWLINE } from '../common/constants';
+import { fileExists } from '../utils/file-exists';
 
 import {
     CONFIG_FILE_NAMES,
@@ -15,7 +16,6 @@ import {
     LinterConfigFileFormat,
     YAML_RC_CONFIG_FILE_NAME,
 } from './config-file/config-file';
-import { fileExists } from './utils/file-exists';
 
 /**
  * Linter CLI initialization wizard.

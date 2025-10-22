@@ -1,0 +1,225 @@
+import deepMerge from 'deepmerge';
+import * as v from 'valibot';
+import { parse as parseYaml } from 'yaml';
+
+import { type LinterConfig } from '../../../linter/config';
+import { type FileSystemAdapter } from '../../../utils/fs-adapter';
+import { type PathAdapter } from '../../../utils/path-adapter';
+import { type ConfigChainEntry } from '../../../utils/tree-builder';
+import {
+    EXT_JSON,
+    EXT_YAML,
+    EXT_YML,
+    type LinterConfigFile,
+    linterConfigFileSchema,
+    RC_CONFIG_FILE,
+} from '../../config-file/config-file';
+
+import { PresetResolver } from './preset-resolver';
+import { type ConfigCacheEntry, type ConfigResolverOptions } from './types';
+
+const AGLINT_PREFIX = 'aglint:';
+
+/**
+ * Deep merge options for config objects.
+ * Arrays are replaced (not concatenated).
+ */
+const mergeOptions = {
+    arrayMerge: (_dest: unknown[], source: unknown[]) => source,
+};
+
+/**
+ * Resolves and flattens linter configurations.
+ * Handles extends, presets, and config chains from LinterTree.
+ */
+export class ConfigResolver {
+    private cache: Map<string, ConfigCacheEntry> = new Map();
+
+    private presetResolver: PresetResolver;
+
+    constructor(
+        private fs: FileSystemAdapter,
+        private pathAdapter: PathAdapter,
+        private options: ConfigResolverOptions,
+    ) {
+        this.presetResolver = new PresetResolver(fs, pathAdapter, options.presetsRoot);
+    }
+
+    /**
+     * Resolves a single config file, flattening extends.
+     *
+     * @param configPath Absolute path to config file
+     * @returns Flattened linter config
+     */
+    public async resolve(configPath: string): Promise<LinterConfig> {
+        const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
+
+        // Check cache
+        if (this.cache.has(absPath)) {
+            return this.cache.get(absPath)!.config;
+        }
+
+        const result = await this.resolveRecursive(absPath, new Set());
+        return result.config;
+    }
+
+    /**
+     * Checks if a config file has root: true.
+     *
+     * @param configPath Absolute path to config file
+     * @returns True if config has root: true
+     */
+    public async isRoot(configPath: string): Promise<boolean> {
+        const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
+
+        // Check cache
+        if (this.cache.has(absPath)) {
+            return this.cache.get(absPath)!.isRoot;
+        }
+
+        // Read and parse to check root flag
+        const content = await this.fs.readFile(absPath);
+        const parsed = ConfigResolver.parseConfig(content, absPath);
+
+        return parsed.root === true;
+    }
+
+    /**
+     * Resolves a config chain from LinterTree, merging all configs.
+     * Later configs in the chain override earlier ones.
+     *
+     * @param configChain Config chain from LinterTree.getConfigChain()
+     * @returns Merged linter config
+     */
+    public async resolveChain(configChain: ConfigChainEntry[]): Promise<LinterConfig> {
+        if (configChain.length === 0) {
+            return deepMerge({}, this.options.baseConfig || {}, mergeOptions) as LinterConfig;
+        }
+
+        // Start with base config
+        let merged = deepMerge({}, this.options.baseConfig || {}, mergeOptions) as LinterConfig;
+
+        // Merge chain from farthest (root) to closest
+        for (let i = configChain.length - 1; i >= 0; i -= 1) {
+            const entry = configChain[i]!;
+            merged = deepMerge(merged, entry.config, mergeOptions) as LinterConfig;
+        }
+
+        return merged;
+    }
+
+    /**
+     * Invalidates cache for a config file.
+     * Should be called when a config file changes.
+     *
+     * @param configPath Absolute path to config file
+     */
+    public invalidate(configPath: string): void {
+        const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
+        this.cache.delete(absPath);
+    }
+
+    /**
+     * Clears all caches.
+     */
+    public clearCache(): void {
+        this.cache.clear();
+    }
+
+    /**
+     * Recursively resolves a config file with extends.
+     */
+    private async resolveRecursive(
+        configPath: string,
+        seen: Set<string>,
+    ): Promise<ConfigCacheEntry> {
+        const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
+
+        // Check cache
+        if (this.cache.has(absPath)) {
+            return this.cache.get(absPath)!;
+        }
+
+        // Detect circular references
+        if (seen.has(absPath)) {
+            const chain = [...seen, absPath].map((p) => this.pathAdapter.basename(p)).join(' -> ');
+            throw new Error(`Circular "extends" detected: ${chain}`);
+        }
+
+        seen.add(absPath);
+
+        // Read and parse config
+        const content = await this.fs.readFile(absPath);
+        const parsed = ConfigResolver.parseConfig(content, absPath);
+        const configDir = this.pathAdapter.dirname(absPath);
+
+        // Resolve extends
+        let mergedFromExtends: LinterConfig = {} as LinterConfig;
+
+        if (parsed.extends?.length) {
+            for (const ref of parsed.extends) {
+                let refPath: string;
+
+                if (ref.startsWith(AGLINT_PREFIX)) {
+                    // Preset reference
+                    const presetName = ref.slice(AGLINT_PREFIX.length);
+                    // eslint-disable-next-line no-await-in-loop
+                    refPath = await this.presetResolver.resolve(presetName);
+                } else {
+                    // Relative path reference
+                    const hasExtension = ref.endsWith(EXT_JSON) || ref.endsWith(EXT_YAML) || ref.endsWith(EXT_YML);
+                    refPath = hasExtension
+                        ? this.pathAdapter.toPosix(this.pathAdapter.join(configDir, ref))
+                        : this.pathAdapter.toPosix(this.pathAdapter.join(configDir, `${ref}.json`));
+                }
+
+                // eslint-disable-next-line no-await-in-loop
+                const extendedEntry = await this.resolveRecursive(refPath, new Set(seen));
+                mergedFromExtends = deepMerge(
+                    mergedFromExtends,
+                    extendedEntry.config,
+                    mergeOptions,
+                ) as LinterConfig;
+            }
+        }
+
+        // Merge local config (drop extends and root)
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const { extends: _extends, root: _root, ...localRest } = parsed;
+        const flattened = deepMerge(mergedFromExtends, localRest, mergeOptions) as LinterConfig;
+
+        // Cache result
+        const entry: ConfigCacheEntry = {
+            config: flattened,
+            isRoot: parsed.root === true,
+            timestamp: Date.now(),
+        };
+
+        this.cache.set(absPath, entry);
+        seen.delete(absPath);
+
+        return entry;
+    }
+
+    /**
+     * Parses config file content.
+     */
+    private static parseConfig(content: string, filePath: string): LinterConfigFile {
+        try {
+            if (filePath.endsWith(EXT_JSON) || filePath.endsWith(RC_CONFIG_FILE)) {
+                const parsed = JSON.parse(content);
+                return v.parse(linterConfigFileSchema, parsed);
+            }
+
+            if (filePath.endsWith(EXT_YAML) || filePath.endsWith(EXT_YML)) {
+                // Note: YAML parsing would go here
+                // For now, assume JSON
+                return parseYaml(content);
+            }
+
+            throw new Error(`Unsupported config file format: ${filePath}`);
+        } catch (error) {
+            throw new Error(`Failed to parse config file ${filePath}: ${error}`);
+        }
+    }
+}

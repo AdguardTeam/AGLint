@@ -1,0 +1,33 @@
+import { type FileSystemAdapter } from '../../../utils/fs-adapter';
+import { type PathAdapter } from '../../../utils/path-adapter';
+import { EXT_JSON } from '../../config-file/config-file';
+
+/**
+ * Resolves preset references like "aglint:recommended" to file paths.
+ */
+export class PresetResolver {
+    constructor(
+        private fs: FileSystemAdapter,
+        private pathAdapter: PathAdapter,
+        private presetsRoot: string,
+    ) {}
+
+    /**
+     * Resolves a preset name to an absolute path.
+     *
+     * @param presetName Preset name (e.g., "recommended", "all")
+     * @returns Absolute path to the preset file
+     * @throws If preset doesn't exist
+     */
+    public async resolve(presetName: string): Promise<string> {
+        const presetPath = this.pathAdapter.toPosix(
+            this.pathAdapter.join(this.presetsRoot, `${presetName}${EXT_JSON}`),
+        );
+
+        if (!(await this.fs.exists(presetPath))) {
+            throw new Error(`Preset "${presetName}" not found at ${presetPath}`);
+        }
+
+        return presetPath;
+    }
+}

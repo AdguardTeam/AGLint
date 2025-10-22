@@ -1,22 +1,35 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 /* eslint-disable n/no-process-exit */
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { version } from '../../package.json';
 import { getFormattedError } from '../utils/error';
+import { NodeFileSystemAdapter } from '../utils/fs-adapter';
+import { NodePathAdapter } from '../utils/path-adapter';
+import { DEFAULT_IGNORE_PATTERNS, matchPatterns } from '../utils/pattern-matcher';
+import { LinterTree } from '../utils/tree-builder';
 
 import { LintResultCache } from './cache';
 import { buildCliProgram, type LinterCliConfig } from './cli-options';
+import { CONFIG_FILE_NAMES } from './config-file/config-file';
+import { DEFAULT_PATTERN, IGNORE_FILE_NAME } from './constants';
 import {
     runParallel,
     runParallelWithCache,
     runSequential,
     runSequentialWithCache,
 } from './executor';
-import { IGNORE_FILE_NAME, scan } from './file-scanner';
 import { LinterCliInitWizard } from './init-wizard';
 import { LinterConsoleReporter } from './reporters/console';
 import { createFileTaskBuckets, getTotalSize } from './task-scheduler';
 import { calculateThreads, isSmallProject, type ThreadsOption } from './thread-manager';
+import { ConfigResolver } from './utils/config-resolver';
+import { LinterFileScanner } from './utils/file-scanner';
+
+// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const main = async () => {
     try {
@@ -26,6 +39,74 @@ const main = async () => {
         program.parse(process.argv);
 
         const options = program.opts() as LinterCliConfig;
+
+        console.time('config');
+        const fsAdapter = new NodeFileSystemAdapter();
+        const pathAdapter = new NodePathAdapter();
+
+        const configResolver = new ConfigResolver(fsAdapter, pathAdapter, {
+            presetsRoot: pathAdapter.join(__dirname, '../../config-presets'),
+            baseConfig: {},
+        });
+
+        const tree = new LinterTree(
+            fsAdapter,
+            pathAdapter,
+            {
+                root: cwd,
+                configFileNames: CONFIG_FILE_NAMES,
+                ignoreFileName: IGNORE_FILE_NAME,
+            },
+            {
+                resolve: (p) => configResolver.resolve(p),
+                isRoot: (p) => configResolver.isRoot(p),
+            },
+        );
+
+        const matchedPatterns = await matchPatterns(
+            [DEFAULT_PATTERN],
+            fsAdapter,
+            pathAdapter,
+            {
+                cwd,
+                defaultIgnorePatterns: [...DEFAULT_IGNORE_PATTERNS],
+                followSymlinks: false,
+                dot: true,
+            },
+        );
+
+        for (const pattern of matchedPatterns.files) {
+            tree.addFile(pattern);
+        }
+
+        const scanner = new LinterFileScanner(tree, configResolver, fsAdapter);
+
+        const files = await scanner.scanAll(matchedPatterns.files);
+
+        console.timeEnd('config');
+
+        // Get config for a file
+        // const configChain2 = await tree.getConfigChain(
+        //     path.join(cwd, '.'),
+        // );
+        // const configChain = await tree.getConfigChain(
+        //     path.join(cwd, './sections/ublock-origin-specific/antiadblock.txt'),
+        // );
+        // console.log(configChain);
+        // console.log(await tree.isIgnored('dist/hufilter.txt'));
+        // const finalConfig = await configResolver.resolveChain(configChain);
+        console.log(files.length);
+
+        // // Handle file changes
+        // await tree.changed('aglint.config.json');
+        // configResolver.invalidate('aglint.config.json');
+
+        // console.log(await matchPatterns([DEFAULT_PATTERN], new NodeFileSystemAdapter(), {
+        //     cwd,
+        //     defaultIgnorePatterns: [...DEFAULT_IGNORE_PATTERNS],
+        //     followSymlinks: false,
+        //     dot: true,
+        // }));
 
         // Handle --init option early (mutually exclusive with all other options)
         if (options.init) {
@@ -38,14 +119,6 @@ const main = async () => {
             ? await LintResultCache.create(cwd, options.cacheLocation)
             : undefined;
 
-        const files = await scan({
-            patterns: program.args,
-            cwd,
-            ignoreFileName: IGNORE_FILE_NAME,
-            ignorePatterns: options.ignorePatterns,
-            followSymlinks: false,
-        });
-
         const reporter = new LinterConsoleReporter(options.color);
 
         // Calculate thread configuration
@@ -53,21 +126,21 @@ const main = async () => {
         const { maxThreads, isAutoMode } = calculateThreads(threadsOpt);
 
         // Create file tasks and calculate total size
-        const totalSize = getTotalSize(files.files);
-        const isSmall = isSmallProject(files.files.length, totalSize);
+        const totalSize = getTotalSize(files);
+        const isSmall = isSmallProject(files.length, totalSize);
 
         let hasErrors = false;
 
         // Run sequentially if single-threaded or auto mode with small project
         if (maxThreads === 1 || (isAutoMode && isSmall)) {
             if (cache) {
-                hasErrors = await runSequentialWithCache(files.files, options, reporter, cwd, cache);
+                hasErrors = await runSequentialWithCache(files, options, reporter, cwd, cache);
             } else {
-                hasErrors = await runSequential(files.files, options, reporter, cwd);
+                hasErrors = await runSequential(files, options, reporter, cwd);
             }
         } else {
             // Run in parallel with bucketed tasks
-            const buckets = createFileTaskBuckets(files.files, maxThreads);
+            const buckets = createFileTaskBuckets(files, maxThreads);
             if (cache) {
                 hasErrors = await runParallelWithCache(buckets, options, reporter, cwd, maxThreads, cache);
             } else {

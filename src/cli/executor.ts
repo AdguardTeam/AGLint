@@ -5,8 +5,8 @@ import Piscina from 'piscina';
 
 import { type LintResultCache } from './cache';
 import type { LinterCliConfig } from './cli-options';
-import { type LinterCliScannedFile } from './file-scanner';
 import type { LinterConsoleReporter } from './reporters/console';
+import { type ScannedFile } from './utils/file-scanner';
 import { hasLinterResultErrors } from './utils/has-errors';
 import runLinterWorker, { type LinterWorkerResults } from './worker';
 
@@ -17,7 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * Runs linting sequentially on all files
  */
 export async function runSequential(
-    files: Array<LinterCliScannedFile>,
+    files: Array<ScannedFile>,
     cliConfig: LinterCliConfig,
     reporter: LinterConsoleReporter,
     cwd: string,
@@ -27,7 +27,7 @@ export async function runSequential(
     reporter.onLintStart();
 
     for (const file of files) {
-        const parsedFilePath = path.parse(file.filePath);
+        const parsedFilePath = path.parse(file.path);
 
         reporter.onFileStart(parsedFilePath);
 
@@ -35,9 +35,9 @@ export async function runSequential(
         const { results } = await runLinterWorker({
             tasks: [
                 {
-                    filePath: file.filePath,
+                    filePath: file.path,
                     cwd,
-                    linterConfig: file.linterConfig,
+                    linterConfig: file.config,
                 },
             ],
             cliConfig,
@@ -59,7 +59,7 @@ export async function runSequential(
  * Runs linting sequentially on all files
  */
 export async function runSequentialWithCache(
-    files: Array<LinterCliScannedFile>,
+    files: Array<ScannedFile>,
     cliConfig: LinterCliConfig,
     reporter: LinterConsoleReporter,
     cwd: string,
@@ -70,16 +70,16 @@ export async function runSequentialWithCache(
     reporter.onLintStart();
 
     for (const file of files) {
-        const parsedFilePath = path.parse(file.filePath);
+        const parsedFilePath = path.parse(file.path);
 
         reporter.onFileStart(parsedFilePath);
 
         // Check if cached result is valid
         const cachedData = cache.getCachedResult(
-            file.filePath,
+            file.path,
             file.mtime,
             file.size,
-            file.linterConfig,
+            file.config,
             cliConfig.cacheStrategy!,
         );
 
@@ -97,9 +97,9 @@ export async function runSequentialWithCache(
         const { results } = await runLinterWorker({
             tasks: [
                 {
-                    filePath: file.filePath,
+                    filePath: file.path,
                     cwd,
-                    linterConfig: file.linterConfig,
+                    linterConfig: file.config,
                 },
             ],
             cliConfig,
@@ -111,10 +111,10 @@ export async function runSequentialWithCache(
 
         // Store result in cache
         cache.setCachedResult(
-            file.filePath,
+            file.path,
             file.mtime,
             file.size,
-            file.linterConfig,
+            file.config,
             results[0]!.linterResult,
         );
 
@@ -130,7 +130,7 @@ export async function runSequentialWithCache(
  * Runs linting in parallel using worker threads
  */
 export async function runParallel(
-    buckets: LinterCliScannedFile[][],
+    buckets: ScannedFile[][],
     cliConfig: LinterCliConfig,
     reporter: LinterConsoleReporter,
     cwd: string,
@@ -154,20 +154,20 @@ export async function runParallel(
             }
 
             for (const f of bucket) {
-                reporter.onFileStart(path.parse(f.filePath));
+                reporter.onFileStart(path.parse(f.path));
             }
 
             const result = await piscina.run({
                 tasks: bucket.map((f) => ({
-                    filePath: f.filePath,
+                    filePath: f.path,
                     cwd,
-                    linterConfig: f.linterConfig,
+                    linterConfig: f.config,
                 })),
                 cliConfig,
             }) as LinterWorkerResults;
 
             for (let i = 0; i < bucket.length; i += 1) {
-                reporter.onFileEnd(path.parse(bucket[i]!.filePath), result.results[i]!.linterResult);
+                reporter.onFileEnd(path.parse(bucket[i]!.path), result.results[i]!.linterResult);
 
                 if (!hasErrors && hasLinterResultErrors(result.results[i]!.linterResult)) {
                     hasErrors = true;
@@ -185,7 +185,7 @@ export async function runParallel(
  * Runs linting in parallel using worker threads with cache support
  */
 export async function runParallelWithCache(
-    buckets: LinterCliScannedFile[][],
+    buckets: ScannedFile[][],
     cliConfig: LinterCliConfig,
     reporter: LinterConsoleReporter,
     cwd: string,
@@ -211,24 +211,24 @@ export async function runParallelWithCache(
 
             // Report file start for all files
             for (const f of bucket) {
-                reporter.onFileStart(path.parse(f.filePath));
+                reporter.onFileStart(path.parse(f.path));
             }
 
             // Send all files to worker with cache data
             const workerResults = await piscina.run({
                 tasks: bucket.map((f) => {
                     const cachedData = cache.getCachedResult(
-                        f.filePath,
+                        f.path,
                         f.mtime,
                         f.size,
-                        f.linterConfig,
+                        f.config,
                         cliConfig.cacheStrategy!,
                     );
 
                     return {
-                        filePath: f.filePath,
+                        filePath: f.path,
                         cwd,
-                        linterConfig: f.linterConfig,
+                        linterConfig: f.config,
                         fileCacheData: cachedData ?? undefined,
                     };
                 }),
@@ -243,17 +243,17 @@ export async function runParallelWithCache(
                 // Update cache if not from cache or content hash changed
                 if (!workerResult.fromCache || workerResult.fileHash) {
                     cache.setCachedResult(
-                        file.filePath,
+                        file.path,
                         file.mtime,
                         file.size,
-                        file.linterConfig,
+                        file.config,
                         workerResult.linterResult,
                         workerResult.fileHash,
                     );
                 }
 
                 // Report result
-                reporter.onFileEnd(path.parse(file.filePath), workerResult.linterResult);
+                reporter.onFileEnd(path.parse(file.path), workerResult.linterResult);
 
                 if (!hasErrors && hasLinterResultErrors(workerResult.linterResult)) {
                     hasErrors = true;
