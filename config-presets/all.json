@@ -26,6 +26,7 @@
     ],
     "no-unknown-hint-platforms": "error",
     "no-unknown-hints": "error",
-    "no-unknown-preprocessor-directives": "error"
+    "no-unknown-preprocessor-directives": "error",
+    "no-unsupported-css-pseudo-class": "error"
   }
 }
