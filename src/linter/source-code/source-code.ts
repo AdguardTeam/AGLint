@@ -120,6 +120,8 @@ export class LinterSourceCode {
         this.source = source;
         this.onParseError = onParseError;
 
+        this.lineMeta = LinterSourceCode.computeLineMetadata(this.source);
+
         this.ast = FilterListParser.parse(this.source, {
             ...defaultParserOptions,
             tolerant: true,
@@ -142,8 +144,6 @@ export class LinterSourceCode {
                 this.onParseError(error);
             },
         });
-
-        this.lineMeta = LinterSourceCode.computeLineMetadata(this.source);
     }
 
     /**
