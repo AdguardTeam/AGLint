@@ -17,8 +17,8 @@ export default defineRule({
             Declaration: (node: DeclarationPlain) => {
                 validateDeclaration(node).forEach((error) => {
                     const position = context.sourceCode.getLinterPositionRangeFromOffsetRange([
-                        node.loc!.start.offset + error.start!,
-                        node.loc!.start.offset + error.end!,
+                        error.start!,
+                        error.end!,
                     ]);
 
                     if (!position) {
