@@ -1,5 +1,5 @@
 // import { defaultParserOptions, DomainListParser } from '@adguard/agtree/parser';
-import { type CssNode, List, parse as parseCss } from '@adguard/ecss-tree';
+import { type CssNode, parse as parseCss, toPlainObject } from '@adguard/ecss-tree';
 
 import { type LinterSubParsersConfig, type Parser } from './config';
 
@@ -7,27 +7,16 @@ const createCssParser = (context: string): Parser => {
     return {
         name: '@adguard/ecss-tree',
         parse: ((source: string, offset: number, line: number, lineStartOffset: number) => {
-            return parseCss(source, {
+            return toPlainObject(parseCss(source, {
                 context,
                 positions: true,
                 offset,
                 line,
                 column: offset - lineStartOffset,
-            });
+            }));
         }),
         nodeTypeKey: 'type',
         childNodeKey: 'children',
-        nodeTransformer: (node: CssNode) => {
-            if ('children' in node) {
-                const maybeChildren = (node as { children?: unknown }).children;
-
-                if (maybeChildren instanceof List) {
-                    // eslint-disable-next-line no-param-reassign
-                    (node as { children: unknown }).children = maybeChildren.toArray();
-                }
-            }
-            return node;
-        },
         getStartOffset: (node: CssNode) => {
             return node.loc!.start.offset;
         },

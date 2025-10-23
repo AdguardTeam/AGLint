@@ -42,17 +42,6 @@ const getOffsetFromNodeSchema = v.pipe(
  */
 export type GetOffsetFromNode = v.InferOutput<typeof getOffsetFromNodeSchema>;
 
-const nodeTransformerFunctionSchema = v.pipe(
-    v.function(),
-    v.args(v.tuple([
-        // node
-        v.pipe(anyNodeSchema),
-    ])),
-    v.returns(v.void()),
-);
-
-export type NodeTransformerFunction = v.InferOutput<typeof nodeTransformerFunctionSchema>;
-
 const parserSchema = v.object({
     /**
      * Optional human-readable name of the parser.
@@ -88,15 +77,6 @@ const parserSchema = v.object({
      * Used to determine the slice of code passed to the sub-parser.
      */
     getEndOffset: v.optional(getOffsetFromNodeSchema),
-
-    /**
-     * Optional transformer applied to each node of the sub-AST before traversal.
-     * Useful for normalizing node shapes or adding metadata.
-     *
-     * @param node The node to transform.
-     * @returns The transformed node object.
-     */
-    nodeTransformer: v.optional(nodeTransformerFunctionSchema),
 });
 
 /**

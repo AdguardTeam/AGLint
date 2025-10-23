@@ -196,31 +196,13 @@ describe('LinterWalker', () => {
         const onRootEnter = vi.fn();
         const visitors: SelectorsWithVisitors = { Root: [onRootEnter] };
 
-        walker.walk(root, visitors, 'children', 'type', undefined, [initial]);
+        walker.walk(root, visitors, 'children', 'type', [initial]);
 
         const [node, parent, ancestry] = onRootEnter.mock.calls[0]!;
         expect(node?.type).toBe('Root');
         expect(parent?.type).toBe('Init'); // initial ancestry parent
         // For the root enter call, ancestry should be the provided initial stack
         expect(ancestry[0]?.type).toBe('Init');
-    });
-
-    it('nodeTransformer runs before matching and can affect GLOBAL selector matches', () => {
-        // Transform: mark nodes with a flag, then match on that flag (global selector)
-        const transformer = (node: AnyNode) => {
-            if (node.type === 'X') {
-                // eslint-disable-next-line no-param-reassign
-                (node as any).renamed = true;
-            }
-            return node;
-        };
-        const hit = vi.fn();
-        const visitors: SelectorsWithVisitors = { '[renamed=true]': [hit] }; // global selector
-
-        walker.walk(root, visitors, 'children', 'type', transformer);
-
-        expect(hit).toHaveBeenCalledTimes(1);
-        expect(hit.mock.calls[0]?.[0]?.type).toBe('X');
     });
 
     it('multiple visitors on the same selector are all invoked (enter and exit)', () => {

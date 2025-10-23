@@ -259,12 +259,6 @@ export class LinterSourceCodeWalker {
                     selectors,
                     parser.childNodeKey,
                     parser.nodeTypeKey,
-                    (node: any) => {
-                        if (parser.nodeTransformer) {
-                            parser.nodeTransformer(node);
-                        }
-                        this.nodeParserMap.set(node, parser);
-                    },
                     [...ancestry, hostNode],
                 );
             } catch {

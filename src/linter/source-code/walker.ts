@@ -194,7 +194,6 @@ export class LinterWalker {
         selectors: SelectorsWithVisitors = {},
         childrenKey: string = 'children',
         typeKey: string = 'type',
-        nodeTransformer?: (node: AnyNode) => AnyNode,
         initialAncestry?: AnyNode[],
     ): void {
         const currentKey = LinterWalker.computeKey(selectors);
@@ -210,10 +209,6 @@ export class LinterWalker {
         const visit = (node: AnyNode, parent: AnyNode | null): void => {
             const nodeType = node[typeKey] as string | undefined;
             const candidatesTyped = nodeType ? index.typeHandlers.get(nodeType) : undefined;
-
-            if (nodeTransformer) {
-                nodeTransformer(node);
-            }
 
             // ENTER phase
             if (candidatesTyped) {
