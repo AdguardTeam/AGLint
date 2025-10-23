@@ -16,6 +16,7 @@ export default defineRule({
             missingIf: 'Using an "{{directive}}" directive without an opening "{{ifDirective}}" directive',
             invalidDirective: 'Invalid usage of preprocessor directive: "{{directive}}"',
         },
+        hasFix: true,
     },
     create: (context) => {
         const stack: PreProcessorCommentRule[] = [];
