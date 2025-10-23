@@ -12,6 +12,8 @@
     "no-invalid-domains": "error",
     "no-invalid-hint-params": "error",
     "no-invalid-modifiers": "error",
+    "no-unsupported-css-pseudo-class": "error",
+    "no-duplicated-css-declaration-props": "error",
     "no-short-rules": [
       "error",
       {
