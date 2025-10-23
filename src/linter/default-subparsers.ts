@@ -22,7 +22,7 @@ const createCssParser = (context: string): Parser => {
                 const maybeChildren = (node as { children?: unknown }).children;
 
                 if (maybeChildren instanceof List) {
-                // eslint-disable-next-line no-param-reassign
+                    // eslint-disable-next-line no-param-reassign
                     (node as { children: unknown }).children = maybeChildren.toArray();
                 }
             }
