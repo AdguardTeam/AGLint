@@ -17,6 +17,12 @@ const rulesConfig: LinterRulesConfig = {
 };
 
 describe('no-unsupported-css-pseudo-class', () => {
+    test('should work in severity-only mode', async () => {
+        expect((await lint('##div:not(.foo)', {
+            'no-unsupported-css-pseudo-class': LinterRuleSeverity.Error,
+        })).problems).toStrictEqual([]);
+    });
+
     test('should ignore non-problematic cases', async () => {
         expect((await lint('##div:not(.foo)', rulesConfig)).problems).toStrictEqual([]);
         expect((await lint('##input:checked', rulesConfig)).problems).toStrictEqual([]);
@@ -70,20 +76,19 @@ describe('no-unsupported-css-pseudo-class', () => {
         const customConfig: LinterRulesConfig = {
             'no-unsupported-css-pseudo-class': [LinterRuleSeverity.Error, {
                 fuzzyThreshold: 0.6,
-                supportedCssPseudoClasses: ['hover', 'focus'],
-                supportedExtCssPseudoClasses: ['contains'],
+                additionalSupportedCssPseudoClasses: ['foo'],
             }],
         };
 
-        expect((await lint('##div:hover', customConfig)).problems).toStrictEqual([]);
+        expect((await lint('##div:foo', customConfig)).problems).toStrictEqual([]);
 
-        expect((await lint('##div:checked', customConfig)).problems).toMatchObject([
+        expect((await lint('##div:bar', customConfig)).problems).toMatchObject([
             {
                 category: 'problem',
                 ruleId: 'no-unsupported-css-pseudo-class',
                 severity: LinterRuleSeverity.Error,
                 data: {
-                    pseudoClass: 'checked',
+                    pseudoClass: 'bar',
                 },
                 messageId: 'unsupportedPseudoClass',
             },
