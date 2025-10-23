@@ -19,12 +19,12 @@ interface CssValidatorError {
     message: string;
 
     /**
-     * Start offset of the error. Relative to the specified node.
+     * Start offset of the error.
      */
     start?: number;
 
     /**
-     * End offset of the error. Relative to the specified node.
+     * End offset of the error.
      */
     end?: number;
 }
