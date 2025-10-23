@@ -43,6 +43,7 @@ export const SUPPORTED_EXT_CSS_PSEUDO_CLASSES = new Set([
     'remove',
     'upward',
     'xpath',
+    'style',
 ]);
 
 /**
