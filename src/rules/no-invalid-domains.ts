@@ -18,15 +18,18 @@ export default defineRule({
     },
     create: (context) => {
         let separator: string | undefined;
+        let start: number | undefined;
         let end: number | undefined;
 
         return {
             DomainList: (node: DomainList) => {
                 separator = node.separator;
+                start = node.start;
                 end = node.end;
             },
             'DomainList:exit': () => {
                 separator = undefined;
+                start = undefined;
                 end = undefined;
             },
             Domain: (node: Domain) => {
@@ -56,14 +59,14 @@ export default defineRule({
                                 if (nextSeparatorOffset !== null) {
                                     return fixer.remove([
                                         node.start!,
-                                        nextSeparatorOffset,
+                                        nextSeparatorOffset + 1,
                                     ]);
                                 }
 
                                 const previousSeparatorOffset = context.sourceCode.findPreviousUnescapedChar(
                                     node.start!,
                                     separator!,
-                                    end,
+                                    start,
                                 );
 
                                 if (previousSeparatorOffset !== null) {
