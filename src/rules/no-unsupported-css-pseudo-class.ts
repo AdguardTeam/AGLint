@@ -93,6 +93,12 @@ export const SUPPORTED_CSS_PSEUDO_CLASSES = new Set([
     'where', // https://developer.mozilla.org/en-US/docs/Web/CSS/:where
 ]);
 
+const DEFAULT_OPTIONS = {
+    fuzzyThreshold: 0.6,
+    additionalSupportedCssPseudoClasses: [],
+    additionalSupportedExtCssPseudoClasses: [],
+};
+
 export default defineRule({
     meta: {
         type: LinterRuleType.Problem,
@@ -106,31 +112,38 @@ export default defineRule({
             changePseudoClass: 'Change pseudo-class to {{suggestedPseudoClass}}',
         },
         configSchema: v.tuple([
-            v.object({
-                fuzzyThreshold: v.pipe(
-                    v.fallback(v.number(), 0.6),
-                    v.minValue(0),
-                    v.maxValue(1),
-                ),
-                supportedCssPseudoClasses: v.fallback(
-                    v.array(v.string()),
-                    [...SUPPORTED_CSS_PSEUDO_CLASSES],
-                ),
-                supportedExtCssPseudoClasses: v.fallback(
-                    v.array(v.string()),
-                    [...SUPPORTED_EXT_CSS_PSEUDO_CLASSES],
-                ),
-            }),
+            v.optional(
+                v.object({
+                    fuzzyThreshold: v.optional(v.pipe(
+                        v.number(),
+                        v.minValue(0),
+                        v.maxValue(1),
+                    ), DEFAULT_OPTIONS.fuzzyThreshold),
+                    additionalSupportedCssPseudoClasses: v.optional(
+                        v.array(v.string()),
+                        DEFAULT_OPTIONS.additionalSupportedCssPseudoClasses,
+                    ),
+                    additionalSupportedExtCssPseudoClasses: v.optional(
+                        v.array(v.string()),
+                        DEFAULT_OPTIONS.additionalSupportedExtCssPseudoClasses,
+                    ),
+                }),
+                DEFAULT_OPTIONS,
+            ),
         ]),
         hasSuggestions: true,
     },
     create: (context) => {
         const config = context.config[0];
-        const supportedCssPseudoClasses = new Set(config.supportedCssPseudoClasses);
-        const supportedExtCssPseudoClasses = new Set(config.supportedExtCssPseudoClasses);
+        const supportedCssPseudoClasses = new Set(
+            [...SUPPORTED_CSS_PSEUDO_CLASSES, ...config.additionalSupportedCssPseudoClasses],
+        );
+        const supportedExtCssPseudoClasses = new Set(
+            [...SUPPORTED_EXT_CSS_PSEUDO_CLASSES, ...config.additionalSupportedExtCssPseudoClasses],
+        );
         const allSupportedPseudoClasses = [
-            ...config.supportedCssPseudoClasses,
-            ...config.supportedExtCssPseudoClasses,
+            ...supportedCssPseudoClasses,
+            ...supportedExtCssPseudoClasses,
         ];
 
         return {

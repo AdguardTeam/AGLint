@@ -93,6 +93,15 @@ export class LinterRuleInstance {
         } else {
             // severity-only case
             this.severity = parsedConfig;
+
+            // we should parse empty array against config schema if it exists,
+            // to set default values in this case as well
+            if (this.rule.meta.configSchema) {
+                this.config.length = 0;
+                const parsedDefaultConfig = v.parse(this.rule.meta.configSchema, []);
+
+                this.config.push(...parsedDefaultConfig);
+            }
         }
     }
 
