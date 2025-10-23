@@ -2,11 +2,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { type LinterRulesConfig, type LinterSubParsersConfig } from '../../../src/linter/config';
+import { defaultSubParsers } from '../../../src/linter/default-subparsers';
 import { LinterFixer, type LinterFixerResult } from '../../../src/linter/fixer';
 import { Linter, type LinterResult } from '../../../src/linter/linter';
 import { type LinterRuleLoader } from '../../../src/linter/rule-registry/rule-loader';
 
-import { commonLinterConfig, commonSubParsers } from './common-linter-config';
+import { commonLinterConfig } from './common-linter-config';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,7 +31,7 @@ export const lint = (
         },
         loadRule: ruleLoader,
         subParsers: {
-            ...commonSubParsers,
+            ...defaultSubParsers,
             ...subParsers,
         },
     });
@@ -51,7 +52,7 @@ export const lintWithFixes = (
         },
         loadRule: ruleLoader,
         subParsers: {
-            ...commonSubParsers,
+            ...defaultSubParsers,
             ...subParsers,
         },
     });
