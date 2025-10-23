@@ -15,6 +15,33 @@ export default defineRule({
     create: (context) => {
         return {
             Declaration: (node: DeclarationPlain) => {
+                // special case: `remove` property
+                if (node.property === 'remove') {
+                    // its value should be `true`
+                    if (
+                        node.value?.type !== 'Value'
+                        || node.value?.children.length !== 1
+                        || node.value.children[0]?.type !== 'Identifier'
+                        || node.value.children[0].name !== 'true'
+                    ) {
+                        const position = context.sourceCode.getLinterPositionRangeFromOffsetRange([
+                            node.loc!.start.offset,
+                            node.loc!.end.offset,
+                        ]);
+
+                        if (!position) {
+                            return;
+                        }
+
+                        context.report({
+                            message: 'Value of `remove` property should be `true`',
+                            position,
+                        });
+                    }
+
+                    return;
+                }
+
                 validateDeclaration(node).forEach((error) => {
                     const position = context.sourceCode.getLinterPositionRangeFromOffsetRange([
                         error.start!,
