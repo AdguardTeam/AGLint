@@ -8,11 +8,16 @@ export type { LinterConfig } from './linter/config';
 export { Linter, type LinterResult, type LinterRunOptions } from './linter/linter';
 export { LinterFixer, type LinterFixerResult, type LinterFixerRunOptions } from './linter/fixer';
 export { LinterRuleSeverity } from './linter/rule';
+export { type LinterProblem, type LinterSuggestion } from './linter/linter-problem';
 
 export { CONFIG_FILE_NAMES } from './cli/config-file/config-file';
 export { IGNORE_FILE_NAME } from './cli/constants';
 
 export { defaultSubParsers } from './linter/default-subparsers';
+
+export { type LinterFixCommand } from './linter/source-code/fix-generator';
+// eslint-disable-next-line max-len
+export { type LinterPosition, type LinterPositionRange, type LinterOffsetRange } from './linter/source-code/source-code';
 
 export {
     type FileSystemAdapter,
@@ -21,6 +26,7 @@ export {
     type FileChangeEvent,
     FileChangeType,
     type Disposable,
+    NodeFileSystemAdapter,
 } from './utils/fs-adapter';
 
 export { type PathAdapter, type ParsedPath, NodePathAdapter } from './utils/path-adapter';
@@ -33,6 +39,23 @@ export {
     IgnoreMatcher,
     LinterTree,
 } from './utils/tree-builder';
+
+export {
+    type PatternMatchOptions,
+    type PatternMatchResult,
+    matchPatterns,
+    DEFAULT_IGNORE_PATTERNS,
+} from './utils/pattern-matcher';
+
+export {
+    type ConfigResolverOptions,
+    ConfigResolver,
+} from './cli/utils/config-resolver';
+
+export {
+    type ScannedFile,
+    LinterFileScanner,
+} from './cli/utils/file-scanner';
 
 // We need this trick to avoid importing `package.json` in the types
 const version = importedVersion;
