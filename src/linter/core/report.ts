@@ -9,6 +9,7 @@ import { type LinterRuntime } from './runtime';
 
 export type LinterReporter = (report: LinterProblemReport, ruleInstance: LinterRuleInstance) => void;
 
+// FIXME: throw errors
 export function createReportFn(runtime: LinterRuntime): LinterReporter {
     return (report: LinterProblemReport, ruleInstance: LinterRuleInstance): void => {
         // Probably rule is disabled meantime with config comment

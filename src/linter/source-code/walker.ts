@@ -195,6 +195,7 @@ export class LinterWalker {
         childrenKey: string = 'children',
         typeKey: string = 'type',
         initialAncestry?: AnyNode[],
+        onEnter?: (node: AnyNode) => void,
     ): void {
         const currentKey = LinterWalker.computeKey(selectors);
 
@@ -211,6 +212,9 @@ export class LinterWalker {
             const candidatesTyped = nodeType ? index.typeHandlers.get(nodeType) : undefined;
 
             // ENTER phase
+            if (onEnter) {
+                onEnter(node);
+            }
             if (candidatesTyped) {
                 for (let i = 0; i < candidatesTyped.length; i += 1) {
                     const c = candidatesTyped[i]!;

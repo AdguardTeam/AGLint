@@ -260,6 +260,9 @@ export class LinterSourceCodeWalker {
                     parser.childNodeKey,
                     parser.nodeTypeKey,
                     [...ancestry, hostNode],
+                    (node) => {
+                        this.nodeParserMap.set(node, parser);
+                    },
                 );
             } catch {
                 // Do nothing

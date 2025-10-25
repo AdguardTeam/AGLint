@@ -25,7 +25,7 @@ const AGLINT_PREFIX = 'aglint:';
  * Arrays are replaced (not concatenated).
  */
 const mergeOptions = {
-    arrayMerge: (_dest: unknown[], source: unknown[]) => source,
+    // arrayMerge: (_dest: unknown[], source: unknown[]) => source,
 };
 
 /**
