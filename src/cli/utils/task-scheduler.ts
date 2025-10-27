@@ -1,4 +1,4 @@
-import { type ScannedFile } from './utils/file-scanner';
+import { type ScannedFile } from './file-scanner';
 
 /**
  * Distributes tasks into buckets for parallel processing using a greedy algorithm

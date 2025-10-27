@@ -19,12 +19,12 @@ import {
 } from './executor';
 import { LinterCliInitWizard } from './init-wizard';
 import { LinterConsoleReporter } from './reporters/console';
-import { createFileTaskBuckets, getTotalSize } from './task-scheduler';
 import { ConfigResolver } from './utils/config-resolver';
 import { LinterFileScanner } from './utils/file-scanner';
 import { NodeFileSystemAdapter } from './utils/fs-adapter';
 import { NodePathAdapter } from './utils/path-adapter';
 import { DEFAULT_IGNORE_PATTERNS, matchPatterns } from './utils/pattern-matcher';
+import { createFileTaskBuckets, getTotalSize } from './utils/task-scheduler';
 import { calculateThreads, isSmallProject, type ThreadsOption } from './utils/thread-manager';
 import { LinterTree } from './utils/tree-builder';
 
