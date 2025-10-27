@@ -11,7 +11,8 @@ import path from 'node:path';
 const makeRelative = (file) => path.relative(process.cwd(), file);
 
 export default {
-    '**/*.md': 'markdownlint',
+    // ignore 'globs' option from '.markdownlint-cli2.jsonc', and pass files as arguments
+    '**/*.md': 'pnpm lint:md --no-globs',
     '**/*.js': 'eslint',
     '**/*.ts': [
         // Type-check only the staged TS files while still honoring tsconfig
