@@ -269,6 +269,23 @@ describe('LinterInlineDisableApplier', () => {
 
             expect(filtered).toHaveLength(2);
         });
+
+        it('disables and re-enables specific rule correctly', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.Disable, 1, 0, 'problematic-rule'),
+                createDirective(LinterConfigCommentType.Enable, 4, 0, 'problematic-rule'),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 0, 'problematic-rule'),
+                createProblem(3, 0, 'problematic-rule'),
+                createProblem(5, 0, 'problematic-rule'),
+            ]);
+
+            expect(filtered).toHaveLength(1);
+            expect(filtered[0]?.position.start.line).toBe(5);
+            expect(filtered[0]?.ruleId).toBe('problematic-rule');
+        });
     });
 
     describe('aglint-disable-next-line', () => {
