@@ -10,9 +10,9 @@ import {
     test,
 } from 'vitest';
 
-import { NodeFileSystemAdapter } from '../../src/utils/fs-adapter';
-import { NodePathAdapter } from '../../src/utils/path-adapter';
-import { DEFAULT_IGNORE_PATTERNS, matchPatterns, NoFilesForPattern } from '../../src/utils/pattern-matcher';
+import { NodeFileSystemAdapter } from '../../../src/cli/utils/fs-adapter';
+import { NodePathAdapter } from '../../../src/cli/utils/path-adapter';
+import { DEFAULT_IGNORE_PATTERNS, matchPatterns, NoFilesForPattern } from '../../../src/cli/utils/pattern-matcher';
 
 describe('pattern-matcher', () => {
     let testDir: string;

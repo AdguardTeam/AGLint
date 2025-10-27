@@ -10,7 +10,7 @@ import {
     test,
 } from 'vitest';
 
-import { NodeFileSystemAdapter } from '../../src/utils/fs-adapter';
+import { NodeFileSystemAdapter } from '../../../src/cli/utils/fs-adapter';
 
 describe('NodeFileSystemAdapter', () => {
     let testDir: string;

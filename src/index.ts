@@ -27,9 +27,9 @@ export {
     FileChangeType,
     type Disposable,
     NodeFileSystemAdapter,
-} from './utils/fs-adapter';
+} from './cli/utils/fs-adapter';
 
-export { type PathAdapter, type ParsedPath, NodePathAdapter } from './utils/path-adapter';
+export { type PathAdapter, type ParsedPath, NodePathAdapter } from './cli/utils/path-adapter';
 
 export {
     type DirectoryNode,
@@ -38,14 +38,14 @@ export {
     type LinterTreeOptions,
     IgnoreMatcher,
     LinterTree,
-} from './utils/tree-builder';
+} from './cli/utils/tree-builder';
 
 export {
     type PatternMatchOptions,
     type PatternMatchResult,
     matchPatterns,
     DEFAULT_IGNORE_PATTERNS,
-} from './utils/pattern-matcher';
+} from './cli/utils/pattern-matcher';
 
 export {
     type ConfigResolverOptions,

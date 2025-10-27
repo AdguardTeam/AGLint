@@ -8,7 +8,8 @@ import * as v from 'valibot';
 import { version } from '../../package.json';
 import { type LinterConfig } from '../linter/config';
 import { type LinterResult, linterResultSchema } from '../linter/linter';
-import { toPosix } from '../utils/to-posix';
+
+import { toPosix } from './utils/to-posix';
 
 export const CACHE_FILE_NAME = '.aglintcache';
 

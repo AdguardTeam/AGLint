@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import deepMerge from 'deepmerge';
 
-import { type LinterConfigFile } from '../../cli/config-file/config-file';
+import { type LinterConfigFile } from '../../config-file/config-file';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 

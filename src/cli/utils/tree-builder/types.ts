@@ -1,4 +1,4 @@
-import { type LinterConfigFile } from '../../cli/config-file/config-file';
+import { type LinterConfigFile } from '../../config-file/config-file';
 
 /**
  * Directory node in the linter tree.

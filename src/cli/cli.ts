@@ -6,10 +6,6 @@ import { fileURLToPath } from 'node:url';
 
 import { version } from '../../package.json';
 import { getFormattedError } from '../utils/error';
-import { NodeFileSystemAdapter } from '../utils/fs-adapter';
-import { NodePathAdapter } from '../utils/path-adapter';
-import { DEFAULT_IGNORE_PATTERNS, matchPatterns } from '../utils/pattern-matcher';
-import { LinterTree } from '../utils/tree-builder';
 
 import { LintResultCache } from './cache';
 import { buildCliProgram, type LinterCliConfig } from './cli-options';
@@ -27,6 +23,10 @@ import { createFileTaskBuckets, getTotalSize } from './task-scheduler';
 import { calculateThreads, isSmallProject, type ThreadsOption } from './thread-manager';
 import { ConfigResolver } from './utils/config-resolver';
 import { LinterFileScanner } from './utils/file-scanner';
+import { NodeFileSystemAdapter } from './utils/fs-adapter';
+import { NodePathAdapter } from './utils/path-adapter';
+import { DEFAULT_IGNORE_PATTERNS, matchPatterns } from './utils/pattern-matcher';
+import { LinterTree } from './utils/tree-builder';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,7 +40,7 @@ const main = async () => {
 
         const options = program.opts() as LinterCliConfig;
 
-        console.time('config');
+        // console.time('config');
         const fsAdapter = new NodeFileSystemAdapter();
         const pathAdapter = new NodePathAdapter();
 
@@ -83,7 +83,7 @@ const main = async () => {
 
         const files = await scanner.scanAll(matchedPatterns.files);
 
-        console.timeEnd('config');
+        // console.timeEnd('config');
 
         // Get config for a file
         // const configChain2 = await tree.getConfigChain(
@@ -95,7 +95,7 @@ const main = async () => {
         // console.log(configChain);
         // console.log(await tree.isIgnored('dist/hufilter.txt'));
         // const finalConfig = await configResolver.resolveChain(configChain);
-        console.log(files.length);
+        // console.log(files.length);
 
         // // Handle file changes
         // await tree.changed('aglint.config.json');

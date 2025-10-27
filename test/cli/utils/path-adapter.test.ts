@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { NodePathAdapter } from '../../src/utils/path-adapter';
+import { NodePathAdapter } from '../../../src/cli/utils/path-adapter';
 
 describe('NodePathAdapter', () => {
     let adapter: NodePathAdapter;

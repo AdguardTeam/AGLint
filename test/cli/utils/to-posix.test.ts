@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { toPosix } from '../../src/utils/to-posix';
+import { toPosix } from '../../../src/cli/utils/to-posix';
 
 describe('toPosix', () => {
     describe('Windows paths', () => {

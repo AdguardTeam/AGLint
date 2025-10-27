@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
-import { type FileSystemAdapter } from '../../../utils/fs-adapter';
-import { type LinterTree } from '../../../utils/tree-builder';
 import { type ConfigResolver } from '../config-resolver';
+import { type FileSystemAdapter } from '../fs-adapter';
+import { type LinterTree } from '../tree-builder';
 
 import { type ScannedFile } from './types';
 

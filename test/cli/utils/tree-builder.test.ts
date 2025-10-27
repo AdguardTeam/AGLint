@@ -10,10 +10,10 @@ import {
     test,
 } from 'vitest';
 
-import { type LinterConfigFile } from '../../src/cli/config-file/config-file';
-import { NodeFileSystemAdapter } from '../../src/utils/fs-adapter';
-import { NodePathAdapter } from '../../src/utils/path-adapter';
-import { IgnoreMatcher, LinterTree } from '../../src/utils/tree-builder';
+import { type LinterConfigFile } from '../../../src/cli/config-file/config-file';
+import { NodeFileSystemAdapter } from '../../../src/cli/utils/fs-adapter';
+import { NodePathAdapter } from '../../../src/cli/utils/path-adapter';
+import { IgnoreMatcher, LinterTree } from '../../../src/cli/utils/tree-builder';
 
 describe('tree-builder', () => {
     let testDir: string;

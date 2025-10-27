@@ -3,9 +3,6 @@ import * as v from 'valibot';
 import { parse as parseYaml } from 'yaml';
 
 import { type LinterConfig } from '../../../linter/config';
-import { type FileSystemAdapter } from '../../../utils/fs-adapter';
-import { type PathAdapter } from '../../../utils/path-adapter';
-import { type ConfigChainEntry } from '../../../utils/tree-builder';
 import {
     EXT_JSON,
     EXT_YAML,
@@ -14,6 +11,9 @@ import {
     linterConfigFileSchema,
     RC_CONFIG_FILE,
 } from '../../config-file/config-file';
+import { type FileSystemAdapter } from '../fs-adapter';
+import { type PathAdapter } from '../path-adapter';
+import { type ConfigChainEntry } from '../tree-builder';
 
 import { PresetResolver } from './preset-resolver';
 import { type ConfigCacheEntry, type ConfigResolverOptions } from './types';

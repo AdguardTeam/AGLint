@@ -11,7 +11,7 @@ import {
     test,
 } from 'vitest';
 
-import { fileExists } from '../../src/utils/file-exists';
+import { fileExists } from '../../../src/cli/utils/file-exists';
 
 describe('fileExists', () => {
     const testDir = join(tmpdir(), 'aglint-file-exists-test');

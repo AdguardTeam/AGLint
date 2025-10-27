@@ -1,6 +1,6 @@
-import { type FileSystemAdapter } from '../../../utils/fs-adapter';
-import { type PathAdapter } from '../../../utils/path-adapter';
 import { EXT_JSON } from '../../config-file/config-file';
+import { type FileSystemAdapter } from '../fs-adapter';
+import { type PathAdapter } from '../path-adapter';
 
 /**
  * Resolves preset references like "aglint:recommended" to file paths.

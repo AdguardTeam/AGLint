@@ -1,5 +1,5 @@
 import { type LinterConfig } from '../../../linter/config';
-import { type ConfigChainEntry } from '../../../utils/tree-builder';
+import { type ConfigChainEntry } from '../tree-builder';
 
 /**
  * A scanned file with its resolved configuration.
