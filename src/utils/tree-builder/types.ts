@@ -1,4 +1,4 @@
-import { type LinterConfig } from '../../linter/config';
+import { type LinterConfigFile } from '../../cli/config-file/config-file';
 
 /**
  * Directory node in the linter tree.
@@ -70,9 +70,9 @@ export interface ConfigChainEntry {
     directory: string;
 
     /**
-     * Flattened configuration (with extends resolved).
+     * Merged config from this file and all parent configs.
      */
-    config: LinterConfig;
+    config: LinterConfigFile;
 
     /**
      * Whether this config has root: true.

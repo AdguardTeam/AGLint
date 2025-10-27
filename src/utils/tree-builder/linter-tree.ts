@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import deepMerge from 'deepmerge';
 
-import { type LinterConfig } from '../../linter/config';
+import { type LinterConfigFile } from '../../cli/config-file/config-file';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 
@@ -15,7 +15,7 @@ import {
 
 const mergeOptions: deepMerge.Options = {
     // last-wins for arrays
-    arrayMerge: (_dest, source) => source,
+    // arrayMerge: (_dest, source) => source,
 };
 
 /**
@@ -33,14 +33,14 @@ export class LinterTree {
 
     private configChainCache: Map<string, ConfigChainEntry[]> = new Map();
 
-    private resolvedConfigCache: Map<string, LinterConfig> = new Map();
+    private resolvedConfigCache: Map<string, LinterConfigFile> = new Map();
 
     constructor(
         private fs: FileSystemAdapter,
         private pathAdapter: PathAdapter,
         private options: LinterTreeOptions,
         private configResolver?: {
-            resolve: (configPath: string) => Promise<LinterConfig>;
+            resolve: (configPath: string) => Promise<LinterConfigFile>;
             isRoot: (configPath: string) => Promise<boolean>;
         },
     ) {
@@ -209,7 +209,7 @@ export class LinterTree {
                 // Use first config file found (should validate only one exists)
                 const configPath = node.configFiles[0]!;
 
-                let config: LinterConfig;
+                let config: LinterConfigFile;
                 let isRoot = false;
 
                 if (this.configResolver) {
@@ -217,7 +217,7 @@ export class LinterTree {
                     isRoot = await this.configResolver.isRoot(configPath);
                 } else {
                     // Fallback: just mark as empty config
-                    config = {} as LinterConfig;
+                    config = {} as LinterConfigFile;
                 }
 
                 chain.push({
@@ -255,7 +255,7 @@ export class LinterTree {
      * @returns Resolved linter config
      * @throws Error if no config resolver was provided in constructor
      */
-    public async getResolvedConfig(targetPath: string): Promise<LinterConfig> {
+    public async getResolvedConfig(targetPath: string): Promise<LinterConfigFile> {
         const absPath = this.pathAdapter.resolve(targetPath);
         const stats = await this.fs.stat(absPath);
         const dirPath = stats.isDirectory ? absPath : this.pathAdapter.dirname(absPath);
@@ -273,7 +273,7 @@ export class LinterTree {
         const chain = await this.getConfigChain(targetPath);
 
         // Merge configs from farthest to closest (chain is closest-first, so reverse)
-        let resolved: LinterConfig = {} as LinterConfig;
+        let resolved: LinterConfigFile = {} as LinterConfigFile;
 
         for (let i = chain.length - 1; i >= 0; i -= 1) {
             const entry = chain[i]!;
@@ -361,7 +361,7 @@ export class LinterTree {
      * @param override Override config
      * @returns Merged config
      */
-    private static mergeConfigs(base: LinterConfig, override: LinterConfig): LinterConfig {
+    private static mergeConfigs(base: LinterConfigFile, override: LinterConfigFile): LinterConfigFile {
         return deepMerge(base, override, mergeOptions);
     }
 
