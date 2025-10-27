@@ -38,15 +38,6 @@ describe('no-duplicated-css-declaration-props', () => {
                 rulesConfig,
             ),
         ).resolves.toMatchObject({ problems: [] });
-
-        // Empty rule
-        // FIXME
-        // await expect(
-        //     lint(
-        //         '##.foo { }',
-        //         rulesConfig,
-        //     ),
-        // ).resolves.toMatchObject({ problems: [] });
     });
 
     it('should detect problematic cases', async () => {
