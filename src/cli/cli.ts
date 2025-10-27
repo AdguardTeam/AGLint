@@ -76,7 +76,7 @@ const main = async () => {
         );
 
         const matchedPatterns = await matchPatterns(
-            [DEFAULT_PATTERN],
+            program.args.length > 0 ? program.args : [DEFAULT_PATTERN],
             fsAdapter,
             pathAdapter,
             {
