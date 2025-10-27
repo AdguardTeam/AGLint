@@ -1,9 +1,14 @@
+// rule.ts
 import { type AdblockSyntax } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { type LinterFixCommand, type LinterFixGenerator } from './source-code/fix-generator';
 import { type LinterOffsetRange, type LinterPositionRange, type LinterSourceCode } from './source-code/source-code';
 import { type Visitor } from './source-code/visitor-collection';
+
+/* =========================
+ * Severity
+ * ========================= */
 
 /**
  * Represents the severity of a linter rule.
@@ -47,6 +52,10 @@ const linterRuleSeveritySchema = v.union([
     linterRuleTextSeveritySchema,
 ]);
 
+/**
+ * Schema for validating rule configuration.
+ * Can be a severity level or a tuple with severity and options.
+ */
 export const linterRuleConfigSchema = v.union([
     linterRuleSeveritySchema,
     v.looseTuple([
@@ -54,18 +63,54 @@ export const linterRuleConfigSchema = v.union([
     ]),
 ]);
 
+/**
+ * Type representing a rule configuration value.
+ */
 export type LinterRuleConfig = v.InferOutput<typeof linterRuleConfigSchema>;
 
-type TupleOf<Elements extends readonly v.BaseSchema<any, any, any>[]> = v.TupleSchema<Elements, undefined>;
+/* =========================
+ * Config schema helpers (Valibot → TS types)
+ * ========================= */
 
-type DefaultElements = [];
+type TupleOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
+  v.TupleSchema<Elements, undefined>;
 
-export const DEFAULT_TUPLE_SCHEMA: TupleOf<[]> = v.tuple([]);
-
-export type LinterRuleBaseConfig = v.InferInput<typeof DEFAULT_TUPLE_SCHEMA>;
+export type { TupleOf };
 
 /**
- * Represents the type of a linter rule.
+ * Helper to define a configuration schema tuple.
+ *
+ * @param els Schema elements for the configuration tuple.
+ *
+ * @returns Typed tuple schema.
+ */
+export const defineConfigSchema = <
+    const Elements extends readonly v.BaseSchema<any, any, any>[],
+>(
+    ...els: Elements
+) => v.tuple(els) as TupleOf<Elements>;
+
+/**
+ * Default empty tuple schema for rules without configuration.
+ */
+export const DEFAULT_TUPLE_SCHEMA: TupleOf<[]> = v.tuple([]);
+
+/**
+ * Base configuration type for rules.
+ */
+export type LinterRuleBaseConfig = v.InferInput<typeof DEFAULT_TUPLE_SCHEMA>;
+
+type ConfigOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
+  v.InferOutput<TupleOf<Elements>>;
+
+export type { ConfigOf };
+
+/* =========================
+ * Rule types / metadata
+ * ========================= */
+
+/**
+ * Categories of linter rules.
  */
 export enum LinterRuleType {
     /**
@@ -110,12 +155,17 @@ export const linterRuleDocsSchema = v.object({
      */
     url: v.optional(v.string()),
 });
-
 type LinterRuleDocs = v.InferOutput<typeof linterRuleDocsSchema>;
 
+/**
+ * Schema for rule message templates.
+ */
 export const linterRuleMessagesSchema = v.record(v.string(), v.string());
 
-type LinterRuleMessages = v.InferOutput<typeof linterRuleMessagesSchema>;
+/**
+ * Type for rule message templates mapping message IDs to template strings.
+ */
+export type LinterRuleMessages = v.InferOutput<typeof linterRuleMessagesSchema>;
 
 /**
  * Schema for validating rule metadata.
@@ -145,86 +195,50 @@ export const linterRuleMetaSchema = v.object({
      * The messages of the rule.
      */
     messages: v.optional(linterRuleMessagesSchema),
-
-    /**
-     * The configuration schema of the rule.
-     */
+    // configSchema is runtime-attached in defineRule; we keep it out of Valibot here
     configSchema: v.optional(v.any()),
 });
 
-/**
- * Schema for validating a complete linter rule.
- */
-export const linterRuleSchema = v.object({
-    /**
-     * The metadata of the rule.
-     */
-    meta: linterRuleMetaSchema,
-
-    /**
-     * The create function of the rule.
-     */
-    create: v.pipe(
-        v.any(),
-        v.check((value) => typeof value === 'function', 'create must be a function'),
-    ),
-});
+/* =========================
+ * Message typing (messages → messageId keys)
+ * ========================= */
 
 /**
- * Represents the metadata of a linter rule.
+ * Schema for message template data.
  */
-export interface LinterRuleMeta<
-    Elements extends readonly v.BaseSchema<any, any, any>[] = DefaultElements,
-> {
-    /**
-     * The type of the rule.
-     */
-    type: LinterRuleType;
-
-    /**
-     * The documentation of the rule.
-     */
-    docs: LinterRuleDocs;
-
-    /**
-     * Whether the rule has suggestions.
-     */
-    hasSuggestions?: boolean;
-
-    /**
-     * Whether the rule has a fix.
-     */
-    hasFix?: boolean;
-
-    /**
-     * The messages of the rule.
-     */
-    messages?: LinterRuleMessages;
-
-    /**
-     * The configuration schema of the rule.
-     */
-    configSchema?: TupleOf<Elements>;
-}
-
 export const linterMessageDataSchema = v.record(v.string(), v.unknown());
 
+/**
+ * Type for data passed to message templates.
+ */
 export type LinterMessageData = v.InferOutput<typeof linterMessageDataSchema>;
 
-export type WithMessages<T extends {} = {}> = T & {
-    message: string;
-    messageId?: never;
-    data?: never;
-} | T & {
-    message?: never;
-    messageId: string;
-    data?: LinterMessageData;
-};
+type MessageIdOf<Msgs> =
+  Msgs extends Record<infer K extends string, string> ? K : never;
 
-// eslint-disable-next-line max-len
+type WithRuleMessages<Msgs, T extends {} = {}> =
+  | (T & { message: string; messageId?: never; data?: never })
+  | (T & { message?: never; messageId: MessageIdOf<Msgs>; data?: LinterMessageData });
+
+/**
+ * Back-compat alias for code that still uses an unconstrained `messageId: string`.
+ */
+export type WithMessages<T extends {} = {}> = WithRuleMessages<Record<string, string>, T>;
+
+/* =========================
+ * Report / Suggestion / Fix types
+ * ========================= */
+
 type FixerFunction = (fixer: LinterFixGenerator) => LinterFixCommand | null;
 
-type LinterProblemReportFixes = {
+type SuggestionBase = { fix: FixerFunction };
+
+/**
+ * Represents a suggestion for fixing a problem.
+ */
+export type Suggestion<Msgs = Record<string, string>> = WithRuleMessages<Msgs, SuggestionBase>;
+
+type LinterProblemReportFixes<Msgs> = {
     /**
      * Fix for the problem.
      *
@@ -241,52 +255,27 @@ type LinterProblemReportFixes = {
      *
      * @returns A fix command, an array of fix commands, or an iterable of fix commands.
      */
-    suggest?: Suggestion[];
+    suggest?: Suggestion<Msgs>[];
 };
 
-type LinterProblemReportPositions = {
-    /**
-     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
-     */
-    node: any;
+type LinterProblemReportPositions =
+  | { node: any; position?: LinterPositionRange }
+  | { node?: any; position: LinterPositionRange }
+  | { node: any; position: LinterPositionRange };
 
-    /**
-     * The location of the problem.
-     */
-    position?: LinterPositionRange;
-} | {
-    /**
-     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
-     */
-    node?: any;
+/**
+ * Report object passed to context.report() by rules.
+ */
+export type LinterProblemReport<Msgs = Record<string, string>> =
+  WithRuleMessages<Msgs, LinterProblemReportFixes<Msgs> & LinterProblemReportPositions>;
 
-    /**
-     * The location of the problem.
-     */
-    position: LinterPositionRange;
-} | {
-    /**
-     * Node that caused the problem. If provided, the linter will use its offsets to determine the problem location.
-     */
-    node: any;
+/* =========================
+ * Rule context / visitors
+ * ========================= */
 
-    /**
-     * The location of the problem.
-     */
-    position: LinterPositionRange;
-};
-
-export type LinterProblemReport = WithMessages<LinterProblemReportFixes & LinterProblemReportPositions>;
-
-type SuggestionBase = {
-    fix: FixerFunction;
-};
-
-type Suggestion = WithMessages<SuggestionBase>;
-
-type ConfigOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
-  v.InferOutput<TupleOf<Elements>>;
-
+/**
+ * Base context available to all rules.
+ */
 export type LinterRuleBaseContext = {
     filePath?: string;
     cwd?: string;
@@ -295,60 +284,82 @@ export type LinterRuleBaseContext = {
     getOffsetRangeForNode(node: any): LinterOffsetRange | null;
 };
 
+/**
+ * Context object passed to rule create functions.
+ */
 export type LinterRuleContext<
-    Elements extends readonly v.BaseSchema<any, any, any>[] = DefaultElements,
+    Elements extends readonly v.BaseSchema<any, any, any>[] = [],
+    Msgs extends Record<string, string> = Record<string, string>,
 > = LinterRuleBaseContext & {
     id: string;
-    report: (problem: LinterProblemReport) => void;
+    report: (problem: LinterProblemReport<Msgs>) => void;
     config: ConfigOf<Elements>;
 };
 
-export type LinterRuleVisitors = {
-    [key: string]: Visitor;
-};
+/**
+ * Map of CSS-like selectors to visitor functions.
+ */
+export type LinterRuleVisitors = { [selector: string]: Visitor };
 
 type LinterRuleCreatorFunction<
-    Elements extends readonly v.BaseSchema<any, any, any>[] = DefaultElements,
-> = (context: LinterRuleContext<Elements>) => LinterRuleVisitors;
+    Elements extends readonly v.BaseSchema<any, any, any>[] = [],
+    Msgs extends Record<string, string> = Record<string, string>,
+> = (context: LinterRuleContext<Elements, Msgs>) => LinterRuleVisitors;
 
 /**
- * Represents an AGLint rule.
+ * Interface representing a complete linter rule.
  */
 export interface LinterRule<
-    Elements extends readonly v.BaseSchema<any, any, any>[] = DefaultElements,
+    Elements extends readonly v.BaseSchema<any, any, any>[] = [],
+    Msgs extends Record<string, string> = Record<string, string>,
 > {
-    meta: LinterRuleMeta<Elements>;
-    create: LinterRuleCreatorFunction<Elements>;
+    meta: {
+        type: LinterRuleType;
+        docs: LinterRuleDocs;
+        hasSuggestions?: boolean;
+        hasFix?: boolean;
+        messages?: Msgs;
+        configSchema?: TupleOf<Elements>;
+    };
+    create: LinterRuleCreatorFunction<Elements, Msgs>;
 }
+
+/* =========================
+ * defineRule (overloads keep DX nice)
+ * ========================= */
 
 export function defineRule<
     const Elements extends readonly v.BaseSchema<any, any, any>[],
+    const Msgs extends Record<string, string> = Record<string, string>,
 >(
-    rule: Omit<LinterRule<Elements>, 'meta'> & {
-        meta: Omit<LinterRule<Elements>['meta'], 'configSchema'> & {
+    rule: Omit<LinterRule<Elements, Msgs>, 'meta'> & {
+        meta: Omit<LinterRule<Elements, Msgs>['meta'], 'configSchema'> & {
             configSchema: TupleOf<Elements>;
         };
     },
-): LinterRule<Elements>;
+): LinterRule<Elements, Msgs>;
 
-export function defineRule(
-    rule: Omit<LinterRule<DefaultElements>, 'meta'> & {
-        meta: Omit<LinterRule<DefaultElements>['meta'], 'configSchema'> & {
+export function defineRule<
+    const Msgs extends Record<string, string> = Record<string, string>,
+>(
+    rule: Omit<LinterRule<[], Msgs>, 'meta'> & {
+        meta: Omit<LinterRule<[], Msgs>['meta'], 'configSchema'> & {
             configSchema?: undefined;
         };
     },
-): LinterRule<DefaultElements>;
+): LinterRule<[], Msgs>;
 
 /**
- * Defines a new rule.
+ * Defines a linter rule with type-safe configuration and message handling.
  *
- * @param rule The rule to define.
+ * Attaches the config schema to rule metadata for runtime validation.
  *
- * @returns The defined rule.
+ * @param rule The rule definition with meta and create function.
+ *
+ * @returns The complete rule with processed metadata.
  */
 export function defineRule(rule: any): any {
     const configSchema = rule?.meta?.configSchema ?? DEFAULT_TUPLE_SCHEMA;
-
     return {
         ...rule,
         meta: {
@@ -357,3 +368,16 @@ export function defineRule(rule: any): any {
         },
     };
 }
+
+/* =========================
+ * (Optional) runtime schema for whole rule shape
+ * – useful if you want to validate dynamic rule modules.
+ * ========================= */
+
+/**
+ * Runtime schema for validating dynamically loaded rule modules.
+ */
+export const linterRuleSchema = v.object({
+    meta: linterRuleMetaSchema,
+    create: v.pipe(v.any(), v.check((x) => typeof x === 'function', 'create must be a function')),
+});
