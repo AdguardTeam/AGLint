@@ -1,0 +1,791 @@
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import {
+    afterAll,
+    beforeAll,
+    describe,
+    expect,
+    test,
+} from 'vitest';
+
+import { ConfigResolver, PresetResolver } from '../../../src/cli/utils/config-resolver';
+import { NodeFileSystemAdapter } from '../../../src/cli/utils/fs-adapter';
+import { NodePathAdapter } from '../../../src/cli/utils/path-adapter';
+import { type ConfigChainEntry } from '../../../src/cli/utils/tree-builder';
+import { type LinterConfig } from '../../../src/linter/config';
+import { LinterRuleSeverity } from '../../../src/linter/rule';
+
+describe('config-resolver', () => {
+    let testDir: string;
+    let presetsDir: string;
+    let fs: NodeFileSystemAdapter;
+    let pathAdapter: NodePathAdapter;
+
+    beforeAll(async () => {
+        // Create temporary directories
+        testDir = join(tmpdir(), `aglint-config-resolver-test-${Date.now()}`);
+        presetsDir = join(testDir, 'presets');
+        await mkdir(presetsDir, { recursive: true });
+
+        // Create preset files
+        await writeFile(
+            join(presetsDir, 'recommended.json'),
+            JSON.stringify({
+                syntax: ['Common'],
+                rules: {
+                    'no-duplicated-modifiers': 'error',
+                },
+            }),
+        );
+
+        await writeFile(
+            join(presetsDir, 'all.json'),
+            JSON.stringify({
+                syntax: ['AdGuard', 'UblockOrigin'],
+                rules: {
+                    'no-duplicated-modifiers': 'error',
+                    'no-invalid-modifiers': 'error',
+                },
+            }),
+        );
+
+        // Create test config files
+        await writeFile(
+            join(testDir, 'simple.json'),
+            JSON.stringify({
+                syntax: ['Common'],
+                rules: {
+                    'no-duplicated-modifiers': 'warn',
+                },
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'root.json'),
+            JSON.stringify({
+                root: true,
+                syntax: ['Common'],
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'with-extends.json'),
+            JSON.stringify({
+                extends: ['./simple.json'],
+                rules: {
+                    'no-invalid-modifiers': 'error',
+                },
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'with-preset.json'),
+            JSON.stringify({
+                extends: ['aglint:recommended'],
+                rules: {
+                    'no-invalid-modifiers': 'warn',
+                },
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'chain-a.json'),
+            JSON.stringify({
+                extends: ['./chain-b.json'],
+                rules: {
+                    'rule-a': 'error',
+                },
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'chain-b.json'),
+            JSON.stringify({
+                extends: ['./chain-c.json'],
+                rules: {
+                    'rule-b': 'warn',
+                },
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'chain-c.json'),
+            JSON.stringify({
+                rules: {
+                    'rule-c': 'off',
+                },
+            }),
+        );
+
+        // Create circular reference configs
+        await writeFile(
+            join(testDir, 'circular-a.json'),
+            JSON.stringify({
+                extends: ['./circular-b.json'],
+            }),
+        );
+
+        await writeFile(
+            join(testDir, 'circular-b.json'),
+            JSON.stringify({
+                extends: ['./circular-a.json'],
+            }),
+        );
+
+        // Create YAML config
+        await writeFile(
+            join(testDir, 'config.yaml'),
+            'syntax:\n  - Common\nrules:\n  no-duplicated-modifiers: error\n',
+        );
+
+        await writeFile(
+            join(testDir, 'config.yml'),
+            'syntax:\n  - AdGuard\nrules:\n  no-invalid-modifiers: warn\n',
+        );
+
+        // Create .aglintrc without extension
+        await writeFile(
+            join(testDir, '.aglintrc'),
+            JSON.stringify({
+                syntax: ['UblockOrigin'],
+            }),
+        );
+
+        // Create config with extends without extension
+        await writeFile(
+            join(testDir, 'no-ext-extends.json'),
+            JSON.stringify({
+                extends: ['./simple'],
+            }),
+        );
+
+        // Create invalid JSON config
+        await writeFile(
+            join(testDir, 'invalid.json'),
+            'not valid json {',
+        );
+
+        // Create config with multiple extends
+        await writeFile(
+            join(testDir, 'multi-extends.json'),
+            JSON.stringify({
+                extends: ['./simple.json', './root.json'],
+                rules: {
+                    'multi-rule': 'error',
+                },
+            }),
+        );
+
+        fs = new NodeFileSystemAdapter();
+        pathAdapter = new NodePathAdapter();
+    });
+
+    afterAll(async () => {
+        await rm(testDir, { recursive: true, force: true });
+    });
+
+    describe('PresetResolver', () => {
+        test('should resolve existing preset', async () => {
+            const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
+            const path = await resolver.resolve('recommended');
+
+            expect(path).toContain('recommended.json');
+            expect(path).toContain(presetsDir);
+        });
+
+        test('should resolve all preset', async () => {
+            const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
+            const path = await resolver.resolve('all');
+
+            expect(path).toContain('all.json');
+        });
+
+        test('should throw error for non-existent preset', async () => {
+            const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
+
+            await expect(
+                resolver.resolve('nonexistent'),
+            ).rejects.toThrow('Preset "nonexistent" not found');
+        });
+
+        test('should throw error with preset path in message', async () => {
+            const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
+
+            try {
+                await resolver.resolve('missing');
+                expect.fail('Should have thrown');
+            } catch (error) {
+                expect((error as Error).message).toContain('missing');
+                expect((error as Error).message).toContain(presetsDir);
+            }
+        });
+
+        test('should return POSIX paths', async () => {
+            const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
+            const path = await resolver.resolve('recommended');
+
+            expect(path).not.toContain('\\');
+            expect(path).toContain('/');
+        });
+    });
+
+    describe('ConfigResolver', () => {
+        describe('constructor', () => {
+            test('should initialize with options', () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                expect(resolver).toBeDefined();
+            });
+
+            test('should initialize with base config', () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                    baseConfig: {
+                        syntax: ['Common'],
+                    },
+                });
+
+                expect(resolver).toBeDefined();
+            });
+        });
+
+        describe('resolve', () => {
+            test('should resolve simple config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'simple.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
+            });
+
+            test('should resolve config with extends', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'with-extends.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
+                expect(config.rules?.['no-invalid-modifiers']).toBe(LinterRuleSeverity.Error);
+            });
+
+            test('should resolve config with preset reference', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'with-preset.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
+                expect(config.rules?.['no-invalid-modifiers']).toBe(LinterRuleSeverity.Warning);
+            });
+
+            test('should resolve config chain', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'chain-a.json'));
+
+                expect(config).toBeDefined();
+                expect(config.rules?.['rule-a']).toBe(LinterRuleSeverity.Error);
+                expect(config.rules?.['rule-b']).toBe(LinterRuleSeverity.Warning);
+                expect(config.rules?.['rule-c']).toBe(LinterRuleSeverity.Off);
+            });
+
+            test('should resolve config with multiple extends', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'multi-extends.json'));
+
+                expect(config).toBeDefined();
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
+                expect(config.rules?.['multi-rule']).toBe(LinterRuleSeverity.Error);
+            });
+
+            test('should resolve extends without extension', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'no-ext-extends.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+            });
+
+            test('should cache resolved configs', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config1 = await resolver.resolve(join(testDir, 'simple.json'));
+                const config2 = await resolver.resolve(join(testDir, 'simple.json'));
+
+                expect(config1).toBe(config2);
+            });
+
+            test('should detect circular references', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                await expect(
+                    resolver.resolve(join(testDir, 'circular-a.json')),
+                ).rejects.toThrow('Circular "extends" detected');
+            });
+
+            test('should parse YAML config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'config.yaml'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe('error');
+            });
+
+            test('should parse YML config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'config.yml'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['AdGuard']);
+            });
+
+            test('should parse .aglintrc without extension', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, '.aglintrc'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['UblockOrigin']);
+            });
+
+            test('should throw error for invalid JSON', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                await expect(
+                    resolver.resolve(join(testDir, 'invalid.json')),
+                ).rejects.toThrow('Failed to parse config file');
+            });
+
+            test('should throw error for non-existent file', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                await expect(
+                    resolver.resolve(join(testDir, 'nonexistent.json')),
+                ).rejects.toThrow();
+            });
+
+            test('should handle relative paths correctly', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'simple.json'));
+
+                expect(config).toBeDefined();
+            });
+
+            test('should exclude root and extends from resolved config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'with-extends.json'));
+
+                expect(config).not.toHaveProperty('extends');
+                expect(config).not.toHaveProperty('root');
+            });
+        });
+
+        describe('isRoot', () => {
+            test('should return true for root config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const isRoot = await resolver.isRoot(join(testDir, 'root.json'));
+
+                expect(isRoot).toBe(true);
+            });
+
+            test('should return false for non-root config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const isRoot = await resolver.isRoot(join(testDir, 'simple.json'));
+
+                expect(isRoot).toBe(false);
+            });
+
+            test('should cache root check', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                // First call reads and caches
+                await resolver.isRoot(join(testDir, 'root.json'));
+                // Second call should use cache
+                const isRoot = await resolver.isRoot(join(testDir, 'root.json'));
+
+                expect(isRoot).toBe(true);
+            });
+
+            test('should handle config with extends when checking root', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const isRoot = await resolver.isRoot(join(testDir, 'with-extends.json'));
+
+                expect(isRoot).toBe(false);
+            });
+        });
+
+        describe('resolveChain', () => {
+            test('should return base config for empty chain', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                    baseConfig: {
+                        syntax: ['Base' as any],
+                    },
+                });
+
+                const config = await resolver.resolveChain([]);
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Base']);
+            });
+
+            test('should merge config chain from root to closest', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const chain: ConfigChainEntry[] = [
+                    {
+                        path: join(testDir, 'child.json'),
+                        directory: testDir,
+                        config: {
+                            syntax: ['Child' as any],
+                            rules: {
+                                'child-rule': 'error',
+                            },
+                        } as LinterConfig,
+                        isRoot: false,
+                    },
+                    {
+                        path: join(testDir, 'parent.json'),
+                        directory: testDir,
+                        config: {
+                            syntax: ['Parent' as any],
+                            rules: {
+                                'parent-rule': 'warn',
+                            },
+                        } as unknown as LinterConfig,
+                        isRoot: true,
+                    },
+                ];
+
+                const config = await resolver.resolveChain(chain);
+
+                expect(config.syntax).toEqual(['Parent', 'Child']);
+                expect(config.rules?.['child-rule']).toBe('error');
+                expect(config.rules?.['parent-rule']).toBe('warn');
+            });
+
+            test('should apply base config before chain', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                    baseConfig: {
+                        syntax: ['Base' as any],
+                        rules: {
+                            'base-rule': 'off',
+                        },
+                    },
+                });
+
+                const chain: ConfigChainEntry[] = [
+                    {
+                        path: join(testDir, 'override.json'),
+                        directory: testDir,
+                        config: {
+                            rules: {
+                                'override-rule': 'error',
+                            },
+                        } as LinterConfig,
+                        isRoot: false,
+                    },
+                ];
+
+                const config = await resolver.resolveChain(chain);
+
+                expect(config.syntax).toEqual(['Base']);
+                expect(config.rules?.['base-rule']).toBe('off');
+                expect(config.rules?.['override-rule']).toBe('error');
+            });
+
+            test('should handle single entry chain', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const chain: ConfigChainEntry[] = [
+                    {
+                        path: join(testDir, 'single.json'),
+                        directory: testDir,
+                        config: {
+                            syntax: ['Single' as any],
+                        } as LinterConfig,
+                        isRoot: true,
+                    },
+                ];
+
+                const config = await resolver.resolveChain(chain);
+
+                expect(config.syntax).toEqual(['Single']);
+            });
+
+            test('should override rules correctly in chain', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const chain: ConfigChainEntry[] = [
+                    {
+                        path: join(testDir, 'child.json'),
+                        directory: testDir,
+                        config: {
+                            rules: {
+                                'shared-rule': 'error',
+                            },
+                        } as LinterConfig,
+                        isRoot: false,
+                    },
+                    {
+                        path: join(testDir, 'parent.json'),
+                        directory: testDir,
+                        config: {
+                            rules: {
+                                'shared-rule': 'warn',
+                            },
+                        } as LinterConfig,
+                        isRoot: true,
+                    },
+                ];
+
+                const config = await resolver.resolveChain(chain);
+
+                expect(config.rules?.['shared-rule']).toBe('error');
+            });
+        });
+
+        describe('invalidate', () => {
+            test('should invalidate cache for specific config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const configPath = join(testDir, 'simple.json');
+                const config1 = await resolver.resolve(configPath);
+
+                resolver.invalidate(configPath);
+
+                const config2 = await resolver.resolve(configPath);
+
+                expect(config1).not.toBe(config2);
+            });
+
+            test('should handle invalidating non-cached config', () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                expect(() => {
+                    resolver.invalidate(join(testDir, 'simple.json'));
+                }).not.toThrow();
+            });
+
+            test('should normalize path when invalidating', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const configPath = join(testDir, 'simple.json');
+                await resolver.resolve(configPath);
+
+                // Invalidate with relative path
+                resolver.invalidate('simple.json');
+
+                const config = await resolver.resolve(configPath);
+                expect(config).toBeDefined();
+            });
+        });
+
+        describe('clearCache', () => {
+            test('should clear all cached configs', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config1a = await resolver.resolve(join(testDir, 'simple.json'));
+                const config2a = await resolver.resolve(join(testDir, 'root.json'));
+
+                resolver.clearCache();
+
+                const config1b = await resolver.resolve(join(testDir, 'simple.json'));
+                const config2b = await resolver.resolve(join(testDir, 'root.json'));
+
+                expect(config1a).not.toBe(config1b);
+                expect(config2a).not.toBe(config2b);
+            });
+
+            test('should not throw when clearing empty cache', () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                expect(() => {
+                    resolver.clearCache();
+                }).not.toThrow();
+            });
+        });
+
+        describe('edge cases', () => {
+            test('should handle config with empty rules', async () => {
+                await writeFile(
+                    join(testDir, 'empty-rules.json'),
+                    JSON.stringify({
+                        syntax: ['Common'],
+                        rules: {},
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'empty-rules.json'));
+
+                expect(config).toBeDefined();
+                expect(config.rules).toBeDefined();
+            });
+
+            test('should handle config with no rules', async () => {
+                await writeFile(
+                    join(testDir, 'no-rules.json'),
+                    JSON.stringify({
+                        syntax: ['Common'],
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'no-rules.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+            });
+
+            test('should handle Windows paths', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'simple.json'));
+
+                expect(config).toBeDefined();
+            });
+
+            test('should handle config with empty extends array', async () => {
+                await writeFile(
+                    join(testDir, 'empty-extends.json'),
+                    JSON.stringify({
+                        extends: [],
+                        syntax: ['Common'],
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'empty-extends.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+            });
+
+            test('should handle deeply nested extends', async () => {
+                await writeFile(
+                    join(testDir, 'deep-1.json'),
+                    JSON.stringify({
+                        extends: ['./deep-2.json'],
+                        rules: { 'rule-1': 'error' },
+                    }),
+                );
+                await writeFile(
+                    join(testDir, 'deep-2.json'),
+                    JSON.stringify({
+                        extends: ['./deep-3.json'],
+                        rules: { 'rule-2': 'warn' },
+                    }),
+                );
+                await writeFile(
+                    join(testDir, 'deep-3.json'),
+                    JSON.stringify({
+                        extends: ['./deep-4.json'],
+                        rules: { 'rule-3': 'off' },
+                    }),
+                );
+                await writeFile(
+                    join(testDir, 'deep-4.json'),
+                    JSON.stringify({
+                        rules: { 'rule-4': 'error' },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'deep-1.json'));
+
+                expect(config.rules?.['rule-1']).toBe(LinterRuleSeverity.Error);
+                expect(config.rules?.['rule-2']).toBe(LinterRuleSeverity.Warning);
+                expect(config.rules?.['rule-3']).toBe(LinterRuleSeverity.Off);
+                expect(config.rules?.['rule-4']).toBe(LinterRuleSeverity.Error);
+            });
+        });
+    });
+});
