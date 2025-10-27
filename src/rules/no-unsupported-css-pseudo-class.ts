@@ -44,6 +44,7 @@ export const SUPPORTED_EXT_CSS_PSEUDO_CLASSES = new Set([
     'upward',
     'xpath',
     'style',
+    'matches-media',
 ]);
 
 /**
