@@ -2,6 +2,7 @@ import { type AnyRule, RegExpUtils } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { createVisitorsForAnyValidRule } from '../utils/visitor-creator';
 
 export default defineRule({
     meta: {
@@ -12,12 +13,16 @@ export default defineRule({
             recommended: false,
         },
         messages: {
+            excludedRuleText: 'Rule matches an excluded rule text: {{ruleText}}',
             excludedPattern: 'Rule matches an excluded pattern: {{pattern}}',
         },
         // TODO: Improve schema with transformation: https://github.com/AdguardTeam/AGLint/issues/217)
         configSchema: v.tuple([
             v.strictObject({
-                regExpPatterns: v.pipe(
+                excludedRuleTexts: v.pipe(
+                    v.fallback(v.array(v.string()), []),
+                ),
+                excludedRegExpPatterns: v.pipe(
                     v.fallback(v.array(v.string()), []),
                 ),
             }),
@@ -28,7 +33,7 @@ export default defineRule({
         const cache: WeakMap<string[], RegExp[]> = new WeakMap();
 
         const getRegExpList = (): RegExp[] => {
-            const patterns = context.config[0].regExpPatterns;
+            const patterns = context.config[0].excludedRegExpPatterns;
 
             if (cache.has(patterns)) {
                 return cache.get(patterns)!;
@@ -50,6 +55,29 @@ export default defineRule({
         };
 
         const handler = (node: AnyRule) => {
+            const excludeRuleTexts = context.config[0].excludedRuleTexts;
+
+            if (excludeRuleTexts.includes(node.raws!.text!)) {
+                context.report({
+                    messageId: 'excludedRuleText',
+                    data: {
+                        ruleText: node.raws!.text!,
+                    },
+                    fix(fixer) {
+                        const lineNumber = context.sourceCode.getLineNumberForOffset(node.start!);
+                        if (!lineNumber) {
+                            return null;
+                        }
+                        const lineRange = context.sourceCode.getLineRange(lineNumber, true);
+                        if (!lineRange) {
+                            return null;
+                        }
+                        return fixer.remove(lineRange);
+                    },
+                    node,
+                });
+            }
+
             const excludePatterns = getRegExpList();
 
             for (const pattern of excludePatterns) {
@@ -77,13 +105,6 @@ export default defineRule({
             }
         };
 
-        return {
-            NetworkRule: handler,
-            CssInjectionRule: handler,
-            ElementHidingRule: handler,
-            ScriptletInjectionRule: handler,
-            HtmlFilteringRule: handler,
-            JsInjectionRule: handler,
-        };
+        return createVisitorsForAnyValidRule(handler);
     },
 });
