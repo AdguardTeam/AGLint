@@ -32,7 +32,97 @@
             "default": "./dist/index.js"
         },
         "./config-presets/all": "./config-presets/all.json",
-        "./config-presets/recommended": "./config-presets/recommended.json"
+        "./config-presets/recommended": "./config-presets/recommended.json",
+        "./rules/if-directive-balance": {
+            "types": "./dist/rules/if-directive-balance.d.ts",
+            "import": "./dist/rules/if-directive-balance.js",
+            "default": "./dist/rules/if-directive-balance.js"
+        },
+        "./rules/max-css-selectors": {
+            "types": "./dist/rules/max-css-selectors.d.ts",
+            "import": "./dist/rules/max-css-selectors.js",
+            "default": "./dist/rules/max-css-selectors.js"
+        },
+        "./rules/no-duplicated-css-declaration-props": {
+            "types": "./dist/rules/no-duplicated-css-declaration-props.d.ts",
+            "import": "./dist/rules/no-duplicated-css-declaration-props.js",
+            "default": "./dist/rules/no-duplicated-css-declaration-props.js"
+        },
+        "./rules/no-duplicated-hint-platforms": {
+            "types": "./dist/rules/no-duplicated-hint-platforms.d.ts",
+            "import": "./dist/rules/no-duplicated-hint-platforms.js",
+            "default": "./dist/rules/no-duplicated-hint-platforms.js"
+        },
+        "./rules/no-duplicated-hints": {
+            "types": "./dist/rules/no-duplicated-hints.d.ts",
+            "import": "./dist/rules/no-duplicated-hints.js",
+            "default": "./dist/rules/no-duplicated-hints.js"
+        },
+        "./rules/no-duplicated-modifiers": {
+            "types": "./dist/rules/no-duplicated-modifiers.d.ts",
+            "import": "./dist/rules/no-duplicated-modifiers.js",
+            "default": "./dist/rules/no-duplicated-modifiers.js"
+        },
+        "./rules/no-excluded-rules": {
+            "types": "./dist/rules/no-excluded-rules.d.ts",
+            "import": "./dist/rules/no-excluded-rules.js",
+            "default": "./dist/rules/no-excluded-rules.js"
+        },
+        "./rules/no-inconsistent-hint-platforms": {
+            "types": "./dist/rules/no-inconsistent-hint-platforms.d.ts",
+            "import": "./dist/rules/no-inconsistent-hint-platforms.js",
+            "default": "./dist/rules/no-inconsistent-hint-platforms.js"
+        },
+        "./rules/no-invalid-css-declaration": {
+            "types": "./dist/rules/no-invalid-css-declaration.d.ts",
+            "import": "./dist/rules/no-invalid-css-declaration.js",
+            "default": "./dist/rules/no-invalid-css-declaration.js"
+        },
+        "./rules/no-invalid-domains": {
+            "types": "./dist/rules/no-invalid-domains.d.ts",
+            "import": "./dist/rules/no-invalid-domains.js",
+            "default": "./dist/rules/no-invalid-domains.js"
+        },
+        "./rules/no-invalid-hint-params": {
+            "types": "./dist/rules/no-invalid-hint-params.d.ts",
+            "import": "./dist/rules/no-invalid-hint-params.js",
+            "default": "./dist/rules/no-invalid-hint-params.js"
+        },
+        "./rules/no-invalid-modifiers": {
+            "types": "./dist/rules/no-invalid-modifiers.d.ts",
+            "import": "./dist/rules/no-invalid-modifiers.js",
+            "default": "./dist/rules/no-invalid-modifiers.js"
+        },
+        "./rules/no-short-rules": {
+            "types": "./dist/rules/no-short-rules.d.ts",
+            "import": "./dist/rules/no-short-rules.js",
+            "default": "./dist/rules/no-short-rules.js"
+        },
+        "./rules/no-unknown-hint-platforms": {
+            "types": "./dist/rules/no-unknown-hint-platforms.d.ts",
+            "import": "./dist/rules/no-unknown-hint-platforms.js",
+            "default": "./dist/rules/no-unknown-hint-platforms.js"
+        },
+        "./rules/no-unknown-hints": {
+            "types": "./dist/rules/no-unknown-hints.d.ts",
+            "import": "./dist/rules/no-unknown-hints.js",
+            "default": "./dist/rules/no-unknown-hints.js"
+        },
+        "./rules/no-unknown-preprocessor-directives": {
+            "types": "./dist/rules/no-unknown-preprocessor-directives.d.ts",
+            "import": "./dist/rules/no-unknown-preprocessor-directives.js",
+            "default": "./dist/rules/no-unknown-preprocessor-directives.js"
+        },
+        "./rules/no-unsupported-css-pseudo-class": {
+            "types": "./dist/rules/no-unsupported-css-pseudo-class.d.ts",
+            "import": "./dist/rules/no-unsupported-css-pseudo-class.js",
+            "default": "./dist/rules/no-unsupported-css-pseudo-class.js"
+        },
+        "./rules/scriptlet-quotes": {
+            "types": "./dist/rules/scriptlet-quotes.d.ts",
+            "import": "./dist/rules/scriptlet-quotes.js",
+            "default": "./dist/rules/scriptlet-quotes.js"
+        }
     },
     "files": [
         "dist/**",
