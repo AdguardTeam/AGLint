@@ -1,4 +1,0 @@
-# Another root config
-root: true
-rules:
-  'rule-1': 'warn'

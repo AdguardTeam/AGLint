@@ -1,3 +1,0 @@
-root: true
-rules:
-  no-invalid-css-syntax: error

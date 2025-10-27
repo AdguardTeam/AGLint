@@ -1,4 +1,0 @@
-!#endif
-!#if (adguard)
-rule
-

@@ -1,2 +1,0 @@
-! valid rule, shouldn't be reported
-||example.com/ads.js^$script

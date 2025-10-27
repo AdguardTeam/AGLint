@@ -1,2 +1,0 @@
-! should be reported as a parsing error (AGLint is enabled for this rule)
-example.com###.ad

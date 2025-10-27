@@ -1,2 +1,0 @@
-! shouldn't be reported, since this file was added to .aglintignore
-example.com#%#//scriptlet('missing-closing-parenthesis'
