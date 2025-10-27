@@ -45,6 +45,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'windows',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "windows"',
                 position: {
                     start: {
                         column: 21,
@@ -74,6 +75,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'windows',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "windows"',
                 position: {
                     start: {
                         column: 25,
@@ -109,6 +111,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'windows',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "windows"',
                 position: {
                     start: {
                         column: 40,
@@ -135,6 +138,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'windows',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "windows"',
                 position: {
                     start: {
                         column: 49,
@@ -161,6 +165,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'ext_safari',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "ext_safari"',
                 position: {
                     start: {
                         column: 129,
@@ -196,6 +201,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'windows',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "windows"',
                 position: {
                     start: {
                         column: 44,
@@ -222,6 +228,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'windows',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "windows"',
                 position: {
                     start: {
                         column: 53,
@@ -248,6 +255,7 @@ describe('no-duplicated-hint-platforms', () => {
                     platform: 'ext_safari',
                 },
                 messageId: 'duplicatedHintPlatforms',
+                message: 'Duplicated platform "ext_safari"',
                 position: {
                     start: {
                         column: 133,

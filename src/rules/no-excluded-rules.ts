@@ -78,8 +78,12 @@ export default defineRule({
         };
 
         return {
-            'FilterList > [type="Network"]': handler,
-            'FilterList > [type="Cosmetic"]': handler,
+            NetworkRule: handler,
+            CssInjectionRule: handler,
+            ElementHidingRule: handler,
+            ScriptletInjectionRule: handler,
+            HtmlFilteringRule: handler,
+            JsInjectionRule: handler,
         };
     },
 });
