@@ -5,34 +5,40 @@ import { type AnyLinterResult } from '../../linter/fixer';
 import { type LinterCliConfig } from '../cli-options';
 
 /**
- * Represents a reporter skeleton for the linter.
+ * Interface for CLI reporters that handle linting progress and results output.
+ *
+ * Reporters can hook into various stages of the linting process to provide
+ * feedback to users in different formats (console, JSON, etc.).
  */
 export interface LinterCliReporter {
     /**
-     * Called when the whole linting process starts.
+     * Called when the CLI linting process begins.
+     *
+     * @param cliOptions Complete CLI configuration.
      */
     onCliStart?: (cliOptions: LinterCliConfig) => void;
 
     /**
-     * Called when linting a file starts.
+     * Called when linting of a single file begins.
      *
-     * @param file The file that is being linted.
-     * @param config The linter configuration.
+     * @param file Parsed file path information.
+     * @param config Linter configuration for this file.
      */
     onFileStart?: (file: ParsedPath, config: LinterConfig) => void;
 
     /**
-     * Called when linting a file ends. It will give you the result of the linting
-     * and the configuration that was used (if you want to do something with it).
+     * Called when linting of a single file completes.
      *
-     * @param file The file that was linted.
-     * @param result The result of the linting.
-     * @param cached Whether the file was linted from cache.
+     * @param file Parsed file path information.
+     * @param result Linting result with problems and counts.
+     * @param cached Whether the result was retrieved from cache.
      */
     onFileEnd?: (file: ParsedPath, result: AnyLinterResult, cached: boolean) => void;
 
     /**
-     * Called when the whole linting process ends.
+     * Called when the entire CLI linting process completes.
+     *
+     * Use this to output final summaries or statistics.
      */
     onCliEnd?: () => void;
 }

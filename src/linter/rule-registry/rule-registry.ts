@@ -16,7 +16,7 @@ import { type LinterRuleLoader } from './rule-loader';
  * - Validating rule structure
  * - Creating rule instances with their configurations
  * - Managing visitor registration
- * - Applying configuration updates
+ * - Applying configuration updates.
  *
  * @example
  * ```typescript
@@ -67,10 +67,10 @@ export class LinterRuleRegistry {
     /**
      * Creates a new linter rule registry.
      *
-     * @param config - The parsed linter configuration containing rule settings
-     * @param visitorCollection - The visitor collection to register rule visitors
-     * @param baseRuleContext - The base context passed to all rules (source code, etc.)
-     * @param loadRule - Function to load rule modules by name
+     * @param config The parsed linter configuration containing rule settings.
+     * @param visitorCollection The visitor collection to register rule visitors.
+     * @param baseRuleContext The base context passed to all rules (source code, etc.).
+     * @param loadRule Function to load rule modules by name.
      */
     constructor(
         config: LinterConfigParsed,
@@ -90,7 +90,7 @@ export class LinterRuleRegistry {
     /**
      * Sets the reporter function for handling problems found by rules.
      *
-     * @param reporter - Function called when a rule reports a problem
+     * @param reporter Function called when a rule reports a problem.
      */
     public setReporter(reporter: LinterReporter): void {
         this.reporter = reporter;
@@ -104,13 +104,13 @@ export class LinterRuleRegistry {
      * 2. Validates the rule structure against the schema
      * 3. Creates a rule instance with its configuration
      * 4. Skips rules with severity "off"
-     * 5. Registers the rule's visitors with the visitor collection
+     * 5. Registers the rule's visitors with the visitor collection.
      *
      * All rules are loaded in parallel for performance.
      *
-     * @throws Error if a rule module cannot be loaded
-     * @throws Error if a rule fails schema validation
-     * @throws Error if a rule configuration is invalid
+     * @throws Error if a rule module cannot be loaded.
+     * @throws Error if a rule fails schema validation.
+     * @throws Error if a rule configuration is invalid.
      *
      * @example
      * ```typescript
@@ -157,9 +157,9 @@ export class LinterRuleRegistry {
      * This allows updating rule severities and options without reloading.
      * Only affects rules that have already been loaded.
      *
-     * @param rulesConfig - Map of rule names to their new configurations
+     * @param rulesConfig Map of rule names to their new configurations.
      *
-     * @throws Error if a referenced rule hasn't been loaded
+     * @throws Error if a referenced rule hasn't been loaded.
      *
      * @example
      * ```typescript
@@ -179,9 +179,9 @@ export class LinterRuleRegistry {
     /**
      * Checks if a rule has been loaded into the registry.
      *
-     * @param ruleName - The name of the rule to check
+     * @param ruleName The name of the rule to check.
      *
-     * @returns True if the rule is loaded, false otherwise
+     * @returns True if the rule is loaded, false otherwise.
      */
     public hasRule(ruleName: string): boolean {
         return this.rules.has(ruleName);
@@ -190,7 +190,7 @@ export class LinterRuleRegistry {
     /**
      * Adds a rule instance to the registry.
      *
-     * @param rule - The rule instance to add
+     * @param rule The rule instance to add.
      */
     private addRule(rule: LinterRuleInstance): void {
         this.rules.set(rule.getId(), rule);
@@ -199,11 +199,11 @@ export class LinterRuleRegistry {
     /**
      * Retrieves a rule instance from the registry.
      *
-     * @param ruleName - The name of the rule to retrieve
+     * @param ruleName The name of the rule to retrieve.
      *
-     * @returns The rule instance
+     * @returns The rule instance.
      *
-     * @throws Error if the rule is not found in the registry
+     * @throws Error if the rule is not found in the registry.
      */
     private getRuleFromStorageOrThrow(ruleName: string): LinterRuleInstance {
         const ruleData = this.rules.get(ruleName);

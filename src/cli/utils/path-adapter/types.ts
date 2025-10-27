@@ -6,82 +6,92 @@ export interface PathAdapter {
     /**
      * Resolve path segments into an absolute path.
      *
-     * @param pathSegments Path segments to resolve
-     * @returns Absolute path
+     * @param pathSegments Path segments to resolve.
+     *
+     * @returns Absolute path.
      */
     resolve(...pathSegments: string[]): string;
 
     /**
      * Join path segments.
      *
-     * @param pathSegments Path segments to join
-     * @returns Joined path
+     * @param pathSegments Path segments to join.
+     *
+     * @returns Joined path.
      */
     join(...pathSegments: string[]): string;
 
     /**
      * Get the directory name of a path.
      *
-     * @param p Path to get directory from
-     * @returns Directory path
+     * @param p Path to get directory from.
+     *
+     * @returns Directory path.
      */
     dirname(p: string): string;
 
     /**
      * Get the base name of a path.
      *
-     * @param p Path to get basename from
-     * @param ext Optional extension to remove
-     * @returns Base name
+     * @param p Path to get basename from.
+     * @param ext Optional extension to remove.
+     *
+     * @returns Base name.
      */
     basename(p: string, ext?: string): string;
 
     /**
      * Get the extension of a path.
      *
-     * @param p Path to get extension from
-     * @returns Extension including the dot (e.g., '.txt')
+     * @param p Path to get extension from.
+     *
+     * @returns Extension including the dot (e.g., '.txt').
      */
     extname(p: string): string;
 
     /**
      * Parse a path into components.
      *
-     * @param p Path to parse
-     * @returns Parsed path components
+     * @param p Path to parse.
+     *
+     * @returns Parsed path components.
      */
     parse(p: string): ParsedPath;
 
     /**
      * Get relative path from 'from' to 'to'.
      *
-     * @param from From path
-     * @param to To path
-     * @returns Relative path
+     * @param from From path.
+     * @param to To path.
+     *
+     * @returns Relative path.
      */
     relative(from: string, to: string): string;
 
     /**
      * Check if path is absolute.
      *
-     * @param p Path to check
-     * @returns True if absolute
+     * @param p Path to check.
+     *
+     * @returns True if absolute.
      */
     isAbsolute(p: string): boolean;
 
     /**
      * Normalize a path (resolve '..' and '.', remove duplicate separators).
      *
-     * @param p Path to normalize
-     * @returns Normalized path
+     * @param p Path to normalize.
+     *
+     * @returns Normalized path.
      */
     normalize(p: string): string;
 
     /**
      * Convert path to POSIX format (forward slashes).
      *
-     * @param p Path to convert
-     * @returns POSIX path
+     * @param p Path to convert.
+     *
+     * @returns POSIX path.
      */
     toPosix(p: string): string;
 

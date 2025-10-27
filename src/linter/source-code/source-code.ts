@@ -12,17 +12,17 @@ import { type OnParseError } from './types';
  */
 export enum LineBreakType {
     /**
-     * Line feed (\n)
+     * Line feed (\n).
      */
     LineFeed,
 
     /**
-     * Carriage return (\r)
+     * Carriage return (\r).
      */
     CarriageReturn,
 
     /**
-     * Carriage return line feed (\r\n)
+     * Carriage return line feed (\r\n).
      */
     CarriageReturnLineFeed,
 }
@@ -108,13 +108,16 @@ export class LinterSourceCode {
      */
     private readonly lineMeta: LineMeta;
 
+    /**
+     * Callback function to be called when a parse error occurs.
+     */
     private readonly onParseError?: OnParseError;
 
     /**
      * Creates an instance of LinterSourceCode.
      *
      * @param source The source code as a string.
-     * @param subParsers Sub-parsers to use for parsing specific parts of the source code.
+     * @param onParseError Callback function to be called when a parse error occurs.
      */
     constructor(source: string, onParseError?: OnParseError) {
         this.source = source;
@@ -151,6 +154,8 @@ export class LinterSourceCode {
      * and linebreak types.
      *
      * @param source The source code as a string.
+     *
+     * @returns The computed line metadata.
      */
     private static computeLineMetadata(source: string): LineMeta {
         const offsetToLine: number[] = [];
@@ -234,6 +239,13 @@ export class LinterSourceCode {
         };
     }
 
+    /**
+     * Retrieves the starting character offset of a line.
+     *
+     * @param line The 1-based line number.
+     *
+     * @returns The zero-based character offset of the line, or null if the line is out of range.
+     */
     public getLineStartOffsetByLine(line: number): number | null {
         const zeroBasedLine = line - 1;
 

@@ -80,8 +80,8 @@ export class LinterInlineDisableApplier {
     /**
      * Creates a new inline disable applier.
      *
-     * @param directives - Array of disable/enable directives to process
-     * @param opts - Configuration options
+     * @param directives Array of disable/enable directives to process.
+     * @param opts Configuration options.
      */
     constructor(
         directives: ReadonlyArray<LinterDisableDirective> = [],
@@ -95,8 +95,9 @@ export class LinterInlineDisableApplier {
     /**
      * Replaces the current directives with a new set.
      *
-     * @param d - New array of directives
-     * @returns This instance for chaining
+     * @param d New array of directives.
+     *
+     * @returns This instance for chaining.
      */
     public setDirectives(d: ReadonlyArray<LinterDisableDirective>): this {
         this.directives = [...d];
@@ -106,8 +107,9 @@ export class LinterInlineDisableApplier {
     /**
      * Adds a single directive to the collection.
      *
-     * @param d - Directive to add
-     * @returns This instance for chaining
+     * @param d Directive to add.
+     *
+     * @returns This instance for chaining.
      */
     public addDirective(d: LinterDisableDirective): this {
         this.directives.push(d);
@@ -120,8 +122,9 @@ export class LinterInlineDisableApplier {
      * Returns a new array with problems that should not be suppressed.
      * The original array is not modified.
      *
-     * @param problems - Problems to filter
-     * @returns New array of problems not covered by disable directives
+     * @param problems Problems to filter.
+     *
+     * @returns New array of problems not covered by disable directives.
      *
      * @example
      * ```typescript
@@ -197,7 +200,7 @@ export class LinterInlineDisableApplier {
      *
      * Modifies the given problems array directly, removing suppressed problems.
      *
-     * @param problems - Problems array to filter (modified in place)
+     * @param problems Problems array to filter (modified in place).
      *
      * @example
      * ```typescript
@@ -213,6 +216,13 @@ export class LinterInlineDisableApplier {
         problems.push(...filtered);
     }
 
+    /**
+     * Builds a timeline of events from disable directives.
+     *
+     * @param directives Array of disable/enable directives.
+     *
+     * @returns Object containing events and nextLineMap.
+     */
     private static buildTimeline(directives: ReadonlyArray<LinterDisableDirective>) {
         const events: Event[] = [];
         const nextLineMap = new Map<number, { all: boolean; rules: Set<string> }>();
@@ -274,6 +284,16 @@ export class LinterInlineDisableApplier {
         };
     }
 
+    /**
+     * Compares the positions of two problems.
+     *
+     * @param a First problem.
+     * @param b Second problem.
+     *
+     * @returns A negative number if the first problem is before the second,
+     *          a positive number if the first problem is after the second,
+     *          or zero if they are at the same position.
+     */
     private static compareProblemPos(a: LinterProblem, b: LinterProblem) {
         const lineDiff = a.position.start.line - b.position.start.line;
 

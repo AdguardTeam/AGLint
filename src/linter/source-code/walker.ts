@@ -79,6 +79,7 @@ export class LinterWalker {
      * Normalizes the given visitors object by splitting it into enter and exit visitors.
      *
      * @param visitors The visitors object to normalize.
+     *
      * @returns An object containing the enter and exit visitors.
      */
     private static normalizeVisitors(visitors: SelectorsWithVisitors): {
@@ -165,6 +166,7 @@ export class LinterWalker {
      * It is used to cache the index of selectors.
      *
      * @param selectors The selectors to compute the key for.
+     *
      * @returns The computed key.
      */
     private static computeKey(selectors: SelectorsWithVisitors): string {
@@ -188,6 +190,8 @@ export class LinterWalker {
      * @param selectors A map of selector strings to visitor functions.
      * @param childrenKey The key used to access an array of child nodes. Defaults to 'children'.
      * @param typeKey The key used to access the node's type. Defaults to 'type'.
+     * @param initialAncestry The initial ancestry of the root node.
+     * @param onEnter A callback function to be called when a node is entered.
      */
     public walk(
         root: AnyNode,

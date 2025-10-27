@@ -12,9 +12,10 @@ import {
 import { defineRule, LinterRuleType } from '../linter/rule';
 
 /**
- * Checks if a character is whitespace
+ * Checks if a character is whitespace.
  *
  * @param char The character to check.
+ *
  * @returns True if the character is whitespace, false otherwise.
  */
 const isWhitespace = (char: string): boolean => {

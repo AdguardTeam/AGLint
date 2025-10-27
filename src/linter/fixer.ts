@@ -104,9 +104,9 @@ export type ApplyFixesOptions = {
  * problems or overlap with each other. Conflicting fixes are deferred
  * to subsequent rounds.
  *
- * @param options - Options containing the linter result and fix preferences
+ * @param options Options containing the linter result and fix preferences.
  *
- * @returns Fixed source code string
+ * @returns Fixed source code string.
  *
  * @example
  * ```typescript
@@ -171,15 +171,15 @@ export function applyFixesToResult(options: ApplyFixesOptions): string {
  * 2. Applies fixes from problems
  * 3. Re-lints the fixed source
  * 4. Repeats until no more fixes can be applied or max rounds reached
- * 5. Returns the final result with fixed source and statistics
+ * 5. Returns the final result with fixed source and statistics.
  *
  * Fixes are filtered by categories and rule IDs if specified.
  * The process continues until either all fixes are applied or the
  * maximum number of rounds is reached.
  *
- * @param options - Linter run options with fix preferences
+ * @param options Linter run options with fix preferences.
  *
- * @returns Promise resolving to linter result with fix statistics and fixed source
+ * @returns Promise resolving to linter result with fix statistics and fixed source.
  *
  * @example
  * ```typescript

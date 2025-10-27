@@ -15,7 +15,17 @@ import runLinterWorker, { type LinterWorkerResults } from './worker';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Runs linting sequentially on all files
+ * Runs linting sequentially on all files without caching.
+ *
+ * Processes files one at a time in the main thread. Suitable for
+ * small projects or when running in single-threaded mode.
+ *
+ * @param files Array of scanned files with their configurations.
+ * @param cliConfig CLI configuration options.
+ * @param reporter Reporter for outputting results.
+ * @param cwd Current working directory.
+ *
+ * @returns True if any file has errors, false otherwise.
  */
 export async function runSequential(
     files: Array<ScannedFile>,
@@ -57,7 +67,18 @@ export async function runSequential(
 }
 
 /**
- * Runs linting sequentially on all files
+ * Runs linting sequentially with cache support.
+ *
+ * Checks cache for each file before linting. Skips linting if a valid
+ * cached result exists. Updates cache with new results.
+ *
+ * @param files Array of scanned files with their configurations.
+ * @param cliConfig CLI configuration options.
+ * @param reporter Reporter for outputting results.
+ * @param cwd Current working directory.
+ * @param cache Cache instance for storing and retrieving results.
+ *
+ * @returns True if any file has errors, false otherwise.
  */
 export async function runSequentialWithCache(
     files: Array<ScannedFile>,
@@ -128,7 +149,19 @@ export async function runSequentialWithCache(
 }
 
 /**
- * Runs linting in parallel using worker threads
+ * Runs linting in parallel using worker threads without caching.
+ *
+ * Distributes file buckets across worker threads for concurrent processing.
+ * Each bucket is processed by a separate worker, improving performance for
+ * large projects.
+ *
+ * @param buckets File buckets distributed for parallel processing.
+ * @param cliConfig CLI configuration options.
+ * @param reporter Reporter for outputting results.
+ * @param cwd Current working directory.
+ * @param maxThreads Maximum number of worker threads to use.
+ *
+ * @returns True if any file has errors, false otherwise.
  */
 export async function runParallel(
     buckets: ScannedFile[][],
@@ -183,7 +216,20 @@ export async function runParallel(
 }
 
 /**
- * Runs linting in parallel using worker threads with cache support
+ * Runs linting in parallel using worker threads with cache support.
+ *
+ * Distributes files across workers while checking cache for each file.
+ * Workers receive cache data and can skip linting cached files. Updates
+ * cache with new results after processing.
+ *
+ * @param buckets File buckets distributed for parallel processing.
+ * @param cliConfig CLI configuration options.
+ * @param reporter Reporter for outputting results.
+ * @param cwd Current working directory.
+ * @param maxThreads Maximum number of worker threads to use.
+ * @param cache Cache instance for storing and retrieving results.
+ *
+ * @returns True if any file has errors, false otherwise.
  */
 export async function runParallelWithCache(
     buckets: ScannedFile[][],

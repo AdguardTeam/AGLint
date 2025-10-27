@@ -13,7 +13,7 @@ export class EsQueryUtils {
      * Extract a narrowed set of candidate ESTree node types for the subject of a selector.
      * Returns null if the selector does not narrow the subject (e.g. "*", :class, regex/unknown type).
      *
-     * @param selAst - EsQuery selector AST.
+     * @param selAst EsQuery selector AST.
      *
      * @returns Set of narrowed candidate ESTree node types.
      */
@@ -201,6 +201,7 @@ export class EsQueryUtils {
      * Parses a selector string into an EsQuery AST and caches the result.
      *
      * @param selector The selector string to parse.
+     *
      * @returns The parsed EsQuery AST.
      */
     public static parse(selector: string): esquery.Selector {

@@ -19,6 +19,13 @@ vi.mock('../../src/linter/source-code/esquery-utils', async () => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     const realEsquery = (await vi.importActual<typeof import('esquery')>('esquery'));
 
+    /**
+     * Parses a selector string into an AST.
+     *
+     * @param selector The selector string to parse.
+     *
+     * @returns The parsed AST.
+     */
     function parse(selector: string): SelectorAst {
         const ast = realEsquery.parse(selector) as unknown as SelectorAst;
         astToSelector.set(ast as any, selector);
@@ -28,6 +35,13 @@ vi.mock('../../src/linter/source-code/esquery-utils', async () => {
     // Very small heuristic:
     // - return null (GLOBAL) for: "*", attribute-only (starts with '['), or complex (contains space, >, +, ~, ,)
     // - otherwise return the first identifier as the candidate type (TYPED)
+    /**
+     * Returns the candidate types for a given AST.
+     *
+     * @param ast The AST to get candidate types for.
+     *
+     * @returns The candidate types for the AST.
+     */
     function getCandidateTypes(ast: object): Set<string> | null {
         const sel = astToSelector.get(ast) ?? '';
         if (

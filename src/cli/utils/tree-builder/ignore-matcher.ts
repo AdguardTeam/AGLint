@@ -9,8 +9,18 @@ import { type IgnoreChainEntry } from './types';
  * Handles hierarchical .aglintignore files with proper scoping.
  */
 export class IgnoreMatcher {
+    /**
+     * Array of matchers, each containing a directory and its corresponding ignore instance.
+     */
     private matchers: Array<{ directory: string; ig: Ignore }> = [];
 
+    /**
+     * Creates a new ignore matcher.
+     *
+     * @param pathAdapter Path adapter for path operations.
+     * @param root Root directory path.
+     * @param ignoreChain Array of ignore chain entries.
+     */
     constructor(
         private pathAdapter: PathAdapter,
         private root: string,
@@ -31,8 +41,9 @@ export class IgnoreMatcher {
     /**
      * Checks if a path should be ignored.
      *
-     * @param targetPath Absolute path to check
-     * @returns True if the path should be ignored
+     * @param targetPath Absolute path to check.
+     *
+     * @returns True if the path should be ignored.
      */
     public isIgnored(targetPath: string): boolean {
         const absPath = this.pathAdapter.resolve(targetPath);

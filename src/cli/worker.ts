@@ -12,30 +12,96 @@ import { type LinterCliConfig } from './cli-options';
 const fsPromises = import('node:fs/promises');
 const { readFile, writeFile } = await fsPromises;
 
+/**
+ * Represents a single file linting task for a worker thread.
+ */
 export type LinterWorkerTask = {
+    /**
+     * Absolute path to the file to lint.
+     */
     filePath: string;
+
+    /**
+     * Current working directory.
+     */
     cwd: string;
+
+    /**
+     * Linter configuration for this file.
+     */
     linterConfig: LinterConfig;
+
+    /**
+     * Optional cached data if cache is enabled.
+     */
     fileCacheData?: CacheFileData;
 };
 
+/**
+ * Collection of tasks and configuration for a worker thread.
+ */
 export type LinterWorkerTasks = {
+    /**
+     * Array of file tasks to process.
+     */
     tasks: LinterWorkerTask[];
+
+    /**
+     * CLI configuration options.
+     */
     cliConfig: LinterCliConfig;
 };
 
+/**
+ * Result of linting a single file in a worker thread.
+ */
 export type LinterWorkerResult = {
+    /**
+     * The linting result (with or without fixes).
+     */
     linterResult: AnyLinterResult;
+
+    /**
+     * Whether the result was retrieved from cache.
+     */
     fromCache: boolean;
+
+    /**
+     * Content hash if computed (for content-based caching).
+     */
     fileHash?: string;
 };
 
+/**
+ * Collection of results from processing multiple files in a worker thread.
+ */
 export type LinterWorkerResults = {
+    /**
+     * Array of results corresponding to the input tasks.
+     */
     results: LinterWorkerResult[];
 };
 
+/**
+ * Cache for loaded rule modules to avoid repeated imports.
+ */
 const ruleCache = new Map<string, LinterRule>();
 
+/**
+ * Worker function that processes linting tasks.
+ *
+ * Handles:
+ * - Cache validation and usage
+ * - File reading and hashing
+ * - Linting with or without fixes
+ * - Writing fixed files back to disk.
+ *
+ * This function runs in worker threads for parallel processing.
+ *
+ * @param tasks Collection of files to lint and configuration.
+ *
+ * @returns Results for all processed files.
+ */
 const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerResults> => {
     const promises = tasks.tasks.map(async (task): Promise<LinterWorkerResult> => {
         // Check if we have valid cached data

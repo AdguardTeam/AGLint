@@ -21,6 +21,9 @@ import { fileExists } from './utils/file-exists';
  * Linter CLI initialization wizard.
  */
 export class LinterCliInitWizard {
+    /**
+     * Current working directory.
+     */
     private cwd: string;
 
     /**
@@ -34,6 +37,8 @@ export class LinterCliInitWizard {
 
     /**
      * Checks if a config file already exists in the current directory.
+     *
+     * @param cwd Current working directory.
      *
      * @throws Error if a config file already exists.
      */

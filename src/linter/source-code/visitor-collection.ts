@@ -52,8 +52,8 @@ export class LinterVisitorCollection {
      * Multiple visitors can be registered for the same selector.
      * They will all be called when a matching node is encountered.
      *
-     * @param selector - CSS-like selector string (e.g., 'NetworkRule', 'CssInjectionRuleBody > Value')
-     * @param visitor - Function to call when the selector matches
+     * @param selector CSS-like selector string (e.g., 'NetworkRule', 'CssInjectionRuleBody > Value').
+     * @param visitor Function to call when the selector matches.
      *
      * @example
      * ```typescript
@@ -74,7 +74,7 @@ export class LinterVisitorCollection {
     /**
      * Registers multiple visitors at once.
      *
-     * @param entries - Object mapping selectors to arrays of visitor functions
+     * @param entries Object mapping selectors to arrays of visitor functions.
      *
      * @example
      * ```typescript
@@ -93,7 +93,7 @@ export class LinterVisitorCollection {
     /**
      * Returns all registered visitors.
      *
-     * @returns Object mapping selectors to their visitor functions
+     * @returns Object mapping selectors to their visitor functions.
      */
     public getVisitors(): SelectorsWithVisitors {
         return this.visitors;

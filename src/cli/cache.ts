@@ -11,10 +11,25 @@ import { type LinterResult, linterResultSchema } from '../linter/linter';
 
 import { toPosix } from './utils/to-posix';
 
+/**
+ * Default cache file name.
+ */
 export const CACHE_FILE_NAME = '.aglintcache';
 
+/**
+ * Cache invalidation strategies.
+ */
 export enum LinterCacheStrategy {
+    /**
+     * Invalidate cache based on file content hash.
+     * More accurate but slower as it requires reading file contents.
+     */
     Content = 'content',
+
+    /**
+     * Invalidate cache based on file metadata (mtime, size).
+     * Faster but less accurate.
+     */
     Metadata = 'metadata',
 }
 
@@ -30,6 +45,9 @@ const cacheFileDataSchema = v.object({
     linterResult: linterResultSchema,
 });
 
+/**
+ * Cached data for a single file.
+ */
 export type CacheFileData = v.InferOutput<typeof cacheFileDataSchema>;
 
 const cacheFileSchema = v.object({
@@ -40,27 +58,70 @@ const cacheFileSchema = v.object({
 
 type LinterCacheFile = v.InferOutput<typeof cacheFileSchema>;
 
+/**
+ * Computes a hash of file content using BLAKE2b-512.
+ *
+ * @param content File content to hash.
+ *
+ * @returns Hex-encoded hash string.
+ */
 export const getFileHash = (content: string): string => {
     return crypto.createHash('blake2b512').update(content).digest('hex');
 };
 
+/**
+ * Manages caching of linter results to improve performance on subsequent runs.
+ *
+ * Supports two caching strategies:
+ * - Metadata: Fast but less accurate, based on file mtime and size
+ * - Content: Slower but accurate, based on file content hash.
+ */
 export class LintResultCache {
+    /**
+     * Cache file format version.
+     */
     private static readonly CACHE_VERSION = '1';
 
+    /**
+     * Current working directory.
+     */
     private readonly cwd: string;
 
+    /**
+     * Path to the cache file.
+     */
     private readonly cacheFilePath: string;
 
+    /**
+     * In-memory cache data.
+     */
     private readonly data: LinterCacheFile;
 
+    /**
+     * Cache for linter config hashes to avoid recomputing.
+     */
     private static linterConfigHashCache = new WeakMap<LinterConfig, string>();
 
+    /**
+     * Private constructor. Use `create()` to instantiate.
+     *
+     * @param cwd Current working directory.
+     * @param cacheFilePath Path to the cache file.
+     * @param data In-memory cache data.
+     */
     private constructor(cwd: string, cacheFilePath: string, data: LinterCacheFile) {
         this.cwd = cwd;
         this.cacheFilePath = cacheFilePath;
         this.data = data;
     }
 
+    /**
+     * Computes or retrieves cached hash of linter configuration.
+     *
+     * @param config Linter configuration to hash.
+     *
+     * @returns Hash string.
+     */
     private static getLinterConfigHash = (config: LinterConfig): string => {
         if (LintResultCache.linterConfigHashCache.has(config)) {
             return LintResultCache.linterConfigHashCache.get(config)!;
@@ -78,10 +139,10 @@ export class LintResultCache {
      * If it's a directory, creates a unique cache filename using hash of cwd.
      * Similar to ESLint's getCacheFile function.
      *
-     * @param cwd Current working directory
-     * @param cacheFilePath The cache file path (can be relative or absolute)
+     * @param cwd Current working directory.
+     * @param cacheFilePath The cache file path (can be relative or absolute).
      *
-     * @returns The resolved absolute path to the cache file
+     * @returns The resolved absolute path to the cache file.
      */
     private static resolveAbsoluteCachePath = async (
         cwd: string,
@@ -99,7 +160,9 @@ export class LintResultCache {
 
         /**
          * Return the cache filename for a directory by creating a unique name
-         * based on the hash of the cwd
+         * based on the hash of the cwd.
+         *
+         * @returns The cache filename for a directory.
          */
         const getCacheFileForDirectory = (): string => {
             const cwdHash = hashObject(cwd);
@@ -135,6 +198,11 @@ export class LintResultCache {
         }
     };
 
+    /**
+     * Creates an empty cache file structure.
+     *
+     * @returns Empty cache file with current version information.
+     */
     private static createEmptyCacheFile(): LinterCacheFile {
         return {
             linterVersion: version,
@@ -145,9 +213,11 @@ export class LintResultCache {
 
     /**
      * Creates a new cache instance by loading from disk or creating empty.
-     * @param cwd Current working directory
-     * @param cacheFilePath Path to cache file
-     * @returns A new LintResultCache instance
+     *
+     * @param cwd Current working directory.
+     * @param cacheFilePath Path to cache file.
+     *
+     * @returns A new LintResultCache instance.
      */
     public static async create(cwd: string, cacheFilePath: string): Promise<LintResultCache> {
         const absoluteCachePath = await LintResultCache.resolveAbsoluteCachePath(cwd, cacheFilePath);
@@ -172,13 +242,13 @@ export class LintResultCache {
     /**
      * Gets cached result for a file if valid.
      *
-     * @param filePath Absolute file path
-     * @param mtime File modification time
-     * @param size File size
-     * @param linterConfig Linter configuration
-     * @param strategy Cache strategy to use
+     * @param filePath Absolute file path.
+     * @param mtime File modification time.
+     * @param size File size.
+     * @param linterConfig Linter configuration.
+     * @param strategy Cache strategy to use.
      *
-     * @returns Cached data if valid, undefined otherwise
+     * @returns Cached data if valid, undefined otherwise.
      */
     public getCachedResult(
         filePath: string,
@@ -217,12 +287,12 @@ export class LintResultCache {
     /**
      * Sets cached result for a file.
      *
-     * @param filePath Absolute file path
-     * @param mtime File modification time
-     * @param size File size
-     * @param linterConfig Linter configuration
-     * @param result Linter result
-     * @param contentHash Optional content hash for content-based caching
+     * @param filePath Absolute file path.
+     * @param mtime File modification time.
+     * @param size File size.
+     * @param linterConfig Linter configuration.
+     * @param result Linter result.
+     * @param contentHash Optional content hash for content-based caching.
      */
     public setCachedResult(
         filePath: string,
@@ -249,7 +319,11 @@ export class LintResultCache {
     }
 
     /**
-     * Gets the raw cache data (for passing to workers in parallel mode).
+     * Gets the raw cache data.
+     *
+     * Useful for passing cache data to worker threads in parallel mode.
+     *
+     * @returns Complete cache file data.
      */
     public getData(): LinterCacheFile {
         return this.data;

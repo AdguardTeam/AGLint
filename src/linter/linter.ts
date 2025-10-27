@@ -71,14 +71,14 @@ const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
  * 4. Processes inline config comments (if enabled)
  * 5. Walks the AST and triggers rule visitors
  * 6. Applies disable directives to filter problems
- * 7. Summarizes results by severity
+ * 7. Summarizes results by severity.
  *
- * @param options - Linter run options including file props, config, and rule loader
+ * @param options Linter run options including file props, config, and rule loader.
  *
- * @returns Promise resolving to linter result with problems and severity counts
+ * @returns Promise resolving to linter result with problems and severity counts.
  *
- * @throws Error if configuration is invalid
- * @throws Error if a required rule cannot be loaded
+ * @throws Error if configuration is invalid.
+ * @throws Error if a required rule cannot be loaded.
  *
  * @example
  * ```typescript

@@ -23,18 +23,46 @@ const mergeOptions: deepMerge.Options = {
  * Supports incremental updates and cache invalidation.
  */
 export class LinterTree {
+    /**
+     * The root directory node.
+     */
     private root: DirectoryNode;
 
+    /**
+     * Map of absolute paths to directory nodes for fast lookup.
+     */
     private nodeCache: Map<string, DirectoryNode> = new Map();
 
-    private scannedDirs: Set<string> = new Set(); // Track which dirs have been scanned
+    /**
+     * Set of directories that have been scanned for config and ignore files.
+     */
+    private scannedDirs: Set<string> = new Set();
 
+    /**
+     * Cache of ignore chains by directory path.
+     */
     private ignoreChainCache: Map<string, IgnoreChainEntry[]> = new Map();
 
+    /**
+     * Cache of config chains by directory path.
+     */
     private configChainCache: Map<string, ConfigChainEntry[]> = new Map();
 
+    /**
+     * Cache of resolved merged configurations by directory path.
+     */
     private resolvedConfigCache: Map<string, LinterConfigFile> = new Map();
 
+    /**
+     * Creates a new linter tree instance.
+     *
+     * @param fs File system adapter for file operations.
+     * @param pathAdapter Path adapter for path operations.
+     * @param options Tree configuration options.
+     * @param configResolver Optional config resolver.
+     * @param configResolver.resolve Function to resolve config files.
+     * @param configResolver.isRoot Function to check if config is root.
+     */
     constructor(
         private fs: FileSystemAdapter,
         private pathAdapter: PathAdapter,
@@ -57,7 +85,7 @@ export class LinterTree {
     /**
      * Adds a file to the tree, creating intermediate directories as needed.
      *
-     * @param filePath Absolute path to the file
+     * @param filePath Absolute path to the file.
      */
     public async addFile(filePath: string): Promise<void> {
         const absPath = this.pathAdapter.resolve(filePath);
@@ -77,7 +105,9 @@ export class LinterTree {
      * Ensures a directory node exists in the tree, creating parent nodes as needed.
      * Scans for .aglintignore and config files in the directory.
      *
-     * @param dirPath Absolute path to the directory
+     * @param dirPath Absolute path to the directory.
+     *
+     * @returns The directory node.
      */
     private async ensureDirectory(dirPath: string): Promise<DirectoryNode> {
         const absDirPath = this.pathAdapter.resolve(dirPath);
@@ -131,8 +161,9 @@ export class LinterTree {
      * Gets the ignore chain for a given path.
      * Returns ignore files from the path's directory up to the root.
      *
-     * @param targetPath Absolute path to file or directory
-     * @returns Array of ignore chain entries (closest first)
+     * @param targetPath Absolute path to file or directory.
+     *
+     * @returns Array of ignore chain entries (closest first).
      */
     public async getIgnoreChain(targetPath: string): Promise<IgnoreChainEntry[]> {
         const absPath = this.pathAdapter.resolve(targetPath);
@@ -183,8 +214,9 @@ export class LinterTree {
      * Gets the config chain for a given path.
      * Returns config files from the path's directory up to a root config or filesystem root.
      *
-     * @param targetPath Absolute path to file or directory
-     * @returns Array of config chain entries (closest first)
+     * @param targetPath Absolute path to file or directory.
+     *
+     * @returns Array of config chain entries (closest first).
      */
     public async getConfigChain(targetPath: string): Promise<ConfigChainEntry[]> {
         const absPath = this.pathAdapter.resolve(targetPath);
@@ -251,9 +283,11 @@ export class LinterTree {
      * Returns the final merged config after resolving the entire chain.
      * This is more efficient than calling getConfigChain + resolver separately.
      *
-     * @param targetPath Absolute path to file or directory
-     * @returns Resolved linter config
-     * @throws Error if no config resolver was provided in constructor
+     * @param targetPath Absolute path to file or directory.
+     *
+     * @returns Resolved linter config.
+     *
+     * @throws Error if no config resolver was provided in constructor.
      */
     public async getResolvedConfig(targetPath: string): Promise<LinterConfigFile> {
         const absPath = this.pathAdapter.resolve(targetPath);
@@ -289,8 +323,9 @@ export class LinterTree {
      * Invalidates caches when a file changes.
      * Clears cached ignore and config chains for affected directories.
      *
-     * @param changedPath Absolute path to the changed file
-     * @throws Error if file does not exist
+     * @param changedPath Absolute path to the changed file.
+     *
+     * @throws Error if file does not exist.
      */
     public async changed(changedPath: string): Promise<void> {
         const absPath = this.pathAdapter.resolve(changedPath);
@@ -346,8 +381,9 @@ export class LinterTree {
     /**
      * Gets the directory node for a path (for debugging/inspection).
      *
-     * @param dirPath Absolute directory path
-     * @returns Directory node or undefined
+     * @param dirPath Absolute directory path.
+     *
+     * @returns Directory node or undefined.
      */
     public getNode(dirPath: string): DirectoryNode | undefined {
         return this.nodeCache.get(this.pathAdapter.resolve(dirPath));
@@ -357,9 +393,10 @@ export class LinterTree {
      * Merges two configs, with the second config taking precedence.
      * Deeply merges the rules object.
      *
-     * @param base Base config
-     * @param override Override config
-     * @returns Merged config
+     * @param base Base config.
+     * @param override Override config.
+     *
+     * @returns Merged config.
      */
     private static mergeConfigs(base: LinterConfigFile, override: LinterConfigFile): LinterConfigFile {
         return deepMerge(base, override, mergeOptions);
@@ -369,8 +406,9 @@ export class LinterTree {
      * Checks if a path should be ignored based on .aglintignore files.
      * Uses the ignore chain to determine if the path matches any ignore patterns.
      *
-     * @param targetPath Absolute path to file or directory
-     * @returns True if the path should be ignored
+     * @param targetPath Absolute path to file or directory.
+     *
+     * @returns True if the path should be ignored.
      */
     public async isIgnored(targetPath: string): Promise<boolean> {
         const ignoreChain = await this.getIgnoreChain(targetPath);

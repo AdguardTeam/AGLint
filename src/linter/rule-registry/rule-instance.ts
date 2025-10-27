@@ -56,11 +56,11 @@ export class LinterRuleInstance {
     /**
      * Creates a new linter rule instance.
      *
-     * @param id - The unique identifier for this rule
-     * @param rule - The rule definition
-     * @param config - The rule configuration (severity and optional parameters)
+     * @param id The unique identifier for this rule.
+     * @param rule The rule definition.
+     * @param config The rule configuration (severity and optional parameters).
      *
-     * @throws Error if the configuration is invalid
+     * @throws Error if the configuration is invalid.
      */
     constructor(id: string, rule: LinterRule, config: LinterRuleConfig) {
         this.id = id;
@@ -73,7 +73,7 @@ export class LinterRuleInstance {
     /**
      * Returns the unique identifier of this rule instance.
      *
-     * @returns The rule ID
+     * @returns The rule ID.
      */
     public getId(): string {
         return this.id;
@@ -82,7 +82,7 @@ export class LinterRuleInstance {
     /**
      * Returns the current severity level of this rule.
      *
-     * @returns The severity level (Off, Warning, or Error)
+     * @returns The severity level (Off, Warning, or Error).
      */
     public getSeverity(): LinterRuleSeverity {
         return this.severity;
@@ -91,7 +91,7 @@ export class LinterRuleInstance {
     /**
      * Returns the parsed configuration for this rule.
      *
-     * @returns The rule configuration array (excluding severity)
+     * @returns The rule configuration array (excluding severity).
      */
     public getConfig(): LinterRuleBaseConfig {
         return this.config;
@@ -100,7 +100,7 @@ export class LinterRuleInstance {
     /**
      * Checks if this rule provides automatic fixes.
      *
-     * @returns True if the rule can automatically fix issues
+     * @returns True if the rule can automatically fix issues.
      */
     public hasFix(): boolean {
         return !!this.rule.meta.hasFix;
@@ -109,7 +109,7 @@ export class LinterRuleInstance {
     /**
      * Checks if this rule provides suggestions for fixes.
      *
-     * @returns True if the rule can provide manual fix suggestions
+     * @returns True if the rule can provide manual fix suggestions.
      */
     public hasSuggestions(): boolean {
         return !!this.rule.meta.hasSuggestions;
@@ -118,7 +118,7 @@ export class LinterRuleInstance {
     /**
      * Returns the type of this rule.
      *
-     * @returns The rule type (Problem, Suggestion, or Layout)
+     * @returns The rule type (Problem, Suggestion, or Layout).
      */
     public getType(): LinterRuleType {
         return this.rule.meta.type;
@@ -131,11 +131,11 @@ export class LinterRuleInstance {
      * validates additional configuration parameters against the rule's schema,
      * and applies default values if needed.
      *
-     * @param config - The new rule configuration (severity or [severity, ...options])
+     * @param config The new rule configuration (severity or [severity, ...options]).
      *
-     * @throws Error if the configuration format is invalid
-     * @throws Error if the rule doesn't accept configuration but options were provided
-     * @throws Error if the configuration options don't match the rule's schema
+     * @throws Error if the configuration format is invalid.
+     * @throws Error if the rule doesn't accept configuration but options were provided.
+     * @throws Error if the configuration options don't match the rule's schema.
      *
      * @example
      * ```typescript
@@ -200,9 +200,9 @@ export class LinterRuleInstance {
      * If the report contains a messageId, it looks up the template from the rule's
      * messages and renders it with the provided data. Direct messages take precedence.
      *
-     * @param report - The problem report containing either a message or messageId
+     * @param report The problem report containing either a message or messageId.
      *
-     * @returns The formatted message string
+     * @returns The formatted message string.
      *
      * @example
      * ```typescript
@@ -245,10 +245,10 @@ export class LinterRuleInstance {
      * configuration and a report function, then invokes the rule's create function
      * to generate the visitor map.
      *
-     * @param baseContext - The base linting context (source code, file path, etc.)
-     * @param reporter - Optional function to report problems found by the rule
+     * @param baseContext The base linting context (source code, file path, etc.).
+     * @param reporter Optional function to report problems found by the rule.
      *
-     * @returns A map of CSS selectors to visitor functions
+     * @returns A map of CSS selectors to visitor functions.
      *
      * @example
      * ```typescript

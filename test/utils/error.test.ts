@@ -11,7 +11,15 @@ describe('error utilities', () => {
         });
 
         test('should extract message from custom Error subclasses', () => {
+            /**
+             * Test class for getErrorMessage.
+             */
             class CustomError extends Error {
+                /**
+                 * Constructor for CustomError.
+                 *
+                 * @param message The error message.
+                 */
                 constructor(message: string) {
                     super(message);
                     this.name = 'CustomError';
@@ -158,7 +166,15 @@ describe('error utilities', () => {
         });
 
         test('should format custom Error subclasses', () => {
+            /**
+             * Test class for getFormattedError.
+             */
             class CustomError extends Error {
+                /**
+                 * Constructor for CustomError.
+                 *
+                 * @param message The error message.
+                 */
                 constructor(message: string) {
                     super(message);
                     this.name = 'CustomError';

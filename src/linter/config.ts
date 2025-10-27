@@ -45,6 +45,7 @@ const getOffsetFromNodeSchema = v.pipe(
  * corresponds to a particular node.
  *
  * @param node The AST node from which to extract the offset.
+ *
  * @returns The absolute character offset within the source code.
  */
 export type GetOffsetFromNode = v.InferOutput<typeof getOffsetFromNodeSchema>;

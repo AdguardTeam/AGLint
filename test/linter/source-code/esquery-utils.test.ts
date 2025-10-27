@@ -7,6 +7,7 @@ import { EsQueryUtils } from '../../../src/linter/source-code/esquery-utils';
  * Helper to normalize the `Set<string> | null` into a sorted array or `null`.
  *
  * @param selector The esquery selector string to parse.
+ *
  * @returns A sorted array of node types that match the selector, or `null` if the selector doesn't narrow the subject.
  */
 function candidatesOf(selector: string): string[] | null {

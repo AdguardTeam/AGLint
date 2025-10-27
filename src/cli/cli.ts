@@ -31,6 +31,19 @@ import { LinterTree } from './utils/tree-builder';
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Main CLI entry point.
+ *
+ * Orchestrates the complete linting workflow:
+ * 1. Parses CLI arguments and options
+ * 2. Builds the project file tree with configurations
+ * 3. Matches files based on patterns and ignore rules
+ * 4. Handles special commands (--init)
+ * 5. Sets up caching if enabled
+ * 6. Determines execution strategy (sequential vs parallel)
+ * 7. Runs linting with the chosen strategy
+ * 8. Reports results and exits with appropriate code.
+ */
 const main = async () => {
     try {
         const cwd = process.cwd();

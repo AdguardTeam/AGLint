@@ -26,13 +26,16 @@ export const DEFAULT_IGNORE_PATTERNS: readonly string[] = [
  * 2. Validates that file patterns exist
  * 3. Matches glob patterns
  * 4. Applies default ignore patterns (e.g., node_modules)
- * 5. Throws error if any pattern matches nothing
+ * 5. Throws error if any pattern matches nothing.
  *
- * @param patterns - Array of file paths, directory paths, or glob patterns
- * @param fs - File system adapter
- * @param options - Pattern matching options
- * @returns Promise resolving to match result with files and pattern map
- * @throws {NoFilesForPattern} If any pattern matches no files
+ * @param patterns Array of file paths, directory paths, or glob patterns.
+ * @param fs File system adapter.
+ * @param pathAdapter Path adapter for path operations.
+ * @param options Pattern matching options.
+ *
+ * @returns Promise resolving to match result with files and pattern map.
+ *
+ * @throws {NoFilesForPattern} If any pattern matches no files.
  */
 export async function matchPatterns(
     patterns: string[],

@@ -7,7 +7,7 @@ import { type LinterRuntime } from '../core/runtime';
  * Invokes the walker to traverse the entire AST (including sub-ASTs)
  * and trigger all registered visitor callbacks from active rules.
  *
- * @param runtime - The linter runtime environment with walker and visitors
+ * @param runtime The linter runtime environment with walker and visitors.
  *
  * @example
  * ```typescript

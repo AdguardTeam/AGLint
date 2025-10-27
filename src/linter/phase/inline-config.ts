@@ -42,15 +42,15 @@ export type DisableComment = {
  *
  * This function handles two types of inline comments:
  * 1. Configuration comments that modify rule settings on-the-fly
- *    (e.g., `! aglint "rule-1": "off"`)
+ *    (e.g., `! Aglint "rule-1": "off"`)
  * 2. Disable/enable directives that control rule activation
- *    (e.g., `! aglint-disable rule-1`, `! aglint-enable`)
+ *    (e.g., `! Aglint-disable rule-1`, `! Aglint-enable`).
  *
- * @param runtime - The linter runtime environment
+ * @param runtime The linter runtime environment.
  *
  * @returns An object containing:
  * - `onConfigComment`: Visitor function to attach to ConfigCommentRule nodes
- * - `disabled`: Array of disable directives found during traversal
+ * - `disabled`: Array of disable directives found during traversal.
  */
 export function makeConfigCommentVisitor(runtime: LinterRuntime) {
     const disabled: DisableComment[] = [];

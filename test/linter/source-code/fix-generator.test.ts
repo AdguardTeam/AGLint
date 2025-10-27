@@ -17,9 +17,24 @@ vi.mock('../../utils/type-guards', () => ({
 }));
 
 // Minimal mock for LinterSourceCode
+/**
+ * Mock implementation of LinterSourceCode for testing.
+ */
 class MockLinterSourceCode {
+    /**
+     * Constructor for MockLinterSourceCode.
+     *
+     * @param validRanges Array of valid ranges for the source code.
+     */
     constructor(private readonly validRanges: Array<[number, number]> = []) {}
 
+    /**
+     * Checks if a range is valid.
+     *
+     * @param range The range to check.
+     *
+     * @returns True if the range is valid, false otherwise.
+     */
     public isRangeValid(range: [number, number]): boolean {
         return this.validRanges.some(([start, end]) => range[0] >= start && range[1] <= end);
     }

@@ -70,7 +70,7 @@ type SubAst = {
  * `Enter` phase, it extracts the relevant source range, invokes the sub-parser, and
  * recursively traverses the resulting sub-AST using the same visitor set.
  *
- * ### Typical Usage
+ * ### Typical Usage.
  * ```ts
  * const walker = new LinterSourceCodeWalker(sourceCode, subParsers);
  * walker.walk(visitors);
@@ -85,10 +85,19 @@ type SubAst = {
  * @see Parser
  */
 export class LinterSourceCodeWalker {
+    /**
+     * The universal selector used to match all nodes.
+     */
     private static readonly UNIVERSAL_SELECTOR = '*';
 
+    /**
+     * The source code to walk.
+     */
     private readonly sourceCode: LinterSourceCode;
 
+    /**
+     * Maps nodes to their corresponding parsers.
+     */
     private readonly nodeParserMap = new WeakMap<AnyNode, Parser>();
 
     /**
@@ -116,8 +125,18 @@ export class LinterSourceCodeWalker {
      */
     private readonly universalSubSelectors: [Parser, esquery.Selector][] = [];
 
+    /**
+     * Callback function to be called when a parse error occurs.
+     */
     private readonly onParseError?: OnParseError;
 
+    /**
+     * Creates an instance of LinterSourceCodeWalker.
+     *
+     * @param sourceCode The source code to walk.
+     * @param subParsers Sub-parsers to use for parsing specific parts of the source code.
+     * @param onParseError Callback function to be called when a parse error occurs.
+     */
     constructor(
         sourceCode: LinterSourceCode,
         subParsers: LinterSubParsersConfig,
@@ -148,6 +167,7 @@ export class LinterSourceCodeWalker {
      * Returns the parser associated with the given node, if any.
      *
      * @param node The node to query.
+     *
      * @returns The parser associated with the node, or null if none is found.
      */
     public getParser(node: AnyNode): Parser | null {
@@ -173,6 +193,10 @@ export class LinterSourceCodeWalker {
         /**
          * Parses a sub-AST for the given host node with the given parser (once),
          * registers it, and immediately walks it with the same user selectors.
+         *
+         * @param hostNode The host node to parse.
+         * @param ancestry The ancestry of the host node.
+         * @param parser The parser to use for parsing the sub-AST.
          */
         const parseAndWalkSub = (hostNode: AnyNode, ancestry: AnyNode[], parser: Parser): void => {
             // Idempotency guard: one parse per (host node × parser namespace)
@@ -272,6 +296,10 @@ export class LinterSourceCodeWalker {
         /**
          * Internal “*” visitor that runs on **Enter** and decides whether to sub-parse the current node.
          * Uses type-indexed selector candidates for efficiency, then falls back to universal selectors.
+         *
+         * @param node The node to visit.
+         * @param _parent The parent node of the node to visit.
+         * @param ancestry The ancestry of the node to visit.
          */
         const internalStar: Visitor = (node, _parent, ancestry) => {
             // This visitor always runs on "enter" phase implicitly.

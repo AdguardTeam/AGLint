@@ -18,8 +18,8 @@ export class LinterSourceCodeError extends Error {
     /**
      * Creates a new source code error.
      *
-     * @param message - Description of the parse error
-     * @param location - Position range where the error occurred
+     * @param message Description of the parse error.
+     * @param location Position range where the error occurred.
      */
     constructor(
         message: string,

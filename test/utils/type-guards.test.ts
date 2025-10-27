@@ -261,6 +261,9 @@ describe('type-guards', () => {
         });
 
         test('should return true for class instances', () => {
+            /**
+             * Test class for isObject.
+             */
             class TestClass {}
             expect(isObject(new TestClass())).toBe(true);
             expect(isObject(new Date())).toBe(true);

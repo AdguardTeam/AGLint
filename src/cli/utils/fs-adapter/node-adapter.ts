@@ -11,10 +11,12 @@ import { type FileStats, type FileSystemAdapter, type GlobOptions } from './type
  * Node.js file system adapter implementation.
  */
 export class NodeFileSystemAdapter implements FileSystemAdapter {
+    /** @inheritdoc */
     public async readFile(path: string): Promise<string> {
         return fs.readFile(path, 'utf8');
     }
 
+    /** @inheritdoc */
     public async stat(path: string): Promise<FileStats> {
         const stats = await fs.stat(path);
         return {
@@ -25,10 +27,12 @@ export class NodeFileSystemAdapter implements FileSystemAdapter {
         };
     }
 
+    /** @inheritdoc */
     public async exists(path: string): Promise<boolean> {
         return fileExists(path);
     }
 
+    /** @inheritdoc */
     public async glob(patterns: string[], options: GlobOptions): Promise<string[]> {
         return fastGlob(patterns, {
             cwd: options.cwd,

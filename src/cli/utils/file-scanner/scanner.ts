@@ -10,6 +10,13 @@ import { type ScannedFile } from './types';
  * Provides an async iterator for efficient memory usage.
  */
 export class LinterFileScanner {
+    /**
+     * Creates a new LinterFileScanner instance.
+     *
+     * @param tree The linter tree to use for file scanning.
+     * @param configResolver The config resolver to use for resolving configs.
+     * @param fs The file system adapter to use for file operations.
+     */
     constructor(
         private tree: LinterTree,
         private configResolver: ConfigResolver,
@@ -20,8 +27,9 @@ export class LinterFileScanner {
      * Scans files, filters ignored ones, and yields files with resolved configs.
      * Uses async generator for memory efficiency - processes files lazily.
      *
-     * @param filePaths Array of absolute file paths to scan
-     * @yields ScannedFile objects with path, config, and metadata
+     * @param filePaths Array of absolute file paths to scan.
+     *
+     * @yields ScannedFile objects with path, config, and metadata.
      */
     public async* scan(filePaths: string[]): AsyncGenerator<ScannedFile> {
         for (const filePath of filePaths) {
@@ -57,8 +65,9 @@ export class LinterFileScanner {
      * Scans files and returns them as an array (convenience method).
      * Use scan() generator for better memory efficiency with large file sets.
      *
-     * @param filePaths Array of absolute file paths to scan
-     * @returns Array of scanned files
+     * @param filePaths Array of absolute file paths to scan.
+     *
+     * @returns Array of scanned files.
      */
     public async scanAll(filePaths: string[]): Promise<ScannedFile[]> {
         const results: ScannedFile[] = [];
@@ -72,9 +81,10 @@ export class LinterFileScanner {
      * Scans files in batches for parallel processing.
      * Useful when you want to process files in chunks.
      *
-     * @param filePaths Array of absolute file paths to scan
-     * @param batchSize Number of files per batch
-     * @yields Batches of scanned files
+     * @param filePaths Array of absolute file paths to scan.
+     * @param batchSize Number of files per batch.
+     *
+     * @yields Batches of scanned files.
      */
     public async* scanBatches(
         filePaths: string[],

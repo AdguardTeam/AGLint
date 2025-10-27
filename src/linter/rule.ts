@@ -339,6 +339,13 @@ export function defineRule(
     },
 ): LinterRule<DefaultElements>;
 
+/**
+ * Defines a new rule.
+ *
+ * @param rule The rule to define.
+ *
+ * @returns The defined rule.
+ */
 export function defineRule(rule: any): any {
     const configSchema = rule?.meta?.configSchema ?? DEFAULT_TUPLE_SCHEMA;
 

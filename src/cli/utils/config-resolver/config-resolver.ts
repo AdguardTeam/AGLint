@@ -33,10 +33,23 @@ const mergeOptions = {
  * Handles extends, presets, and config chains from LinterTree.
  */
 export class ConfigResolver {
+    /**
+     * Cache of resolved configs.
+     */
     private cache: Map<string, ConfigCacheEntry> = new Map();
 
+    /**
+     * Preset resolver for resolving preset references.
+     */
     private presetResolver: PresetResolver;
 
+    /**
+     * Creates a new ConfigResolver instance.
+     *
+     * @param fs The file system adapter to use for file operations.
+     * @param pathAdapter The path adapter to use for path operations.
+     * @param options The config resolver options.
+     */
     constructor(
         private fs: FileSystemAdapter,
         private pathAdapter: PathAdapter,
@@ -48,8 +61,9 @@ export class ConfigResolver {
     /**
      * Resolves a single config file, flattening extends.
      *
-     * @param configPath Absolute path to config file
-     * @returns Flattened linter config
+     * @param configPath Absolute path to config file.
+     *
+     * @returns Flattened linter config.
      */
     public async resolve(configPath: string): Promise<LinterConfig> {
         const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
@@ -66,8 +80,9 @@ export class ConfigResolver {
     /**
      * Checks if a config file has root: true.
      *
-     * @param configPath Absolute path to config file
-     * @returns True if config has root: true
+     * @param configPath Absolute path to config file.
+     *
+     * @returns True if config has root: true.
      */
     public async isRoot(configPath: string): Promise<boolean> {
         const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
@@ -88,8 +103,9 @@ export class ConfigResolver {
      * Resolves a config chain from LinterTree, merging all configs.
      * Later configs in the chain override earlier ones.
      *
-     * @param configChain Config chain from LinterTree.getConfigChain()
-     * @returns Merged linter config
+     * @param configChain Config chain from LinterTree.getConfigChain().
+     *
+     * @returns Merged linter config.
      */
     public async resolveChain(configChain: ConfigChainEntry[]): Promise<LinterConfig> {
         if (configChain.length === 0) {
@@ -112,7 +128,7 @@ export class ConfigResolver {
      * Invalidates cache for a config file.
      * Should be called when a config file changes.
      *
-     * @param configPath Absolute path to config file
+     * @param configPath Absolute path to config file.
      */
     public invalidate(configPath: string): void {
         const absPath = this.pathAdapter.toPosix(this.pathAdapter.resolve(configPath));
@@ -128,6 +144,11 @@ export class ConfigResolver {
 
     /**
      * Recursively resolves a config file with extends.
+     *
+     * @param configPath Absolute path to config file.
+     * @param seen Set of seen config paths to detect circular references.
+     *
+     * @returns Resolved config and metadata.
      */
     private async resolveRecursive(
         configPath: string,
@@ -203,6 +224,11 @@ export class ConfigResolver {
 
     /**
      * Parses config file content.
+     *
+     * @param content The content of the config file.
+     * @param filePath The path to the config file.
+     *
+     * @returns The parsed config file.
      */
     private static parseConfig(content: string, filePath: string): LinterConfigFile {
         try {

@@ -21,7 +21,7 @@ import { LinterVisitorCollection } from '../source-code/visitor-collection';
  * - Fix generator for automatic repairs
  * - Rule registry managing active rules
  * - Problems array collecting issues found
- * - Error handlers for parse failures
+ * - Error handlers for parse failures.
  */
 export type LinterRuntime = {
     /**
@@ -76,14 +76,14 @@ export type LinterRuntime = {
  * - Initializes the visitor collection
  * - Sets up the fix generator
  * - Creates the rule registry
- * - Wires up all components together
+ * - Wires up all components together.
  *
- * @param file - Properties of the file to lint (content, path, cwd)
- * @param config - Parsed linter configuration
- * @param loadRule - Function to dynamically load rule modules
- * @param subParsers - Configuration for sub-parsers (e.g., CSS, HTML)
+ * @param file Properties of the file to lint (content, path, cwd).
+ * @param config Parsed linter configuration.
+ * @param loadRule Function to dynamically load rule modules.
+ * @param subParsers Configuration for sub-parsers (e.g., CSS, HTML).
  *
- * @returns A fully initialized linter runtime ready for rule loading and AST traversal
+ * @returns A fully initialized linter runtime ready for rule loading and AST traversal.
  */
 export function createLinterRuntime(
     file: LinterFileProps,
