@@ -43,8 +43,8 @@ export default defineRule({
         };
 
         return {
-            CosmeticRule: handler,
-            NetworkRule: handler,
+            'FilterList > [type="Network"]': handler,
+            'FilterList > [type="Cosmetic"]': handler,
         };
     },
 });

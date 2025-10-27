@@ -78,13 +78,8 @@ export default defineRule({
         };
 
         return {
-            // FIXME, https://eslint.org/docs/latest/extend/code-path-analysis#events
-            // onRule(node: AnyRule) {
-            //     handler(node);
-            // },
-            // FIXME: Add all types
-            NetworkRule: handler,
-            // CosmeticRule: handler,
+            'FilterList > [type="Network"]': handler,
+            'FilterList > [type="Cosmetic"]': handler,
         };
     },
 });
