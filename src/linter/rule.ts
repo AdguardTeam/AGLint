@@ -84,12 +84,12 @@ export enum LinterRuleType {
     Layout = 'layout',
 }
 
-// const linterRuleTypeSchema = v.enum(LinterRuleType);
+const linterRuleTypeSchema = v.enum(LinterRuleType);
 
 /**
  * Represents the documentation of a linter rule.
  */
-const linterRuleDocsSchema = v.object({
+export const linterRuleDocsSchema = v.object({
     /**
      * The name of the rule.
      */
@@ -113,9 +113,62 @@ const linterRuleDocsSchema = v.object({
 
 type LinterRuleDocs = v.InferOutput<typeof linterRuleDocsSchema>;
 
-const linterRuleMessagesSchema = v.record(v.string(), v.string());
+export const linterRuleMessagesSchema = v.record(v.string(), v.string());
 
 type LinterRuleMessages = v.InferOutput<typeof linterRuleMessagesSchema>;
+
+/**
+ * Schema for validating rule metadata.
+ */
+export const linterRuleMetaSchema = v.object({
+    /**
+     * The type of the rule.
+     */
+    type: linterRuleTypeSchema,
+
+    /**
+     * The documentation of the rule.
+     */
+    docs: linterRuleDocsSchema,
+
+    /**
+     * Whether the rule has suggestions.
+     */
+    hasSuggestions: v.optional(v.boolean()),
+
+    /**
+     * Whether the rule has a fix.
+     */
+    hasFix: v.optional(v.boolean()),
+
+    /**
+     * The messages of the rule.
+     */
+    messages: v.optional(linterRuleMessagesSchema),
+
+    /**
+     * The configuration schema of the rule.
+     */
+    configSchema: v.optional(v.any()),
+});
+
+/**
+ * Schema for validating a complete linter rule.
+ */
+export const linterRuleSchema = v.object({
+    /**
+     * The metadata of the rule.
+     */
+    meta: linterRuleMetaSchema,
+
+    /**
+     * The create function of the rule.
+     */
+    create: v.pipe(
+        v.any(),
+        v.check((value) => typeof value === 'function', 'create must be a function'),
+    ),
+});
 
 /**
  * Represents the metadata of a linter rule.

@@ -4,7 +4,14 @@ import * as v from 'valibot';
 import { linterRuleConfigSchema } from './rule';
 import { anyNodeSchema } from './source-code/visitor-collection';
 
+/**
+ * Default key name used to identify node types in ASTs.
+ */
 export const DEFAULT_TYPE_KEY = 'type';
+
+/**
+ * Default key name used to access child nodes in ASTs.
+ */
 export const DEFAULT_CHILD_KEY = 'children';
 
 const parseFunctionSchema = v.pipe(
@@ -102,25 +109,86 @@ export type Parser = v.InferOutput<typeof parserSchema>;
  */
 export type ParseFunction = v.InferOutput<typeof parseFunctionSchema>;
 
+/**
+ * Schema for validating the rules configuration object.
+ */
 export const linterRulesConfigSchema = v.record(v.string(), linterRuleConfigSchema);
 
+/**
+ * Configuration object mapping rule names to their settings.
+ *
+ * @example
+ * ```typescript
+ * const rulesConfig: LinterRulesConfig = {
+ *   'no-short-rules': 'error',
+ *   'scriptlet-quotes': ['warn', { prefer: 'double' }]
+ * };
+ * ```
+ */
 export type LinterRulesConfig = v.InferOutput<typeof linterRulesConfigSchema>;
 
+/**
+ * Schema for validating the sub-parsers configuration object.
+ */
 export const linterSubParsersConfigSchema = v.record(v.string(), parserSchema);
 
+/**
+ * Configuration object mapping CSS selectors to sub-parser definitions.
+ *
+ * Each key is a selector that identifies which AST nodes should be parsed
+ * by the corresponding sub-parser.
+ *
+ * @example
+ * ```typescript
+ * const subParsers: LinterSubParsersConfig = {
+ *   'ElementHidingRuleBody > Value.selectorList': cssParser,
+ *   'CssInjectionRuleBody > Value.declarationList': cssParser
+ * };
+ * ```
+ */
 export type LinterSubParsersConfig = v.InferOutput<typeof linterSubParsersConfigSchema>;
 
 const adblockSyntaxSchema = v.enum(AdblockSyntax);
 
+/**
+ * Schema for validating an array of adblock syntax types.
+ */
 export const syntaxArraySchema = v.array(adblockSyntaxSchema);
 
+/**
+ * Schema for validating the complete linter configuration.
+ */
 export const linterConfigSchema = v.object({
+    /**
+     * Map of rule names to their configurations.
+     */
     rules: linterRulesConfigSchema,
+
+    /**
+     * Whether inline configuration comments are allowed.
+     * Defaults to true.
+     */
     allowInlineConfig: v.optional(v.boolean(), true),
+
+    /**
+     * Array of adblock syntaxes to support.
+     * Defaults to [AdblockSyntax.Common].
+     */
     syntax: v.optional(syntaxArraySchema, [AdblockSyntax.Common]),
+
+    /**
+     * Whether to report unused disable directives as problems.
+     * Defaults to false.
+     */
     reportUnusedDisableDirectives: v.optional(v.boolean(), false),
 });
 
+/**
+ * Linter configuration before validation and default value application.
+ */
 export type LinterConfig = v.InferInput<typeof linterConfigSchema>;
 
+/**
+ * Linter configuration after validation with all defaults applied.
+ */
 export type LinterConfigParsed = v.InferOutput<typeof linterConfigSchema>;

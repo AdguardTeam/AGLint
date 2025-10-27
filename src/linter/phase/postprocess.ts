@@ -5,6 +5,16 @@ import { LinterRuleSeverity } from '../rule';
 
 import { type DisableComment } from './inline-config';
 
+/**
+ * Filters problems based on inline disable directives.
+ *
+ * Removes problems that are covered by disable directives
+ * (e.g., `! aglint-disable`, `! aglint-disable-next-line`).
+ * Fatal errors are preserved regardless of disable directives.
+ *
+ * @param problems - Array of problems to filter (modified in place)
+ * @param directives - Array of disable directives found in the source
+ */
 export function applyDisableDirectives(
     problems: LinterProblem[],
     directives: DisableComment[],
@@ -13,6 +23,16 @@ export function applyDisableDirectives(
     applier.filterInPlace(problems);
 }
 
+/**
+ * Counts problems by severity level.
+ *
+ * Categorizes problems into warnings, errors, and fatal errors
+ * for summary reporting.
+ *
+ * @param problems - Array of linter problems to summarize
+ *
+ * @returns Object with counts for each severity level
+ */
 export function summarize(problems: LinterProblem[]) {
     let warningCount = 0;
     let errorCount = 0;

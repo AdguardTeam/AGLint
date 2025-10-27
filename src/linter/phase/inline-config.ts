@@ -8,13 +8,50 @@ import { type LinterRuntime } from '../core/runtime';
 import { LinterRuleSeverity } from '../rule';
 import { type LinterPositionRange } from '../source-code/source-code';
 
+/**
+ * Represents a disable/enable directive found in inline comments.
+ *
+ * These directives control which rules are active for specific
+ * portions of the source code.
+ */
 export type DisableComment = {
+    /**
+     * The type of directive (disable, enable, or disable-next-line).
+     */
     command: LinterConfigCommentType;
+
+    /**
+     * The position of the directive in the source code.
+     */
     position: LinterPositionRange;
+
+    /**
+     * Optional specific rule ID that this directive applies to.
+     * If omitted, the directive applies to all rules.
+     */
     ruleId?: string;
+
+    /**
+     * The AST node representing the comment.
+     */
     commentNode: ConfigCommentRule;
 };
 
+/**
+ * Creates a visitor function that processes inline configuration comments.
+ *
+ * This function handles two types of inline comments:
+ * 1. Configuration comments that modify rule settings on-the-fly
+ *    (e.g., `! aglint "rule-1": "off"`)
+ * 2. Disable/enable directives that control rule activation
+ *    (e.g., `! aglint-disable rule-1`, `! aglint-enable`)
+ *
+ * @param runtime - The linter runtime environment
+ *
+ * @returns An object containing:
+ * - `onConfigComment`: Visitor function to attach to ConfigCommentRule nodes
+ * - `disabled`: Array of disable directives found during traversal
+ */
 export function makeConfigCommentVisitor(runtime: LinterRuntime) {
     const disabled: DisableComment[] = [];
     const toPos = (node: any) => {

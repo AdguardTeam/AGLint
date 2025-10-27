@@ -34,10 +34,28 @@ export const linterResultSchema = v.object({
  */
 export type LinterResult = v.InferOutput<typeof linterResultSchema>;
 
+/**
+ * Options for running the linter on a file.
+ */
 export type LinterRunOptions = {
+    /**
+     * Properties of the file to lint (content, path, working directory).
+     */
     fileProps: LinterFileProps;
+
+    /**
+     * Linter configuration specifying which rules to run and how.
+     */
     config: LinterConfig;
+
+    /**
+     * Function to dynamically load rule modules by name.
+     */
     loadRule: LinterRuleLoader;
+
+    /**
+     * Optional sub-parsers for handling embedded syntaxes (e.g., CSS).
+     */
     subParsers?: LinterSubParsersConfig;
 };
 
@@ -46,8 +64,40 @@ const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
 /**
  * Lints a file according to the provided configuration and returns problems found.
  *
- * @param options Linter run options including file props, config, and rule loader
- * @returns Promise resolving to linter result with problems and counts
+ * This is the main entry point for linting. The function:
+ * 1. Validates and parses the configuration
+ * 2. Creates a linter runtime environment
+ * 3. Loads all configured rules
+ * 4. Processes inline config comments (if enabled)
+ * 5. Walks the AST and triggers rule visitors
+ * 6. Applies disable directives to filter problems
+ * 7. Summarizes results by severity
+ *
+ * @param options - Linter run options including file props, config, and rule loader
+ *
+ * @returns Promise resolving to linter result with problems and severity counts
+ *
+ * @throws Error if configuration is invalid
+ * @throws Error if a required rule cannot be loaded
+ *
+ * @example
+ * ```typescript
+ * const result = await lint({
+ *   fileProps: {
+ *     content: 'example.com##.ad',
+ *     filePath: 'filters.txt'
+ *   },
+ *   config: {
+ *     rules: {
+ *       'no-short-rules': 'error',
+ *       'no-invalid-css': ['warn', { strict: true }]
+ *     }
+ *   },
+ *   loadRule: async (name) => import(`./rules/${name}`)
+ * });
+ *
+ * console.log(`Found ${result.errorCount} errors and ${result.warningCount} warnings`);
+ * ```
  */
 export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     const parsedConfig = v.parse(linterConfigSchema, options.config);

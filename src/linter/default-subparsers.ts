@@ -3,6 +3,16 @@ import { type CssNode, parse as parseCss, toPlainObject } from '@adguard/ecss-tr
 
 import { type LinterSubParsersConfig, type Parser } from './config';
 
+/**
+ * Creates a CSS parser for a specific context.
+ *
+ * Uses @adguard/ecss-tree to parse CSS selector lists and declaration lists
+ * embedded within adblock filter rules.
+ *
+ * @param context - The CSS parsing context ('selectorList' or 'declarationList')
+ *
+ * @returns A configured parser instance for the specified CSS context
+ */
 const createCssParser = (context: string): Parser => {
     return {
         name: '@adguard/ecss-tree',
@@ -26,6 +36,16 @@ const createCssParser = (context: string): Parser => {
     };
 };
 
+/**
+ * Default sub-parsers for handling CSS embedded in adblock filter rules.
+ *
+ * These parsers handle CSS selector lists and declaration lists found in:
+ * - Element hiding rules (e.g., `example.com##.selector`)
+ * - CSS injection rules (e.g., `example.com#$#.selector { style }`)
+ *
+ * The parsers extract and parse CSS syntax using @adguard/ecss-tree,
+ * allowing linter rules to analyze CSS-specific patterns within filter rules.
+ */
 export const defaultSubParsers: LinterSubParsersConfig = {
     'ElementHidingRuleBody > Value.selectorList': createCssParser('selectorList'),
     'CssInjectionRuleBody > Value.selectorList': createCssParser('selectorList'),

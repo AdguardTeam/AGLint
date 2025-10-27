@@ -16,15 +16,52 @@ import {
     type WithMessages,
 } from '../rule';
 
+/**
+ * Represents an instance of a linter rule with its configuration and runtime state.
+ *
+ * This class wraps a rule definition with its specific configuration, severity level,
+ * and provides methods to access rule metadata and create visitors.
+ *
+ * @example
+ * ```typescript
+ * const instance = new LinterRuleInstance(
+ *   'no-invalid-css',
+ *   rule,
+ *   ['error', { strict: true }]
+ * );
+ * const visitors = instance.createVisitors(baseContext, reporter);
+ * ```
+ */
 export class LinterRuleInstance {
+    /**
+     * The underlying rule definition.
+     */
     private readonly rule: LinterRule;
 
+    /**
+     * The unique identifier for this rule instance.
+     */
     private readonly id: string;
 
+    /**
+     * The current severity level of the rule (Off, Warning, or Error).
+     */
     private severity!: LinterRuleSeverity;
 
+    /**
+     * The parsed configuration for the rule (excluding severity).
+     */
     private readonly config: LinterRuleBaseConfig;
 
+    /**
+     * Creates a new linter rule instance.
+     *
+     * @param id - The unique identifier for this rule
+     * @param rule - The rule definition
+     * @param config - The rule configuration (severity and optional parameters)
+     *
+     * @throws Error if the configuration is invalid
+     */
     constructor(id: string, rule: LinterRule, config: LinterRuleConfig) {
         this.id = id;
         this.rule = rule;
@@ -33,30 +70,82 @@ export class LinterRuleInstance {
         this.setConfig(config);
     }
 
+    /**
+     * Returns the unique identifier of this rule instance.
+     *
+     * @returns The rule ID
+     */
     public getId(): string {
         return this.id;
     }
 
+    /**
+     * Returns the current severity level of this rule.
+     *
+     * @returns The severity level (Off, Warning, or Error)
+     */
     public getSeverity(): LinterRuleSeverity {
         return this.severity;
     }
 
+    /**
+     * Returns the parsed configuration for this rule.
+     *
+     * @returns The rule configuration array (excluding severity)
+     */
     public getConfig(): LinterRuleBaseConfig {
         return this.config;
     }
 
+    /**
+     * Checks if this rule provides automatic fixes.
+     *
+     * @returns True if the rule can automatically fix issues
+     */
     public hasFix(): boolean {
         return !!this.rule.meta.hasFix;
     }
 
+    /**
+     * Checks if this rule provides suggestions for fixes.
+     *
+     * @returns True if the rule can provide manual fix suggestions
+     */
     public hasSuggestions(): boolean {
         return !!this.rule.meta.hasSuggestions;
     }
 
+    /**
+     * Returns the type of this rule.
+     *
+     * @returns The rule type (Problem, Suggestion, or Layout)
+     */
     public getType(): LinterRuleType {
         return this.rule.meta.type;
     }
 
+    /**
+     * Updates the configuration for this rule instance.
+     *
+     * Parses the provided configuration, extracts the severity level,
+     * validates additional configuration parameters against the rule's schema,
+     * and applies default values if needed.
+     *
+     * @param config - The new rule configuration (severity or [severity, ...options])
+     *
+     * @throws Error if the configuration format is invalid
+     * @throws Error if the rule doesn't accept configuration but options were provided
+     * @throws Error if the configuration options don't match the rule's schema
+     *
+     * @example
+     * ```typescript
+     * // Set severity only
+     * instance.setConfig('error');
+     *
+     * // Set severity with options
+     * instance.setConfig(['warn', { strict: true }]);
+     * ```
+     */
     public setConfig(config: LinterRuleConfig): void {
         const parsedConfig = v.parse(linterRuleConfigSchema, config);
 
@@ -105,6 +194,32 @@ export class LinterRuleInstance {
         }
     }
 
+    /**
+     * Generates a human-readable message from a report.
+     *
+     * If the report contains a messageId, it looks up the template from the rule's
+     * messages and renders it with the provided data. Direct messages take precedence.
+     *
+     * @param report - The problem report containing either a message or messageId
+     *
+     * @returns The formatted message string
+     *
+     * @example
+     * ```typescript
+     * // Using messageId with template
+     * const message = instance.getMessage({
+     *   messageId: 'invalidProperty',
+     *   data: { prop: 'color' }
+     * });
+     * // Returns: "Property 'color' is invalid"
+     *
+     * // Using direct message
+     * const message = instance.getMessage({
+     *   message: 'Custom error message'
+     * });
+     * // Returns: "Custom error message"
+     * ```
+     */
     public getMessage(report: WithMessages): string {
         let message = '';
 
@@ -125,6 +240,24 @@ export class LinterRuleInstance {
 
     /**
      * Creates a rule-specific context and initializes visitors.
+     *
+     * Constructs a complete context by combining the base context with rule-specific
+     * configuration and a report function, then invokes the rule's create function
+     * to generate the visitor map.
+     *
+     * @param baseContext - The base linting context (source code, file path, etc.)
+     * @param reporter - Optional function to report problems found by the rule
+     *
+     * @returns A map of CSS selectors to visitor functions
+     *
+     * @example
+     * ```typescript
+     * const visitors = instance.createVisitors(
+     *   { sourceCode, filePath: 'filters.txt' },
+     *   (problem, rule) => console.log(problem)
+     * );
+     * // Returns: { 'NetworkRule': (node) => { ... }, ... }
+     * ```
      */
     public createVisitors(
         baseContext: LinterRuleBaseContext,

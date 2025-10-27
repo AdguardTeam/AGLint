@@ -7,9 +7,37 @@ import { type LinterPositionRange } from '../source-code/source-code';
 
 import { type LinterRuntime } from './runtime';
 
+/**
+ * Function signature for reporting linter problems.
+ *
+ * Called by rules when they detect issues in the source code.
+ * The reporter validates the report, extracts position information,
+ * generates the message, processes fixes/suggestions, and adds the
+ * problem to the runtime's problem list.
+ */
 export type LinterReporter = (report: LinterProblemReport, ruleInstance: LinterRuleInstance) => void;
 
-// FIXME: throw errors
+/**
+ * Creates a reporter function for the given linter runtime.
+ *
+ * The reporter function:
+ * 1. Validates that the rule is not disabled
+ * 2. Extracts position information from nodes or explicit positions
+ * 3. Generates human-readable messages from templates
+ * 4. Processes fix commands if the rule supports fixes
+ * 5. Processes suggestions if the rule supports suggestions
+ * 6. Adds the complete problem to the runtime's problems array
+ *
+ * @param runtime - The linter runtime environment
+ *
+ * @returns A reporter function that rules can use to report problems
+ *
+ * @throws Error if a node has no offset range
+ * @throws Error if a node has no position
+ * @throws Error if a rule reports a fix without declaring hasFix in meta
+ * @throws Error if a rule reports suggestions without declaring hasSuggestions in meta
+ * ```
+ */
 export function createReportFn(runtime: LinterRuntime): LinterReporter {
     return (report: LinterProblemReport, ruleInstance: LinterRuleInstance): void => {
         // Probably rule is disabled meantime with config comment
