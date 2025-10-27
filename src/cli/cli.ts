@@ -40,7 +40,6 @@ const main = async () => {
 
         const options = program.opts() as LinterCliConfig;
 
-        // console.time('config');
         const fsAdapter = new NodeFileSystemAdapter();
         const pathAdapter = new NodePathAdapter();
 
@@ -82,31 +81,6 @@ const main = async () => {
         const scanner = new LinterFileScanner(tree, configResolver, fsAdapter);
 
         const files = await scanner.scanAll(matchedPatterns.files);
-
-        // console.timeEnd('config');
-
-        // Get config for a file
-        // const configChain2 = await tree.getConfigChain(
-        //     path.join(cwd, '.'),
-        // );
-        // const configChain = await tree.getConfigChain(
-        //     path.join(cwd, './sections/ublock-origin-specific/antiadblock.txt'),
-        // );
-        // console.log(configChain);
-        // console.log(await tree.isIgnored('dist/hufilter.txt'));
-        // const finalConfig = await configResolver.resolveChain(configChain);
-        // console.log(files.length);
-
-        // // Handle file changes
-        // await tree.changed('aglint.config.json');
-        // configResolver.invalidate('aglint.config.json');
-
-        // console.log(await matchPatterns([DEFAULT_PATTERN], new NodeFileSystemAdapter(), {
-        //     cwd,
-        //     defaultIgnorePatterns: [...DEFAULT_IGNORE_PATTERNS],
-        //     followSymlinks: false,
-        //     dot: true,
-        // }));
 
         // Handle --init option early (mutually exclusive with all other options)
         if (options.init) {
