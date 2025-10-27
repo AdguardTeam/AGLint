@@ -7,4 +7,5 @@ export const commonLinterConfig: Omit<LinterConfigParsed, 'rules'> = {
         AdblockSyntax.Adg,
     ],
     allowInlineConfig: true,
+    reportUnusedDisableDirectives: false,
 };
