@@ -192,7 +192,7 @@ export function buildCliProgram(): Command {
             'If you do not specify any patterns, aglint will use its default patterns, so',
             '  $ aglint',
             'is equivalent to',
-            `  $ aglint ${DEFAULT_PATTERN}`,
+            `  $ aglint '${DEFAULT_PATTERN}'`,
             '',
         ].join('\n'));
 
