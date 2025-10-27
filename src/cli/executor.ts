@@ -3,11 +3,12 @@ import { fileURLToPath } from 'node:url';
 
 import Piscina from 'piscina';
 
+import { hasLinterResultErrors } from '../utils/linter-result';
+
 import { type LintResultCache } from './cache';
 import type { LinterCliConfig } from './cli-options';
 import type { LinterConsoleReporter } from './reporters/console';
 import { type ScannedFile } from './utils/file-scanner';
-import { hasLinterResultErrors } from './utils/has-errors';
 import runLinterWorker, { type LinterWorkerResults } from './worker';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
