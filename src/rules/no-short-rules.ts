@@ -1,7 +1,8 @@
-import { type CosmeticRule, type ElementHidingRule, type NetworkRule } from '@adguard/agtree';
+import { type AnyCosmeticRule, type AnyNetworkRule } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { createVisitorsForAnyCosmeticRule, createVisitorsForAnyNetworkRule } from '../utils/visitor-creator';
 
 const DEFAULT_MIN_RULE_LENGTH = 4;
 
@@ -29,7 +30,7 @@ export default defineRule({
     create: (context) => {
         const { minLength } = context.config[0];
 
-        const handler = (node: CosmeticRule | NetworkRule | ElementHidingRule) => {
+        const handler = (node: AnyCosmeticRule | AnyNetworkRule) => {
             const sourceText = node.raws?.text;
 
             if (!sourceText) {
@@ -50,12 +51,8 @@ export default defineRule({
         };
 
         return {
-            NetworkRule: handler,
-            CssInjectionRule: handler,
-            ElementHidingRule: handler,
-            ScriptletInjectionRule: handler,
-            HtmlFilteringRule: handler,
-            JsInjectionRule: handler,
+            ...createVisitorsForAnyCosmeticRule(handler),
+            ...createVisitorsForAnyNetworkRule(handler),
         };
     },
 });
