@@ -28,7 +28,8 @@
     "exports": {
         ".": {
             "types": "./dist/types/index.d.ts",
-            "import": "./dist/index.js"
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
         },
         "./config-presets/all": "./config-presets/all.json",
         "./config-presets/recommended": "./config-presets/recommended.json"
