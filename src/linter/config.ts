@@ -116,9 +116,9 @@ export const syntaxArraySchema = v.array(adblockSyntaxSchema);
 
 export const linterConfigSchema = v.object({
     rules: linterRulesConfigSchema,
-    allowInlineConfig: v.optional(v.boolean()),
-    syntax: v.optional(syntaxArraySchema),
-    reportUnusedDisableDirectives: v.optional(v.boolean()),
+    allowInlineConfig: v.optional(v.boolean(), true),
+    syntax: v.optional(syntaxArraySchema, [AdblockSyntax.Common]),
+    reportUnusedDisableDirectives: v.optional(v.boolean(), false),
 });
 
 export type LinterConfig = v.InferInput<typeof linterConfigSchema>;

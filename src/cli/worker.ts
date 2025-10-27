@@ -1,4 +1,6 @@
-import { type LinterConfig } from '../linter/config';
+import * as v from 'valibot';
+
+import { type LinterConfig, linterConfigSchema } from '../linter/config';
 import { defaultSubParsers } from '../linter/default-subparsers';
 import { type AnyLinterResult, LinterFixer } from '../linter/fixer';
 import { Linter, type LinterRunOptions } from '../linter/linter';
@@ -91,7 +93,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
                 content,
                 cwd: task.cwd,
             },
-            config: task.linterConfig,
+            config: v.parse(linterConfigSchema, task.linterConfig),
             loadRule: async (ruleName) => {
                 if (ruleCache.has(ruleName)) {
                     return ruleCache.get(ruleName);
