@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import { type LinterConfig } from '../../src/linter/config';
 import { defaultSubParsers } from '../../src/linter/default-subparsers';
-import { Linter, type LinterResult } from '../../src/linter/linter';
+import { type LinterResult, lint as lintFn } from '../../src/linter/linter';
 import { defineRule, LinterRuleSeverity, LinterRuleType } from '../../src/linter/rule';
 import { type LinterRule } from '../../src/linter/rule';
 import { type LinterRuleLoader } from '../../src/linter/rule-registry/rule-loader';
@@ -73,7 +73,7 @@ const lint = async (
     config: LinterConfig,
     ruleLoader?: LinterRuleLoader,
 ): Promise<LinterResult> => {
-    return Linter.lint({
+    return lintFn({
         fileProps: { content },
         config: {
             syntax: [AdblockSyntax.Adg],
@@ -623,7 +623,7 @@ describe('Linter E2E Tests', () => {
 
     describe('file properties', () => {
         test('should accept filePath and cwd', async () => {
-            const result = await Linter.lint({
+            const result = await lintFn({
                 fileProps: {
                     content: 'example.com##.ad',
                     filePath: '/test/file.txt',

@@ -3,8 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import { type LinterRulesConfig, type LinterSubParsersConfig } from '../../../src/linter/config';
 import { defaultSubParsers } from '../../../src/linter/default-subparsers';
-import { LinterFixer, type LinterFixerResult } from '../../../src/linter/fixer';
-import { Linter, type LinterResult } from '../../../src/linter/linter';
+import { type LinterFixerResult, lintWithFixes as lintWithFixesFn } from '../../../src/linter/fixer';
+import { type LinterResult, lint as lintFn } from '../../../src/linter/linter';
 import { type LinterRuleLoader } from '../../../src/linter/rule-registry/rule-loader';
 
 import { commonLinterConfig } from './common-linter-config';
@@ -21,7 +21,7 @@ export const lint = (
     rulesConfig: LinterRulesConfig,
     subParsers?: LinterSubParsersConfig,
 ): Promise<LinterResult> => {
-    return Linter.lint({
+    return lintFn({
         fileProps: {
             content,
         },
@@ -42,7 +42,7 @@ export const lintWithFixes = (
     rulesConfig: LinterRulesConfig,
     subParsers?: LinterSubParsersConfig,
 ): Promise<LinterFixerResult> => {
-    return LinterFixer.lintWithFixes({
+    return lintWithFixesFn({
         fileProps: {
             content,
         },

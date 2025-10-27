@@ -5,8 +5,10 @@
 import { version as importedVersion } from '../package.json';
 
 export type { LinterConfig } from './linter/config';
-export { Linter, type LinterResult, type LinterRunOptions } from './linter/linter';
-export { LinterFixer, type LinterFixerResult, type LinterFixerRunOptions } from './linter/fixer';
+export { lint, type LinterResult, type LinterRunOptions } from './linter/linter';
+export {
+    applyFixesToResult, lintWithFixes, type LinterFixerResult, type LinterFixerRunOptions,
+} from './linter/fixer';
 export { LinterRuleSeverity } from './linter/rule';
 export { type LinterProblem, type LinterSuggestion } from './linter/linter-problem';
 

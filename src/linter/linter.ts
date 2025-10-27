@@ -41,34 +41,38 @@ export type LinterRunOptions = {
     subParsers?: LinterSubParsersConfig;
 };
 
-export class Linter {
-    private static readonly CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
+const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
 
-    public static async lint(options: LinterRunOptions): Promise<LinterResult> {
-        const parsedConfig = v.parse(linterConfigSchema, options.config);
-        const runtime = createLinterRuntime(
-            options.fileProps,
-            parsedConfig,
-            options.loadRule,
-            options.subParsers ?? {},
-        );
+/**
+ * Lints a file according to the provided configuration and returns problems found.
+ *
+ * @param options Linter run options including file props, config, and rule loader
+ * @returns Promise resolving to linter result with problems and counts
+ */
+export async function lint(options: LinterRunOptions): Promise<LinterResult> {
+    const parsedConfig = v.parse(linterConfigSchema, options.config);
+    const runtime = createLinterRuntime(
+        options.fileProps,
+        parsedConfig,
+        options.loadRule,
+        options.subParsers ?? {},
+    );
 
-        const report = createReportFn(runtime);
-        runtime.ruleRegistry.setReporter(report);
+    const report = createReportFn(runtime);
+    runtime.ruleRegistry.setReporter(report);
 
-        await runtime.ruleRegistry.loadRules();
+    await runtime.ruleRegistry.loadRules();
 
-        const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
+    const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
 
-        if (options.config.allowInlineConfig) {
-            runtime.visitors.addVisitor(Linter.CONFIG_COMMENT_SELECTOR, onConfigComment);
-        }
-
-        runWalk(runtime);
-
-        applyDisableDirectives(runtime.problems, disabled);
-        const counts = summarize(runtime.problems);
-
-        return { problems: runtime.problems, ...counts };
+    if (options.config.allowInlineConfig) {
+        runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
     }
+
+    runWalk(runtime);
+
+    applyDisableDirectives(runtime.problems, disabled);
+    const counts = summarize(runtime.problems);
+
+    return { problems: runtime.problems, ...counts };
 }

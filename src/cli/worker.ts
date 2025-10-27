@@ -2,8 +2,8 @@ import * as v from 'valibot';
 
 import { type LinterConfig, linterConfigSchema } from '../linter/config';
 import { defaultSubParsers } from '../linter/default-subparsers';
-import { type AnyLinterResult, LinterFixer } from '../linter/fixer';
-import { Linter, type LinterRunOptions } from '../linter/linter';
+import { type AnyLinterResult, applyFixesToResult, lintWithFixes } from '../linter/fixer';
+import { lint, type LinterRunOptions } from '../linter/linter';
 import { type LinterRule } from '../linter/rule';
 
 import { type CacheFileData, getFileHash, LinterCacheStrategy } from './cache';
@@ -55,7 +55,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
 
                 // If cache valid and fix mode, apply fixes from cached result
                 if (cacheValid && tasks.cliConfig.fix) {
-                    const fixedSource = LinterFixer.applyFixesToResult({
+                    const fixedSource = applyFixesToResult({
                         linterResult: task.fileCacheData.linterResult,
                         sourceContent: content,
                         maxFixRounds: tasks.cliConfig.maxFixRounds,
@@ -108,7 +108,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
         };
 
         if (tasks.cliConfig.fix) {
-            const linterResult = await LinterFixer.lintWithFixes({
+            const linterResult = await lintWithFixes({
                 ...commonLinterRunOptions,
                 maxFixRounds: tasks.cliConfig.maxFixRounds,
                 categories: tasks.cliConfig.fixTypes ? new Set(tasks.cliConfig.fixTypes) : undefined,
@@ -127,7 +127,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
         }
 
         return {
-            linterResult: await Linter.lint(commonLinterRunOptions),
+            linterResult: await lint(commonLinterRunOptions),
             fromCache: false,
             fileHash,
         };
