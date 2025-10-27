@@ -20,12 +20,12 @@ import {
 import { LinterCliInitWizard } from './init-wizard';
 import { LinterConsoleReporter } from './reporters/console';
 import { createFileTaskBuckets, getTotalSize } from './task-scheduler';
-import { calculateThreads, isSmallProject, type ThreadsOption } from './thread-manager';
 import { ConfigResolver } from './utils/config-resolver';
 import { LinterFileScanner } from './utils/file-scanner';
 import { NodeFileSystemAdapter } from './utils/fs-adapter';
 import { NodePathAdapter } from './utils/path-adapter';
 import { DEFAULT_IGNORE_PATTERNS, matchPatterns } from './utils/pattern-matcher';
+import { calculateThreads, isSmallProject, type ThreadsOption } from './utils/thread-manager';
 import { LinterTree } from './utils/tree-builder';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle

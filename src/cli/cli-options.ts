@@ -6,7 +6,7 @@ import type { LinterRuleType } from '../linter/rule';
 
 import { CACHE_FILE_NAME, LinterCacheStrategy } from './cache';
 import { DEFAULT_PATTERN, IGNORE_FILE_NAME, SUPPORTED_FILE_EXTENSIONS } from './constants';
-import { threadOptionSchema, type ThreadsOption } from './thread-manager';
+import { threadOptionSchema, type ThreadsOption } from './utils/thread-manager';
 
 export type LinterCliConfig = {
     ext: string[];
