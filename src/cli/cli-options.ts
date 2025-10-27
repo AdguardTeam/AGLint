@@ -175,7 +175,26 @@ export function buildCliProgram(): Command {
             '[patterns...]',
             'Patterns to lint, they could be files, directories or glob patterns',
             DEFAULT_PATTERN,
-        );
+        )
+
+        .addHelpText('after', [
+            '',
+            'Examples:',
+            '  $ aglint',
+            '  $ aglint path/to/file.txt',
+            '  $ aglint path/to/directory',
+            "  $ aglint '**/*.filter'",
+            '  $ aglint path/to/file.txt path/to/directory "**/*.filter"',
+            '  $ aglint path/to/file.txt --fix',
+            '',
+            "Please add quotes to glob patterns like `aglint '**/*.txt'`, otherwise your shell may expand them.",
+            '',
+            'If you do not specify any patterns, aglint will use its default patterns, so',
+            '  $ aglint',
+            'is equivalent to',
+            `  $ aglint ${DEFAULT_PATTERN}`,
+            '',
+        ].join('\n'));
 
     return program;
 }
