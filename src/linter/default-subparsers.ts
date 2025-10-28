@@ -2,6 +2,7 @@
 import { type CssNode, parse as parseCss, toPlainObject } from '@adguard/ecss-tree';
 
 import { type LinterSubParsersConfig, type Parser } from './config';
+import { LinterSourceCodeError } from './source-code/error';
 
 /**
  * Creates a CSS parser for a specific context.
@@ -23,6 +24,18 @@ const createCssParser = (context: string): Parser => {
                 offset,
                 line,
                 column: offset - lineStartOffset,
+                onParseError: (error) => {
+                    throw new LinterSourceCodeError(error.message, {
+                        start: {
+                            line: error.line,
+                            column: error.column - 1,
+                        },
+                        end: {
+                            line: error.line,
+                            column: error.column - 1,
+                        },
+                    });
+                },
             }));
         }),
         nodeTypeKey: 'type',
