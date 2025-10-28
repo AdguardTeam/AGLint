@@ -8,4 +8,5 @@ export const commonLinterConfig: Omit<LinterConfigParsed, 'rules'> = {
     ],
     allowInlineConfig: true,
     reportUnusedDisableDirectives: false,
+    unusedDisableDirectivesSeverity: 'warn',
 };

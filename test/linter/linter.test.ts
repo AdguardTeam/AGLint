@@ -639,4 +639,192 @@ describe('Linter E2E Tests', () => {
             expect(result.problems).toHaveLength(1);
         });
     });
+
+    describe('unused disable directives', () => {
+        test('should not report unused directives by default', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+            );
+
+            // Only reports the actual rule violations, not unused directives
+            expect(result.problems.every((p) => p.ruleId !== 'unused-disable-directive')).toBe(true);
+        });
+
+        test('should report unused disable-all directive as warning', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive');
+            expect(unusedProblems[0]?.severity).toBe(LinterRuleSeverity.Warning);
+        });
+
+        test('should report unused disable-all directive as error when configured', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                    unusedDisableDirectivesSeverity: 'error',
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.severity).toBe(LinterRuleSeverity.Error);
+        });
+
+        test('should report unused specific rule directive', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint-disable test-cosmetic-rule',
+                    '||example.net^',
+                ].join('\n'),
+                {
+                    rules: { 'test-network-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive for rule: test-cosmetic-rule');
+        });
+
+        test('should report unused disable-next-line directive', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable-next-line',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive');
+        });
+
+        test('should not report used disable directive', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    'example.com##.popup',
+                ].join('\n'),
+                {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(0);
+
+            // Should have filtered out the actual rule problems
+            const ruleProblems = result.problems.filter((p) => p.ruleId !== 'unused-disable-directive');
+            expect(ruleProblems).toHaveLength(1); // Only the first one before disable
+        });
+
+        test('should report unused specific rule while used rules are fine', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint-disable test-network-rule, test-cosmetic-rule',
+                    '||example.net^',
+                    '||example.org^',
+                ].join('\n'),
+                {
+                    rules: { 'test-network-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive for rule: test-cosmetic-rule');
+
+            // Should have filtered out the network rule problems
+            const ruleProblems = result.problems.filter((p) => p.ruleId !== 'unused-disable-directive');
+            expect(ruleProblems).toHaveLength(1); // Only the first network rule
+        });
+
+        test('should not report enable directives as unused', async () => {
+            const result = await lint(
+                [
+                    '! aglint-enable',
+                    'example.com##.ad',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(0);
+        });
+
+        test('should combine unused directive problems with rule problems', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable test-network-rule',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            // Should have both cosmetic rule problems and the unused directive problem
+            expect(result.problems).toHaveLength(3);
+
+            const ruleProblems = result.problems.filter((p) => p.ruleId === 'test-cosmetic-rule');
+            expect(ruleProblems).toHaveLength(2); // Both cosmetic rules should be reported
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1); // The network rule disable is unused
+
+            expect(result.warningCount).toBe(1); // The unused directive warning
+            expect(result.errorCount).toBe(2); // The two cosmetic rule errors
+        });
+    });
 });

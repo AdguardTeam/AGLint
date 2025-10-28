@@ -121,7 +121,12 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
 
     runWalk(runtime);
 
-    applyDisableDirectives(runtime.problems, disabled);
+    applyDisableDirectives(
+        runtime.problems,
+        disabled,
+        parsedConfig.reportUnusedDisableDirectives,
+        parsedConfig.unusedDisableDirectivesSeverity,
+    );
     const counts = summarize(runtime.problems);
 
     return { problems: runtime.problems, ...counts };

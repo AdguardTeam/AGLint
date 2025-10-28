@@ -182,6 +182,16 @@ export const linterConfigSchema = v.object({
      * Defaults to false.
      */
     reportUnusedDisableDirectives: v.optional(v.boolean(), false),
+
+    /**
+     * Severity level for unused disable directive problems.
+     * Only applies when reportUnusedDisableDirectives is true.
+     * Defaults to 'warn'.
+     */
+    unusedDisableDirectivesSeverity: v.optional(
+        v.union([v.literal('warn'), v.literal('error')]),
+        'warn',
+    ),
 });
 
 /**
