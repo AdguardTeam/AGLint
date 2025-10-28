@@ -15,14 +15,18 @@ export default defineRule({
             multipleSelectors: 'This selector list contains {{count}} selectors, but only {{maxSelectors}} are allowed',
         },
         configSchema: v.tuple([
-            v.strictObject({
+            v.optional(v.strictObject({
                 maxSelectors: v.pipe(
-                    v.fallback(v.number(), 1),
+                    v.optional(v.number(), 1),
                     v.minValue(1),
                 ),
-            }),
+            }), { maxSelectors: 1 }),
         ]),
         hasFix: true,
+        examples: [
+            '##.single-selector',
+            '##.selector1, .selector2',
+        ],
     },
     create: (context) => {
         const { maxSelectors } = context.config[0];

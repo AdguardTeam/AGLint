@@ -182,6 +182,11 @@ export const linterRuleMetaSchema = v.object({
     docs: linterRuleDocsSchema,
 
     /**
+     * Example problems for the rule.
+     */
+    examples: v.optional(v.array(v.string())),
+
+    /**
      * Whether the rule has suggestions.
      */
     hasSuggestions: v.optional(v.boolean()),
@@ -320,6 +325,7 @@ export interface LinterRule<
         hasFix?: boolean;
         messages?: Msgs;
         configSchema?: TupleOf<Elements>;
+        examples?: string[];
     };
     create: LinterRuleCreatorFunction<Elements, Msgs>;
 }

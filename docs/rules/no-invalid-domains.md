@@ -1,13 +1,13 @@
 <!-- markdownlint-disable -->
-# no-duplicated-css-declaration-props
+# no-invalid-domains
 
 ## Description
 
-Checks for duplicated CSS declaration properties within the same rule block
+Disallows invalid domains
 
 ## Metadata
 
-- Fixable: ✅
+- Fixable: ❌
 - Suggestions: ✅
 - Recommended: ✅
 - Type: problem
@@ -31,9 +31,9 @@ Checks for duplicated CSS declaration properties within the same rule block
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-css-declaration-props.ts
+https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-domains.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-duplicated-css-declaration-props.test.ts
+https://github.com/AdguardTeam/AGLint/test/rules/no-invalid-domains.test.ts
 

@@ -1,13 +1,13 @@
 <!-- markdownlint-disable -->
-# no-duplicated-hint-platforms
+# no-unknown-hints
 
 ## Description
 
-Checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint
+Checks if hints are known
 
 ## Metadata
 
-- Fixable: ✅
+- Fixable: ❌
 - Suggestions: ❌
 - Recommended: ✅
 - Type: problem
@@ -31,9 +31,9 @@ Checks if a platform is used more than once within the same PLATFORM / NOT_PLATF
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-hint-platforms.ts
+https://github.com/AdguardTeam/AGLint/src/rules/no-unknown-hints.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-duplicated-hint-platforms.test.ts
+https://github.com/AdguardTeam/AGLint/test/rules/no-unknown-hints.test.ts
 
