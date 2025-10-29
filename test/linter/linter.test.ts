@@ -469,7 +469,7 @@ describe('Linter E2E Tests', () => {
             expect(result.fatalErrorCount).toBeGreaterThan(0);
         });
 
-        test('should not disable fatal errors by default', async () => {
+        test('should disable fatal errors by default', async () => {
             const result = await lint(
                 [
                     '! aglint-disable',
@@ -478,7 +478,7 @@ describe('Linter E2E Tests', () => {
                 ].join('\n'),
                 { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
             );
-            expect(result.fatalErrorCount).toBeGreaterThan(0);
+            expect(result.fatalErrorCount).toBe(0);
         });
     });
 

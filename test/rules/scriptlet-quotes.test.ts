@@ -8,7 +8,10 @@ import { lint, lintWithFixes } from './helpers/lint';
 
 const rulesConfig: LinterRulesConfig = {
     'scriptlet-quotes': [LinterRuleSeverity.Error, {
-        adg: QuoteType.Double, ubo: QuoteType.None, abp: QuoteType.None, disallowCurlyQuotes: true,
+        adg: QuoteType.Double,
+        ubo: QuoteType.None,
+        abp: QuoteType.None,
+        disallowCurlyQuotes: true,
     }],
 };
 
