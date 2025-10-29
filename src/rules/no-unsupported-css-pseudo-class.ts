@@ -138,13 +138,13 @@ export default defineRule({
         correctExamples: [
             {
                 name: 'Known pseudo-class',
-                code: '##*:has(.selector)',
+                code: '#?#*:has(.selector)',
             },
         ],
         incorrectExamples: [
             {
                 name: 'Almost correct pseudo-class, but misspelled',
-                code: '##*:contians(foo)',
+                code: '#?#*:contians(foo)',
             },
         ],
         version: '4.0.0',
