@@ -61,7 +61,7 @@ This rule can be configured using the following options.
 
 Examples of correct code:
 
-### Single selector
+### Single selector in element hiding rule
 
 The following code
 
@@ -81,7 +81,27 @@ with the following rule config:
 
 should not be reported
 
-### Multiple selectors
+### Single selector in CSS injection rule
+
+The following code
+
+```adblock
+#$#.single-selector { display: none; }
+```
+
+with the following rule config:
+
+```json
+[
+  {
+    "maxSelectors": 1
+  }
+]
+```
+
+should not be reported
+
+### Multiple selectors in element hiding rule, maxSelectors: 2
 
 The following code
 
@@ -105,7 +125,7 @@ should not be reported
 
 Examples of incorrect code:
 
-### Multiple selectors
+### Multiple selectors in element hiding rule
 
 The following code
 
@@ -139,6 +159,42 @@ and should be fixed as:
 -##.selector1, .selector2
 +##.selector1
 +##.selector2
+```
+
+### Multiple selectors in CSS injection rule
+
+The following code
+
+```adblock
+#$#.selector1, .selector2 { display: none; }
+```
+
+with the following rule config:
+
+```json
+[
+  {
+    "maxSelectors": 1
+  }
+]
+```
+
+should be reported as:
+
+```shell
+1:3 This selector list contains 2 selectors, but only 1 are allowed
+```
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,1 +1,2 @@
+-#$#.selector1, .selector2 { display: none; }
++#$#.selector1 { display: none; }
++#$#.selector2 { display: none; }
 ```
 
 ## Version

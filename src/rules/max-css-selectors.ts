@@ -31,19 +31,27 @@ export default defineRule({
         hasFix: true,
         correctExamples: [
             {
-                name: 'Single selector',
+                name: 'Single selector in element hiding rule',
                 code: '##.single-selector',
             },
             {
-                name: 'Multiple selectors',
+                name: 'Single selector in CSS injection rule',
+                code: '#$#.single-selector { display: none; }',
+            },
+            {
+                name: 'Multiple selectors in element hiding rule, maxSelectors: 2',
                 code: '##.selector1, .selector2',
                 config: [{ maxSelectors: 2 }],
             },
         ],
         incorrectExamples: [
             {
-                name: 'Multiple selectors',
+                name: 'Multiple selectors in element hiding rule',
                 code: '##.selector1, .selector2',
+            },
+            {
+                name: 'Multiple selectors in CSS injection rule',
+                code: '#$#.selector1, .selector2 { display: none; }',
             },
         ],
         version: '1.0.0',
