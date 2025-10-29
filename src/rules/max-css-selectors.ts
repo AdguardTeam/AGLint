@@ -15,17 +15,19 @@ export default defineRule({
             multipleSelectors: 'This selector list contains {{count}} selectors, but only {{maxSelectors}} are allowed',
         },
         configSchema: v.tuple([
-            v.optional(
-                v.strictObject({
-                    maxSelectors: v.pipe(
-                        v.optional(v.number(), 1),
-                        v.minValue(1),
-                        v.description('The maximum number of selectors allowed in a selector list'),
-                    ),
-                }),
-                { maxSelectors: 1 },
-            ),
+            v.strictObject({
+                maxSelectors: v.pipe(
+                    v.optional(v.number(), 1),
+                    v.minValue(1),
+                    v.description('The maximum number of selectors allowed in a selector list'),
+                ),
+            }),
         ]),
+        defaultConfig: [
+            {
+                maxSelectors: 1,
+            },
+        ],
         hasFix: true,
         correctExamples: [
             {

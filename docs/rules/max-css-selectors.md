@@ -10,6 +10,50 @@ Checks if a CSS selector list contains more than the specified number of selecto
 
 - Some reported problems can be fixed automatically 🔧
 
+## Options
+
+This rule can be configured using the following options:
+
+### Options schema
+
+<details>
+<summary>Click to expand</summary>
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": [
+    {
+      "type": "object",
+      "properties": {
+        "maxSelectors": {
+          "type": "number",
+          "default": 1,
+          "minimum": 1,
+          "description": "The maximum number of selectors allowed in a selector list"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  ],
+  "minItems": 1
+}
+```
+
+</details>
+
+### Default options
+
+```json
+[
+  {
+    "maxSelectors": 1
+  }
+]
+```
+
 ## Correct examples
 
 Examples of correct code:
@@ -20,12 +64,32 @@ Examples of correct code:
 ##.single-selector
 ```
 
+with config:
+
+```json
+[
+  {
+    "maxSelectors": 1
+  }
+]
+```
+
 should not be reported
 
 ### Multiple selectors
 
 ```adblock
 ##.selector1, .selector2
+```
+
+with config:
+
+```json
+[
+  {
+    "maxSelectors": 2
+  }
+]
 ```
 
 should not be reported
@@ -38,6 +102,16 @@ Examples of incorrect code:
 
 ```adblock
 ##.selector1, .selector2
+```
+
+with config:
+
+```json
+[
+  {
+    "maxSelectors": 1
+  }
+]
 ```
 
 should be reported as:
