@@ -7,6 +7,46 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [4.0.0-alpha.0] - 2025-10-30
+
+### Added
+
+- Support for multi-threaded linting. [#208]
+- Autofix and Suggestions API. [#200]
+- Possibility to detect unused disable comments. [#197]
+- Cache for previous linting results. [#188]
+- `scriptlet-quotes` linter rule. [#258]
+- `no-duplicated-css-declaration-props` linter rule. [#234]
+- `no-unsupported-css-pseudo-class` linter rule. [#205]
+
+### Changed
+
+- Library exports are completely changed because of the new API.
+- Minimum Node.js version is `v20`.
+- Linter engine rewritten from scratch. It provides a more flexible and extensible API, and better performance.
+  Generally, the new engine is 2 times faster than the previous one.
+  We resolved many issues with the previous engine, e.g. we implemented more performant walking [#241]
+  and improved rule management, including rule configuration [#217].
+- Linter rules are renamed, now they have consistent names. [#231]
+- Improved CLI experience. CLI now accepts glob patterns, directories, and files. [#198]
+- Replaced `superstruct` with `valibot`. [#218]
+- Moved rule documentations to the `docs/rules` directory. [#72]
+
+[4.0.0-alpha.0]: https://github.com/AdguardTeam/AGLint/compare/v3.0.0...v4.0.0-alpha.0
+[#72]: https://github.com/AdguardTeam/AGLint/issues/72
+[#188]: https://github.com/AdguardTeam/AGLint/issues/188
+[#197]: https://github.com/AdguardTeam/AGLint/issues/197
+[#198]: https://github.com/AdguardTeam/AGLint/issues/198
+[#200]: https://github.com/AdguardTeam/AGLint/issues/200
+[#205]: https://github.com/AdguardTeam/AGLint/issues/205
+[#208]: https://github.com/AdguardTeam/AGLint/issues/208
+[#217]: https://github.com/AdguardTeam/AGLint/issues/217
+[#218]: https://github.com/AdguardTeam/AGLint/issues/218
+[#231]: https://github.com/AdguardTeam/AGLint/issues/231
+[#234]: https://github.com/AdguardTeam/AGLint/issues/234
+[#241]: https://github.com/AdguardTeam/AGLint/issues/241
+[#258]: https://github.com/AdguardTeam/AGLint/issues/258
+
 ## [3.0.0] - 2025-05-21
 
 ### Changed
