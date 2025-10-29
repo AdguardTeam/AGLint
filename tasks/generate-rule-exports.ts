@@ -7,12 +7,14 @@ import fg from 'fast-glob';
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = new URL('.', import.meta.url).pathname;
 
+const packageJsonPath = path.join(__dirname, '../package.json');
+
 /**
  * Generates rule exports.
  */
 async function main() {
     const files = await fg([path.join(__dirname, '../src/rules/*.ts')]);
-    const packageJson = JSON.parse(await readFile(path.join(__dirname, '../package.json'), 'utf-8'));
+    const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf-8'));
 
     // clear existing rule exports
     for (const key of Object.keys(packageJson.exports)) {
@@ -31,7 +33,7 @@ async function main() {
         };
     }
 
-    await writeFile(path.join(__dirname, '../package.json'), `${JSON.stringify(packageJson, null, 4)}\n`);
+    await writeFile(packageJsonPath, `${JSON.stringify(packageJson, null, 4)}\n`);
 }
 
 main();
