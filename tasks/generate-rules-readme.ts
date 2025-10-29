@@ -84,8 +84,8 @@ const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExa
             md.push('with the following rule config:');
             md.push('');
             md.push('```json');
-            if (example.config && Array.isArray(example.config) && example.config.length > 1) {
-                md.push(`${JSON.stringify(example.config.slice(1), null, 2)}`);
+            if (example.config && Array.isArray(example.config) && example.config.length > 0) {
+                md.push(`${JSON.stringify(example.config, null, 2)}`);
             } else {
                 md.push(`${JSON.stringify(meta.defaultConfig, null, 2)}`);
             }

@@ -79,8 +79,8 @@ This rule can be configured using the following options.
 [
   {
     "adg": "double",
-    "ubo": "double",
-    "abp": "double",
+    "ubo": "none",
+    "abp": "none",
     "disallowCurlyQuotes": true
   }
 ]
@@ -104,8 +104,8 @@ with the following rule config:
 [
   {
     "adg": "double",
-    "ubo": "double",
-    "abp": "double",
+    "ubo": "none",
+    "abp": "none",
     "disallowCurlyQuotes": true
   }
 ]
@@ -131,8 +131,8 @@ with the following rule config:
 [
   {
     "adg": "double",
-    "ubo": "double",
-    "abp": "double",
+    "ubo": "none",
+    "abp": "none",
     "disallowCurlyQuotes": true
   }
 ]
