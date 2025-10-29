@@ -21,12 +21,11 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ### Changed
 
+- Linter core and CLI are completely rewritten, API is changed.
 - Library exports are completely changed because of the new API.
 - Minimum Node.js version is `v20`.
-- Linter engine rewritten from scratch. It provides a more flexible and extensible API, and better performance.
-  Generally, the new engine is 2 times faster than the previous one.
-  We resolved many issues with the previous engine, e.g. we implemented more performant walking [#241]
-  and improved rule management, including rule configuration [#217].
+- Implemented more performant walking. [#241]
+- Improved rule management via rules registry. [#217]
 - Linter rules are renamed, now they have consistent names. [#231]
 - Improved CLI experience. CLI now accepts glob patterns, directories, and files. [#198]
 - Replaced `superstruct` with `valibot`. [#218]
