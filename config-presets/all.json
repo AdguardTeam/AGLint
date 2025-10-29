@@ -3,31 +3,62 @@
     "Common"
   ],
   "rules": {
-    "if-directive-balance": "error",
+    "if-directive-balance": 2,
     "max-css-selectors": [
-      "warn",
-      {
-        "maxSelectors": 1
-      }
+      1,
+      [
+        {
+          "maxSelectors": 1
+        }
+      ]
     ],
-    "no-duplicated-css-declaration-props": "error",
-    "no-duplicated-hint-platforms": "error",
-    "no-duplicated-hints": "error",
-    "no-duplicated-modifiers": "error",
-    "no-inconsistent-hint-platforms": "error",
-    "no-invalid-css-declaration": "error",
-    "no-invalid-domains": "error",
-    "no-invalid-hint-params": "error",
-    "no-invalid-modifiers": "error",
+    "no-duplicated-css-declaration-props": 2,
+    "no-duplicated-hint-platforms": 2,
+    "no-duplicated-hints": 2,
+    "no-duplicated-modifiers": 2,
+    "no-excluded-rules": [
+      2,
+      [
+        {
+          "excludedRuleTexts": [],
+          "excludedRegExpPatterns": []
+        }
+      ]
+    ],
+    "no-inconsistent-hint-platforms": 2,
+    "no-invalid-css-declaration": 2,
+    "no-invalid-domains": 2,
+    "no-invalid-hint-params": 2,
+    "no-invalid-modifiers": 2,
     "no-short-rules": [
-      "error",
-      {
-        "minLength": 3
-      }
+      2,
+      [
+        {
+          "minLength": 4
+        }
+      ]
     ],
-    "no-unknown-hint-platforms": "error",
-    "no-unknown-hints": "error",
-    "no-unknown-preprocessor-directives": "error",
-    "no-unsupported-css-pseudo-class": "error"
+    "no-unknown-hint-platforms": 2,
+    "no-unknown-hints": 2,
+    "no-unknown-preprocessor-directives": 2,
+    "no-unsupported-css-pseudo-class": [
+      2,
+      [
+        {
+          "fuzzyThreshold": 0.6
+        }
+      ]
+    ],
+    "scriptlet-quotes": [
+      2,
+      [
+        {
+          "adg": "double",
+          "ubo": "none",
+          "abp": "none",
+          "disallowCurlyQuotes": true
+        }
+      ]
+    ]
   }
 }
