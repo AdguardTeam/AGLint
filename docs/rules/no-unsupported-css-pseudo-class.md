@@ -125,7 +125,7 @@ should be reported as:
 1:4 Unsupported CSS pseudo-class: contians
 ```
 
-and should offer the following suggestions:
+and the following suggestions should be offered:
 
 - Change pseudo-class to contains
 

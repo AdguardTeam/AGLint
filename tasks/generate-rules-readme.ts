@@ -18,6 +18,13 @@ const __dirname = new URL('.', import.meta.url).pathname;
 
 const REPO_URL = 'https://github.com/AdguardTeam/AGLint/';
 
+/**
+ * Normalizes a string by replacing Windows line endings with Unix line endings and ensuring it ends with a newline.
+ *
+ * @param s The string to normalize.
+ *
+ * @returns The normalized string.
+ */
 const norm = (s: string) => (s.replace(/\r\n/g, '\n').endsWith('\n') ? s : `${s}\n`);
 
 /**
@@ -47,6 +54,14 @@ ${patch.slice(0, -1)}
 \`\`\``;
 }
 
+/**
+ * Processes examples for a given rule.
+ *
+ * @param meta The metadata of the rule.
+ * @param examples The examples to process.
+ *
+ * @returns A promise that resolves to the processed examples as a string.
+ */
 const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExample[]) => {
     const md: string[] = [];
 
@@ -104,7 +119,7 @@ const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExa
             }
 
             if (meta.hasSuggestions && linterResult.problems.some((problem) => problem.suggestions)) {
-                md.push('and should offer the following suggestions:');
+                md.push('and the following suggestions should be offered:');
                 md.push('');
 
                 for (const problem of linterResult.problems) {
@@ -130,6 +145,14 @@ const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExa
     return md.join('\n');
 };
 
+/**
+ * Generates documentation for a given rule.
+ *
+ * @param file The path to the rule file.
+ * @param rule The rule to generate documentation for.
+ *
+ * @returns A promise that resolves to the generated documentation as a string.
+ */
 const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
     const md: string[] = [];
 
@@ -243,16 +266,18 @@ const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
 };
 
 /**
- * Generates the rules README.md file.
+ * Generates documentation for rules.
  */
 async function main() {
     const files = await fg([path.join(__dirname, '../src/rules/*.ts')]);
 
-    let md = '# Rules\n\n';
+    const md: string[] = [];
 
-    md += '<!-- markdownlint-disable -->\n';
-    md += '| Name | Description | Recommended | Fixable | Suggestions |\n';
-    md += '| --- | --- | :---: | :---: | :---: |\n';
+    md.push('<!-- markdownlint-disable -->');
+    md.push('# Rules');
+    md.push('');
+    md.push('| Name | Description | Recommended | Fixable | Suggestions |');
+    md.push('| --- | --- | :---: | :---: | :---: |');
 
     for (const file of files) {
         const fileName = path.basename(file);
@@ -261,13 +286,15 @@ async function main() {
         const rule: LinterRule = (await import(file)).default;
 
         // eslint-disable-next-line max-len
-        md += `| [${rule.meta.docs.name}](./${fileName.replace('.ts', '.md')}) | ${rule.meta.docs.description} | ${rule.meta.docs.recommended ? '✅' : ''} | ${rule.meta.hasFix ? '🔧' : ''} | ${rule.meta.hasSuggestions ? '💡' : ''} |\n`;
+        md.push(`| [${rule.meta.docs.name}](./${fileName.replace('.ts', '.md')}) | ${rule.meta.docs.description} | ${rule.meta.docs.recommended ? '✅' : ''} | ${rule.meta.hasFix ? '🔧' : ''} | ${rule.meta.hasSuggestions ? '💡' : ''} |`);
 
         // eslint-disable-next-line no-await-in-loop
         await generateRuleDocumentation(fileName, rule);
     }
 
-    await writeFile(path.join(__dirname, '../docs/rules/README.md'), md);
+    md.push('');
+
+    await writeFile(path.join(__dirname, '../docs/rules/README.md'), md.join('\n'));
 }
 
 main();

@@ -1,6 +1,6 @@
+<!-- markdownlint-disable -->
 # Rules
 
-<!-- markdownlint-disable -->
 | Name | Description | Recommended | Fixable | Suggestions |
 | --- | --- | :---: | :---: | :---: |
 | [if-directive-balance](./if-directive-balance.md) | Checks if conditional preprocessor directives are structured correctly | ✅ | 🔧 |  |
