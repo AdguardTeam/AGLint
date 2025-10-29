@@ -1,6 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import deepMerge from 'deepmerge';
-
+import { deepMerge } from '../../../utils/deepmerge';
 import { type LinterConfigFile } from '../../config-file/config-file';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
@@ -12,11 +11,6 @@ import {
     type IgnoreChainEntry,
     type LinterTreeOptions,
 } from './types';
-
-const mergeOptions: deepMerge.Options = {
-    // last-wins for arrays
-    // arrayMerge: (_dest, source) => source,
-};
 
 /**
  * Dynamic directory tree for tracking configs and ignore files.
@@ -399,7 +393,7 @@ export class LinterTree {
      * @returns Merged config.
      */
     private static mergeConfigs(base: LinterConfigFile, override: LinterConfigFile): LinterConfigFile {
-        return deepMerge(base, override, mergeOptions);
+        return deepMerge(base, override);
     }
 
     /**

@@ -1,8 +1,8 @@
-import deepMerge from 'deepmerge';
 import * as v from 'valibot';
 import { parse as parseYaml } from 'yaml';
 
 import { type LinterConfig } from '../../../linter/config';
+import { deepMerge } from '../../../utils/deepmerge';
 import {
     EXT_JSON,
     EXT_YAML,
@@ -19,14 +19,6 @@ import { PresetResolver } from './preset-resolver';
 import { type ConfigCacheEntry, type ConfigResolverOptions } from './types';
 
 const AGLINT_PREFIX = 'aglint:';
-
-/**
- * Deep merge options for config objects.
- * Arrays are replaced (not concatenated).
- */
-const mergeOptions = {
-    // arrayMerge: (_dest: unknown[], source: unknown[]) => source,
-};
 
 /**
  * Resolves and flattens linter configurations.
@@ -109,16 +101,16 @@ export class ConfigResolver {
      */
     public async resolveChain(configChain: ConfigChainEntry[]): Promise<LinterConfig> {
         if (configChain.length === 0) {
-            return deepMerge({}, this.options.baseConfig || {}, mergeOptions) as LinterConfig;
+            return deepMerge({}, this.options.baseConfig || {}) as LinterConfig;
         }
 
         // Start with base config
-        let merged = deepMerge({}, this.options.baseConfig || {}, mergeOptions) as LinterConfig;
+        let merged = deepMerge({}, this.options.baseConfig || {}) as LinterConfig;
 
         // Merge chain from farthest (root) to closest
         for (let i = configChain.length - 1; i >= 0; i -= 1) {
             const entry = configChain[i]!;
-            merged = deepMerge(merged, entry.config, mergeOptions) as LinterConfig;
+            merged = deepMerge(merged, entry.config) as LinterConfig;
         }
 
         return merged;
@@ -199,7 +191,6 @@ export class ConfigResolver {
                 mergedFromExtends = deepMerge(
                     mergedFromExtends,
                     extendedEntry.config,
-                    mergeOptions,
                 ) as LinterConfig;
             }
         }
@@ -207,7 +198,7 @@ export class ConfigResolver {
         // Merge local config (drop extends and root)
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { extends: _extends, root: _root, ...localRest } = parsed;
-        const flattened = deepMerge(mergedFromExtends, localRest, mergeOptions) as LinterConfig;
+        const flattened = deepMerge(mergedFromExtends, localRest) as LinterConfig;
 
         // Cache result
         const entry: ConfigCacheEntry = {

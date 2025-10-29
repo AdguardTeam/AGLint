@@ -1,6 +1,7 @@
 import { render } from 'micromustache';
 import * as v from 'valibot';
 
+import { deepMerge } from '../../utils/deepmerge';
 import { getErrorMessage } from '../../utils/error';
 import { type LinterReporter } from '../core/report';
 import {
@@ -167,7 +168,7 @@ export class LinterRuleInstance {
                 try {
                     parsedRestConfig = v.parse(
                         this.rule.meta.configSchema,
-                        parsedConfig.slice(1),
+                        deepMerge(this.rule.meta.defaultConfig ?? [], parsedConfig.slice(1)),
                     );
                 } catch (e) {
                     // eslint-disable-next-line max-len
