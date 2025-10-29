@@ -49,8 +49,8 @@ export default defineRule({
         defaultConfig: [
             {
                 adg: QuoteType.Double,
-                ubo: QuoteType.Double,
-                abp: QuoteType.Double,
+                ubo: QuoteType.None,
+                abp: QuoteType.None,
                 disallowCurlyQuotes: true,
             },
         ],
