@@ -66,6 +66,109 @@ This rule can be configured using the following options:
 ]
 ```
 
+## Correct examples
+
+Examples of correct code:
+
+### No excluded rules
+
+```adblock
+||example.com^
+```
+
+with config:
+
+```json
+[
+  {
+    "excludedRuleTexts": [],
+    "excludedRegExpPatterns": []
+  }
+]
+```
+
+should not be reported
+
+## Incorrect examples
+
+Examples of incorrect code:
+
+### `||example.com^` rule is excluded
+
+```adblock
+||example.com^
+||example.org^
+```
+
+with config:
+
+```json
+[
+  {
+    "excludedRuleTexts": [
+      "||example.com^"
+    ],
+    "excludedRegExpPatterns": []
+  }
+]
+```
+
+should be reported as:
+
+```shell
+1:0 Rule matches an excluded rule text: ||example.com^
+```
+
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,2 +1,1 @@
+-||example.com^
+ ||example.org^
+```
+
+### Rules containing `.org` are excluded
+
+```adblock
+||example.com^
+||example.org^
+```
+
+with config:
+
+```json
+[
+  {
+    "excludedRuleTexts": [],
+    "excludedRegExpPatterns": [
+      "\\.org"
+    ]
+  }
+]
+```
+
+should be reported as:
+
+```shell
+2:0 Rule matches an excluded pattern: \.org
+```
+
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,2 +1,1 @@
+ ||example.com^
+-||example.org^
+```
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-excluded-rules.ts

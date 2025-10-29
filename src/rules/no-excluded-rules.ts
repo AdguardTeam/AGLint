@@ -1,7 +1,7 @@
 import { type AnyRule, RegExpUtils } from '@adguard/agtree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleType } from '../linter/rule';
+import { defineRule, LinterRuleSeverity, LinterRuleType } from '../linter/rule';
 import { createVisitorsForAnyValidRule } from '../utils/visitor-creator';
 
 export default defineRule({
@@ -33,6 +33,46 @@ export default defineRule({
             {
                 excludedRuleTexts: [],
                 excludedRegExpPatterns: [],
+            },
+        ],
+        correctExamples: [
+            {
+                name: 'No excluded rules',
+                code: [
+                    '||example.com^',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: '`||example.com^` rule is excluded',
+                code: [
+                    '||example.com^',
+                    '||example.org^',
+                ].join('\n'),
+                config: [
+                    LinterRuleSeverity.Error,
+                    {
+                        excludedRuleTexts: [
+                            '||example.com^',
+                        ],
+                        excludedRegExpPatterns: [],
+                    },
+                ],
+            },
+            {
+                name: 'Rules containing `.org` are excluded',
+                code: [
+                    '||example.com^',
+                    '||example.org^',
+                ].join('\n'),
+                config: [
+                    LinterRuleSeverity.Error,
+                    {
+                        excludedRuleTexts: [],
+                        excludedRegExpPatterns: ['\\.org'],
+                    },
+                ],
             },
         ],
         hasFix: true,
