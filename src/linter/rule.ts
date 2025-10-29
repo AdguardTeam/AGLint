@@ -132,6 +132,31 @@ export enum LinterRuleType {
 const linterRuleTypeSchema = v.enum(LinterRuleType);
 
 /**
+ * Schema for rule examples.
+ */
+export const linterRuleExampleSchema = v.object({
+    /**
+     * Optional name of the example.
+     */
+    name: v.optional(v.string()),
+
+    /**
+     * Code for the example.
+     */
+    code: v.string(),
+
+    /**
+     * Linter rule config for the example.
+     */
+    config: v.optional(linterRuleConfigSchema),
+});
+
+/**
+ * Type representing a rule example.
+ */
+export type LinterRuleExample = v.InferOutput<typeof linterRuleExampleSchema>;
+
+/**
  * Represents the documentation of a linter rule.
  */
 export const linterRuleDocsSchema = v.object({
@@ -154,6 +179,16 @@ export const linterRuleDocsSchema = v.object({
      * The URL of the rule documentation.
      */
     url: v.optional(v.string()),
+
+    /**
+     * When to use this rule.
+     */
+    whenToUseIt: v.optional(v.string()),
+
+    /**
+     * When not to use this rule.
+     */
+    whenNotToUseIt: v.optional(v.string()),
 });
 type LinterRuleDocs = v.InferOutput<typeof linterRuleDocsSchema>;
 
@@ -182,9 +217,14 @@ export const linterRuleMetaSchema = v.object({
     docs: linterRuleDocsSchema,
 
     /**
-     * Example problems for the rule.
+     * Examples of incorrect code for the rule.
      */
-    examples: v.optional(v.array(v.string())),
+    incorrectExamples: v.optional(v.array(linterRuleExampleSchema)),
+
+    /**
+     * Examples of correct code for the rule.
+     */
+    correctExamples: v.optional(v.array(linterRuleExampleSchema)),
 
     /**
      * Whether the rule has suggestions.
@@ -200,8 +240,22 @@ export const linterRuleMetaSchema = v.object({
      * The messages of the rule.
      */
     messages: v.optional(linterRuleMessagesSchema),
-    // configSchema is runtime-attached in defineRule; we keep it out of Valibot here
+
+    /**
+     * The configuration schema of the rule.
+     * No need to define it here, as it is runtime-attached in defineRule.
+     */
     configSchema: v.optional(v.any()),
+
+    /**
+     * Default configuration for the rule.
+     */
+    defaultConfig: v.optional(v.any()),
+
+    /**
+     * The linter version in which this rule was added.
+     */
+    version: v.optional(v.string()),
 });
 
 /* =========================
@@ -325,7 +379,10 @@ export interface LinterRule<
         hasFix?: boolean;
         messages?: Msgs;
         configSchema?: TupleOf<Elements>;
-        examples?: string[];
+        defaultConfig?: ConfigOf<Elements>;
+        correctExamples?: LinterRuleExample[];
+        incorrectExamples?: LinterRuleExample[];
+        version?: string;
     };
     create: LinterRuleCreatorFunction<Elements, Msgs>;
 }

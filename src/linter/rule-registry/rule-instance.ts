@@ -183,13 +183,17 @@ export class LinterRuleInstance {
             // severity-only case
             this.severity = parsedConfig;
 
-            // we should parse empty array against config schema if it exists,
-            // to set default values in this case as well
             if (this.rule.meta.configSchema) {
                 this.config.length = 0;
-                const parsedDefaultConfig = v.parse(this.rule.meta.configSchema, []);
+                try {
+                    // eslint-disable-next-line max-len
+                    const parsedDefaultConfig = v.parse(this.rule.meta.configSchema, this.rule.meta.defaultConfig ?? []);
 
-                this.config.push(...parsedDefaultConfig);
+                    this.config.push(...parsedDefaultConfig);
+                } catch (e) {
+                    // eslint-disable-next-line max-len
+                    throw new Error(`Rule '${this.rule.meta.docs.name}' has invalid default configuration: ${getErrorMessage(e)}`);
+                }
             }
         }
     }
