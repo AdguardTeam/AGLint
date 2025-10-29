@@ -77,7 +77,7 @@ const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExa
         md.push('');
 
         const linterResult = await lint(example.code, {
-            [meta.docs.name]: example.config ?? LinterRuleSeverity.Error,
+            [meta.docs.name]: example.config ? [LinterRuleSeverity.Error, ...example.config] : LinterRuleSeverity.Error,
         });
 
         if (meta.configSchema && meta.defaultConfig) {
