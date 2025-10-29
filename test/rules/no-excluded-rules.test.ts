@@ -15,6 +15,7 @@ describe('no-excluded-rules', () => {
                     excludedRuleTexts: [
                         'example.com/exact/match/',
                     ],
+                    excludedRegExpPatterns: [],
                 },
             ],
         };
@@ -177,6 +178,7 @@ describe('no-excluded-rules', () => {
                         '||ads.example.com^',
                         '@@||example.com/whitelist^',
                     ],
+                    excludedRegExpPatterns: [],
                 },
             ],
         };
@@ -287,6 +289,7 @@ describe('no-excluded-rules', () => {
                     excludedRegExpPatterns: [
                         String.raw`example\.com\/bad\/query\/`,
                     ],
+                    excludedRuleTexts: [],
                 },
             ],
         };
@@ -435,6 +438,7 @@ describe('no-excluded-rules', () => {
                     excludedRegExpPatterns: [
                         String.raw`example\.(com|org)\/bad\/query\/`,
                     ],
+                    excludedRuleTexts: [],
                 },
             ],
         };

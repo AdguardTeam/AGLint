@@ -95,12 +95,6 @@ export const SUPPORTED_CSS_PSEUDO_CLASSES = new Set([
     'where', // https://developer.mozilla.org/en-US/docs/Web/CSS/:where
 ]);
 
-const DEFAULT_OPTIONS = {
-    fuzzyThreshold: 0.6,
-    additionalSupportedCssPseudoClasses: [],
-    additionalSupportedExtCssPseudoClasses: [],
-};
-
 export default defineRule({
     meta: {
         type: LinterRuleType.Problem,
@@ -114,34 +108,54 @@ export default defineRule({
             changePseudoClass: 'Change pseudo-class to {{suggestedPseudoClass}}',
         },
         configSchema: v.tuple([
-            v.optional(
-                v.object({
-                    fuzzyThreshold: v.optional(v.pipe(
-                        v.number(),
-                        v.minValue(0),
-                        v.maxValue(1),
-                    ), DEFAULT_OPTIONS.fuzzyThreshold),
-                    additionalSupportedCssPseudoClasses: v.optional(
+            v.strictObject({
+                fuzzyThreshold: v.pipe(
+                    v.number(),
+                    v.minValue(0),
+                    v.maxValue(1),
+                    v.description('Minimum similarity threshold for fuzzy matching'),
+                ),
+                additionalSupportedCssPseudoClasses: v.optional(
+                    v.pipe(
                         v.array(v.string()),
-                        DEFAULT_OPTIONS.additionalSupportedCssPseudoClasses,
+                        v.description('Additional supported CSS pseudo-classes'),
                     ),
-                    additionalSupportedExtCssPseudoClasses: v.optional(
+                ),
+                additionalSupportedExtCssPseudoClasses: v.optional(
+                    v.pipe(
                         v.array(v.string()),
-                        DEFAULT_OPTIONS.additionalSupportedExtCssPseudoClasses,
+                        v.description('Additional supported Extended CSS pseudo-classes'),
                     ),
-                }),
-                DEFAULT_OPTIONS,
-            ),
+                ),
+            }),
         ]),
+        defaultConfig: [
+            {
+                fuzzyThreshold: 0.6,
+            },
+        ],
         hasSuggestions: true,
+        correctExamples: [
+            {
+                name: 'Known pseudo-class',
+                code: '##*:has(.selector)',
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Almost correct pseudo-class, but misspelled',
+                code: '##*:contians(foo)',
+            },
+        ],
+        version: '4.0.0',
     },
     create: (context) => {
         const config = context.config[0];
         const supportedCssPseudoClasses = new Set(
-            [...SUPPORTED_CSS_PSEUDO_CLASSES, ...config.additionalSupportedCssPseudoClasses],
+            [...SUPPORTED_CSS_PSEUDO_CLASSES, ...(config.additionalSupportedCssPseudoClasses ?? [])],
         );
         const supportedExtCssPseudoClasses = new Set(
-            [...SUPPORTED_EXT_CSS_PSEUDO_CLASSES, ...config.additionalSupportedExtCssPseudoClasses],
+            [...SUPPORTED_EXT_CSS_PSEUDO_CLASSES, ...(config.additionalSupportedExtCssPseudoClasses ?? [])],
         );
         const allSupportedPseudoClasses = [
             ...supportedCssPseudoClasses,

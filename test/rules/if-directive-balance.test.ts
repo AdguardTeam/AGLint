@@ -316,7 +316,7 @@ describe('if-directive-balance', () => {
                 },
                 fix: {
                     range: [
-                        32,
+                        36,
                         49,
                     ],
                     text: '',

@@ -1,7 +1,7 @@
 import { type SelectorListPlain } from '@adguard/ecss-tree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleType } from '../linter/rule';
+import { defineRule, LinterRuleSeverity, LinterRuleType } from '../linter/rule';
 
 export default defineRule({
     meta: {
@@ -15,18 +15,36 @@ export default defineRule({
             multipleSelectors: 'This selector list contains {{count}} selectors, but only {{maxSelectors}} are allowed',
         },
         configSchema: v.tuple([
-            v.optional(v.strictObject({
-                maxSelectors: v.pipe(
-                    v.optional(v.number(), 1),
-                    v.minValue(1),
-                ),
-            }), { maxSelectors: 1 }),
+            v.optional(
+                v.strictObject({
+                    maxSelectors: v.pipe(
+                        v.optional(v.number(), 1),
+                        v.minValue(1),
+                        v.description('The maximum number of selectors allowed in a selector list'),
+                    ),
+                }),
+                { maxSelectors: 1 },
+            ),
         ]),
         hasFix: true,
-        examples: [
-            '##.single-selector',
-            '##.selector1, .selector2',
+        correctExamples: [
+            {
+                name: 'Single selector',
+                code: '##.single-selector',
+            },
+            {
+                name: 'Multiple selectors',
+                code: '##.selector1, .selector2',
+                config: [LinterRuleSeverity.Error, { maxSelectors: 2 }],
+            },
         ],
+        incorrectExamples: [
+            {
+                name: 'Multiple selectors',
+                code: '##.selector1, .selector2',
+            },
+        ],
+        version: '1.0.0',
     },
     create: (context) => {
         const { maxSelectors } = context.config[0];

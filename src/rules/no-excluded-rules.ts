@@ -20,13 +20,21 @@ export default defineRule({
         configSchema: v.tuple([
             v.strictObject({
                 excludedRuleTexts: v.pipe(
-                    v.fallback(v.array(v.string()), []),
+                    v.array(v.string()),
+                    v.description('List of rule texts to exclude'),
                 ),
                 excludedRegExpPatterns: v.pipe(
-                    v.fallback(v.array(v.string()), []),
+                    v.array(v.string()),
+                    v.description('List of RegExp patterns to exclude'),
                 ),
             }),
         ]),
+        defaultConfig: [
+            {
+                excludedRuleTexts: [],
+                excludedRegExpPatterns: [],
+            },
+        ],
         hasFix: true,
     },
     create: (context) => {

@@ -17,6 +17,47 @@ export default defineRule({
             invalidDirective: 'Invalid usage of preprocessor directive: "{{directive}}"',
         },
         hasFix: true,
+        correctExamples: [
+            {
+                name: 'Correct example',
+                code: [
+                    '!#if adguard',
+                    'adguard-rule',
+                    '!#endif',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Unclosed if',
+                code: [
+                    '!#if adguard',
+                    'adguard-rule',
+                ].join('\n'),
+            },
+            {
+                name: 'Missing if',
+                code: [
+                    '!#endif',
+                ].join('\n'),
+            },
+            {
+                name: 'Else without if',
+                code: [
+                    '!#else',
+                ].join('\n'),
+            },
+            {
+                name: 'Else with params',
+                code: [
+                    '!#if adguard',
+                    'adguard-rule',
+                    '!#else ext_ublock',
+                    'ublock-rule',
+                    '!#endif',
+                ].join('\n'),
+            },
+        ],
     },
     create: (context) => {
         const stack: PreProcessorCommentRule[] = [];
@@ -40,7 +81,7 @@ export default defineRule({
                                 },
                                 node,
                                 fix: (fixer) => {
-                                    return fixer.remove([node.name.start!, node.params!.end!]);
+                                    return fixer.remove([node.name.end!, node.params!.end!]);
                                 },
                             });
                         }

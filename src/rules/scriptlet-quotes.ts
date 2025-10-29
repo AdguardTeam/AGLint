@@ -39,14 +39,35 @@ export default defineRule({
             curlyQuotesDisallowed: 'Curly quotes are disallowed',
         },
         configSchema: v.tuple([
-            v.object({
+            v.strictObject({
                 adg: v.enum(QuoteType),
                 ubo: v.enum(QuoteType),
                 abp: v.enum(QuoteType),
                 disallowCurlyQuotes: v.boolean(),
             }),
         ]),
+        defaultConfig: [
+            {
+                adg: QuoteType.Double,
+                ubo: QuoteType.Double,
+                abp: QuoteType.Double,
+                disallowCurlyQuotes: true,
+            },
+        ],
         hasFix: true,
+        correctExamples: [
+            {
+                name: 'Correct quotes',
+                code: '#%#//scriptlet("scriptlet-name", "arg1", "arg2")',
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Single quotes instead of double quotes',
+                code: "#%#//scriptlet('scriptlet-name', 'arg1', 'arg2')",
+            },
+        ],
+        version: '4.0.0',
     },
     create: (context) => {
         let syntax: AdblockSyntax | undefined;
