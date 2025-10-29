@@ -159,7 +159,11 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
                 content,
                 cwd: task.cwd,
             },
-            config: v.parse(linterConfigSchema, task.linterConfig),
+            config: {
+                ...v.parse(linterConfigSchema, task.linterConfig),
+                reportUnusedDisableDirectives: tasks.cliConfig.reportUnusedDisableDirectives,
+                unusedDisableDirectivesSeverity: tasks.cliConfig.unusedDisableDirectivesSeverity,
+            },
             loadRule: async (ruleName) => {
                 if (ruleCache.has(ruleName)) {
                     return ruleCache.get(ruleName);

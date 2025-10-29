@@ -61,6 +61,16 @@ export type LinterCliConfig = {
     inlineConfig: boolean;
 
     /**
+     * Whether to report unused disable directives.
+     */
+    reportUnusedDisableDirectives: boolean;
+
+    /**
+     * Severity of unused disable directives.
+     */
+    unusedDisableDirectivesSeverity: 'warn' | 'error';
+
+    /**
      * Whether to enable result caching.
      */
     cache: boolean;
@@ -146,6 +156,13 @@ export function buildCliProgram(): Command {
 
         .optionsGroup('Inline configuration comments')
         .option('--no-inline-config', 'Disable inline configuration comments')
+        .option('--report-unused-disable-directives', 'Report unused disable directives')
+        .addOption(
+            new Option(
+                '--unused-disable-directives-severity <severity>',
+                'Severity of unused disable directives',
+            ).choices(['warn', 'error']).default('warn'),
+        )
 
         .optionsGroup('Caching')
         .option('--cache', 'Enable caching', false)
