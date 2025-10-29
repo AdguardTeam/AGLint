@@ -11,6 +11,24 @@ export default defineRule({
             description: 'Checks if CSS declarations are valid',
             recommended: true,
         },
+        correctExamples: [
+            {
+                name: 'Valid declarations',
+                code: [
+                    '#$#body { color: red; }',
+                    '#$?#body { remove: true; }',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid declarations',
+                code: [
+                    '#$#body { color: foo; padding: bar; }',
+                ].join('\n'),
+            },
+        ],
+        version: '4.0.0',
     },
     create: (context) => {
         return {

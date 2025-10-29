@@ -37,6 +37,30 @@ export default defineRule({
         },
         hasFix: true,
         hasSuggestions: true,
+        correctExamples: [
+            {
+                name: 'No duplicated CSS properties',
+                code: [
+                    '#$#body { color: red; }',
+                    '#$#body { padding: 10px; }',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid CSS declarations (same property, same values)',
+                code: [
+                    '#$#body { color: red; color: red; }',
+                ].join('\n'),
+            },
+            {
+                name: 'Invalid CSS declarations (same property, different values)',
+                code: [
+                    '#$#body { color: red; color: blue; }',
+                ].join('\n'),
+            },
+        ],
+        version: '4.0.0',
     },
     create: (context) => {
         const declarationHistory: Map<string, DeclarationPlain[]> = new Map();

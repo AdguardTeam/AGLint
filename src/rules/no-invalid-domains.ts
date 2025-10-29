@@ -15,6 +15,24 @@ export default defineRule({
             removeInvalidDomain: 'Remove invalid domain "{{domain}}"',
         },
         hasSuggestions: true,
+        correctExamples: [
+            {
+                name: 'Valid domains',
+                code: [
+                    'example.*##.ad',
+                    'pelda.hu##.ad',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid domain',
+                code: [
+                    'example. com##.ad',
+                ].join('\n'),
+            },
+        ],
+        version: '1.0.9',
     },
     create: (context) => {
         let separator: string | undefined;
