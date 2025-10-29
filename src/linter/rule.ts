@@ -132,6 +132,11 @@ export enum LinterRuleType {
 const linterRuleTypeSchema = v.enum(LinterRuleType);
 
 /**
+ * Schema for rule example config (config parameters without severity).
+ */
+const linterRuleExampleConfigSchema = v.optional(v.array(v.any()));
+
+/**
  * Schema for rule examples.
  */
 export const linterRuleExampleSchema = v.object({
@@ -148,7 +153,8 @@ export const linterRuleExampleSchema = v.object({
     /**
      * Linter rule config for the example.
      */
-    config: v.optional(linterRuleConfigSchema),
+    // should be configOf without severity
+    config: v.optional(linterRuleExampleConfigSchema),
 });
 
 /**

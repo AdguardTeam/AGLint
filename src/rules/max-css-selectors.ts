@@ -1,7 +1,7 @@
 import { type SelectorListPlain } from '@adguard/ecss-tree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleSeverity, LinterRuleType } from '../linter/rule';
+import { defineRule, LinterRuleType } from '../linter/rule';
 
 export default defineRule({
     meta: {
@@ -37,7 +37,7 @@ export default defineRule({
             {
                 name: 'Multiple selectors',
                 code: '##.selector1, .selector2',
-                config: [LinterRuleSeverity.Error, { maxSelectors: 2 }],
+                config: [{ maxSelectors: 2 }],
             },
         ],
         incorrectExamples: [
