@@ -57,7 +57,7 @@ export function applyDisableDirectives(
     reportUnused = false,
     severity: 'warn' | 'error' = 'warn',
 ) {
-    const applier = new LinterInlineDisableApplier(directives, { keepFatal: true });
+    const applier = new LinterInlineDisableApplier(directives, { keepFatal: false });
 
     if (reportUnused) {
         const { problems: filtered, unusedDirectives } = applier.filterWithUnusedDirectives(problems);
