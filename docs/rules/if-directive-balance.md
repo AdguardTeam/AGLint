@@ -9,6 +9,10 @@
 
 Checks if conditional preprocessor directives are structured correctly
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧

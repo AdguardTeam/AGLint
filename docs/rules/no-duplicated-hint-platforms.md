@@ -9,6 +9,10 @@
 
 Checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧

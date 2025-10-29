@@ -9,6 +9,10 @@
 
 Checks if a network rule contains multiple same modifiers
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-modifiers.ts

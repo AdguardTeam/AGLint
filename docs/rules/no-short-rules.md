@@ -9,6 +9,10 @@
 
 Checks if a rule is too short
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Options
 
 This rule can be configured using the following options.

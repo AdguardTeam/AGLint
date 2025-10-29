@@ -5,6 +5,10 @@
 
 Checks if a CSS selector list contains more than the specified number of selectors
 
+## Type
+
+Layout. Focuses on how filters look, not how they work.
+
 ## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧

@@ -9,6 +9,10 @@
 
 Checks if a preprocessor directive is known
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-unknown-preprocessor-directives.ts

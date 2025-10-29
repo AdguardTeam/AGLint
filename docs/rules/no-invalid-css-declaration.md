@@ -9,6 +9,10 @@
 
 Checks if CSS declarations are valid
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-css-declaration.ts

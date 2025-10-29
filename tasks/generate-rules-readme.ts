@@ -172,6 +172,24 @@ const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
     md.push(rule.meta.docs.description);
     md.push('');
 
+    md.push('## Type');
+    md.push('');
+    switch (rule.meta.type) {
+        case 'problem':
+            md.push('Problem. Identifies parts that causes errors or confusing behavior. High priority fix.');
+            break;
+        case 'suggestion':
+            md.push('Suggestion. Identifies better ways to write filters without breaking functionality.');
+            break;
+        case 'layout':
+            md.push('Layout. Focuses on how filters look, not how they work.');
+            break;
+        default:
+            md.push('Unknown type.');
+            break;
+    }
+    md.push('');
+
     if (rule.meta.hasFix || rule.meta.hasSuggestions) {
         md.push('## Automatic issue fixing');
         md.push('');

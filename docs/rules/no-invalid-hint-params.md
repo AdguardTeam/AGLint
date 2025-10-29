@@ -9,6 +9,10 @@
 
 Checks if hints are parameterized correctly
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-hint-params.ts

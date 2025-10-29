@@ -5,6 +5,10 @@
 
 Checks if any rule matches an excluded pattern
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧

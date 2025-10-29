@@ -9,6 +9,10 @@
 
 Checks that CSS pseudo-classes are supported
 
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
 ## Automatic issue fixing
 
 - Some reported problems can be fixed via suggestions 💡
