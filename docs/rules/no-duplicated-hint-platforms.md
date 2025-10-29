@@ -1,33 +1,17 @@
 <!-- markdownlint-disable -->
-# no-duplicated-hint-platforms
+# `no-duplicated-hint-platforms`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint
 
-## Metadata
+## Features
 
-- Fixable: ✅
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
+- Some reported problems can be fixed automatically 🔧
 
 ## Rule source
 

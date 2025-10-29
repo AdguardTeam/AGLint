@@ -1,33 +1,16 @@
 <!-- markdownlint-disable -->
-# no-inconsistent-hint-platforms
+# `no-inconsistent-hint-platforms`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM() hint at the same time
 
-## Metadata
+## Features
 
-- Fixable: ❌
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
 
 ## Rule source
 

@@ -1,57 +1,20 @@
 <!-- markdownlint-disable -->
-# max-css-selectors
+# `max-css-selectors`
+
 
 ## Description
 
 Checks if a CSS selector list contains more than the specified number of selectors
 
-## Metadata
+## Features
 
-- Fixable: ✅
-- Suggestions: ❌
-- Recommended: ❌
-- Type: layout
+- Some reported problems can be fixed automatically 🔧
 
-## Options
+## Correct examples
 
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [
-    {
-      "type": "object",
-      "properties": {
-        "maxSelectors": {
-          "type": "number",
-          "default": 1,
-          "minimum": 1
-        }
-      },
-      "required": [],
-      "additionalProperties": false,
-      "default": {
-        "maxSelectors": 1
-      }
-    }
-  ],
-  "minItems": 1
-}
-```
+Examples of correct code:
 
-### Default options
-
-```json
-[
-  {
-    "maxSelectors": 1
-  }
-]
-```
-
-## Examples
-
-### Example 1
+### Single selector
 
 ```adblock
 ##.single-selector
@@ -59,7 +22,19 @@ Checks if a CSS selector list contains more than the specified number of selecto
 
 should not be reported
 
-### Example 2
+### Multiple selectors
+
+```adblock
+##.selector1, .selector2
+```
+
+should not be reported
+
+## Incorrect examples
+
+Examples of incorrect code:
+
+### Multiple selectors
 
 ```adblock
 ##.selector1, .selector2
@@ -71,13 +46,23 @@ should be reported as:
 1:2 This selector list contains 2 selectors, but only 1 are allowed
 ```
 
+
 and should be fixed as:
 
 ```diff
-- ##.selector1, .selector2
-+ ##.selector1
-+ ##.selector2
+===================================================================
+--- original
++++ fixed
+@@ -1,1 +1,2 @@
+-##.selector1, .selector2
++##.selector1
++##.selector2
 ```
+
+## Version
+
+This rule was added in AGLint version 1.0.0
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/max-css-selectors.ts

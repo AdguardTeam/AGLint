@@ -1,33 +1,18 @@
 <!-- markdownlint-disable -->
-# no-duplicated-css-declaration-props
+# `no-duplicated-css-declaration-props`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks for duplicated CSS declaration properties within the same rule block
 
-## Metadata
+## Features
 
-- Fixable: ✅
-- Suggestions: ✅
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
+- Some reported problems can be fixed automatically 🔧
+- Some reported problems can be fixed via suggestions 💡
 
 ## Rule source
 

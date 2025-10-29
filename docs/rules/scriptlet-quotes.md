@@ -1,18 +1,26 @@
 <!-- markdownlint-disable -->
-# scriptlet-quotes
+# `scriptlet-quotes`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks quotes in scriptlet
 
-## Metadata
+## Features
 
-- Fixable: ✅
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
+- Some reported problems can be fixed automatically 🔧
 
 ## Options
+
+This rule can be configured using the following options:
+
+### Options schema
+
+<details>
+<summary>Click to expand</summary>
 
 ```json
 {
@@ -55,20 +63,100 @@ Checks quotes in scriptlet
         "ubo",
         "abp",
         "disallowCurlyQuotes"
-      ]
+      ],
+      "additionalProperties": false
     }
   ],
   "minItems": 1
 }
 ```
 
+</details>
+
 ### Default options
 
 ```json
 [
-  {}
+  {
+    "adg": "double",
+    "ubo": "double",
+    "abp": "double",
+    "disallowCurlyQuotes": true
+  }
 ]
 ```
+
+## Correct examples
+
+Examples of correct code:
+
+### Correct quotes
+
+```adblock
+#%#//scriptlet("scriptlet-name", "arg1", "arg2")
+```
+
+with config:
+
+```json
+[
+  {
+    "adg": "double",
+    "ubo": "double",
+    "abp": "double",
+    "disallowCurlyQuotes": true
+  }
+]
+```
+
+should not be reported
+
+## Incorrect examples
+
+Examples of incorrect code:
+
+### Single quotes instead of double quotes
+
+```adblock
+#%#//scriptlet('scriptlet-name', 'arg1', 'arg2')
+```
+
+with config:
+
+```json
+[
+  {
+    "adg": "double",
+    "ubo": "double",
+    "abp": "double",
+    "disallowCurlyQuotes": true
+  }
+]
+```
+
+should be reported as:
+
+```shell
+1:15 Scriptlet argument should be quoted with double, but single was found
+1:33 Scriptlet argument should be quoted with double, but single was found
+1:41 Scriptlet argument should be quoted with double, but single was found
+```
+
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,1 +1,1 @@
+-#%#//scriptlet('scriptlet-name', 'arg1', 'arg2')
++#%#//scriptlet("scriptlet-name", "arg1", "arg2")
+```
+
+## Version
+
+This rule was added in AGLint version 4.0.0
 
 ## Rule source
 

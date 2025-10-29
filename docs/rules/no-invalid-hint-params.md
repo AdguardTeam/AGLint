@@ -1,33 +1,16 @@
 <!-- markdownlint-disable -->
-# no-invalid-hint-params
+# `no-invalid-hint-params`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks if hints are parameterized correctly
 
-## Metadata
+## Features
 
-- Fixable: ❌
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
 
 ## Rule source
 

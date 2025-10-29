@@ -1,33 +1,16 @@
 <!-- markdownlint-disable -->
-# no-unknown-hint-platforms
+# `no-unknown-hint-platforms`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks if platforms in related hints are known
 
-## Metadata
+## Features
 
-- Fixable: ❌
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
 
 ## Rule source
 

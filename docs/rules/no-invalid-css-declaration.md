@@ -1,33 +1,16 @@
 <!-- markdownlint-disable -->
-# no-invalid-css-declaration
+# `no-invalid-css-declaration`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks if CSS declarations are valid
 
-## Metadata
+## Features
 
-- Fixable: ❌
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
 
 ## Rule source
 

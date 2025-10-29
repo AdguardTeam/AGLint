@@ -1,33 +1,16 @@
 <!-- markdownlint-disable -->
-# no-invalid-modifiers
+# `no-invalid-modifiers`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks modifiers validity for basic (network) rules
 
-## Metadata
+## Features
 
-- Fixable: ❌
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
-
-## Options
-
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
-```
-
-### Default options
-
-```json
-[]
-```
 
 ## Rule source
 

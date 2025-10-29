@@ -1,18 +1,26 @@
 <!-- markdownlint-disable -->
-# no-unsupported-css-pseudo-class
+# `no-unsupported-css-pseudo-class`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks that CSS pseudo-classes are supported
 
-## Metadata
+## Features
 
-- Fixable: ❌
-- Suggestions: ✅
-- Recommended: ✅
-- Type: problem
+- Some reported problems can be fixed via suggestions 💡
 
 ## Options
+
+This rule can be configured using the following options:
+
+### Options schema
+
+<details>
+<summary>Click to expand</summary>
 
 ```json
 {
@@ -26,46 +34,121 @@ Checks that CSS pseudo-classes are supported
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "default": 0.6
+          "description": "Minimum similarity threshold for fuzzy matching"
         },
         "additionalSupportedCssPseudoClasses": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "default": []
+          "description": "Additional supported CSS pseudo-classes"
         },
         "additionalSupportedExtCssPseudoClasses": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "default": []
+          "description": "Additional supported Extended CSS pseudo-classes"
         }
       },
-      "required": [],
-      "default": {
-        "fuzzyThreshold": 0.6,
-        "additionalSupportedCssPseudoClasses": [],
-        "additionalSupportedExtCssPseudoClasses": []
-      }
+      "required": [
+        "fuzzyThreshold"
+      ],
+      "additionalProperties": false
     }
   ],
   "minItems": 1
 }
 ```
 
+</details>
+
 ### Default options
 
 ```json
 [
   {
-    "fuzzyThreshold": 0.6,
-    "additionalSupportedCssPseudoClasses": [],
-    "additionalSupportedExtCssPseudoClasses": []
+    "fuzzyThreshold": 0.6
   }
 ]
 ```
+
+## Correct examples
+
+Examples of correct code:
+
+### Known pseudo-class
+
+```adblock
+##*:has(.selector)
+```
+
+with config:
+
+```json
+[
+  {
+    "fuzzyThreshold": 0.6
+  }
+]
+```
+
+should not be reported
+
+## Incorrect examples
+
+Examples of incorrect code:
+
+### Almost correct pseudo-class, but misspelled
+
+```adblock
+##*:contians(foo)
+```
+
+with config:
+
+```json
+[
+  {
+    "fuzzyThreshold": 0.6
+  }
+]
+```
+
+should be reported as:
+
+```shell
+1:3 Unsupported CSS pseudo-class: contians
+```
+
+
+and should offer the following suggestions:
+
+- Change pseudo-class to contains
+
+  ```diff
+  ===================================================================
+  --- original
+  +++ fixed
+  @@ -1,1 +1,1 @@
+  -##*:contians(foo)
+  +##*:contains(foo)
+  ```
+
+- Change pseudo-class to -abp-contains
+
+  ```diff
+  ===================================================================
+  --- original
+  +++ fixed
+  @@ -1,1 +1,1 @@
+  -##*:contians(foo)
+  +##*:-abp-contains(foo)
+  ```
+
+## Version
+
+This rule was added in AGLint version 4.0.0
 
 ## Rule source
 

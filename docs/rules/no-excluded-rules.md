@@ -1,18 +1,23 @@
 <!-- markdownlint-disable -->
-# no-excluded-rules
+# `no-excluded-rules`
+
 
 ## Description
 
 Checks if any rule matches an excluded pattern
 
-## Metadata
+## Features
 
-- Fixable: ✅
-- Suggestions: ❌
-- Recommended: ❌
-- Type: problem
+- Some reported problems can be fixed automatically 🔧
 
 ## Options
+
+This rule can be configured using the following options:
+
+### Options schema
+
+<details>
+<summary>Click to expand</summary>
 
 ```json
 {
@@ -26,13 +31,15 @@ Checks if any rule matches an excluded pattern
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of rule texts to exclude"
         },
         "excludedRegExpPatterns": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of RegExp patterns to exclude"
         }
       },
       "required": [
@@ -46,11 +53,16 @@ Checks if any rule matches an excluded pattern
 }
 ```
 
+</details>
+
 ### Default options
 
 ```json
 [
-  {}
+  {
+    "excludedRuleTexts": [],
+    "excludedRegExpPatterns": []
+  }
 ]
 ```
 

@@ -1,32 +1,103 @@
 <!-- markdownlint-disable -->
-# if-directive-balance
+# `if-directive-balance`
+
+> 
+> ✅ Using `aglint:recommended` preset will enable this rule
+> 
 
 ## Description
 
 Checks if conditional preprocessor directives are structured correctly
 
-## Metadata
+## Features
 
-- Fixable: ✅
-- Suggestions: ❌
-- Recommended: ✅
-- Type: problem
+- Some reported problems can be fixed automatically 🔧
 
-## Options
+## Correct examples
 
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
-  "items": [],
-  "minItems": 0
-}
+Examples of correct code:
+
+### Correct example
+
+```adblock
+!#if adguard
+adguard-rule
+!#endif
 ```
 
-### Default options
+should not be reported
 
-```json
-[]
+## Incorrect examples
+
+Examples of incorrect code:
+
+### Unclosed if
+
+```adblock
+!#if adguard
+adguard-rule
+```
+
+should be reported as:
+
+```shell
+1:0 Unclosed "if" directive
+```
+
+### Missing if
+
+```adblock
+!#endif
+```
+
+should be reported as:
+
+```shell
+1:0 Using an "endif" directive without an opening "if" directive
+```
+
+### Else without if
+
+```adblock
+!#else
+```
+
+should be reported as:
+
+```shell
+1:0 Using an "else" directive without an opening "if" directive
+```
+
+### Else with params
+
+```adblock
+!#if adguard
+adguard-rule
+!#else ext_ublock
+ublock-rule
+!#endif
+```
+
+should be reported as:
+
+```shell
+3:0 Invalid usage of preprocessor directive: "else"
+```
+
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,5 +1,5 @@
+ !#if adguard
+ adguard-rule
+-!#else ext_ublock
++!#else
+ ublock-rule
+ !#endif
 ```
 
 ## Rule source
