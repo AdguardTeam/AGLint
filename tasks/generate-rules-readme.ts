@@ -181,6 +181,7 @@ const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
         md.push('```');
         md.push('');
         md.push('</details>');
+        md.push('');
 
         md.push('### Default options');
         md.push('');

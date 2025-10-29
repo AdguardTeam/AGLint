@@ -72,6 +72,7 @@ This rule can be configured using the following options.
 ```
 
 </details>
+
 ### Default options
 
 ```json

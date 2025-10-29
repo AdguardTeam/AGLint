@@ -62,6 +62,7 @@ This rule can be configured using the following options.
 ```
 
 </details>
+
 ### Default options
 
 ```json
@@ -81,7 +82,7 @@ Examples of correct code:
 The following code
 
 ```adblock
-##*:has(.selector)
+#?#*:has(.selector)
 ```
 
 with the following rule config:
@@ -105,7 +106,7 @@ Examples of incorrect code:
 The following code
 
 ```adblock
-##*:contians(foo)
+#?#*:contians(foo)
 ```
 
 with the following rule config:
@@ -121,7 +122,7 @@ with the following rule config:
 should be reported as:
 
 ```shell
-1:3 Unsupported CSS pseudo-class: contians
+1:4 Unsupported CSS pseudo-class: contians
 ```
 
 and should offer the following suggestions:
@@ -133,8 +134,8 @@ and should offer the following suggestions:
   --- original
   +++ fixed
   @@ -1,1 +1,1 @@
-  -##*:contians(foo)
-  +##*:contains(foo)
+  -#?#*:contians(foo)
+  +#?#*:contains(foo)
   ```
 
 - Change pseudo-class to -abp-contains
@@ -144,8 +145,8 @@ and should offer the following suggestions:
   --- original
   +++ fixed
   @@ -1,1 +1,1 @@
-  -##*:contians(foo)
-  +##*:-abp-contains(foo)
+  -#?#*:contians(foo)
+  +#?#*:-abp-contains(foo)
   ```
 
 ## Version
