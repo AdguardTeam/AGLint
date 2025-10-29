@@ -9,9 +9,6 @@
 
 Checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM() hint at the same time
 
-## Features
-
-
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-inconsistent-hint-platforms.ts
@@ -19,4 +16,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-inconsistent-hint-platforms.t
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-inconsistent-hint-platforms.test.ts
-

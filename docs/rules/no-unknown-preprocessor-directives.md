@@ -9,9 +9,6 @@
 
 Checks if a preprocessor directive is known
 
-## Features
-
-
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-unknown-preprocessor-directives.ts
@@ -19,4 +16,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-unknown-preprocessor-directiv
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-unknown-preprocessor-directives.test.ts
-

@@ -9,9 +9,6 @@
 
 Checks if CSS declarations are valid
 
-## Features
-
-
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-css-declaration.ts
@@ -19,4 +16,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-css-declaration.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-invalid-css-declaration.test.ts
-

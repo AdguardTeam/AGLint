@@ -9,13 +9,13 @@
 
 Checks quotes in scriptlet
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed automatically 🔧
 
 ## Options
 
-This rule can be configured using the following options:
+This rule can be configured using the following options.
 
 ### Options schema
 
@@ -72,7 +72,6 @@ This rule can be configured using the following options:
 ```
 
 </details>
-
 ### Default options
 
 ```json
@@ -92,11 +91,13 @@ Examples of correct code:
 
 ### Correct quotes
 
+The following code
+
 ```adblock
 #%#//scriptlet("scriptlet-name", "arg1", "arg2")
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -117,11 +118,13 @@ Examples of incorrect code:
 
 ### Single quotes instead of double quotes
 
+The following code
+
 ```adblock
 #%#//scriptlet('scriptlet-name', 'arg1', 'arg2')
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -141,7 +144,6 @@ should be reported as:
 1:33 Scriptlet argument should be quoted with double, but single was found
 1:41 Scriptlet argument should be quoted with double, but single was found
 ```
-
 
 and should be fixed as:
 
@@ -165,4 +167,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/scriptlet-quotes.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/scriptlet-quotes.test.ts
-

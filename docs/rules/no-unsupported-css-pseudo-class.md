@@ -9,13 +9,13 @@
 
 Checks that CSS pseudo-classes are supported
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed via suggestions 💡
 
 ## Options
 
-This rule can be configured using the following options:
+This rule can be configured using the following options.
 
 ### Options schema
 
@@ -62,7 +62,6 @@ This rule can be configured using the following options:
 ```
 
 </details>
-
 ### Default options
 
 ```json
@@ -79,11 +78,13 @@ Examples of correct code:
 
 ### Known pseudo-class
 
+The following code
+
 ```adblock
 ##*:has(.selector)
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -101,11 +102,13 @@ Examples of incorrect code:
 
 ### Almost correct pseudo-class, but misspelled
 
+The following code
+
 ```adblock
 ##*:contians(foo)
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -120,7 +123,6 @@ should be reported as:
 ```shell
 1:3 Unsupported CSS pseudo-class: contians
 ```
-
 
 and should offer the following suggestions:
 
@@ -157,4 +159,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-unsupported-css-pseudo-class.
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-unsupported-css-pseudo-class.test.ts
-

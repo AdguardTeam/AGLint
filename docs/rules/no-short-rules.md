@@ -9,12 +9,9 @@
 
 Checks if a rule is too short
 
-## Features
-
-
 ## Options
 
-This rule can be configured using the following options:
+This rule can be configured using the following options.
 
 ### Options schema
 
@@ -46,7 +43,6 @@ This rule can be configured using the following options:
 ```
 
 </details>
-
 ### Default options
 
 ```json
@@ -63,11 +59,13 @@ Examples of correct code:
 
 ### Long enough rule
 
+The following code
+
 ```adblock
 ||example.com^
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -85,11 +83,13 @@ Examples of incorrect code:
 
 ### Too short rule
 
+The following code
+
 ```adblock
 ||a
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -116,4 +116,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-short-rules.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-short-rules.test.ts
-

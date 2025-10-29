@@ -1,18 +1,17 @@
 <!-- markdownlint-disable -->
 # `max-css-selectors`
 
-
 ## Description
 
 Checks if a CSS selector list contains more than the specified number of selectors
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed automatically 🔧
 
 ## Options
 
-This rule can be configured using the following options:
+This rule can be configured using the following options.
 
 ### Options schema
 
@@ -43,7 +42,6 @@ This rule can be configured using the following options:
 ```
 
 </details>
-
 ### Default options
 
 ```json
@@ -60,11 +58,13 @@ Examples of correct code:
 
 ### Single selector
 
+The following code
+
 ```adblock
 ##.single-selector
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -78,11 +78,13 @@ should not be reported
 
 ### Multiple selectors
 
+The following code
+
 ```adblock
 ##.selector1, .selector2
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -100,11 +102,13 @@ Examples of incorrect code:
 
 ### Multiple selectors
 
+The following code
+
 ```adblock
 ##.selector1, .selector2
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -119,7 +123,6 @@ should be reported as:
 ```shell
 1:2 This selector list contains 2 selectors, but only 1 are allowed
 ```
-
 
 and should be fixed as:
 
@@ -144,4 +147,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/max-css-selectors.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/max-css-selectors.test.ts
-

@@ -1,18 +1,17 @@
 <!-- markdownlint-disable -->
 # `no-excluded-rules`
 
-
 ## Description
 
 Checks if any rule matches an excluded pattern
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed automatically 🔧
 
 ## Options
 
-This rule can be configured using the following options:
+This rule can be configured using the following options.
 
 ### Options schema
 
@@ -54,7 +53,6 @@ This rule can be configured using the following options:
 ```
 
 </details>
-
 ### Default options
 
 ```json
@@ -72,11 +70,13 @@ Examples of correct code:
 
 ### No excluded rules
 
+The following code
+
 ```adblock
 ||example.com^
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -95,12 +95,14 @@ Examples of incorrect code:
 
 ### `||example.com^` rule is excluded
 
+The following code
+
 ```adblock
 ||example.com^
 ||example.org^
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -119,7 +121,6 @@ should be reported as:
 1:0 Rule matches an excluded rule text: ||example.com^
 ```
 
-
 and should be fixed as:
 
 ```diff
@@ -133,12 +134,14 @@ and should be fixed as:
 
 ### Rules containing `.org` are excluded
 
+The following code
+
 ```adblock
 ||example.com^
 ||example.org^
 ```
 
-with config:
+with the following rule config:
 
 ```json
 [
@@ -156,7 +159,6 @@ should be reported as:
 ```shell
 2:0 Rule matches an excluded pattern: \.org
 ```
-
 
 and should be fixed as:
 
@@ -176,4 +178,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-excluded-rules.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-excluded-rules.test.ts
-

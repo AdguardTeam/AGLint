@@ -9,7 +9,7 @@
 
 Checks for duplicated CSS declaration properties within the same rule block
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed automatically 🔧
 - Some reported problems can be fixed via suggestions 💡
@@ -21,4 +21,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-css-declaration-pr
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-duplicated-css-declaration-props.test.ts
-

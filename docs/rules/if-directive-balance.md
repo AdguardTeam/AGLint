@@ -9,7 +9,7 @@
 
 Checks if conditional preprocessor directives are structured correctly
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed automatically 🔧
 
@@ -18,6 +18,8 @@ Checks if conditional preprocessor directives are structured correctly
 Examples of correct code:
 
 ### Correct example
+
+The following code
 
 ```adblock
 !#if adguard
@@ -33,6 +35,8 @@ Examples of incorrect code:
 
 ### Unclosed if
 
+The following code
+
 ```adblock
 !#if adguard
 adguard-rule
@@ -46,6 +50,8 @@ should be reported as:
 
 ### Missing if
 
+The following code
+
 ```adblock
 !#endif
 ```
@@ -58,6 +64,8 @@ should be reported as:
 
 ### Else without if
 
+The following code
+
 ```adblock
 !#else
 ```
@@ -69,6 +77,8 @@ should be reported as:
 ```
 
 ### Else with params
+
+The following code
 
 ```adblock
 !#if adguard
@@ -83,7 +93,6 @@ should be reported as:
 ```shell
 3:0 Invalid usage of preprocessor directive: "else"
 ```
-
 
 and should be fixed as:
 
@@ -107,4 +116,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/if-directive-balance.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/if-directive-balance.test.ts
-

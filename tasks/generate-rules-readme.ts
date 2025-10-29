@@ -48,42 +48,50 @@ ${patch.slice(0, -1)}
 }
 
 const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExample[]) => {
-    let ruleMd = '';
+    const md: string[] = [];
 
     for (const example of examples) {
-        ruleMd += `### ${example.name}\n\n`;
+        md.push(`### ${example.name}`);
+        md.push('');
 
-        ruleMd += '```adblock\n';
-        ruleMd += `${example.code}\n`;
-        ruleMd += '```\n\n';
+        md.push('The following code');
+        md.push('');
+        md.push('```adblock');
+        md.push(example.code);
+        md.push('```');
+        md.push('');
 
         const linterResult = await lint(example.code, {
             [meta.docs.name]: example.config ?? LinterRuleSeverity.Error,
         });
 
         if (meta.configSchema && meta.defaultConfig) {
-            ruleMd += 'with config:\n\n';
-            ruleMd += '```json\n';
+            md.push('with the following rule config:');
+            md.push('');
+            md.push('```json');
             if (example.config && Array.isArray(example.config) && example.config.length > 1) {
-                ruleMd += `${JSON.stringify(example.config.slice(1), null, 2)}\n`;
+                md.push(`${JSON.stringify(example.config.slice(1), null, 2)}`);
             } else {
-                ruleMd += `${JSON.stringify(meta.defaultConfig, null, 2)}\n`;
+                md.push(`${JSON.stringify(meta.defaultConfig, null, 2)}`);
             }
-            ruleMd += '```\n\n';
+            md.push('```');
+            md.push('');
         }
 
         if (linterResult.problems.length > 0) {
-            ruleMd += 'should be reported as:\n\n';
-
-            ruleMd += '```shell\n';
+            md.push('should be reported as:');
+            md.push('');
+            md.push('```shell');
             linterResult.problems.forEach((problem) => {
-                ruleMd += `${problem.position.start.line}:${problem.position.start.column} ${problem.message}\n`;
+                md.push(`${problem.position.start.line}:${problem.position.start.column} ${problem.message}`);
             });
-            ruleMd += '```\n\n';
+            md.push('```');
+            md.push('');
 
             if (meta.hasFix && linterResult.problems.some((problem) => problem.fix)) {
-                ruleMd += '\nand should be fixed as:\n\n';
-                ruleMd += mdUnifiedDiff(
+                md.push('and should be fixed as:');
+                md.push('');
+                md.push(mdUnifiedDiff(
                     'original',
                     'fixed',
                     example.code,
@@ -91,33 +99,146 @@ const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExa
                         linterResult,
                         sourceContent: example.code,
                     }),
-                );
-                ruleMd += '\n\n';
+                ));
+                md.push('');
             }
 
             if (meta.hasSuggestions && linterResult.problems.some((problem) => problem.suggestions)) {
-                ruleMd += '\nand should offer the following suggestions:\n\n';
+                md.push('and should offer the following suggestions:');
+                md.push('');
 
                 for (const problem of linterResult.problems) {
                     for (const suggestion of problem.suggestions!) {
-                        ruleMd += `- ${suggestion.message}\n`;
-                        ruleMd += '\n';
-                        ruleMd += mdUnifiedDiff(
+                        md.push(`- ${suggestion.message}`);
+                        md.push('');
+                        md.push(mdUnifiedDiff(
                             'original',
                             'fixed',
                             example.code,
                             new FixApplier(example.code).applyFixes([suggestion.fix]).fixedSource,
-                        ).split(/\r?\n/).map((line) => `  ${line}`).join('\n');
-                        ruleMd += '\n\n';
+                        ).split(/\r?\n/).map((line) => `  ${line}`).join('\n'));
+                        md.push('');
                     }
                 }
             }
         } else {
-            ruleMd += 'should not be reported\n\n';
+            md.push('should not be reported');
+            md.push('');
         }
     }
 
-    return ruleMd;
+    return md.join('\n');
+};
+
+const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
+    const md: string[] = [];
+
+    md.push('<!-- markdownlint-disable -->');
+    md.push(`# \`${rule.meta.docs.name}\``);
+    md.push('');
+
+    if (rule.meta.docs.recommended) {
+        md.push('> ');
+        md.push('> ✅ Using `aglint:recommended` preset will enable this rule');
+        md.push('> ');
+        md.push('');
+    }
+
+    md.push('## Description');
+    md.push('');
+    md.push(rule.meta.docs.description);
+    md.push('');
+
+    if (rule.meta.hasFix || rule.meta.hasSuggestions) {
+        md.push('## Automatic issue fixing');
+        md.push('');
+
+        if (rule.meta.hasFix) {
+            md.push('- Some reported problems can be fixed automatically 🔧');
+        }
+        if (rule.meta.hasSuggestions) {
+            md.push('- Some reported problems can be fixed via suggestions 💡');
+        }
+
+        md.push('');
+    }
+
+    if (rule.meta.configSchema && rule.meta.defaultConfig) {
+        md.push('## Options');
+        md.push('');
+
+        md.push('This rule can be configured using the following options.');
+        md.push('');
+
+        md.push('### Options schema');
+        md.push('');
+
+        md.push('<details>');
+        md.push('<summary>Click to expand</summary>');
+        md.push('');
+        md.push('```json');
+        md.push(`${JSON.stringify(toJsonSchema(rule.meta.configSchema), null, 2)}`);
+        md.push('```');
+        md.push('');
+        md.push('</details>');
+
+        md.push('### Default options');
+        md.push('');
+        md.push('```json');
+        md.push(`${JSON.stringify(rule.meta.defaultConfig, null, 2)}`);
+        md.push('```');
+        md.push('');
+    }
+
+    if (rule.meta.correctExamples) {
+        md.push('## Correct examples');
+        md.push('');
+        md.push('Examples of correct code:');
+        md.push('');
+        md.push(await processExamples(rule.meta, rule.meta.correctExamples));
+    }
+
+    if (rule.meta.incorrectExamples) {
+        md.push('## Incorrect examples');
+        md.push('');
+        md.push('Examples of incorrect code:');
+        md.push('');
+        md.push(await processExamples(rule.meta, rule.meta.incorrectExamples));
+    }
+
+    if (rule.meta.docs.whenToUseIt) {
+        md.push('## When to use it');
+        md.push('');
+        md.push(`${rule.meta.docs.whenToUseIt}`);
+        md.push('');
+    }
+
+    if (rule.meta.docs.whenNotToUseIt) {
+        md.push('## When not to use it');
+        md.push('');
+        md.push(`${rule.meta.docs.whenNotToUseIt}`);
+        md.push('');
+    }
+
+    if (rule.meta.version) {
+        md.push('## Version');
+        md.push('');
+        md.push(`This rule was added in AGLint version ${rule.meta.version}`);
+        md.push('');
+    }
+
+    md.push('## Rule source');
+    md.push('');
+    md.push(`${REPO_URL}src/rules/${file}`);
+    md.push('');
+
+    md.push('## Test cases');
+    md.push('');
+    md.push(`${REPO_URL}test/rules/${file.replace('.ts', '.test.ts')}`);
+    md.push('');
+
+    // eslint-disable-next-line no-await-in-loop
+    await writeFile(path.join(__dirname, '../docs/rules', path.basename(file).replace('.ts', '.md')), md.join('\n'));
 };
 
 /**
@@ -141,87 +262,8 @@ async function main() {
         // eslint-disable-next-line max-len
         md += `| [${rule.meta.docs.name}](./${fileName.replace('.ts', '.md')}) | ${rule.meta.docs.description} | ${rule.meta.docs.recommended ? '✅' : ''} | ${rule.meta.hasFix ? '🔧' : ''} | ${rule.meta.hasSuggestions ? '💡' : ''} |\n`;
 
-        let ruleMd = '<!-- markdownlint-disable -->\n';
-        ruleMd += `# \`${rule.meta.docs.name}\`\n\n`;
-
-        if (rule.meta.docs.recommended) {
-            ruleMd += '> \n';
-            ruleMd += '> ✅ Using `aglint:recommended` preset will enable this rule\n';
-            ruleMd += '> \n';
-        }
-
-        ruleMd += '\n';
-
-        ruleMd += '## Description\n\n';
-        ruleMd += `${rule.meta.docs.description}\n\n`;
-
-        ruleMd += '## Features\n\n';
-
-        if (rule.meta.hasFix) {
-            ruleMd += '- Some reported problems can be fixed automatically 🔧\n';
-        }
-        if (rule.meta.hasSuggestions) {
-            ruleMd += '- Some reported problems can be fixed via suggestions 💡\n';
-        }
-
-        ruleMd += '\n';
-
-        if (rule.meta.configSchema && rule.meta.defaultConfig) {
-            ruleMd += '## Options\n\n';
-
-            ruleMd += 'This rule can be configured using the following options:\n\n';
-
-            ruleMd += '### Options schema\n\n';
-
-            ruleMd += '<details>\n<summary>Click to expand</summary>\n\n';
-
-            ruleMd += '```json\n';
-            ruleMd += `${JSON.stringify(toJsonSchema(rule.meta.configSchema), null, 2)}\n`;
-            ruleMd += '```\n\n';
-
-            ruleMd += '</details>\n\n';
-
-            ruleMd += '### Default options\n\n';
-            ruleMd += '```json\n';
-            ruleMd += `${JSON.stringify(rule.meta.defaultConfig, null, 2)}\n`;
-            ruleMd += '```\n\n';
-        }
-
-        if (rule.meta.correctExamples) {
-            ruleMd += '## Correct examples\n\n';
-            ruleMd += 'Examples of correct code:\n\n';
-            ruleMd += await processExamples(rule.meta, rule.meta.correctExamples);
-        }
-
-        if (rule.meta.incorrectExamples) {
-            ruleMd += '## Incorrect examples\n\n';
-            ruleMd += 'Examples of incorrect code:\n\n';
-            ruleMd += await processExamples(rule.meta, rule.meta.incorrectExamples);
-        }
-
-        if (rule.meta.docs.whenToUseIt) {
-            ruleMd += '## When to use it\n\n';
-            ruleMd += `${rule.meta.docs.whenToUseIt}\n\n`;
-        }
-
-        if (rule.meta.docs.whenNotToUseIt) {
-            ruleMd += '## When not to use it\n\n';
-            ruleMd += `${rule.meta.docs.whenNotToUseIt}\n\n`;
-        }
-
-        if (rule.meta.version) {
-            ruleMd += '## Version\n\n';
-            ruleMd += `This rule was added in AGLint version ${rule.meta.version}\n\n`;
-        }
-
-        ruleMd += '## Rule source\n\n';
-        ruleMd += `${REPO_URL}src/rules/${fileName}\n\n`;
-
-        ruleMd += '## Test cases\n\n';
-        ruleMd += `${REPO_URL}test/rules/${fileName.replace('.ts', '.test.ts')}\n\n`;
-
         // eslint-disable-next-line no-await-in-loop
-        await writeFile(path.join(__dirname, '../docs/rules', path.basename(file).replace('.ts', '.md')), ruleMd);
+        await generateRuleDocumentation(fileName, rule);
     }
 
     await writeFile(path.join(__dirname, '../docs/rules/README.md'), md);

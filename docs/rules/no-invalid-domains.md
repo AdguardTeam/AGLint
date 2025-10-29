@@ -9,7 +9,7 @@
 
 Disallows invalid domains
 
-## Features
+## Fixing
 
 - Some reported problems can be fixed via suggestions 💡
 
@@ -20,4 +20,3 @@ https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-domains.ts
 ## Test cases
 
 https://github.com/AdguardTeam/AGLint/test/rules/no-invalid-domains.test.ts
-
