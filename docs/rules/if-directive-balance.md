@@ -9,7 +9,7 @@
 
 Checks if conditional preprocessor directives are structured correctly
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧
 

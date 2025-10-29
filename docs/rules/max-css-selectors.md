@@ -5,7 +5,7 @@
 
 Checks if a CSS selector list contains more than the specified number of selectors
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧
 

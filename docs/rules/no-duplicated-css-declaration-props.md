@@ -9,7 +9,7 @@
 
 Checks for duplicated CSS declaration properties within the same rule block
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧
 - Some reported problems can be fixed via suggestions 💡

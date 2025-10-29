@@ -9,7 +9,7 @@
 
 Checks that CSS pseudo-classes are supported
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed via suggestions 💡
 

@@ -9,7 +9,7 @@
 
 Checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧
 

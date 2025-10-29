@@ -5,7 +5,7 @@
 
 Checks if any rule matches an excluded pattern
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧
 

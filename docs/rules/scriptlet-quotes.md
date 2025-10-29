@@ -9,7 +9,7 @@
 
 Checks quotes in scriptlet
 
-## Fixing
+## Automatic issue fixing
 
 - Some reported problems can be fixed automatically 🔧
 
