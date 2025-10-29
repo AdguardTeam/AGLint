@@ -176,6 +176,10 @@ and should be fixed as:
 -||example.org^
 ```
 
+## Version
+
+This rule was added in AGLint version 2.0.10
+
 ## Rule source
 
 https://github.com/AdguardTeam/AGLint/src/rules/no-excluded-rules.ts

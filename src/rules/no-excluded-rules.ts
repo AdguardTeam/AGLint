@@ -74,6 +74,7 @@ export default defineRule({
             },
         ],
         hasFix: true,
+        version: '2.0.10',
     },
     create: (context) => {
         const cache: WeakMap<string[], RegExp[]> = new WeakMap();

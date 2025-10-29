@@ -17,6 +17,23 @@ export default defineRule({
             duplicatedHintPlatforms: 'Duplicated platform "{{platform}}"',
         },
         hasFix: true,
+        correctExamples: [
+            {
+                name: 'No duplicated hint platforms',
+                code: [
+                    '!+ PLATFORM(windows, mac, ios)',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Duplicated hint platforms',
+                code: [
+                    '!+ PLATFORM(windows, mac, windows, ios)',
+                ].join('\n'),
+            },
+        ],
+        version: '1.0.9',
     },
     create: (context) => {
         let history: Set<string> | null = null;
