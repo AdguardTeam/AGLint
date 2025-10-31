@@ -7,7 +7,10 @@ import { version as importedVersion } from '../package.json';
 export type { LinterConfig } from './linter/config';
 export { lint, type LinterResult, type LinterRunOptions } from './linter/linter';
 export {
-    applyFixesToResult, lintWithFixes, type LinterFixerResult, type LinterFixerRunOptions,
+    applyFixesToResult,
+    lintWithFixes,
+    type LinterFixerResult,
+    type LinterFixerRunOptions,
 } from './linter/fixer';
 export { LinterRuleSeverity } from './linter/rule';
 export { type LinterProblem, type LinterSuggestion } from './linter/linter-problem';
@@ -20,6 +23,8 @@ export { defaultSubParsers } from './linter/default-subparsers';
 export { type LinterFixCommand } from './linter/source-code/fix-generator';
 // eslint-disable-next-line max-len
 export { type LinterPosition, type LinterPositionRange, type LinterOffsetRange } from './linter/source-code/source-code';
+
+export type { LinterConfigFile } from './cli/config-file/config-file';
 
 export {
     type FileSystemAdapter,
