@@ -20,6 +20,34 @@ export default defineRule({
             hintMustHaveAtLeastOnePlatform: 'Hint "{{hintName}}" must have at least one platform specified',
             hintMustNotHaveAnyParameters: 'Hint "{{hintName}}" must not have any parameters',
         },
+        correctExamples: [
+            {
+                name: 'Valid hint parameters',
+                code: [
+                    '!+ PLATFORM(windows)',
+                ].join('\n'),
+            },
+            {
+                name: 'Valid hint parameters',
+                code: [
+                    '!+ NOT_VALIDATE',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Hint with empty parameters',
+                code: [
+                    '!+ PLATFORM()',
+                ].join('\n'),
+            },
+            {
+                name: 'Hint without parameters',
+                code: [
+                    '!+ PLATFORM',
+                ].join('\n'),
+            },
+        ],
     },
     create: (context) => {
         return {

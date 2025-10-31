@@ -14,6 +14,18 @@ export default defineRule({
         messages: {
             unknownPreprocessorDirective: 'Unknown preprocessor directive "{{directive}}"',
         },
+        correctExamples: [
+            {
+                name: 'Valid preprocessor directive',
+                code: '!#if (conditions_2)',
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid preprocessor directive',
+                code: '!#if2 (conditions_2)',
+            },
+        ],
     },
     create: (context) => {
         return {

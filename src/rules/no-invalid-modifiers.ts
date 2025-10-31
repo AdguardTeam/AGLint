@@ -13,6 +13,22 @@ export default defineRule({
         messages: {
             invalidModifier: 'Invalid modifier: "{{modifier}}", got "{{validationError}}"',
         },
+        correctExamples: [
+            {
+                name: 'Valid `script` and `third-party` modifiers',
+                code: [
+                    '||example.com^$script,third-party',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid `foo` modifier',
+                code: [
+                    '||example.com^$foo',
+                ].join('\n'),
+            },
+        ],
     },
     create: (context) => {
         let isExceptionRule = false;
