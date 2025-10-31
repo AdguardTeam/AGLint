@@ -15,33 +15,27 @@
     "no-invalid-modifiers": 2,
     "no-short-rules": [
       2,
-      [
-        {
-          "minLength": 4
-        }
-      ]
+      {
+        "minLength": 4
+      }
     ],
     "no-unknown-hint-platforms": 2,
     "no-unknown-hints": 2,
     "no-unknown-preprocessor-directives": 2,
     "no-unsupported-css-pseudo-class": [
       2,
-      [
-        {
-          "fuzzyThreshold": 0.6
-        }
-      ]
+      {
+        "fuzzyThreshold": 0.6
+      }
     ],
     "scriptlet-quotes": [
       2,
-      [
-        {
-          "adg": "double",
-          "ubo": "none",
-          "abp": "none",
-          "disallowCurlyQuotes": true
-        }
-      ]
+      {
+        "adg": "double",
+        "ubo": "none",
+        "abp": "none",
+        "disallowCurlyQuotes": true
+      }
     ]
   }
 }
