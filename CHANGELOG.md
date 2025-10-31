@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-## [4.0.0-alpha.0] - 2025-10-30
+## [4.0.0-alpha.0] - 2025-10-31
 
 ### Added
 
