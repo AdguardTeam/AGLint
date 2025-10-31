@@ -34,15 +34,16 @@ pnpm install
 
 During development, you can use the following commands (listed in `package.json`):
 
-- `pnpm build` - build the library to the `dist` folder by using [Rollup][rollup]
-- `pnpm build-types` - build type definitions with [TypeScript][typescript] to the `dist/types` folder.
+- `pnpm build` - build the library to the `dist` folder using [Rollup][rollup]
 - `pnpm check-types` - check types with [TypeScript][typescript]
-- `pnpm clean` - remove the `dist` folder.
+- `pnpm clean` - remove the `dist` folder
 - `pnpm coverage` - print test coverage report
-- `pnpm lint` - run all linters.
-- `pnpm lint:md` - lint the markdown files with [markdownlint][markdownlint].
-- `pnpm lint:ts` - lint the code with [ESLint][eslint].
+- `pnpm increment` - increment the version number (patch)
+- `pnpm lint` - run all linters (types, TS, and Markdown)
+- `pnpm lint:md` - lint Markdown files with [markdownlint][markdownlint]
+- `pnpm lint:ts` - lint TypeScript code with [ESLint][eslint]
 - `pnpm test` - run tests with [Vitest][vitest] (you can also run a specific test with `pnpm test <test-name>`)
+- `pnpm rules:update` - regenerate rule exports, documentation, and presets
 
 [contribute]: https://adguard.com/contribute.html
 [eslint]: https://eslint.org/
