@@ -81,7 +81,7 @@ That's it! AGLint will scan your filter lists and report any issues.
 **You can also lint specific files, glob patterns, or directories:**
 
 ```bash
-npx aglint filters/social.txt filters/privacy/*.txt filters/security/
+npx aglint filters/social.txt 'filters/privacy/*.txt' filters/security/
 ```
 
 **Auto-fix issues:**
