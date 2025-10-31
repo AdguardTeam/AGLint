@@ -35,10 +35,8 @@ jobs:
 
             const changelogUrl = `https://github.com/AdguardTeam/AGLint/blob/master/CHANGELOG.md`;
 
-            const releaseName = `AGLint v${version}`;
-
             const releaseBody = [
-              `We are happy to announce the release of ${releaseName}!`,
+              `We are happy to announce the release of ${tag}!`,
               '',
               `Please see the [CHANGELOG](${changelogUrl}) for more information.`,
             ].join('\n');
@@ -52,14 +50,13 @@ jobs:
             const isPreRelease = match && match[4] !== undefined;
 
             core.exportVariable('TAG_NAME', tag);
-            core.exportVariable('RELEASE_NAME', releaseName);
             core.exportVariable('RELEASE_BODY', releaseBody);
             core.exportVariable('IS_PRERELEASE', isPreRelease.toString());
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ env.RELEASE_NAME }}
+          name: ${{ env.TAG_NAME }}
           tag_name: ${{ env.TAG_NAME }}
           body: ${{ env.RELEASE_BODY }}
           draft: false
