@@ -27,7 +27,7 @@ const buildConfig: RollupOptions = {
         path.join(__dirname, 'src/index.ts'),
         path.join(__dirname, 'src/linter/index.ts'),
         path.join(__dirname, 'src/cli/index.ts'),
-        path.join(__dirname, 'src/cli/cli.ts'),
+        path.join(__dirname, 'src/cli/bin.ts'),
         path.join(__dirname, 'src/cli/worker.ts'),
     ],
     output: {

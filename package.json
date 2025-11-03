@@ -21,7 +21,7 @@
         "url": "https://github.com/AdguardTeam/AGLint/issues"
     },
     "homepage": "https://github.com/AdguardTeam/AGLint#readme",
-    "bin": "dist/cli/cli.js",
+    "bin": "dist/cli/bin.js",
     "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/types/index.d.ts",
