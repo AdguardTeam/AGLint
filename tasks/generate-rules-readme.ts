@@ -8,7 +8,7 @@ import { toJsonSchema } from '@valibot/to-json-schema';
 import { createTwoFilesPatch } from 'diff';
 import fg from 'fast-glob';
 
-import { applyFixesToResult } from '../src';
+import { applyFixesToResult } from '../src/linter/fixer';
 import { type LinterRule, type LinterRuleExample, LinterRuleSeverity } from '../src/linter/rule';
 import { FixApplier } from '../src/linter/source-code/fix-applier';
 import { lint } from '../test/rules/helpers/lint';

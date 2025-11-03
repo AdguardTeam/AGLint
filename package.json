@@ -1,6 +1,6 @@
 {
     "name": "@adguard/aglint",
-    "version": "4.0.0-alpha.1",
+    "version": "4.0.0-alpha.2",
     "description": "Linter for adblock filter lists.",
     "keywords": [
         "adblock",
@@ -30,6 +30,16 @@
             "types": "./dist/types/index.d.ts",
             "import": "./dist/index.js",
             "default": "./dist/index.js"
+        },
+        "./linter": {
+            "types": "./dist/types/linter/index.d.ts",
+            "import": "./dist/linter/index.js",
+            "default": "./dist/linter/index.js"
+        },
+        "./cli": {
+            "types": "./dist/types/cli/index.d.ts",
+            "import": "./dist/cli/index.js",
+            "default": "./dist/cli/index.js"
         },
         "./config-presets/all": "./config-presets/all.json",
         "./config-presets/recommended": "./config-presets/recommended.json",
@@ -150,6 +160,7 @@
         "@rollup/plugin-commonjs": "^25.0.2",
         "@rollup/plugin-json": "^6.0.0",
         "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-replace": "^6.0.3",
         "@rollup/plugin-typescript": "^12.1.2",
         "@types/clone-deep": "^4.0.1",
         "@types/esquery": "^1.5.4",

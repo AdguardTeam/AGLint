@@ -2,7 +2,7 @@ import { type AnyCosmeticRule, type AnyNetworkRule } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
-import { createVisitorsForAnyCosmeticRule, createVisitorsForAnyNetworkRule } from '../utils/visitor-creator';
+import { createVisitorsForAnyCosmeticRule, createVisitorsForAnyNetworkRule } from '../linter/visitor-creator';
 
 export default defineRule({
     meta: {

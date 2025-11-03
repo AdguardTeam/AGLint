@@ -1,5 +1,5 @@
-import { type LinterRuleVisitors } from '../linter/rule';
-import { type Visitor } from '../linter/source-code/visitor-collection';
+import { type LinterRuleVisitors } from './rule';
+import { type Visitor } from './source-code/visitor-collection';
 
 /**
  * Helper to create visitors for any network rule.

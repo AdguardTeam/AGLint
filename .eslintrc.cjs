@@ -240,15 +240,32 @@ const N_PLUGIN_RULES = {
  */
 const BOUNDARIES_PLUGIN_RULES = {
     'boundaries/element-types': ['error', {
-        default: 'allow',
+        default: 'disallow',
         rules: [
-            // Do not allow too general imports in tests, e.g. import something from `src` directly.
+            {
+                from: 'common-folder',
+                allow: [],
+            },
+            {
+                from: 'utils-folder',
+                allow: ['common-folder'],
+            },
+            {
+                from: 'cli-folder',
+                allow: ['common-folder', 'utils-folder', 'linter-folder'],
+            },
+            {
+                from: 'linter-folder',
+                allow: ['common-folder', 'utils-folder'],
+            },
+            {
+                from: 'rules-folder',
+                allow: ['common-folder', 'linter-folder'],
+            },
             {
                 from: 'test-folder',
-                disallow: ['src-index'],
-                message: 'Do not import directly from src/. Use specific submodules like src/utils instead.',
+                allow: ['common-folder', 'cli-folder', 'utils-folder', 'rules-folder', 'linter-folder'],
             },
-            // TODO: Add more rules, like helpers only can import helpers, etc.
         ],
     }],
 };
@@ -302,13 +319,33 @@ module.exports = {
     settings: {
         'boundaries/elements': [
             {
-                type: 'src-index',
-                pattern: 'src/index.ts',
-                mode: 'file',
-            },
-            {
                 type: 'test-folder',
                 pattern: 'test',
+                mode: 'folder',
+            },
+            {
+                type: 'linter-folder',
+                pattern: 'src/linter',
+                mode: 'folder',
+            },
+            {
+                type: 'cli-folder',
+                pattern: 'src/cli',
+                mode: 'folder',
+            },
+            {
+                type: 'utils-folder',
+                pattern: 'src/utils',
+                mode: 'folder',
+            },
+            {
+                type: 'rules-folder',
+                pattern: 'src/linter/rules',
+                mode: 'folder',
+            },
+            {
+                type: 'common-folder',
+                pattern: 'src/common',
                 mode: 'folder',
             },
         ],

@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import fastGlob from 'fast-glob';
 import { type RollupOptions } from 'rollup';
@@ -44,6 +45,12 @@ const buildConfig: RollupOptions = {
         }),
         resolve({ preferBuiltins: false }),
         externals(),
+        replace({
+            preventAssignment: true,
+            values: {
+                __IS_TEST__: 'false',
+            },
+        }),
     ],
 };
 
