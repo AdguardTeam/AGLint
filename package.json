@@ -1,6 +1,6 @@
 {
     "name": "@adguard/aglint",
-    "version": "4.0.0-alpha.3",
+    "version": "4.0.0-alpha.4",
     "description": "Linter for adblock filter lists.",
     "keywords": [
         "adblock",
@@ -144,7 +144,7 @@
     },
     "scripts": {
         "prebuild": "rimraf dist",
-        "build": "rollup --config rollup.config.ts --configPlugin typescript",
+        "build": "rollup --config rollup.config.ts --configPlugin typescript && tsx tasks/transform-dts.ts",
         "check-types": "tsc",
         "clean": "rimraf dist",
         "coverage": "vitest --coverage",
@@ -190,6 +190,7 @@
         "rimraf": "^5.0.1",
         "rollup": "^4.41.0",
         "rollup-plugin-node-externals": "^6.1.1",
+        "ts-morph": "^27.0.2",
         "tsc-files": "^1.1.4",
         "tsx": "^4.7.0",
         "typescript": "^5.8.3",
