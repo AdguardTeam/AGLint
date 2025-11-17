@@ -12,15 +12,14 @@ import {
     DOT,
     DOUBLE_NEWLINE,
     EMPTY,
-    HASHMARK,
     NEWLINE,
     OPEN_PARENTHESIS,
-    REPO_URL,
     SPACE,
 } from '../../common/constants';
 import { type AnyLinterResult } from '../../linter/fixer';
 import { type LinterProblem } from '../../linter/linter-problem';
 import { LinterRuleSeverity } from '../../linter/rule';
+import { getAglintRuleDocumentationUrl } from '../../utils/repo-url';
 
 import { type LinterCliReporter } from './reporter';
 
@@ -178,7 +177,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
                     // Some terminals support links, so we can link to the rule documentation directly
                     // in this case.
                     if (terminalLink.isSupported) {
-                        row.push(terminalLink(problem.ruleId, `${REPO_URL}${HASHMARK}${problem.ruleId}`));
+                        row.push(terminalLink(problem.ruleId, getAglintRuleDocumentationUrl(problem.ruleId)));
                     } else {
                         row.push(this.chalk.dim(problem.ruleId));
                     }
