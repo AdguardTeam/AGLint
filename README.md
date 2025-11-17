@@ -70,7 +70,7 @@ If you know ESLint, you'll feel at home with AGLint.
 npm install -D @adguard/aglint
 
 # Initialize configuration
-npx aglint init
+npx aglint --init
 
 # Run linter
 npx aglint
