@@ -3,6 +3,7 @@
 /* eslint-disable n/no-process-exit */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inspect } from 'node:util';
 
 import { version } from '../../package.json';
 import { getFormattedError } from '../utils/error';
@@ -94,6 +95,21 @@ const main = async () => {
         const scanner = new LinterFileScanner(tree, configResolver, fsAdapter);
 
         const files = await scanner.scanAll(matchedPatterns.files);
+
+        if (options.printConfig) {
+            if (matchedPatterns.files.length !== 1) {
+                throw new Error('Please specify a pattern that matches exactly one file.');
+            }
+
+            const file = matchedPatterns.files[0]!;
+            const config = await tree.getResolvedConfig(file);
+
+            console.log(inspect(config, {
+                colors: options.color,
+                depth: Infinity,
+            }));
+            return;
+        }
 
         // Handle --init option early (mutually exclusive with all other options)
         if (options.init) {

@@ -94,6 +94,11 @@ export type LinterCliConfig = {
      * Thread configuration for parallel processing.
      */
     threads: ThreadsOption;
+
+    /**
+     * Whether to print configuration.
+     */
+    printConfig: boolean;
 };
 
 /**
@@ -184,6 +189,9 @@ export function buildCliProgram(): Command {
                 .argParser((rawValue: string) => {
                     return v.parse(threadOptionSchema, rawValue);
                 }),
+        )
+        .addOption(
+            new Option('--print-config', 'Print configuration for the given file without linting'),
         )
         .version(version, '-v, --version', 'Output the version number')
         .helpOption('-h, --help', 'Display help for command')
