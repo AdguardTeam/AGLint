@@ -9,7 +9,7 @@ import { version } from '../../package.json';
 import { getFormattedError } from '../utils/error';
 
 import { LintResultCache } from './cache';
-import { buildCliProgram, type LinterCliConfig } from './cli-options';
+import { buildCliProgram, enforceSoloOptions, type LinterCliConfig } from './cli-options';
 import { CONFIG_FILE_NAMES } from './config-file/config-file';
 import { DEFAULT_PATTERN, IGNORE_FILE_NAME } from './constants';
 import {
@@ -53,6 +53,15 @@ const main = async () => {
         program.parse(process.argv);
 
         const options = program.opts() as LinterCliConfig;
+
+        enforceSoloOptions(program, ['init']);
+
+        // Handle --init option early (mutually exclusive with all other options)
+        if (options.init) {
+            const initWizard = new LinterCliInitWizard(cwd);
+            await initWizard.run();
+            return;
+        }
 
         const fsAdapter = new NodeFileSystemAdapter();
         const pathAdapter = new NodePathAdapter();
@@ -108,13 +117,6 @@ const main = async () => {
                 colors: options.color,
                 depth: Infinity,
             }));
-            return;
-        }
-
-        // Handle --init option early (mutually exclusive with all other options)
-        if (options.init) {
-            const initWizard = new LinterCliInitWizard(cwd);
-            await initWizard.run();
             return;
         }
 

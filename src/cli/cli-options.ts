@@ -102,6 +102,28 @@ export type LinterCliConfig = {
 };
 
 /**
+ * Enforces that only one of the given options is enabled.
+ * This function is needed because commander.js only provides a .conflicts() method,
+ * but that method requires specifying the names of all other conflicting options
+ * if you want to specify a solo option.
+ *
+ * @param program The Commander program instance.
+ * @param soloLongFlags Array of option names to enforce.
+ */
+export const enforceSoloOptions = (program: Command, soloLongFlags: string[] = []) => {
+    const enabledFromCli = program.options.filter((opt) => {
+        const source = program.getOptionValueSource(opt.name());
+        return source === 'cli';
+    });
+
+    for (const solo of soloLongFlags) {
+        if (program.getOptionValueSource(solo) === 'cli' && enabledFromCli.length > 1) {
+            throw new Error(`The --${solo} option cannot be used with other options.`);
+        }
+    }
+};
+
+/**
  * Builds and configures the Commander program with all CLI options.
  *
  * Sets up argument parsing for file patterns and all CLI flags including
