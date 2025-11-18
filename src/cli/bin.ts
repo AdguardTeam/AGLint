@@ -182,7 +182,7 @@ const main = async () => {
 
         console.error(prefix + getFormattedError(error));
 
-        process.exit(1);
+        process.exit(2);
     }
 };
 
