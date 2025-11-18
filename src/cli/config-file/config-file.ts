@@ -17,6 +17,8 @@ export const JSON_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_JSON}`;
 export const YAML_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_YAML}`;
 export const YML_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_YML}`;
 
+export const PACKAGE_JSON = 'package.json';
+
 /**
  * Possible names of the config file.
  */
@@ -31,11 +33,15 @@ export const CONFIG_FILE_NAMES: ReadonlySet<string> = new Set([
     JSON_RC_CONFIG_FILE_NAME,
     YAML_RC_CONFIG_FILE_NAME,
     YML_RC_CONFIG_FILE_NAME,
+
+    // package.json
+    PACKAGE_JSON,
 ]);
 
 export enum LinterConfigFileFormat {
     Json = 'json',
     Yaml = 'yaml',
+    PackageJson = 'package.json',
 }
 
 export const linterConfigFileSchema = v.object({

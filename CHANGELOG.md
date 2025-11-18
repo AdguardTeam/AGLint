@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## Unreleased
+
+### Added
+
+- Support for `package.json` configuration file. [#245]
+
+[#245]: https://github.com/AdguardTeam/AGLint/issues/245
+
 ## [4.0.0-alpha.5] - 2025-11-03
 
 ### Added

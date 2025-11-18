@@ -102,6 +102,16 @@ const main = async () => {
             return;
         }
 
+        // Check if at least one config file was found
+        const noConfigFiles = files.find((file) => file.configChain.length === 0);
+        if (noConfigFiles) {
+            throw new Error(
+                `No AGLint configuration found for file "${noConfigFiles.path}". `
+                + 'Please create a configuration file using "aglint --init" '
+                + 'or ensure a config file exists in your project.',
+            );
+        }
+
         const cache = options.cache
             ? await LintResultCache.create(cwd, options.cacheLocation)
             : undefined;

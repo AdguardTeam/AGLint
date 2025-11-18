@@ -178,6 +178,84 @@ describe('config-resolver', () => {
             }),
         );
 
+        // Create subdirectories for package.json tests
+        const pkgDir = join(testDir, 'pkg');
+        const pkgNoAglintDir = join(testDir, 'pkg-no-aglint');
+        const pkgExtendsDir = join(testDir, 'pkg-extends');
+        const pkgPresetDir = join(testDir, 'pkg-preset');
+        const pkgRootDir = join(testDir, 'pkg-root');
+
+        await mkdir(pkgDir, { recursive: true });
+        await mkdir(pkgNoAglintDir, { recursive: true });
+        await mkdir(pkgExtendsDir, { recursive: true });
+        await mkdir(pkgPresetDir, { recursive: true });
+        await mkdir(pkgRootDir, { recursive: true });
+
+        // Create package.json with aglint config
+        await writeFile(
+            join(pkgDir, 'package.json'),
+            JSON.stringify({
+                name: 'test-package',
+                version: '1.0.0',
+                aglint: {
+                    syntax: ['Common'],
+                    rules: {
+                        'no-duplicated-modifiers': 'error',
+                    },
+                },
+            }),
+        );
+
+        // Create package.json without aglint property
+        await writeFile(
+            join(pkgNoAglintDir, 'package.json'),
+            JSON.stringify({
+                name: 'test-package-no-config',
+                version: '1.0.0',
+            }),
+        );
+
+        // Create package.json with aglint config and extends
+        await writeFile(
+            join(pkgExtendsDir, 'package.json'),
+            JSON.stringify({
+                name: 'test-package-extends',
+                version: '1.0.0',
+                aglint: {
+                    extends: ['../simple.json'],
+                    rules: {
+                        'no-invalid-modifiers': 'warn',
+                    },
+                },
+            }),
+        );
+
+        // Create package.json with aglint config using preset
+        await writeFile(
+            join(pkgPresetDir, 'package.json'),
+            JSON.stringify({
+                name: 'test-package-preset',
+                version: '1.0.0',
+                aglint: {
+                    extends: ['aglint:recommended'],
+                    syntax: ['AdGuard'],
+                },
+            }),
+        );
+
+        // Create package.json with root config
+        await writeFile(
+            join(pkgRootDir, 'package.json'),
+            JSON.stringify({
+                name: 'test-package-root',
+                version: '1.0.0',
+                aglint: {
+                    root: true,
+                    syntax: ['UblockOrigin'],
+                },
+            }),
+        );
+
         fs = new NodeFileSystemAdapter();
         pathAdapter = new NodePathAdapter();
     });
@@ -785,6 +863,97 @@ describe('config-resolver', () => {
                 expect(config.rules?.['rule-2']).toBe(LinterRuleSeverity.Warning);
                 expect(config.rules?.['rule-3']).toBe(LinterRuleSeverity.Off);
                 expect(config.rules?.['rule-4']).toBe(LinterRuleSeverity.Error);
+            });
+        });
+
+        describe('package.json support', () => {
+            test('should resolve package.json with aglint property', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'pkg', 'package.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
+            });
+
+            test('should throw error for package.json without aglint property', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                await expect(
+                    resolver.resolve(join(testDir, 'pkg-no-aglint', 'package.json')),
+                ).rejects.toThrow('No "aglint" property found in package.json');
+            });
+
+            test('should resolve package.json with extends', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'pkg-extends', 'package.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
+                expect(config.rules?.['no-invalid-modifiers']).toBe(LinterRuleSeverity.Warning);
+            });
+
+            test('should resolve package.json with preset reference', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'pkg-preset', 'package.json'));
+
+                expect(config).toBeDefined();
+                expect(config.syntax).toEqual(['Common', 'AdGuard']);
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
+            });
+
+            test('should check root flag in package.json', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const isRoot = await resolver.isRoot(join(testDir, 'pkg-root', 'package.json'));
+
+                expect(isRoot).toBe(true);
+            });
+
+            test('should return false for non-root package.json', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const isRoot = await resolver.isRoot(join(testDir, 'pkg', 'package.json'));
+
+                expect(isRoot).toBe(false);
+            });
+
+            test('should exclude root and extends from resolved package.json config', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'pkg-extends', 'package.json'));
+
+                expect(config).not.toHaveProperty('extends');
+                expect(config).not.toHaveProperty('root');
+            });
+
+            test('should cache package.json configs', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config1 = await resolver.resolve(join(testDir, 'pkg', 'package.json'));
+                const config2 = await resolver.resolve(join(testDir, 'pkg', 'package.json'));
+
+                expect(config1).toBe(config2);
             });
         });
     });

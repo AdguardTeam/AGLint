@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { deepMerge } from '../../../utils/deepmerge';
-import { type LinterConfigFile } from '../../config-file/config-file';
+import { type LinterConfigFile, PACKAGE_JSON } from '../../config-file/config-file';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 
@@ -141,8 +141,30 @@ export class LinterTree {
             for (const configName of this.options.configFileNames) {
                 const configPath = this.pathAdapter.join(absDirPath, configName);
                 if (await this.fs.exists(configPath)) {
-                    node.configFiles.push(configPath);
+                    // Special handling for package.json - only include if it has "aglint" property
+                    if (configName === PACKAGE_JSON) {
+                        try {
+                            const content = await this.fs.readFile(configPath);
+                            const parsed = JSON.parse(content);
+                            if (parsed.aglint && !node.configFiles.includes(configPath)) {
+                                node.configFiles.push(configPath);
+                            }
+                        } catch {
+                            // If we can't read/parse package.json, skip it
+                        }
+                    } else if (!node.configFiles.includes(configPath)) {
+                        node.configFiles.push(configPath);
+                    }
                 }
+            }
+
+            // Validate that only one config file exists in this directory
+            if (node.configFiles.length > 1) {
+                const fileNames = node.configFiles.map((p) => this.pathAdapter.basename(p)).join(', ');
+                throw new Error(
+                    `Multiple config files found in "${absDirPath}": ${fileNames}. `
+                    + 'Please use only one config file per directory.',
+                );
             }
 
             this.scannedDirs.add(absDirPath);
@@ -232,7 +254,7 @@ export class LinterTree {
             const node = this.nodeCache.get(currentPath);
 
             if (node && node.configFiles.length > 0) {
-                // Use first config file found (should validate only one exists)
+                // Only one config file per directory is allowed (validated during scanning)
                 const configPath = node.configFiles[0]!;
 
                 let config: LinterConfigFile;

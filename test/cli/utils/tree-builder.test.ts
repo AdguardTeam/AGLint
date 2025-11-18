@@ -554,6 +554,125 @@ describe('tree-builder', () => {
                 expect(chain).toBeDefined();
             });
         });
+
+        describe('multiple config files validation', () => {
+            test('should throw error when multiple config files exist in same directory', async () => {
+                const multiConfigDir = join(tmpdir(), `aglint-multi-config-test-${Date.now()}`);
+                await mkdir(multiConfigDir, { recursive: true });
+
+                try {
+                    // Create two config files
+                    await writeFile(join(multiConfigDir, 'aglint.config.json'), JSON.stringify({ root: true }));
+                    await writeFile(join(multiConfigDir, '.aglintrc.json'), JSON.stringify({ root: true }));
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: multiConfigDir,
+                        configFileNames: new Set(['aglint.config.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Should throw when scanning directory
+                    await expect(
+                        tree.addFile(join(multiConfigDir, 'test.txt')),
+                    ).rejects.toThrow(/Multiple config files found/);
+                } finally {
+                    await rm(multiConfigDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should throw error when package.json with aglint property coexists with other config', async () => {
+                const multiConfigDir = join(tmpdir(), `aglint-pkg-multi-config-test-${Date.now()}`);
+                await mkdir(multiConfigDir, { recursive: true });
+
+                try {
+                    // Create package.json with aglint property
+                    await writeFile(
+                        join(multiConfigDir, 'package.json'),
+                        JSON.stringify({
+                            name: 'test',
+                            aglint: { root: true },
+                        }),
+                    );
+                    // And another config file
+                    await writeFile(join(multiConfigDir, '.aglintrc.json'), JSON.stringify({ root: true }));
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: multiConfigDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Should throw when scanning directory
+                    await expect(
+                        tree.addFile(join(multiConfigDir, 'test.txt')),
+                    ).rejects.toThrow(/Multiple config files found/);
+                } finally {
+                    await rm(multiConfigDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should not throw error when package.json without aglint property coexists with config', async () => {
+                const multiConfigDir = join(tmpdir(), `aglint-pkg-no-aglint-test-${Date.now()}`);
+                await mkdir(multiConfigDir, { recursive: true });
+
+                try {
+                    // Create package.json WITHOUT aglint property
+                    await writeFile(
+                        join(multiConfigDir, 'package.json'),
+                        JSON.stringify({
+                            name: 'test',
+                            version: '1.0.0',
+                        }),
+                    );
+                    // And another config file
+                    await writeFile(join(multiConfigDir, '.aglintrc.json'), JSON.stringify({ root: true }));
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: multiConfigDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Should NOT throw - package.json without aglint property doesn't count
+                    await expect(
+                        tree.addFile(join(multiConfigDir, 'test.txt')),
+                    ).resolves.not.toThrow();
+
+                    const node = tree.getNode(multiConfigDir);
+                    expect(node?.configFiles.length).toBe(1);
+                    expect(node?.configFiles[0]).toContain('.aglintrc.json');
+                } finally {
+                    await rm(multiConfigDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should include specific file names in error message', async () => {
+                const multiConfigDir = join(tmpdir(), `aglint-error-msg-test-${Date.now()}`);
+                await mkdir(multiConfigDir, { recursive: true });
+
+                try {
+                    await writeFile(join(multiConfigDir, 'aglint.config.json'), JSON.stringify({}));
+                    await writeFile(join(multiConfigDir, '.aglintrc.yaml'), 'root: true');
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: multiConfigDir,
+                        configFileNames: new Set(['aglint.config.json', '.aglintrc.yaml']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    try {
+                        await tree.addFile(join(multiConfigDir, 'test.txt'));
+                        expect.fail('Should have thrown');
+                    } catch (error) {
+                        expect((error as Error).message).toContain('aglint.config.json');
+                        expect((error as Error).message).toContain('.aglintrc.yaml');
+                        expect((error as Error).message).toContain('Please use only one config file per directory');
+                    }
+                } finally {
+                    await rm(multiConfigDir, { recursive: true, force: true });
+                }
+            });
+        });
     });
 
     describe('IgnoreMatcher', () => {

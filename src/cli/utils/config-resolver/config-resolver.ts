@@ -9,6 +9,7 @@ import {
     EXT_YML,
     type LinterConfigFile,
     linterConfigFileSchema,
+    PACKAGE_JSON,
     RC_CONFIG_FILE,
 } from '../../config-file/config-file';
 import { type FileSystemAdapter } from '../fs-adapter';
@@ -86,7 +87,7 @@ export class ConfigResolver {
 
         // Read and parse to check root flag
         const content = await this.fs.readFile(absPath);
-        const parsed = ConfigResolver.parseConfig(content, absPath);
+        const parsed = this.parseConfig(content, absPath);
 
         return parsed.root === true;
     }
@@ -163,7 +164,7 @@ export class ConfigResolver {
 
         // Read and parse config
         const content = await this.fs.readFile(absPath);
-        const parsed = ConfigResolver.parseConfig(content, absPath);
+        const parsed = this.parseConfig(content, absPath);
         const configDir = this.pathAdapter.dirname(absPath);
 
         // Resolve extends
@@ -221,14 +222,28 @@ export class ConfigResolver {
      *
      * @returns The parsed config file.
      */
-    private static parseConfig(content: string, filePath: string): LinterConfigFile {
+    private parseConfig(content: string, filePath: string): LinterConfigFile {
         try {
-            if (filePath.endsWith(EXT_JSON) || filePath.endsWith(RC_CONFIG_FILE)) {
+            const basename = this.pathAdapter.basename(filePath);
+
+            // Check if this is a package.json file
+            if (basename === PACKAGE_JSON) {
+                const parsed = JSON.parse(content);
+                // For package.json files, extract the "aglint" property
+                if (!parsed.aglint) {
+                    throw new Error('No "aglint" property found in package.json');
+                }
+                return v.parse(linterConfigFileSchema, parsed.aglint);
+            }
+
+            const ext = this.pathAdapter.extname(filePath);
+
+            if (ext === EXT_JSON || basename === RC_CONFIG_FILE) {
                 const parsed = JSON.parse(content);
                 return v.parse(linterConfigFileSchema, parsed);
             }
 
-            if (filePath.endsWith(EXT_YAML) || filePath.endsWith(EXT_YML)) {
+            if (ext === EXT_YAML || ext === EXT_YML) {
                 // Note: YAML parsing would go here
                 // For now, assume JSON
                 return parseYaml(content);
