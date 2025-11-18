@@ -24,193 +24,129 @@
 </p>
 <!-- markdownlint-restore -->
 
-Table of Contents:
+**Table of Contents:**
 
 - [Introduction](#introduction)
 - [Features](#features)
-- [Getting started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation \& Usage](#installation--usage)
-    - [Integrate AGLint into your project](#integrate-aglint-into-your-project)
-- [VSCode extension](#vscode-extension)
-- [Ignoring files or folders](#ignoring-files-or-folders)
-    - [Default ignores](#default-ignores)
-- [Configuration](/docs/configuration.md)
-- [Development \& Contribution](#development--contribution)
-- [Ideas \& Questions](#ideas--questions)
+- [Quick Start](#quick-start)
+    - [Install AGLint](#install-aglint)
+    - [Install VSCode Extension](#install-vscode-extension)
+    - [Repository integration](#repository-integration)
+- [Linter rules](#linter-rules)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
 - [License](#license)
-- [References](#references)
 
 ## Introduction
 
-AGLint is a universal adblock filter list linter. It supports all popular syntaxes currently in use:
+AGLint is a universal linter for adblock filter lists.
+It supports all major syntaxes and can be used as a CLI tool
+or as a TypeScript/JavaScript library.
 
-<!--markdownlint-disable MD013-->
-- <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard][adg-url]
-- <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin][ubo-url]
-- <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus][abp-url]
-- <img src="https://cdn.adguard.com/website/github.com/AGLint/ab_logo.svg" width="14px" alt="AdBlock"> [AdBlock][ab-url]
-<!--markdownlint-enable MD013-->
+Our goal is to make it easy to create and maintain clean, valid filter lists.  
+AGLint's philosophy is highly inspired by [ESLint][eslint].
+If you know ESLint, you'll feel at home with AGLint.
 
-AGLint can be used as a command-line tool or as a TS/JS library in the Node.js or browser environment.
-
-Our goal is to provide a tool that can be used by everyone who is interested in adblock filters. We want to make it easy
-to create and maintain filter lists.
-
-Generally the philosophy of AGLint are inspired by [ESLint][eslint]. If you are familiar with ESLint, you will find
-it easy to use AGLint as well.
+[eslint]: https://eslint.org/
 
 ## Features
 
-- **Universal syntax support**: AdGuard, uBlock Origin, Adblock Plus, and AdBlock
-- **Auto-fixing**: automatically fix linting issues with `--fix`
-- **Cascading configuration**: hierarchical `.aglintrc` files with `extends` support
-- **Ignore patterns**: `.aglintignore` files for excluding files
-- **Multi-threaded**: parallel processing with intelligent caching
-- **CLI and programmatic API**: use as command-line tool or TypeScript/JavaScript library
-- **LSP integration**: designed for language servers and IDE extensions
+- 🧠 **Built-in rules** — detect syntax errors, invalid domains, CSS issues, and more  
+- 🛠️ **Auto-fixing** — automatically correct common issues  
+- 🌐 **Multi-syntax support** — AdGuard, uBlock Origin, Adblock Plus, AdBlock  
+- ⚙️ **Flexible configuration** — `.aglintrc` files with inheritance and inline comments  
+- 🚫 **Smart ignoring** — `.aglintignore` with pattern matching  
+- ⚡ **High performance** — parallel processing and caching  
+- 💡 **Dual API** — CLI tool and TypeScript/JavaScript library
 
-## Getting started
+## Quick Start
 
-Mainly AGLint is a CLI tool, but it can also be used programmatically.
-Here is a very short instruction on how to use it as a CLI tool with the default configuration.
+### Install AGLint
 
-### Prerequisites
+**Prerequisites:** [Node.js][nodejs]
 
-Ensure that [Node.js][nodejs] is installed on your computer.
-Optionally, you can also install [pnpm][pnpm] or [Yarn][yarn] for package management.
+```bash
+# Install
+npm install -D @adguard/aglint
 
-[nodejs]: https://nodejs.org/en/download
-[pnpm]: https://pnpm.io/installation
-[yarn]: https://classic.yarnpkg.com/en/docs/install
+# Initialize configuration
+npx aglint --init
 
-### Installation & Usage
+# Run linter
+npx aglint
+```
 
-1. Install AGLint to your project:
-   - NPM: `npm install -D @adguard/aglint`
-   - PNPM: `pnpm install -D @adguard/aglint`
-   - Yarn: `yarn add -D @adguard/aglint`
-1. Initialize the configuration file for AGLint:
-   - NPM: `npx aglint init`
-   - PNPM: `pnpm aglint init`
-   - Yarn: `yarn aglint init`
-1. Run AGLint:
-   - NPM: `npx aglint`
-   - PNPM: `pnpm aglint`
-   - Yarn: `yarn aglint`
+That's it! AGLint will scan your filter lists and report any issues.
 
-That's all! :hugs: The linter will check all filter lists in your project and print the results to the console.
+**You can also lint specific files, glob patterns, or directories:**
 
-> [!NOTE]
-> You can also install AGLint globally, so you can use it without `npx` or `pnpm`, but we recommend to install
-> it locally to your project.
+```bash
+npx aglint filters/social.txt 'filters/privacy/*.txt' filters/security/
+```
 
-> [!NOTE]
-> If you want to lint just some specific files, you can pass them as arguments:
-> `aglint path/to/file.txt path/to/another/file.txt`
+**Auto-fix issues:**
 
-> [!NOTE]
-> To see all available options, run `aglint --help`.
+```bash
+npx aglint --fix
+```
 
-*To customize the default configuration, see [Configuration](./docs/configuration.md) for more info.
-If you want to use AGLint programmatically, see [Use programmatically](/docs/how-to-use-programmatically.md).*
+**See all options:**
 
-### Integrate AGLint into your project
+```bash
+npx aglint --help
+```
 
-If you would like to integrate AGLint into your project / filter list, please read our detailed
-[Integration guide][integration-guide] for more info.
+[nodejs]: https://nodejs.org/
 
-## VSCode extension
+### Install VSCode Extension
 
-We have created a VSCode extension that fully covers adblock filter list syntax. It is available
-[in the VSCode marketplace][vscode-extension].
+We provide a VSCode extension offering full adblock filter list syntax support.
+It is available on the [VSCode Marketplace][vscode-marketplace] and [Open VSX][open-vsx].
 
-This extension enables syntax highlighting, and it's compatible with AGLint. Typically, it means that this extension
-will detect all syntax errors and show them in the editor, and on top of that, it will also show some warnings and
-hints, because it also runs AGLint under the hood.
+The extension provides:
 
-GitHub Linguist [also uses][linguist-pr] this extension to highlight adblock filter lists.
+- Syntax highlighting
+- Real-time linting using AGLint
+- Inline error and warning display
+
+GitHub Linguist [also uses][linguist-pr] this extension for adblock list syntax highlighting on GitHub.
 
 **We strongly recommend using this extension if you are working with adblock filter lists.**
 
-## Ignoring files or folders
+[linguist-pr]: https://github.com/github/linguist/pull/5968
+[vscode-marketplace]: https://marketplace.visualstudio.com/items?itemName=adguard.adblock
+[open-vsx]: https://open-vsx.org/extension/adguard/adblock
 
-You can ignore files or folders by creating an "ignore file" named `.aglintignore` in any directory. The syntax and
-behavior of this file is the same as `.gitignore` file. Learn more about `.gitignore` [in the docs][gitignore-docs]
-if you are not familiar with it.
+### Repository integration
 
-If you have a config file in an ignored folder, it will be ignored as well.
+Read the [integration guide][integration-guide] for details on how to integrate AGLint into your repository.
 
-### Default ignores
+[integration-guide]: https://github.com/AdguardTeam/AGLint/blob/master/docs/repo-integration.md
 
-Some "problematic" paths are ignored by default in order to avoid linting files that are not related to adblock filter
-lists. These paths are:
+## Linter rules
 
-- `node_modules` - Vendor files for Node.js, usually contains a lot of files - this can slow down the linter
-  significantly
-- `.DS_Store` - macOS system file
-- `.git` - Git files
-- `.hg` - Mercurial files
-- `.svn` - Subversion files
-- `Thumbs.db` - Windows system file
+See [docs/rules folder][rule-list] for a full list of built-in rules and their descriptions.
 
-## Development & Contribution
+[rule-list]: https://github.com/AdguardTeam/AGLint/blob/master/docs/rules/
+
+## Documentation
+
+For all available documentation, see the [docs folder][docs-folder].
+
+[docs-folder]: https://github.com/AdguardTeam/AGLint/blob/master/docs/
+
+## Contributing
 
 Please read the [CONTRIBUTING.md][contributing-url] file for details on how to contribute to this project.
 
-## Ideas & Questions
-
-If you have any questions or ideas for new features, please open an issue or a discussion. We will be happy to discuss
-it with you.
+[contributing-url]: https://github.com/AdguardTeam/AGLint/tree/master/CONTRIBUTING.md
 
 ## License
 
-AGLint is licensed under the MIT License. See the [LICENSE][aglint-license] file for details.
+MIT License. See [LICENSE][aglint-license] for details.
 
-## References
-
-Here are some useful links to help you write adblock rules. This list is not exhaustive, so if you know any other useful
-resources, please let us know.
-
-<!--markdownlint-disable MD013-->
-- Syntax documentation:
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard: *How to create your own ad filters*][adg-filters]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin: *Static filter syntax*][ubo-filters]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus: *How to write filters*][abp-filters]
-- Extended CSS documentation:
-    - [MDN: *CSS selectors*][mdn-css-selectors]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard: *Extended CSS capabilities*][adg-ext-css]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin: *Procedural cosmetic filters*][ubo-procedural]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus: *Extended CSS selectors*][abp-ext-css]
-- Scriptlets:
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard scriptlets][adg-scriptlets]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/ubo_logo.svg" width="14px" alt="uBlock Origin"> [uBlock Origin scriptlets][ubo-scriptlets]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/abp_logo.svg" width="14px" alt="Adblock Plus"> [Adblock Plus snippets][abp-snippets]
-- Third party libraries:
-    - <img src="https://raw.githubusercontent.com/csstree/csstree/master/assets/csstree-logo-rounded.svg" width="14px" alt="CSSTree"> [CSSTree docs][css-tree-docs]
-    - <img src="https://cdn.adguard.com/website/github.com/AGLint/adg_logo.svg" width="14px" alt="AdGuard"> [AdGuard's compatibility table][adg-compatibility-table]
-<!--markdownlint-enable MD013-->
-
-[ab-url]: https://getadblock.com
-[abp-ext-css]: https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide-emulation
-[abp-filters]: https://help.eyeo.com/adblockplus/how-to-write-filters
-[abp-snippets]: https://help.eyeo.com/adblockplus/snippet-filters-tutorial#snippets-ref
-[abp-url]: https://adblockplus.org
-[adg-compatibility-table]: https://github.com/AdguardTeam/Scriptlets/blob/master/wiki/compatibility-table.md
-[adg-ext-css]: https://github.com/AdguardTeam/ExtendedCss/blob/master/README.md
-[adg-filters]: https://kb.adguard.com/en/general/how-to-create-your-own-ad-filters
-[adg-scriptlets]: https://github.com/AdguardTeam/Scriptlets/blob/master/wiki/about-scriptlets.md#scriptlets
-[adg-url]: https://adguard.com
 [aglint-license]: https://github.com/AdguardTeam/AGLint/blob/master/LICENSE
-[contributing-url]: https://github.com/AdguardTeam/AGLint/tree/master/CONTRIBUTING.md
-[css-tree-docs]: https://github.com/csstree/csstree/tree/master/docs
-[eslint]: https://eslint.org/
-[gitignore-docs]: https://git-scm.com/docs/gitignore
-[integration-guide]: https://github.com/AdguardTeam/AGLint/blob/master/docs/repo-integration.md
-[linguist-pr]: https://github.com/github/linguist/pull/5968
-[mdn-css-selectors]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors
-[ubo-filters]: https://github.com/gorhill/uBlock/wiki/Static-filter-syntax
-[ubo-procedural]: https://github.com/gorhill/uBlock/wiki/Procedural-cosmetic-filters
-[ubo-scriptlets]: https://github.com/gorhill/uBlock/wiki/Resources-Library#available-general-purpose-scriptlets
-[ubo-url]: https://github.com/gorhill/uBlock
-[vscode-extension]: https://marketplace.visualstudio.com/items?itemName=adguard.adblock
+
+---
+
+<sub>Made with ❤️ by [AdGuard](https://adguard.com)</sub>

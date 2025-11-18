@@ -3,12 +3,13 @@
 /* eslint-disable n/no-process-exit */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inspect } from 'node:util';
 
 import { version } from '../../package.json';
 import { getFormattedError } from '../utils/error';
 
 import { LintResultCache } from './cache';
-import { buildCliProgram, type LinterCliConfig } from './cli-options';
+import { buildCliProgram, enforceSoloOptions, type LinterCliConfig } from './cli-options';
 import { CONFIG_FILE_NAMES } from './config-file/config-file';
 import { DEFAULT_PATTERN, IGNORE_FILE_NAME } from './constants';
 import {
@@ -53,6 +54,15 @@ const main = async () => {
 
         const options = program.opts() as LinterCliConfig;
 
+        enforceSoloOptions(program, ['init']);
+
+        // Handle --init option early (mutually exclusive with all other options)
+        if (options.init) {
+            const initWizard = new LinterCliInitWizard(cwd);
+            await initWizard.run();
+            return;
+        }
+
         const fsAdapter = new NodeFileSystemAdapter();
         const pathAdapter = new NodePathAdapter();
 
@@ -95,11 +105,29 @@ const main = async () => {
 
         const files = await scanner.scanAll(matchedPatterns.files);
 
-        // Handle --init option early (mutually exclusive with all other options)
-        if (options.init) {
-            const initWizard = new LinterCliInitWizard(cwd);
-            await initWizard.run();
+        if (options.printConfig) {
+            if (matchedPatterns.files.length !== 1) {
+                throw new Error('Please specify a pattern that matches exactly one file.');
+            }
+
+            const file = matchedPatterns.files[0]!;
+            const config = await tree.getResolvedConfig(file);
+
+            console.log(inspect(config, {
+                colors: options.color,
+                depth: Infinity,
+            }));
             return;
+        }
+
+        // Check if at least one config file was found
+        const noConfigFiles = files.find((file) => file.configChain.length === 0);
+        if (noConfigFiles) {
+            throw new Error(
+                `No AGLint configuration found for file "${noConfigFiles.path}". `
+                + 'Please create a configuration file using "aglint --init" '
+                + 'or ensure a config file exists in your project.',
+            );
         }
 
         const cache = options.cache
@@ -154,7 +182,7 @@ const main = async () => {
 
         console.error(prefix + getFormattedError(error));
 
-        process.exit(1);
+        process.exit(2);
     }
 };
 

@@ -1,4 +1,3 @@
-// core/report.ts
 import { isNull } from '../../utils/type-guards';
 import { type LinterProblem, type LinterSuggestion } from '../linter-problem';
 import { type LinterProblemReport, LinterRuleSeverity } from '../rule';
@@ -70,7 +69,7 @@ export function createReportFn(runtime: LinterRuntime): LinterReporter {
             message: ruleInstance.getMessage(report),
         };
 
-        if (process.env.NODE_ENV === 'test') {
+        if (__IS_TEST__) {
             problem.messageId = report.messageId;
             problem.data = report.data;
         }
@@ -112,7 +111,7 @@ export function createReportFn(runtime: LinterRuntime): LinterReporter {
                     fix,
                 };
 
-                if (process.env.NODE_ENV === 'test') {
+                if (__IS_TEST__) {
                     suggestion.messageId = suggest.messageId;
                     suggestion.data = suggest.data;
                 }

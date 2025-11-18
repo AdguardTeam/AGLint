@@ -2,10 +2,10 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+    define: {
+        __IS_TEST__: true,
+    },
     test: {
-        env: {
-            NODE_ENV: 'test',
-        },
         watch: false,
         coverage: {
             include: [

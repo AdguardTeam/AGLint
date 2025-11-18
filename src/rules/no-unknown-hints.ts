@@ -26,6 +26,18 @@ export default defineRule({
         messages: {
             unknownHintName: 'Unknown hint name "{{hintName}}"',
         },
+        correctExamples: [
+            {
+                name: 'Valid hint name',
+                code: '!+ NOT_OPTIMIZED',
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid hint name',
+                code: '!+ NOT_FOO',
+            },
+        ],
     },
     create: (context) => {
         return {

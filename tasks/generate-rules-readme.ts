@@ -8,15 +8,17 @@ import { toJsonSchema } from '@valibot/to-json-schema';
 import { createTwoFilesPatch } from 'diff';
 import fg from 'fast-glob';
 
-import { applyFixesToResult } from '../src';
+import { applyFixesToResult } from '../src/linter/fixer';
 import { type LinterRule, type LinterRuleExample, LinterRuleSeverity } from '../src/linter/rule';
 import { FixApplier } from '../src/linter/source-code/fix-applier';
+import { AGLINT_REPO_URL } from '../src/utils/repo-url';
 import { lint } from '../test/rules/helpers/lint';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = new URL('.', import.meta.url).pathname;
 
-const REPO_URL = 'https://github.com/AdguardTeam/AGLint/';
+// eslint-disable-next-line no-underscore-dangle
+(global as any).__IS_TEST__ = true;
 
 /**
  * Normalizes a string by replacing Windows line endings with Unix line endings and ensuring it ends with a newline.
@@ -271,12 +273,12 @@ const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
 
     md.push('## Rule source');
     md.push('');
-    md.push(`${REPO_URL}src/rules/${file}`);
+    md.push(`${AGLINT_REPO_URL}/blob/master/src/rules/${file}`);
     md.push('');
 
     md.push('## Test cases');
     md.push('');
-    md.push(`${REPO_URL}test/rules/${file.replace('.ts', '.test.ts')}`);
+    md.push(`${AGLINT_REPO_URL}/blob/master/test/rules/${file.replace('.ts', '.test.ts')}`);
     md.push('');
 
     // eslint-disable-next-line no-await-in-loop

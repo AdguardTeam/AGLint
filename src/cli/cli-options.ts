@@ -94,6 +94,33 @@ export type LinterCliConfig = {
      * Thread configuration for parallel processing.
      */
     threads: ThreadsOption;
+
+    /**
+     * Whether to print configuration.
+     */
+    printConfig: boolean;
+};
+
+/**
+ * Enforces that only one of the given options is enabled.
+ * This function is needed because commander.js only provides a .conflicts() method,
+ * but that method requires specifying the names of all other conflicting options
+ * if you want to specify a solo option.
+ *
+ * @param program The Commander program instance.
+ * @param soloLongFlags Array of option names to enforce.
+ */
+export const enforceSoloOptions = (program: Command, soloLongFlags: string[] = []) => {
+    const enabledFromCli = program.options.filter((opt) => {
+        const source = program.getOptionValueSource(opt.name());
+        return source === 'cli';
+    });
+
+    for (const solo of soloLongFlags) {
+        if (program.getOptionValueSource(solo) === 'cli' && enabledFromCli.length > 1) {
+            throw new Error(`The --${solo} option cannot be used with other options.`);
+        }
+    }
 };
 
 /**
@@ -184,6 +211,9 @@ export function buildCliProgram(): Command {
                 .argParser((rawValue: string) => {
                     return v.parse(threadOptionSchema, rawValue);
                 }),
+        )
+        .addOption(
+            new Option('--print-config', 'Print configuration for the given file without linting'),
         )
         .version(version, '-v, --version', 'Output the version number')
         .helpOption('-h, --help', 'Display help for command')

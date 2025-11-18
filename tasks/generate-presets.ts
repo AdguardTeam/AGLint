@@ -41,7 +41,7 @@ async function main() {
         let ruleConfig: LinterRuleConfig;
 
         if (rule.meta.configSchema && rule.meta.defaultConfig) {
-            ruleConfig = [severity, rule.meta.defaultConfig];
+            ruleConfig = [severity, ...rule.meta.defaultConfig];
         } else {
             ruleConfig = severity;
         }

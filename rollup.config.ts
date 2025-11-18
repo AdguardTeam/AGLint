@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import fastGlob from 'fast-glob';
 import { type RollupOptions } from 'rollup';
@@ -22,10 +23,12 @@ const distDirLocation = path.join(__dirname, 'dist');
 
 const buildConfig: RollupOptions = {
     input: [
-        ...(await fastGlob.async(path.join(__dirname, 'src/rules/*.ts'))),
         path.join(__dirname, 'src/index.ts'),
-        path.join(__dirname, 'src/cli/cli.ts'),
+        path.join(__dirname, 'src/linter/index.ts'),
+        path.join(__dirname, 'src/cli/index.ts'),
+        path.join(__dirname, 'src/cli/bin.ts'),
         path.join(__dirname, 'src/cli/worker.ts'),
+        ...(await fastGlob.async(path.join(__dirname, 'src/rules/*.ts'))),
     ],
     output: {
         dir: distDirLocation,
@@ -44,6 +47,12 @@ const buildConfig: RollupOptions = {
         }),
         resolve({ preferBuiltins: false }),
         externals(),
+        replace({
+            preventAssignment: true,
+            values: {
+                __IS_TEST__: 'false',
+            },
+        }),
     ],
 };
 

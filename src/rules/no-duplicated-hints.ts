@@ -13,6 +13,35 @@ export default defineRule({
         messages: {
             duplicatedHints: 'Duplicated hint "{{hint}}"',
         },
+        correctExamples: [
+            {
+                name: 'PLATFORM hint with single parameter',
+                code: [
+                    '!+ PLATFORM(windows)',
+                ].join('\n'),
+            },
+            {
+                name: 'PLATFORM hint with multiple parameters',
+                code: [
+                    '!+ PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera)',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Duplicated hint "windows"',
+                code: [
+                    '!+ PLATFORM(windows, mac, windows, ios) PLATFORM(windows)',
+                ].join('\n'),
+            },
+            {
+                name: 'Duplicated hint "NOT_OPTIMIZED"',
+                code: [
+                    '!+ NOT_OPTIMIZED NOT_OPTIMIZED PLATFORM(windows)',
+                ].join('\n'),
+            },
+        ],
+        version: '1.0.9',
     },
     create: (context) => {
         const history: Set<string> = new Set();

@@ -115,8 +115,8 @@ and should be fixed as:
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/if-directive-balance.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/if-directive-balance.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/if-directive-balance.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/if-directive-balance.test.ts

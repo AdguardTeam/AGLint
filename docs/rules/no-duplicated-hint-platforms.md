@@ -66,8 +66,8 @@ This rule was added in AGLint version 1.0.9
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-hint-platforms.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-duplicated-hint-platforms.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-duplicated-hint-platforms.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-duplicated-hint-platforms.test.ts

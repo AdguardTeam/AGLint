@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import Piscina from 'piscina';
 
-import { hasLinterResultErrors } from '../utils/linter-result';
+import { hasLinterResultErrors } from '../linter/linter-result';
 
 import { type LintResultCache } from './cache';
 import type { LinterCliConfig } from './cli-options';

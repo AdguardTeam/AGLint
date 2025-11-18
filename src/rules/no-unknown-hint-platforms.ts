@@ -30,6 +30,18 @@ export default defineRule({
         messages: {
             unknownPlatform: 'Unknown platform "{{platform}}"',
         },
+        correctExamples: [
+            {
+                name: 'Valid platform',
+                code: '!+ PLATFORM(windows)',
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Invalid platform',
+                code: '!+ PLATFORM(foo)',
+            },
+        ],
     },
     create: (context) => {
         const handler = (node: Value) => {

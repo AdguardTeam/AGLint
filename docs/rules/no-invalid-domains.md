@@ -69,8 +69,8 @@ This rule was added in AGLint version 1.0.9
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-domains.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-invalid-domains.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-invalid-domains.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-invalid-domains.test.ts

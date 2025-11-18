@@ -182,8 +182,8 @@ This rule was added in AGLint version 2.0.10
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-excluded-rules.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-excluded-rules.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-excluded-rules.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-excluded-rules.test.ts

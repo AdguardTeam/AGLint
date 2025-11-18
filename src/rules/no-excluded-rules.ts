@@ -2,7 +2,7 @@ import { type AnyRule, RegExpUtils } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
-import { createVisitorsForAnyValidRule } from '../utils/visitor-creator';
+import { createVisitorsForAnyValidRule } from '../linter/visitor-creator';
 
 export default defineRule({
     meta: {

@@ -15,6 +15,22 @@ export default defineRule({
             // eslint-disable-next-line max-len
             inconsistentHintPlatforms: 'Platform "{{platform}}" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
         },
+        correctExamples: [
+            {
+                name: 'PLATFORM and NOT_PLATFORM hint with different platforms',
+                code: [
+                    '!+ PLATFORM(windows) NOT_PLATFORM(mac)',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'PLATFORM and NOT_PLATFORM hint with the same platform',
+                code: [
+                    '!+ PLATFORM(windows) NOT_PLATFORM(windows)',
+                ].join('\n'),
+            },
+        ],
     },
     create: (context) => {
         const platforms: Value[] = [];

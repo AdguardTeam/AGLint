@@ -13,6 +13,28 @@ export default defineRule({
         messages: {
             duplicatedModifiers: 'Duplicated modifier "{{modifier}}"',
         },
+        correctExamples: [
+            {
+                name: 'Network rule, single `script` and `third-party` modifiers',
+                code: [
+                    '||example.com^$script,third-party',
+                ].join('\n'),
+            },
+        ],
+        incorrectExamples: [
+            {
+                name: 'Network rule, multiple repeated `script` and `third-party` modifiers',
+                code: [
+                    '||example.com^$script,third-party,script',
+                ].join('\n'),
+            },
+            {
+                name: 'Network rule, multiple repeated `domain` modifier',
+                code: [
+                    'ads.js$script,domain=example.com,domain=example.net',
+                ].join('\n'),
+            },
+        ],
     },
     create: (context) => {
         const history = new Set<string>();

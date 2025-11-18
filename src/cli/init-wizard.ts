@@ -1,4 +1,4 @@
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { AdblockSyntax } from '@adguard/agtree';
@@ -7,13 +7,20 @@ import select from '@inquirer/select';
 import { stringify as yamlStringify } from 'yaml';
 
 import { NEWLINE } from '../common/constants';
+import { formatJson } from '../utils/format-json';
 
 import {
     CONFIG_FILE_NAMES,
+    JSON_CONFIG_FILE_NAME,
     JSON_RC_CONFIG_FILE_NAME,
     type LinterConfigFile,
     LinterConfigFileFormat,
+    PACKAGE_JSON,
+    RC_CONFIG_FILE,
+    YAML_CONFIG_FILE_NAME,
     YAML_RC_CONFIG_FILE_NAME,
+    YML_CONFIG_FILE_NAME,
+    YML_RC_CONFIG_FILE_NAME,
 } from './config-file/config-file';
 import { fileExists } from './utils/file-exists';
 
@@ -47,7 +54,27 @@ export class LinterCliInitWizard {
             const configPath = join(cwd, configFileName);
             // eslint-disable-next-line no-await-in-loop
             if (await fileExists(configPath)) {
-                throw new Error(`Config file "${configFileName}" already exists in "${cwd}"`);
+                // For package.json, check if it has an "aglint" property
+                if (configFileName === PACKAGE_JSON) {
+                    // Try to read and parse package.json
+                    let parsed;
+                    try {
+                        // eslint-disable-next-line no-await-in-loop
+                        const content = await readFile(configPath, 'utf-8');
+                        parsed = JSON.parse(content);
+                    } catch {
+                        // Can't read or parse package.json, skip it
+                        continue;
+                    }
+
+                    // Successfully parsed - check for aglint property
+                    if (parsed.aglint) {
+                        throw new Error(`Config found in "aglint" property of "${configFileName}" in "${cwd}"`);
+                    }
+                    // No "aglint" property, continue checking other config files
+                } else {
+                    throw new Error(`Config file "${configFileName}" already exists in "${cwd}"`);
+                }
             }
         }
     }
@@ -55,15 +82,67 @@ export class LinterCliInitWizard {
     /**
      * Prompts user to select a config file format.
      *
+     * @param cwd Current working directory.
+     *
      * @returns Selected format.
      */
-    private static async promptFormat(): Promise<LinterConfigFileFormat> {
+    private static async promptFormat(cwd: string): Promise<LinterConfigFileFormat> {
+        const choices = [
+            { value: LinterConfigFileFormat.Yaml },
+            { value: LinterConfigFileFormat.Json },
+        ];
+
+        // Only offer package.json option if it already exists
+        const packageJsonPath = join(cwd, PACKAGE_JSON);
+        if (await fileExists(packageJsonPath)) {
+            choices.push({ value: LinterConfigFileFormat.PackageJson });
+        }
+
         return select({
             message: 'Select which config file format you want to use.\n',
-            choices: [
-                { value: LinterConfigFileFormat.Yaml },
-                { value: LinterConfigFileFormat.Json },
-            ],
+            choices,
+        });
+    }
+
+    /**
+     * Prompts user to select a config file name.
+     *
+     * @param format The selected format.
+     *
+     * @returns Selected config file name.
+     */
+    private static async promptConfigFileName(format: LinterConfigFileFormat): Promise<string> {
+        const choices: Array<{ value: string; name?: string }> = [];
+
+        switch (format) {
+            case LinterConfigFileFormat.Json:
+                choices.push(
+                    { value: JSON_RC_CONFIG_FILE_NAME, name: `${JSON_RC_CONFIG_FILE_NAME} (recommended)` },
+                    { value: JSON_CONFIG_FILE_NAME, name: JSON_CONFIG_FILE_NAME },
+                    { value: RC_CONFIG_FILE, name: RC_CONFIG_FILE },
+                );
+                break;
+
+            case LinterConfigFileFormat.Yaml:
+                choices.push(
+                    { value: YAML_RC_CONFIG_FILE_NAME, name: `${YAML_RC_CONFIG_FILE_NAME} (recommended)` },
+                    { value: YML_RC_CONFIG_FILE_NAME, name: YML_RC_CONFIG_FILE_NAME },
+                    { value: YAML_CONFIG_FILE_NAME, name: YAML_CONFIG_FILE_NAME },
+                    { value: YML_CONFIG_FILE_NAME, name: YML_CONFIG_FILE_NAME },
+                );
+                break;
+
+            case LinterConfigFileFormat.PackageJson:
+                // No choice needed for package.json
+                return PACKAGE_JSON;
+
+            default:
+                throw new Error(`Unsupported config file format "${format}"`);
+        }
+
+        return select({
+            message: 'Select which config file name you want to use.\n',
+            choices,
         });
     }
 
@@ -124,31 +203,18 @@ export class LinterCliInitWizard {
                 serializedConfig += NEWLINE;
                 break;
 
+            case LinterConfigFileFormat.PackageJson:
+                // For package.json, we only return the config object (not serialized)
+                // It will be merged with existing package.json in writeConfigFile
+                serializedConfig = JSON.stringify(preparedConfig, null, 2);
+                serializedConfig += NEWLINE;
+                break;
+
             default:
                 throw new Error(`Unsupported config file format "${chosenFormat}"`);
         }
 
         return serializedConfig;
-    }
-
-    /**
-     * Gets the config file name based on the chosen format.
-     *
-     * @param chosenFormat Format chosen by the user.
-     *
-     * @returns Config file name.
-     */
-    private static getConfigFileName(chosenFormat: LinterConfigFileFormat): string {
-        switch (chosenFormat) {
-            case LinterConfigFileFormat.Yaml:
-                return YAML_RC_CONFIG_FILE_NAME;
-
-            case LinterConfigFileFormat.Json:
-                return JSON_RC_CONFIG_FILE_NAME;
-
-            default:
-                throw new Error(`Unsupported config file format "${chosenFormat}"`);
-        }
     }
 
     /**
@@ -158,7 +224,24 @@ export class LinterCliInitWizard {
      * @param configContent Config file content.
      */
     private async writeConfigFile(configFileName: string, configContent: string): Promise<void> {
-        await writeFile(join(this.cwd, configFileName), configContent);
+        const filePath = join(this.cwd, configFileName);
+
+        // Special handling for package.json - merge with existing file
+        if (configFileName === PACKAGE_JSON) {
+            // Read existing package.json (we know it exists because we only offer this option when it does)
+            const originalRawPkg = await readFile(filePath, 'utf-8');
+            const pkg = JSON.parse(originalRawPkg);
+
+            // Add aglint property with the config
+            pkg.aglint = JSON.parse(configContent);
+
+            // Preserve original formatting: indent, newline style, and final newline
+            const updatedRawPkg = formatJson(pkg, originalRawPkg);
+            await writeFile(filePath, updatedRawPkg);
+        } else {
+            // For other formats, just write directly
+            await writeFile(filePath, configContent);
+        }
     }
 
     /**
@@ -167,8 +250,13 @@ export class LinterCliInitWizard {
      * @param configFileName Config file name.
      */
     private notifySuccess(configFileName: string): void {
-        // eslint-disable-next-line no-console
-        console.log(`Config file was created successfully in directory "${this.cwd}" as "${configFileName}"`);
+        if (configFileName === PACKAGE_JSON) {
+            // eslint-disable-next-line no-console
+            console.log(`Config was added successfully to "${configFileName}" in directory "${this.cwd}"`);
+        } else {
+            // eslint-disable-next-line no-console
+            console.log(`Config file was created successfully in directory "${this.cwd}" as "${configFileName}"`);
+        }
 
         // Notify user about root: true option
         // eslint-disable-next-line no-console, max-len
@@ -185,16 +273,16 @@ export class LinterCliInitWizard {
         await LinterCliInitWizard.checkExistingConfig(this.cwd);
 
         // Ask user to specify which config file format to use
-        const chosenFormat = await LinterCliInitWizard.promptFormat();
+        const chosenFormat = await LinterCliInitWizard.promptFormat(this.cwd);
+
+        // Ask user to specify which config file name to use
+        const configFileName = await LinterCliInitWizard.promptConfigFileName(chosenFormat);
 
         // Ask user to specify which syntaxes to use
         const chosenSyntaxes = await LinterCliInitWizard.promptSyntaxes();
 
         // Generate config file content based on the chosen format and syntaxes
         const configContent = LinterCliInitWizard.getConfigFileContent(chosenFormat, chosenSyntaxes);
-
-        // Determine the config file name based on the chosen format
-        const configFileName = LinterCliInitWizard.getConfigFileName(chosenFormat);
 
         // Write the config file to the current working directory
         await this.writeConfigFile(configFileName, configContent);

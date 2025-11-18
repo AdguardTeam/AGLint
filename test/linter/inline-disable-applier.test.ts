@@ -441,6 +441,100 @@ describe('LinterInlineDisableApplier', () => {
 
             expect(filtered.map((p) => p.ruleId)).toEqual(['r1', 'r2']);
         });
+
+        it('handles multiple problems at the exact same position with disable-all', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.Disable, 1, 0),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule2'),
+                createProblem(2, 5, 'rule3'),
+            ]);
+
+            // All problems at the same position should be disabled
+            expect(filtered).toHaveLength(0);
+        });
+
+        it('handles multiple problems at the same position with specific rule disable', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.Disable, 1, 0, 'rule1'),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule1'), // Duplicate at same position
+                createProblem(2, 5, 'rule2'),
+            ]);
+
+            // Both rule1 problems should be disabled, rule2 should remain
+            expect(filtered).toHaveLength(1);
+            expect(filtered[0]?.ruleId).toBe('rule2');
+        });
+
+        it('handles multiple problems at same position with disable-next-line', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.DisableNextLine, 1, 0),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule2'),
+                createProblem(2, 5, 'rule3'),
+            ]);
+
+            // All problems on line 2 should be disabled
+            expect(filtered).toHaveLength(0);
+        });
+
+        it('handles multiple same-rule problems at same position', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.Disable, 1, 0, 'rule1'),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule1'),
+            ]);
+
+            // All three instances of rule1 at the same position should be disabled
+            expect(filtered).toHaveLength(0);
+        });
+
+        it('handles multiple problems at same position with directive at exact same position', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.Disable, 2, 5),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule2'),
+                createProblem(2, 5, 'rule3'),
+            ]);
+
+            // With sameLineTakesEffect=true (default), all should be disabled
+            expect(filtered).toHaveLength(0);
+        });
+
+        it('handles multiple problems at same position when some should be kept', () => {
+            const applier = new LinterInlineDisableApplier([
+                createDirective(LinterConfigCommentType.Disable, 1, 0, 'rule1'),
+                createDirective(LinterConfigCommentType.Disable, 1, 5, 'rule2'),
+            ]);
+
+            const filtered = applier.filter([
+                createProblem(2, 5, 'rule1'),
+                createProblem(2, 5, 'rule2'),
+                createProblem(2, 5, 'rule3'),
+                createProblem(2, 5, 'rule1'), // Duplicate
+            ]);
+
+            // Only rule3 should remain
+            expect(filtered).toHaveLength(1);
+            expect(filtered[0]?.ruleId).toBe('rule3');
+        });
     });
 
     describe('filterWithUnusedDirectives', () => {

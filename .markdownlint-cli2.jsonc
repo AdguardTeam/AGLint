@@ -21,7 +21,8 @@
                 "a",
                 "details",
                 "summary",
-                "img"
+                "img",
+                "sub"
             ]
         },
         "no-duplicate-heading": {
