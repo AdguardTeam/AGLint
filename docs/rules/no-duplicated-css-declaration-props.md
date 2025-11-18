@@ -106,8 +106,8 @@ This rule was added in AGLint version 4.0.0
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-css-declaration-props.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-duplicated-css-declaration-props.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-duplicated-css-declaration-props.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-duplicated-css-declaration-props.test.ts

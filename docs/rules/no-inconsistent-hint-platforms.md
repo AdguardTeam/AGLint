@@ -47,8 +47,8 @@ should be reported as:
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-inconsistent-hint-platforms.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-inconsistent-hint-platforms.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-inconsistent-hint-platforms.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-inconsistent-hint-platforms.test.ts

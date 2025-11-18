@@ -47,8 +47,8 @@ should be reported as:
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-unknown-preprocessor-directives.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-unknown-preprocessor-directives.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-unknown-preprocessor-directives.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-unknown-preprocessor-directives.test.ts

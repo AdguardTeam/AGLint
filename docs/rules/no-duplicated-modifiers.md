@@ -61,8 +61,8 @@ should be reported as:
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-duplicated-modifiers.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-duplicated-modifiers.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-duplicated-modifiers.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-duplicated-modifiers.test.ts

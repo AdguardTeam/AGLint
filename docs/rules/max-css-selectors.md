@@ -203,8 +203,8 @@ This rule was added in AGLint version 1.0.0
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/max-css-selectors.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/max-css-selectors.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/max-css-selectors.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/max-css-selectors.test.ts

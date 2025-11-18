@@ -47,8 +47,8 @@ should be reported as:
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-invalid-modifiers.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-invalid-modifiers.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-invalid-modifiers.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-invalid-modifiers.test.ts

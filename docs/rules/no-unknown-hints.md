@@ -47,8 +47,8 @@ should be reported as:
 
 ## Rule source
 
-https://github.com/AdguardTeam/AGLint/src/rules/no-unknown-hints.ts
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/no-unknown-hints.ts
 
 ## Test cases
 
-https://github.com/AdguardTeam/AGLint/test/rules/no-unknown-hints.test.ts
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/no-unknown-hints.test.ts
