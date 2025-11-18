@@ -5,6 +5,8 @@
     },
     "include": [
         ".eslintrc.cjs",
+        "src/linter/.eslintrc.cjs",
+        "src/utils/.eslintrc.cjs",
         ".lintstagedrc.js",
         "rollup.config.ts",
         "src/**/*.ts",
