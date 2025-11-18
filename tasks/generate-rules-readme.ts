@@ -17,6 +17,9 @@ import { lint } from '../test/rules/helpers/lint';
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = new URL('.', import.meta.url).pathname;
 
+// eslint-disable-next-line no-underscore-dangle
+(global as any).__IS_TEST__ = true;
+
 /**
  * Normalizes a string by replacing Windows line endings with Unix line endings and ensuring it ends with a newline.
  *
