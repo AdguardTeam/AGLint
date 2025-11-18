@@ -23,12 +23,12 @@ const distDirLocation = path.join(__dirname, 'dist');
 
 const buildConfig: RollupOptions = {
     input: [
-        ...(await fastGlob.async(path.join(__dirname, 'src/rules/*.ts'))),
         path.join(__dirname, 'src/index.ts'),
         path.join(__dirname, 'src/linter/index.ts'),
         path.join(__dirname, 'src/cli/index.ts'),
         path.join(__dirname, 'src/cli/bin.ts'),
         path.join(__dirname, 'src/cli/worker.ts'),
+        ...(await fastGlob.async(path.join(__dirname, 'src/rules/*.ts'))),
     ],
     output: {
         dir: distDirLocation,
