@@ -37,7 +37,7 @@ export default defineRule({
             NetworkRule: (node: NetworkRule) => {
                 isExceptionRule = node.exception;
             },
-            'ExceptionRule:exit': () => {
+            'NetworkRule:exit': () => {
                 isExceptionRule = false;
             },
             'NetworkRule Modifier': (node: Modifier) => {
