@@ -57,6 +57,11 @@ export type LinterRunOptions = {
      * Optional sub-parsers for handling embedded syntaxes (e.g., CSS).
      */
     subParsers?: LinterSubParsersConfig;
+
+    /**
+     * Optional module debugger for logging.
+     */
+    debug?: { log: (message: string) => void };
 };
 
 const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
@@ -100,34 +105,75 @@ const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
  * ```
  */
 export async function lint(options: LinterRunOptions): Promise<LinterResult> {
+    const debug = options.debug || { log: () => {} };
+    const filePath = options.fileProps.filePath || 'unknown';
+    const startTime = Date.now();
+
+    debug.log(`Starting lint for: ${filePath}`);
+    debug.log(`File size: ${options.fileProps.content.length} bytes`);
+
+    // Parse and validate config
+    const configParseStart = Date.now();
     const parsedConfig = v.parse(linterConfigSchema, options.config);
+    debug.log(`Config parsed in ${Date.now() - configParseStart}ms`);
+    if (debug) {
+        debug.log(`Linter config: ${JSON.stringify(parsedConfig)}`);
+    }
+
+    // Create runtime (includes source code parsing)
+    const runtimeStart = Date.now();
     const runtime = createLinterRuntime(
         options.fileProps,
         parsedConfig,
         options.loadRule,
         options.subParsers ?? {},
+        debug,
     );
+    debug.log(`Runtime created in ${Date.now() - runtimeStart}ms`);
 
     const report = createReportFn(runtime);
     runtime.ruleRegistry.setReporter(report);
 
+    // Load rules
+    const ruleLoadStart = Date.now();
+    if (debug) {
+        debug.log(`Loading ${Object.keys(parsedConfig.rules).length} rule(s)`);
+    }
     await runtime.ruleRegistry.loadRules();
+    debug.log(`Rules loaded in ${Date.now() - ruleLoadStart}ms`);
 
     const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
 
     if (options.config.allowInlineConfig) {
         runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
+        debug.log('Inline config comments enabled');
     }
 
+    // AST walk
+    const walkStart = Date.now();
+    debug.log('Starting AST walk');
     runWalk(runtime);
+    debug.log(`AST walk completed in ${Date.now() - walkStart}ms`);
 
+    // Apply disable directives
+    const disableStart = Date.now();
+    debug.log(`Applying disable directives (${disabled.length} directive(s))`);
     applyDisableDirectives(
         runtime.problems,
         disabled,
         parsedConfig.reportUnusedDisableDirectives,
         parsedConfig.unusedDisableDirectivesSeverity,
     );
+    debug.log(`Disable directives applied in ${Date.now() - disableStart}ms`);
+
     const counts = summarize(runtime.problems);
+    const totalTime = Date.now() - startTime;
+
+    debug.log(
+        `Lint completed for ${filePath} in ${totalTime}ms: `
+        + `${counts.errorCount} error(s), ${counts.warningCount} warning(s), `
+        + `${counts.fatalErrorCount} fatal`,
+    );
 
     return { problems: runtime.problems, ...counts };
 }

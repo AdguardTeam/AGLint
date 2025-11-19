@@ -82,6 +82,8 @@ export type LinterRuntime = {
  * @param config Parsed linter configuration.
  * @param loadRule Function to dynamically load rule modules.
  * @param subParsers Configuration for sub-parsers (e.g., CSS, HTML).
+ * @param debug Optional debug logger with log method.
+ * @param debug.log Debug logging function.
  *
  * @returns A fully initialized linter runtime ready for rule loading and AST traversal.
  */
@@ -90,6 +92,7 @@ export function createLinterRuntime(
     config: LinterConfigParsed,
     loadRule: LinterRuleLoader,
     subParsers: LinterSubParsersConfig,
+    debug?: { log: (message: string) => void },
 ): LinterRuntime {
     const problems: LinterProblem[] = [];
 
@@ -99,6 +102,9 @@ export function createLinterRuntime(
             throw error;
         }
 
+        if (debug) {
+            debug.log(`Parse error: ${error.message} at line ${error.location.start.line}`);
+        }
         problems.push({
             message: error.message,
             position: error.location,
@@ -107,9 +113,28 @@ export function createLinterRuntime(
         });
     };
 
+    if (debug) {
+        debug.log('Parsing source code');
+    }
+    const parseStart = Date.now();
     const sourceCode = new LinterSourceCode(file.content, onParseError);
+    if (debug) {
+        debug.log(`Source code parsed in ${Date.now() - parseStart}ms`);
+    }
+
+    if (debug) {
+        debug.log('Creating walker with sub-parsers');
+    }
     const walker = new LinterSourceCodeWalker(sourceCode, subParsers, onParseError);
+
+    if (debug) {
+        debug.log('Initializing visitor collection');
+    }
     const visitors = new LinterVisitorCollection();
+
+    if (debug) {
+        debug.log('Creating fix generator');
+    }
     const fixGen = new LinterFixGenerator(sourceCode);
 
     const getOffsetRangeForNode = (node: any): LinterOffsetRange | null => {
@@ -126,8 +151,12 @@ export function createLinterRuntime(
         sourceCode,
         syntax: config.syntax,
         getOffsetRangeForNode,
-    };
+        ...(debug ? { debug } : {}),
+    } as LinterRuleBaseContext;
 
+    if (debug) {
+        debug.log('Creating rule registry');
+    }
     const ruleRegistry = new LinterRuleRegistry(
         config,
         visitors,
@@ -144,5 +173,6 @@ export function createLinterRuntime(
         problems,
         onParseError,
         getOffsetRangeForNode,
-    };
+        ...(debug ? { debug } : {}),
+    } as LinterRuntime;
 }

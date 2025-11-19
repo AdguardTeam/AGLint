@@ -1,3 +1,5 @@
+import { type ModuleDebugger } from '../debug';
+
 /**
  * Result of pattern matching.
  */
@@ -37,4 +39,9 @@ export interface PatternMatchOptions {
      * Include dotfiles in glob matches.
      */
     dot?: boolean;
+
+    /**
+     * Optional module debugger for logging.
+     */
+    debug?: ModuleDebugger;
 }

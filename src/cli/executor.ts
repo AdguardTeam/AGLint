@@ -35,6 +35,11 @@ export async function runSequential(
 ): Promise<boolean> {
     let hasErrors = false;
 
+    if (cliConfig.debug) {
+        // eslint-disable-next-line no-console
+        console.log(`[executor] Starting sequential processing of ${files.length} file(s)`);
+    }
+
     reporter.onLintStart();
 
     for (const file of files) {
@@ -88,6 +93,13 @@ export async function runSequentialWithCache(
     cache: LintResultCache,
 ): Promise<boolean> {
     let hasErrors = false;
+    let cacheHits = 0;
+    let cacheMisses = 0;
+
+    if (cliConfig.debug) {
+        // eslint-disable-next-line no-console
+        console.log(`[executor] Starting sequential processing with cache of ${files.length} file(s)`);
+    }
 
     reporter.onLintStart();
 
@@ -106,44 +118,64 @@ export async function runSequentialWithCache(
         );
 
         if (cachedData) {
+            // Cache hit - use cached result
+            cacheHits += 1;
+            if (cliConfig.debug) {
+                // eslint-disable-next-line no-console
+                console.log(`[executor] Cache HIT for: ${file.path}`);
+            }
             reporter.onFileEnd(parsedFilePath, cachedData.linterResult);
 
             if (!hasErrors && hasLinterResultErrors(cachedData.linterResult)) {
                 hasErrors = true;
             }
+        } else {
+            // Cache miss - run linter
+            cacheMisses += 1;
+            if (cliConfig.debug) {
+                // eslint-disable-next-line no-console
+                console.log(`[executor] Cache MISS for: ${file.path}`);
+            }
 
-            continue;
+            // eslint-disable-next-line no-await-in-loop
+            const { results } = await runLinterWorker({
+                tasks: [
+                    {
+                        filePath: file.path,
+                        cwd,
+                        linterConfig: file.config,
+                    },
+                ],
+                cliConfig,
+            });
+
+            if (!hasErrors && hasLinterResultErrors(results[0]!.linterResult)) {
+                hasErrors = true;
+            }
+
+            // Store result in cache
+            cache.setCachedResult(
+                file.path,
+                file.mtime,
+                file.size,
+                file.config,
+                results[0]!.linterResult,
+            );
+
+            reporter.onFileEnd(parsedFilePath, results[0]!.linterResult);
         }
-
-        // eslint-disable-next-line no-await-in-loop
-        const { results } = await runLinterWorker({
-            tasks: [
-                {
-                    filePath: file.path,
-                    cwd,
-                    linterConfig: file.config,
-                },
-            ],
-            cliConfig,
-        });
-
-        if (!hasErrors && hasLinterResultErrors(results[0]!.linterResult)) {
-            hasErrors = true;
-        }
-
-        // Store result in cache
-        cache.setCachedResult(
-            file.path,
-            file.mtime,
-            file.size,
-            file.config,
-            results[0]!.linterResult,
-        );
-
-        reporter.onFileEnd(parsedFilePath, results[0]!.linterResult);
     }
 
     reporter.onLintEnd();
+
+    if (cliConfig.debug) {
+        const hitRate = files.length > 0 ? ((cacheHits / files.length) * 100).toFixed(1) : '0.0';
+        // eslint-disable-next-line no-console
+        console.log(
+            '[executor] Sequential processing with cache completed: '
+            + `${cacheHits} hit(s), ${cacheMisses} miss(es) (${hitRate}% hit rate)`,
+        );
+    }
 
     return hasErrors;
 }
@@ -171,6 +203,15 @@ export async function runParallel(
     maxThreads: number,
 ): Promise<boolean> {
     let hasErrors = false;
+
+    if (cliConfig.debug) {
+        const totalFiles = buckets.reduce((sum, bucket) => sum + bucket.length, 0);
+        // eslint-disable-next-line no-console
+        console.log(
+            `[executor] Starting parallel processing of ${totalFiles} file(s) `
+            + `in ${buckets.length} bucket(s) with ${maxThreads} thread(s)`,
+        );
+    }
 
     const piscina = new Piscina({
         filename: path.resolve(__dirname, './worker.js'),
@@ -212,6 +253,11 @@ export async function runParallel(
 
     reporter.onLintEnd();
 
+    if (cliConfig.debug) {
+        // eslint-disable-next-line no-console
+        console.log('[executor] Parallel processing completed');
+    }
+
     return hasErrors;
 }
 
@@ -240,6 +286,17 @@ export async function runParallelWithCache(
     cache: LintResultCache,
 ): Promise<boolean> {
     let hasErrors = false;
+    let cacheHits = 0;
+    let cacheMisses = 0;
+
+    if (cliConfig.debug) {
+        const totalFiles = buckets.reduce((sum, bucket) => sum + bucket.length, 0);
+        // eslint-disable-next-line no-console
+        console.log(
+            `[executor] Starting parallel processing with cache of ${totalFiles} file(s) `
+            + `in ${buckets.length} bucket(s) with ${maxThreads} thread(s)`,
+        );
+    }
 
     const piscina = new Piscina({
         filename: path.resolve(__dirname, './worker.js'),
@@ -297,6 +354,9 @@ export async function runParallelWithCache(
                         workerResult.linterResult,
                         workerResult.fileHash,
                     );
+                    cacheMisses += 1;
+                } else {
+                    cacheHits += 1;
                 }
 
                 // Report result
@@ -310,6 +370,16 @@ export async function runParallelWithCache(
     );
 
     reporter.onLintEnd();
+
+    if (cliConfig.debug) {
+        const totalFiles = cacheHits + cacheMisses;
+        const hitRate = totalFiles > 0 ? ((cacheHits / totalFiles) * 100).toFixed(1) : '0.0';
+        // eslint-disable-next-line no-console
+        console.log(
+            '[executor] Parallel processing with cache completed: '
+            + `${cacheHits} hit(s), ${cacheMisses} miss(es) (${hitRate}% hit rate)`,
+        );
+    }
 
     return hasErrors;
 }

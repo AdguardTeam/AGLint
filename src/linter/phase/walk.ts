@@ -18,5 +18,24 @@ import { type LinterRuntime } from '../core/runtime';
  * ```
  */
 export function runWalk(runtime: LinterRuntime) {
-    runtime.walker.walk(runtime.visitors.getVisitors());
+    const { debug } = runtime as any;
+    const visitors = runtime.visitors.getVisitors();
+
+    if (debug) {
+        const selectorCount = Object.keys(visitors).length;
+        debug.log(`Walking AST with ${selectorCount} registered selector(s)`);
+
+        // Log registered selectors
+        const selectors = Object.keys(visitors).slice(0, 10); // Show first 10
+        if (selectors.length > 0) {
+            debug.log(`Selectors: ${selectors.join(', ')}${selectorCount > 10 ? '...' : ''}`);
+        }
+    }
+
+    const walkStart = Date.now();
+    runtime.walker.walk(visitors);
+
+    if (debug) {
+        debug.log(`Walker traversed AST in ${Date.now() - walkStart}ms`);
+    }
 }

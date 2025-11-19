@@ -40,3 +40,8 @@ export {
     type ScannedFile,
     LinterFileScanner,
 } from './utils/file-scanner';
+
+export {
+    DebugLogger,
+    createDebugLogger,
+} from './utils/debug';

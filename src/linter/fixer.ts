@@ -205,6 +205,19 @@ export function applyFixesToResult(options: ApplyFixesOptions): string {
  */
 export async function lintWithFixes(options: LinterFixerRunOptions): Promise<LinterFixerResult> {
     const maxFixRounds = options.maxFixRounds ?? FixApplier.MAX_FIX_ROUNDS;
+    const { debug } = options;
+
+    if (debug) {
+        debug.log(`Starting fix mode (max ${maxFixRounds} round(s))`);
+        if (options.categories) {
+            const cats = Array.from(options.categories).join(', ');
+            debug.log(`Fix categories filter: ${cats}`);
+        }
+        if (options.ruleIds) {
+            const rules = Array.from(options.ruleIds).join(', ');
+            debug.log(`Fix rules filter: ${rules}`);
+        }
+    }
 
     let source = options.fileProps.content;
     let remainingFixes: LinterFixCommand[] = [];
@@ -247,13 +260,25 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
 
         remainingFixes = fixApplicationResult.remainingFixes;
         source = fixApplicationResult.fixedSource;
-        appliedFixesCount += fixApplicationResult.appliedFixes.length;
+        const roundApplied = fixApplicationResult.appliedFixes.length;
+        appliedFixesCount += roundApplied;
         remainingFixesCount = remainingFixes.length;
         fixRoundsCount += 1;
+
+        if (debug) {
+            debug.log(
+                `Fix round ${fixRoundsCount}: applied ${roundApplied} fix(es), `
+                + `${remainingFixesCount} remaining`,
+            );
+        }
     } while (remainingFixesCount > 0 && fixRoundsCount < maxFixRounds);
 
     // Final verification lint, ensures offsets match the fixed source
     if (appliedFixesCount > 0) {
+        if (debug) {
+            debug.log('Running final verification lint on fixed source');
+        }
+
         linterResult = await lint({
             fileProps: {
                 ...options.fileProps,
@@ -262,7 +287,16 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
             config: options.config,
             loadRule: options.loadRule,
             subParsers: options.subParsers,
+            debug,
         });
+    }
+
+    if (debug) {
+        const maxReached = fixRoundsCount >= maxFixRounds;
+        debug.log(
+            `Fix mode completed: ${appliedFixesCount} fix(es) applied in ${fixRoundsCount} round(s)`
+            + `${maxReached ? ' (max rounds reached)' : ''}`,
+        );
     }
 
     return {

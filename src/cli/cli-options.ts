@@ -99,6 +99,11 @@ export type LinterCliConfig = {
      * Whether to print configuration.
      */
     printConfig: boolean;
+
+    /**
+     * Whether to enable debug logging.
+     */
+    debug: boolean;
 };
 
 /**
@@ -214,6 +219,9 @@ export function buildCliProgram(): Command {
         )
         .addOption(
             new Option('--print-config', 'Print configuration for the given file without linting'),
+        )
+        .addOption(
+            new Option('--debug', 'Enable debug logging with colored module output'),
         )
         .version(version, '-v, --version', 'Output the version number')
         .helpOption('-h, --help', 'Display help for command')
