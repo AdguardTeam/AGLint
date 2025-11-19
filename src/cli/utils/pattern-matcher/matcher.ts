@@ -48,11 +48,20 @@ export async function matchPatterns(
         defaultIgnorePatterns = DEFAULT_IGNORE_PATTERNS,
         followSymlinks = false,
         dot = true,
+        debug,
     } = options;
+
+    if (debug) {
+        debug.log(`Matching ${patterns.length} pattern(s): ${patterns.join(', ')}`);
+    }
 
     const absCwd = pathAdapter.toPosix(pathAdapter.resolve(cwd));
     const patternMap = new Map<string, string[]>();
     const expandedPatterns: string[] = [];
+
+    if (debug) {
+        debug.log(`Working directory: ${absCwd}`);
+    }
 
     // Process each pattern and expand as needed
     for (const pattern of patterns) {
@@ -60,6 +69,9 @@ export async function matchPatterns(
 
         if (isGlob(normalizedPattern)) {
             // Glob pattern - use as-is
+            if (debug) {
+                debug.log(`Pattern "${pattern}" is a glob`);
+            }
             expandedPatterns.push(normalizedPattern);
             patternMap.set(pattern, []);
         } else {
@@ -72,11 +84,17 @@ export async function matchPatterns(
 
                 if (stats.isFile) {
                     // Direct file reference
+                    if (debug) {
+                        debug.log(`Pattern "${pattern}" is a file: ${absPath}`);
+                    }
                     expandedPatterns.push(absPath);
                     patternMap.set(pattern, []);
                 } else if (stats.isDirectory) {
                     // Directory - expand to glob pattern
                     const dirGlob = `${absPath.replace(/\/+$/, '')}/**/*`;
+                    if (debug) {
+                        debug.log(`Pattern "${pattern}" is a directory, expanding to: ${dirGlob}`);
+                    }
                     expandedPatterns.push(dirGlob);
                     patternMap.set(pattern, []);
                 } else {
@@ -91,6 +109,9 @@ export async function matchPatterns(
     }
 
     // Match all patterns with glob
+    if (debug) {
+        debug.log(`Running glob with ${expandedPatterns.length} expanded pattern(s)`);
+    }
     const matchedFiles = await fs.glob(expandedPatterns, {
         cwd: absCwd,
         dot,
@@ -99,6 +120,9 @@ export async function matchPatterns(
         absolute: true,
         ignore: [...defaultIgnorePatterns],
     });
+    if (debug) {
+        debug.log(`Glob matched ${matchedFiles.length} file(s)`);
+    }
 
     // Build pattern map - determine which files came from which pattern
     for (let i = 0; i < patterns.length; i += 1) {
@@ -137,6 +161,9 @@ export async function matchPatterns(
     for (const [pattern, matches] of patternMap.entries()) {
         if (matches.length === 0) {
             throw new NoFilesForPattern(pattern);
+        }
+        if (debug) {
+            debug.log(`Pattern "${pattern}" matched ${matches.length} file(s)`);
         }
     }
 

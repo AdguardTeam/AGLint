@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { type ConfigResolver } from '../config-resolver';
+import { type ModuleDebugger } from '../debug';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type LinterTree } from '../tree-builder';
 
@@ -11,17 +12,26 @@ import { type ScannedFile } from './types';
  */
 export class LinterFileScanner {
     /**
+     * Module debugger for logging.
+     */
+    private debug?: ModuleDebugger;
+
+    /**
      * Creates a new LinterFileScanner instance.
      *
      * @param tree The linter tree to use for file scanning.
      * @param configResolver The config resolver to use for resolving configs.
      * @param fs The file system adapter to use for file operations.
+     * @param debug Optional debug instance for logging.
      */
     constructor(
         private tree: LinterTree,
         private configResolver: ConfigResolver,
         private fs: FileSystemAdapter,
-    ) {}
+        debug?: ModuleDebugger,
+    ) {
+        this.debug = debug;
+    }
 
     /**
      * Scans files, filters ignored ones, and yields files with resolved configs.
@@ -32,6 +42,10 @@ export class LinterFileScanner {
      * @yields ScannedFile objects with path, config, and metadata.
      */
     public async* scan(filePaths: string[]): AsyncGenerator<ScannedFile> {
+        if (this.debug) {
+            this.debug.log(`Starting scan of ${filePaths.length} file(s)`);
+        }
+
         for (const filePath of filePaths) {
             // Add file to tree (idempotent - safe to call multiple times)
             await this.tree.addFile(filePath);
@@ -39,11 +53,17 @@ export class LinterFileScanner {
             // Check if ignored
             const isIgnored = await this.tree.isIgnored(filePath);
             if (isIgnored) {
+                if (this.debug) {
+                    this.debug.log(`Skipping ignored file: ${filePath}`);
+                }
                 continue; // Skip ignored files
             }
 
             // Get config chain
             const configChain = await this.tree.getConfigChain(filePath);
+            if (this.debug) {
+                this.debug.log(`File "${filePath}" has ${configChain.length} config(s) in chain`);
+            }
 
             // Resolve final config from chain
             const config = await this.configResolver.resolveChain(configChain);
@@ -73,6 +93,9 @@ export class LinterFileScanner {
         const results: ScannedFile[] = [];
         for await (const file of this.scan(filePaths)) {
             results.push(file);
+        }
+        if (this.debug) {
+            this.debug.log(`Scan completed: ${results.length} file(s) ready for linting`);
         }
         return results;
     }

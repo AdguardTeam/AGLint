@@ -120,7 +120,11 @@ export class LinterRuleRegistry {
      * ```
      */
     public async loadRules(): Promise<void> {
+        const ruleNames = Object.keys(this.config.rules);
+        const loadStart = Date.now();
+
         const tasks = Object.entries(this.config.rules).map(async ([ruleName, ruleConfig]) => {
+            const ruleStart = Date.now();
             const rule = await this.loadRule(ruleName);
 
             // Validate rule against schema
@@ -132,8 +136,26 @@ export class LinterRuleRegistry {
                 ruleConfig,
             );
 
-            if (instance.getSeverity() === LinterRuleSeverity.Off) {
-                return;
+            const severity = instance.getSeverity();
+            let severityLabel: string;
+            if (severity === LinterRuleSeverity.Error) {
+                severityLabel = 'error';
+            } else if (severity === LinterRuleSeverity.Warning) {
+                severityLabel = 'warn';
+            } else if (severity === LinterRuleSeverity.Off) {
+                severityLabel = 'off';
+            } else {
+                severityLabel = 'unknown';
+            }
+
+            if (severity === LinterRuleSeverity.Off) {
+                // Rule is disabled, skip it
+                return {
+                    ruleName,
+                    loaded: false,
+                    severity: severityLabel,
+                    time: Date.now() - ruleStart,
+                };
             }
 
             this.addRule(instance);
@@ -143,12 +165,39 @@ export class LinterRuleRegistry {
                 this.reporter,
             );
 
+            const selectorCount = Object.keys(visitors).length;
             for (const [selector, visitor] of Object.entries(visitors)) {
                 this.visitorCollection.addVisitor(selector, visitor);
             }
+
+            return {
+                ruleName,
+                loaded: true,
+                severity: severityLabel,
+                selectors: selectorCount,
+                time: Date.now() - ruleStart,
+            };
         });
 
-        await Promise.all(tasks);
+        const results = await Promise.all(tasks);
+        const loadTime = Date.now() - loadStart;
+
+        // Log results if debug is available (passed through base context)
+        const { debug } = this.baseRuleContext as any;
+        if (debug) {
+            const loaded = results.filter((r) => r?.loaded).length;
+            const skipped = results.length - loaded;
+            debug.log(`Loaded ${loaded}/${ruleNames.length} rule(s) in ${loadTime}ms (${skipped} disabled)`);
+
+            for (const result of results) {
+                if (result && result.loaded) {
+                    debug.log(
+                        `  - ${result.ruleName}: ${result.severity} `
+                        + `(${result.selectors} selector(s), ${result.time}ms)`,
+                    );
+                }
+            }
+        }
     }
 
     /**

@@ -12,9 +12,11 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 ### Added
 
 - Ability to print config for a file. [#158]
+- Debug mode with comprehensive logging. [#199]
 - Support for `package.json` configuration file. [#245]
 
 [#158]: https://github.com/AdguardTeam/AGLint/issues/158
+[#199]: https://github.com/AdguardTeam/AGLint/issues/199
 [#245]: https://github.com/AdguardTeam/AGLint/issues/245
 
 ## [4.0.0-alpha.5] - 2025-11-03

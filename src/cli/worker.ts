@@ -8,6 +8,7 @@ import { type LinterRule } from '../linter/rule';
 
 import { type CacheFileData, getFileHash, LinterCacheStrategy } from './cache';
 import { type LinterCliConfig } from './cli-options';
+import { createDebugLogger } from './utils/debug';
 
 const fsPromises = import('node:fs/promises');
 const { readFile, writeFile } = await fsPromises;
@@ -103,6 +104,14 @@ const ruleCache = new Map<string, LinterRule>();
  * @returns Results for all processed files.
  */
 const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerResults> => {
+    // Create debug logger for worker thread
+    const workerDebugLogger = createDebugLogger(tasks.cliConfig.debug ?? false);
+    const workerDebug = workerDebugLogger.createDebugger('worker');
+
+    if (tasks.cliConfig.debug) {
+        workerDebug.log(`Processing ${tasks.tasks.length} task(s) in worker thread`);
+    }
+
     const promises = tasks.tasks.map(async (task): Promise<LinterWorkerResult> => {
         // Check if we have valid cached data
         if (tasks.cliConfig.cache && task.fileCacheData) {
@@ -153,6 +162,11 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
             fileHash = getFileHash(content);
         }
 
+        // Create debug object for linter if debug mode is enabled
+        const debugFn = tasks.cliConfig.debug
+            ? workerDebugLogger.createDebugger('linter')
+            : undefined;
+
         const commonLinterRunOptions: LinterRunOptions = {
             fileProps: {
                 filePath: task.filePath,
@@ -175,6 +189,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
                 return rule;
             },
             subParsers: defaultSubParsers,
+            debug: debugFn,
         };
 
         if (tasks.cliConfig.fix) {
@@ -203,9 +218,13 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
         };
     });
 
-    return {
-        results: await Promise.all(promises),
-    };
+    const results = await Promise.all(promises);
+
+    if (tasks.cliConfig.debug) {
+        workerDebug.log(`Completed ${tasks.tasks.length} task(s) in worker thread`);
+    }
+
+    return { results };
 };
 
 export default runLinterWorker;
