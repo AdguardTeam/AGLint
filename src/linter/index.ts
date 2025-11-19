@@ -5,7 +5,7 @@ export type {
     GetOffsetFromNode,
     LinterRulesConfig,
     LinterConfigParsed,
-    DEFAULT_CHILD_KEY,
+    DEFAULT_CHILD_KEYS,
     DEFAULT_TYPE_KEY,
 } from './config';
 export { lint, type LinterResult, type LinterRunOptions } from './linter';

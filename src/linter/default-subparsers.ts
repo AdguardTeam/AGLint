@@ -1,5 +1,10 @@
 // import { defaultParserOptions, DomainListParser } from '@adguard/agtree/parser';
-import { type CssNode, parse as parseCss, toPlainObject } from '@adguard/ecss-tree';
+import {
+    type Comment,
+    type CssNode,
+    parse as parseCss,
+    toPlainObject,
+} from '@adguard/ecss-tree';
 
 import { type LinterSubParsersConfig, type Parser } from './config';
 import { LinterSourceCodeError } from './source-code/error';
@@ -18,7 +23,9 @@ const createCssParser = (context: string): Parser => {
     return {
         name: '@adguard/ecss-tree',
         parse: ((source: string, offset: number, line: number, lineStartOffset: number) => {
-            return toPlainObject(parseCss(source, {
+            const comments: Comment[] = [];
+
+            const res = toPlainObject(parseCss(source, {
                 context,
                 positions: true,
                 offset,
@@ -36,10 +43,26 @@ const createCssParser = (context: string): Parser => {
                         },
                     });
                 },
+                onComment(value, loc) {
+                    comments.push({
+                        type: 'Comment',
+                        value,
+                        loc,
+                    });
+                },
             }));
+
+            // By default, css-tree ignores comments from the AST.
+            // With this little trick, we include them into the AST.
+            // Its not a perfect solution, but enough to detect comments.
+            if (comments.length > 0) {
+                (res as any).comments = comments;
+            }
+
+            return res;
         }),
         nodeTypeKey: 'type',
-        childNodeKey: 'children',
+        childNodeKeys: ['children', 'comments'],
         getStartOffset: (node: CssNode) => {
             return node.loc!.start.offset;
         },
@@ -64,6 +87,7 @@ export const defaultSubParsers: LinterSubParsersConfig = {
     'CssInjectionRuleBody > Value.selectorList': createCssParser('selectorList'),
     'ElementHidingRuleBody > Value.declarationList': createCssParser('declarationList'),
     'CssInjectionRuleBody > Value.declarationList': createCssParser('declarationList'),
+    'CssInjectionRuleBody > Value.mediaQueryList': createCssParser('mediaQueryList'),
 
     // TODO: Enable it later
     // Problematic with regex values in domain modifiers,
@@ -80,6 +104,6 @@ export const defaultSubParsers: LinterSubParsersConfig = {
     //         );
     //     }),
     //     nodeTypeKey: 'type',
-    //     childNodeKey: 'children',
+    //     childNodeKeys: ['children'],
     // },
 };

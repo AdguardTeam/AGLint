@@ -3,7 +3,7 @@ import esquery from 'esquery';
 
 import { getErrorMessage } from '../../utils/error';
 import {
-    DEFAULT_CHILD_KEY,
+    DEFAULT_CHILD_KEYS,
     DEFAULT_TYPE_KEY,
     type LinterSubParsersConfig,
     type Parser,
@@ -37,10 +37,10 @@ type SubAst = {
     nodeTypeKey: string;
 
     /**
-     * The key name used to access an array of child nodes.
-     * For example, "children" or "body".
+     * The key names used to access child nodes.
+     * For example, ["children"], ["body"], or ["children", "comments"] for multiple keys.
      */
-    childNodeKey: string;
+    childNodeKeys: string[];
 };
 
 /**
@@ -260,7 +260,7 @@ export class LinterSourceCodeWalker {
                 const sub: SubAst = {
                     ast: subAstObj,
                     nodeTypeKey: parser.nodeTypeKey,
-                    childNodeKey: parser.childNodeKey,
+                    childNodeKeys: parser.childNodeKeys,
                 };
 
                 // Keep per-host list and a global flat list (useful for diagnostics).
@@ -281,7 +281,7 @@ export class LinterSourceCodeWalker {
                 walker.walk(
                     sub.ast as AnyNode,
                     selectors,
-                    parser.childNodeKey,
+                    parser.childNodeKeys,
                     parser.nodeTypeKey,
                     [...ancestry, hostNode],
                     (node) => {
@@ -346,7 +346,7 @@ export class LinterSourceCodeWalker {
         mainWalker.walk(
             ast as unknown as AnyNode,
             combined,
-            DEFAULT_CHILD_KEY,
+            DEFAULT_CHILD_KEYS,
             DEFAULT_TYPE_KEY,
         );
     }
