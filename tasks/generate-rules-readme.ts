@@ -163,9 +163,7 @@ const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
     md.push('');
 
     if (rule.meta.docs.recommended) {
-        md.push('> ');
         md.push('> ✅ Using `aglint:recommended` preset will enable this rule');
-        md.push('> ');
         md.push('');
     }
 

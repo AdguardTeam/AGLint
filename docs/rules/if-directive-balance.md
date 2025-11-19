@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `if-directive-balance`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-invalid-modifiers`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-inconsistent-hint-platforms`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

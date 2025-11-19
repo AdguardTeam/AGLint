@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-unknown-hints`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

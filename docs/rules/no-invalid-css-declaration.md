@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-invalid-css-declaration`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

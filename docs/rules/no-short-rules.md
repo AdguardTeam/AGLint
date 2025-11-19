@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-short-rules`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 
