@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import Piscina from 'piscina';
 
-import { hasLinterResultErrors } from '../linter/linter-result';
+import { hasErrors } from '../linter/linter-helpers';
 
 import { type LintResultCache } from './cache';
 import type { LinterCliConfig } from './cli-options';
@@ -33,7 +33,7 @@ export async function runSequential(
     reporter: LinterConsoleReporter,
     cwd: string,
 ): Promise<boolean> {
-    let hasErrors = false;
+    let foundErrors = false;
 
     if (cliConfig.debug) {
         // eslint-disable-next-line no-console
@@ -59,8 +59,8 @@ export async function runSequential(
             cliConfig,
         });
 
-        if (!hasErrors && hasLinterResultErrors(results[0]!.linterResult)) {
-            hasErrors = true;
+        if (!foundErrors && hasErrors(results[0]!.linterResult)) {
+            foundErrors = true;
         }
 
         reporter.onFileEnd(parsedFilePath, results[0]!.linterResult);
@@ -68,7 +68,7 @@ export async function runSequential(
 
     reporter.onLintEnd();
 
-    return hasErrors;
+    return foundErrors;
 }
 
 /**
@@ -92,7 +92,7 @@ export async function runSequentialWithCache(
     cwd: string,
     cache: LintResultCache,
 ): Promise<boolean> {
-    let hasErrors = false;
+    let foundErrors = false;
     let cacheHits = 0;
     let cacheMisses = 0;
 
@@ -126,8 +126,8 @@ export async function runSequentialWithCache(
             }
             reporter.onFileEnd(parsedFilePath, cachedData.linterResult);
 
-            if (!hasErrors && hasLinterResultErrors(cachedData.linterResult)) {
-                hasErrors = true;
+            if (!foundErrors && hasErrors(cachedData.linterResult)) {
+                foundErrors = true;
             }
         } else {
             // Cache miss - run linter
@@ -149,8 +149,8 @@ export async function runSequentialWithCache(
                 cliConfig,
             });
 
-            if (!hasErrors && hasLinterResultErrors(results[0]!.linterResult)) {
-                hasErrors = true;
+            if (!foundErrors && hasErrors(results[0]!.linterResult)) {
+                foundErrors = true;
             }
 
             // Store result in cache
@@ -177,7 +177,7 @@ export async function runSequentialWithCache(
         );
     }
 
-    return hasErrors;
+    return foundErrors;
 }
 
 /**
@@ -202,7 +202,7 @@ export async function runParallel(
     cwd: string,
     maxThreads: number,
 ): Promise<boolean> {
-    let hasErrors = false;
+    let foundErrors = false;
 
     if (cliConfig.debug) {
         const totalFiles = buckets.reduce((sum, bucket) => sum + bucket.length, 0);
@@ -244,8 +244,8 @@ export async function runParallel(
             for (let i = 0; i < bucket.length; i += 1) {
                 reporter.onFileEnd(path.parse(bucket[i]!.path), result.results[i]!.linterResult);
 
-                if (!hasErrors && hasLinterResultErrors(result.results[i]!.linterResult)) {
-                    hasErrors = true;
+                if (!foundErrors && hasErrors(result.results[i]!.linterResult)) {
+                    foundErrors = true;
                 }
             }
         }),
@@ -258,7 +258,7 @@ export async function runParallel(
         console.log('[executor] Parallel processing completed');
     }
 
-    return hasErrors;
+    return foundErrors;
 }
 
 /**
@@ -285,7 +285,7 @@ export async function runParallelWithCache(
     maxThreads: number,
     cache: LintResultCache,
 ): Promise<boolean> {
-    let hasErrors = false;
+    let foundErrors = false;
     let cacheHits = 0;
     let cacheMisses = 0;
 
@@ -362,8 +362,8 @@ export async function runParallelWithCache(
                 // Report result
                 reporter.onFileEnd(path.parse(file.path), workerResult.linterResult);
 
-                if (!hasErrors && hasLinterResultErrors(workerResult.linterResult)) {
-                    hasErrors = true;
+                if (!foundErrors && hasErrors(workerResult.linterResult)) {
+                    foundErrors = true;
                 }
             }
         }),
@@ -381,5 +381,5 @@ export async function runParallelWithCache(
         );
     }
 
-    return hasErrors;
+    return foundErrors;
 }

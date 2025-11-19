@@ -49,3 +49,10 @@ export {
 export { type LinterRuleLoader } from './rule-registry/rule-loader';
 export { type LinterFileProps } from './file-props';
 export { AGLINT_REPO_URL, getAglintRuleDocumentationUrl } from '../utils/repo-url';
+export {
+    hasErrors,
+    assertLinterFixCommand,
+    isLinterFixCommand,
+    assertLinterSuggestions,
+    isLinterSuggestions,
+} from './linter-helpers';
