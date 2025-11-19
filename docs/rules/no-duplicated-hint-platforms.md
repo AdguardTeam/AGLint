@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-duplicated-hint-platforms`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

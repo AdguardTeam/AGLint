@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-unknown-preprocessor-directives`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

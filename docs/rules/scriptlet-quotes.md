@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `scriptlet-quotes`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

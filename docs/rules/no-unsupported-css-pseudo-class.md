@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-unsupported-css-pseudo-class`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 

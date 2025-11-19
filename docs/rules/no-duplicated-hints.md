@@ -1,9 +1,7 @@
 <!-- markdownlint-disable -->
 # `no-duplicated-hints`
 
-> 
 > ✅ Using `aglint:recommended` preset will enable this rule
-> 
 
 ## Description
 
