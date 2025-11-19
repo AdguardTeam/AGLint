@@ -12,7 +12,7 @@ export const DEFAULT_TYPE_KEY = 'type';
 /**
  * Default key name used to access child nodes in ASTs.
  */
-export const DEFAULT_CHILD_KEY = 'children';
+export const DEFAULT_CHILD_KEYS = ['children'];
 
 const parseFunctionSchema = v.pipe(
     v.function(),
@@ -69,10 +69,10 @@ const parserSchema = v.object({
     nodeTypeKey: v.string(),
 
     /**
-     * The key used to access arrays of child nodes within the sub-AST.
-     * For example, "children" or "body".
+     * The key (or keys) used to access arrays of child nodes within the sub-AST.
+     * For example, ["children"], ["body"], or ["children", "comments"] for multiple keys.
      */
-    childNodeKey: v.string(),
+    childNodeKeys: v.array(v.string()),
 
     /**
      * Optional function that returns the start offset of a node in the main source.

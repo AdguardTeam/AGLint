@@ -5,6 +5,7 @@
 | --- | --- | :---: | :---: | :---: |
 | [if-directive-balance](./if-directive-balance.md) | Checks if conditional preprocessor directives are structured correctly | ✅ | 🔧 |  |
 | [max-css-selectors](./max-css-selectors.md) | Checks if a CSS selector list contains more than the specified number of selectors |  | 🔧 |  |
+| [no-css-comments](./no-css-comments.md) | Disallows CSS comments | ✅ | 🔧 |  |
 | [no-duplicated-css-declaration-props](./no-duplicated-css-declaration-props.md) | Checks for duplicated CSS declaration properties within the same rule block | ✅ | 🔧 | 💡 |
 | [no-duplicated-hint-platforms](./no-duplicated-hint-platforms.md) | Checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint | ✅ | 🔧 |  |
 | [no-duplicated-hints](./no-duplicated-hints.md) | Checks if hints are duplicated within the same hint comment rule | ✅ |  |  |

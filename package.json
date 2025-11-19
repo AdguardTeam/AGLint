@@ -53,6 +53,11 @@
             "import": "./dist/rules/max-css-selectors.js",
             "default": "./dist/rules/max-css-selectors.js"
         },
+        "./rules/no-css-comments": {
+            "types": "./dist/rules/no-css-comments.d.ts",
+            "import": "./dist/rules/no-css-comments.js",
+            "default": "./dist/rules/no-css-comments.js"
+        },
         "./rules/no-duplicated-css-declaration-props": {
             "types": "./dist/rules/no-duplicated-css-declaration-props.d.ts",
             "import": "./dist/rules/no-duplicated-css-declaration-props.js",

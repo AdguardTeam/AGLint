@@ -27,7 +27,7 @@ describe('LinterSourceCodeWalker', () => {
                 name: 'test-parser',
                 parse: () => ({ type: 'Root', children: [] }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -44,7 +44,7 @@ describe('LinterSourceCodeWalker', () => {
                 name: 'universal-parser',
                 parse: () => ({ type: 'Root', children: [] }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -60,7 +60,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: () => ({ type: 'Root', children: [] }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -100,7 +100,7 @@ describe('LinterSourceCodeWalker', () => {
                 name: 'css-parser',
                 parse: () => subNode,
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -181,7 +181,7 @@ describe('LinterSourceCodeWalker', () => {
                 name: 'test-parser',
                 parse: parseFn,
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -210,7 +210,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: parseFn,
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -245,12 +245,12 @@ describe('LinterSourceCodeWalker', () => {
                 SelectorList: {
                     parse: parser1,
                     nodeTypeKey: 'type',
-                    childNodeKey: 'children',
+                    childNodeKeys: ['children'],
                 },
                 DeclarationList: {
                     parse: parser2,
                     nodeTypeKey: 'type',
-                    childNodeKey: 'children',
+                    childNodeKeys: ['children'],
                 },
             };
 
@@ -274,7 +274,7 @@ describe('LinterSourceCodeWalker', () => {
                     ],
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -298,7 +298,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: () => ({ type: 'SubRoot', children: [] }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -329,7 +329,7 @@ describe('LinterSourceCodeWalker', () => {
                     throw new Error('Parse failed');
                 },
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -355,7 +355,7 @@ describe('LinterSourceCodeWalker', () => {
                     return { type: 'SubRoot', children: [] };
                 },
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -374,7 +374,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: parseFn,
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             // Create walker that will try to parse all nodes
@@ -398,7 +398,7 @@ describe('LinterSourceCodeWalker', () => {
                     throw new Error('Parse error');
                 },
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -438,7 +438,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: () => ({ type: 'Sub', children: [] }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -459,7 +459,7 @@ describe('LinterSourceCodeWalker', () => {
                     children: [{ type: 'CSSNode', value: src }],
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -482,7 +482,7 @@ describe('LinterSourceCodeWalker', () => {
                     ],
                 }),
                 nodeTypeKey: 'kind',
-                childNodeKey: 'items',
+                childNodeKeys: ['items'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -503,7 +503,7 @@ describe('LinterSourceCodeWalker', () => {
                     children: [{ type: 'Target' }],
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -527,7 +527,7 @@ describe('LinterSourceCodeWalker', () => {
                     value: 'test',
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -555,7 +555,7 @@ describe('LinterSourceCodeWalker', () => {
                     }],
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -578,7 +578,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: parseFn,
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -597,7 +597,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: () => ({ type: 'Sub', children: [] }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
                 getStartOffset: (node: any) => node.start || 0,
                 getEndOffset: (node: any) => node.end || 10,
             };
@@ -619,7 +619,7 @@ describe('LinterSourceCodeWalker', () => {
                     children: [{ type: 'SubChild' }],
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -652,7 +652,7 @@ describe('LinterSourceCodeWalker', () => {
             const parser: Parser = {
                 parse: parseFn,
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -685,7 +685,7 @@ describe('LinterSourceCodeWalker', () => {
                     };
                 },
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {
@@ -706,7 +706,7 @@ describe('LinterSourceCodeWalker', () => {
                     children: [{ type: 'SubNode' }],
                 }),
                 nodeTypeKey: 'type',
-                childNodeKey: 'children',
+                childNodeKeys: ['children'],
             };
 
             const walker = new LinterSourceCodeWalker(sourceCode, {

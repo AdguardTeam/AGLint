@@ -4,6 +4,7 @@
   ],
   "rules": {
     "if-directive-balance": 2,
+    "no-css-comments": 1,
     "no-duplicated-css-declaration-props": 2,
     "no-duplicated-hint-platforms": 2,
     "no-duplicated-hints": 2,

@@ -210,7 +210,7 @@ describe('LinterWalker', () => {
         const onRootEnter = vi.fn();
         const visitors: SelectorsWithVisitors = { Root: [onRootEnter] };
 
-        walker.walk(root, visitors, 'children', 'type', [initial]);
+        walker.walk(root, visitors, ['children'], 'type', [initial]);
 
         const [node, parent, ancestry] = onRootEnter.mock.calls[0]!;
         expect(node?.type).toBe('Root');
@@ -313,10 +313,48 @@ describe('LinterWalker', () => {
         walker.walk(
             customRoot,
             visitors,
-            'list' /* childrenKey */,
+            ['list'] /* childrenKey */,
             'kind' /* typeKey */,
         );
 
         expect(hits).toEqual(['K', 'K']);
+    });
+
+    it('supports multiple childrenKeys to visit nodes from different arrays', () => {
+        // AST with both 'children' and 'comments' arrays
+        const astWithComments: AnyNode = {
+            type: 'Root',
+            children: [
+                { type: 'Child', name: 'c1' },
+                { type: 'Child', name: 'c2' },
+            ],
+            comments: [
+                { type: 'Comment', value: 'comment1' },
+                { type: 'Comment', value: 'comment2' },
+            ],
+        };
+
+        const childHits: string[] = [];
+        const commentHits: string[] = [];
+
+        const childVisitor: Visitor = (n) => childHits.push((n as any).name);
+        const commentVisitor: Visitor = (n) => commentHits.push((n as any).value);
+
+        const visitors: SelectorsWithVisitors = {
+            Child: [childVisitor],
+            Comment: [commentVisitor],
+        };
+
+        // Pass both 'children' and 'comments' as childrenKeys
+        walker.walk(
+            astWithComments,
+            visitors,
+            ['children', 'comments'] /* multiple childrenKeys */,
+            'type',
+        );
+
+        // Should visit both children and comments
+        expect(childHits).toEqual(['c1', 'c2']);
+        expect(commentHits).toEqual(['comment1', 'comment2']);
     });
 });

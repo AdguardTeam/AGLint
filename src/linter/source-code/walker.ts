@@ -188,7 +188,7 @@ export class LinterWalker {
      *
      * @param root The root node of the AST to traverse.
      * @param selectors A map of selector strings to visitor functions.
-     * @param childrenKey The key used to access an array of child nodes. Defaults to 'children'.
+     * @param childrenKeys The key(s) used to access child nodes. Defaults to ['children'].
      * @param typeKey The key used to access the node's type. Defaults to 'type'.
      * @param initialAncestry The initial ancestry of the root node.
      * @param onEnter A callback function to be called when a node is entered.
@@ -196,7 +196,7 @@ export class LinterWalker {
     public walk(
         root: AnyNode,
         selectors: SelectorsWithVisitors = {},
-        childrenKey: string = 'children',
+        childrenKeys: string[] = ['children'],
         typeKey: string = 'type',
         initialAncestry?: AnyNode[],
         onEnter?: (node: AnyNode) => void,
@@ -242,32 +242,53 @@ export class LinterWalker {
 
             // Traverse children
             ancestors.unshift(node);
-            const list = (node as any)[childrenKey];
-            if (Array.isArray(list)) {
-                for (let i = 0; i < list.length; i += 1) {
-                    const child = list[i];
-                    if (child && typeof child === 'object' && (child as any)[typeKey]) {
-                        visit(child, node);
-                    }
-                }
-            } else {
-                Object.keys(node).forEach((key) => {
-                    const v = (node as any)[key];
-                    if (!v || typeof v !== 'object') {
-                        return;
-                    }
 
-                    if (Array.isArray(v)) {
-                        for (let i = 0; i < v.length; i += 1) {
-                            const child = v[i];
+            // If multiple keys specified, visit each explicitly
+            if (childrenKeys.length > 1) {
+                for (const key of childrenKeys) {
+                    const list = (node as any)[key];
+                    if (Array.isArray(list)) {
+                        for (let i = 0; i < list.length; i += 1) {
+                            const child = list[i];
                             if (child && typeof child === 'object' && (child as any)[typeKey]) {
                                 visit(child, node);
                             }
                         }
-                    } else if ((v as any)[typeKey]) {
-                        visit(v, node);
+                    } else if (list && typeof list === 'object' && (list as any)[typeKey]) {
+                        visit(list, node);
                     }
-                });
+                }
+            } else {
+                // Single key: try explicit key first, then fallback to scanning all properties
+                const singleKey = childrenKeys[0]!;
+                const list = (node as any)[singleKey];
+                if (Array.isArray(list)) {
+                    for (let i = 0; i < list.length; i += 1) {
+                        const child = list[i];
+                        if (child && typeof child === 'object' && (child as any)[typeKey]) {
+                            visit(child, node);
+                        }
+                    }
+                } else {
+                    // Fallback: scan all object properties for children (backward compatibility)
+                    Object.keys(node).forEach((key) => {
+                        const v = (node as any)[key];
+                        if (!v || typeof v !== 'object') {
+                            return;
+                        }
+
+                        if (Array.isArray(v)) {
+                            for (let i = 0; i < v.length; i += 1) {
+                                const child = v[i];
+                                if (child && typeof child === 'object' && (child as any)[typeKey]) {
+                                    visit(child, node);
+                                }
+                            }
+                        } else if ((v as any)[typeKey]) {
+                            visit(v, node);
+                        }
+                    });
+                }
             }
             ancestors.shift();
 
