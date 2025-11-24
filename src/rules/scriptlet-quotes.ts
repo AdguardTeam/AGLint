@@ -33,7 +33,8 @@ export default defineRule({
         docs: {
             name: 'scriptlet-quotes',
             description: 'Checks quotes in scriptlet',
-            recommended: true,
+            // TODO: make it recommended later
+            recommended: false,
             url: getBuiltInRuleDocumentationUrl('scriptlet-quotes'),
         },
         messages: {

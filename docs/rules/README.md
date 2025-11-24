@@ -21,4 +21,4 @@
 | [no-unknown-hints](./no-unknown-hints.md) | Checks if hints are known | ✅ |  |  |
 | [no-unknown-preprocessor-directives](./no-unknown-preprocessor-directives.md) | Checks if a preprocessor directive is known | ✅ |  |  |
 | [no-unsupported-css-pseudo-class](./no-unsupported-css-pseudo-class.md) | Checks that CSS pseudo-classes are supported | ✅ |  | 💡 |
-| [scriptlet-quotes](./scriptlet-quotes.md) | Checks quotes in scriptlet | ✅ | 🔧 |  |
+| [scriptlet-quotes](./scriptlet-quotes.md) | Checks quotes in scriptlet |  | 🔧 |  |
