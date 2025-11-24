@@ -528,4 +528,71 @@ describe('LinterSourceCode', () => {
             expect(sourceCode.getPositionFromOffset(4)).toEqual({ line: 2, column: 0 });
         });
     });
+
+    describe('AST immutability', () => {
+        it('freezes the AST to prevent mutations', () => {
+            const sourceCode = new LinterSourceCode('example.com');
+            const ast = sourceCode.getAst();
+
+            // Verify the AST is frozen
+            expect(Object.isFrozen(ast)).toBe(true);
+        });
+
+        it('prevents adding properties to AST root', () => {
+            const sourceCode = new LinterSourceCode('example.com');
+            const ast = sourceCode.getAst() as any;
+
+            // Attempting to add a property should throw in strict mode or silently fail
+            expect(() => {
+                ast.newProperty = 'test';
+            }).toThrow();
+        });
+
+        it('prevents modifying AST properties', () => {
+            const sourceCode = new LinterSourceCode('example.com');
+            const ast = sourceCode.getAst() as any;
+
+            // Attempting to modify a property should throw in strict mode or silently fail
+            expect(() => {
+                ast.type = 'modified';
+            }).toThrow();
+        });
+
+        it('freezes nested AST nodes', () => {
+            const sourceCode = new LinterSourceCode('example.com\n##.ad');
+            const ast = sourceCode.getAst();
+
+            // Check that children array is frozen
+            expect(Object.isFrozen(ast.children)).toBe(true);
+
+            // Check that individual child nodes are frozen
+            if (ast.children.length > 0) {
+                expect(Object.isFrozen(ast.children[0])).toBe(true);
+            }
+        });
+
+        it('prevents adding items to children array', () => {
+            const sourceCode = new LinterSourceCode('example.com');
+            const ast = sourceCode.getAst();
+
+            // Attempting to push to children should throw or fail
+            expect(() => {
+                (ast.children as any).push({ type: 'fake' });
+            }).toThrow();
+        });
+
+        it('prevents modifying nested node properties', () => {
+            const sourceCode = new LinterSourceCode('example.com\n##.ad');
+            const ast = sourceCode.getAst();
+
+            if (ast.children.length > 0) {
+                const firstChild = ast.children[0] as any;
+
+                // Attempting to modify nested properties should throw
+                expect(() => {
+                    firstChild.type = 'modified';
+                }).toThrow();
+            }
+        });
+    });
 });

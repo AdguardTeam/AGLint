@@ -724,4 +724,141 @@ describe('LinterSourceCodeWalker', () => {
             expect(mainVisitor).toHaveBeenCalled();
         });
     });
+
+    describe('sub-AST immutability', () => {
+        it('freezes sub-ASTs to prevent mutations', () => {
+            const source = 'example.com##.ad';
+            const sourceCode = new LinterSourceCode(source);
+
+            let capturedSubAst: any = null;
+
+            const parser: Parser = {
+                name: 'test-parser',
+                parse: () => {
+                    const ast = {
+                        type: 'SubRoot',
+                        children: [{ type: 'SubNode', value: 'test' }],
+                    };
+                    return ast;
+                },
+                nodeTypeKey: 'type',
+                childNodeKeys: ['children'],
+            };
+
+            const walker = new LinterSourceCodeWalker(sourceCode, {
+                Value: parser,
+            });
+
+            walker.walk({
+                SubRoot: [(node) => {
+                    capturedSubAst = node;
+                }],
+            });
+
+            // Verify the sub-AST is frozen
+            expect(capturedSubAst).not.toBeNull();
+            expect(Object.isFrozen(capturedSubAst)).toBe(true);
+        });
+
+        it('prevents modifying sub-AST properties', () => {
+            const source = 'example.com##.ad';
+            const sourceCode = new LinterSourceCode(source);
+
+            let capturedSubAst: any = null;
+
+            const parser: Parser = {
+                parse: () => ({
+                    type: 'SubRoot',
+                    value: 'original',
+                }),
+                nodeTypeKey: 'type',
+                childNodeKeys: ['children'],
+            };
+
+            const walker = new LinterSourceCodeWalker(sourceCode, {
+                Value: parser,
+            });
+
+            walker.walk({
+                SubRoot: [(node) => {
+                    capturedSubAst = node;
+                }],
+            });
+
+            // Attempting to modify should throw
+            expect(() => {
+                capturedSubAst.value = 'modified';
+            }).toThrow();
+        });
+
+        it('freezes nested sub-AST nodes', () => {
+            const source = 'example.com##.ad';
+            const sourceCode = new LinterSourceCode(source);
+
+            let capturedChildren: any = null;
+            let capturedChild: any = null;
+
+            const parser: Parser = {
+                parse: () => ({
+                    type: 'SubRoot',
+                    children: [
+                        { type: 'SubNode1', value: 'test1' },
+                        { type: 'SubNode2', value: 'test2' },
+                    ],
+                }),
+                nodeTypeKey: 'type',
+                childNodeKeys: ['children'],
+            };
+
+            const walker = new LinterSourceCodeWalker(sourceCode, {
+                Value: parser,
+            });
+
+            walker.walk({
+                SubRoot: [(node: any) => {
+                    capturedChildren = node.children;
+                }],
+                SubNode1: [(node) => {
+                    capturedChild = node;
+                }],
+            });
+
+            // Verify children array is frozen
+            expect(Object.isFrozen(capturedChildren)).toBe(true);
+
+            // Verify individual child nodes are frozen
+            expect(Object.isFrozen(capturedChild)).toBe(true);
+        });
+
+        it('prevents adding items to sub-AST children array', () => {
+            const source = 'example.com##.ad';
+            const sourceCode = new LinterSourceCode(source);
+
+            let capturedChildren: any = null;
+
+            const parser: Parser = {
+                parse: () => ({
+                    type: 'SubRoot',
+                    children: [{ type: 'SubNode' }],
+                }),
+                nodeTypeKey: 'type',
+                childNodeKeys: ['children'],
+            };
+
+            const walker = new LinterSourceCodeWalker(sourceCode, {
+                Value: parser,
+            });
+
+            walker.walk({
+                SubRoot: [(node: any) => {
+                    capturedChildren = node.children;
+                }],
+            });
+
+            // Attempting to push should throw
+            expect(() => {
+                capturedChildren.push({ type: 'FakeNode' });
+            }).toThrow();
+        });
+    });
 });
