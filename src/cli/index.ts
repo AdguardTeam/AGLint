@@ -51,3 +51,5 @@ export {
 } from '../utils/debug';
 
 export { chalkColorFormatter } from './utils/debug-colors';
+
+export { getLinterConfigHash } from './utils/config-hash';
