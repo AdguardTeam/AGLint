@@ -264,6 +264,8 @@ export const linterRuleMetaSchema = v.object({
     version: v.optional(v.string()),
 });
 
+export type LinterRuleMeta = v.InferOutput<typeof linterRuleMetaSchema>;
+
 /* =========================
  * Message typing (messages → messageId keys)
  * ========================= */

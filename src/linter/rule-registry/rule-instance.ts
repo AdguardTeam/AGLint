@@ -1,3 +1,4 @@
+import cloneDeep from 'clone-deep';
 import { render } from 'micromustache';
 import * as v from 'valibot';
 
@@ -11,6 +12,7 @@ import {
     type LinterRuleConfig,
     linterRuleConfigSchema,
     type LinterRuleContext,
+    type LinterRuleMeta,
     type LinterRuleSeverity,
     type LinterRuleType,
     type LinterRuleVisitors,
@@ -123,6 +125,15 @@ export class LinterRuleInstance {
      */
     public getType(): LinterRuleType {
         return this.rule.meta.type;
+    }
+
+    /**
+     * Returns the metadata for this rule.
+     *
+     * @returns The rule metadata.
+     */
+    public getMeta(): LinterRuleMeta {
+        return cloneDeep(this.rule.meta);
     }
 
     /**

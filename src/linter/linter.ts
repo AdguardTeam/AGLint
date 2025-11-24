@@ -8,6 +8,7 @@ import { linterProblemSchema } from './linter-problem';
 import { makeConfigCommentVisitor } from './phase/inline-config';
 import { applyDisableDirectives, summarize } from './phase/postprocess';
 import { runWalk } from './phase/walk';
+import { linterRuleMetaSchema } from './rule';
 import { type LinterRuleLoader } from './rule-registry/rule-loader';
 
 export const linterResultSchema = v.object({
@@ -15,6 +16,10 @@ export const linterResultSchema = v.object({
      * Array of problems detected by the linter.
      */
     problems: v.array(linterProblemSchema),
+    /**
+     * Metadata of the rules that were run.
+     */
+    metadata: v.optional(v.record(v.string(), linterRuleMetaSchema)),
     /**
      * Count of warnings (just for convenience, can be calculated from problems array).
      */
@@ -62,6 +67,11 @@ export type LinterRunOptions = {
      * Optional module debugger for logging.
      */
     debug?: { log: (message: string) => void };
+
+    /**
+     * Whether to include metadata of the rules that were run.
+     */
+    includeMetadata?: boolean;
 };
 
 const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
@@ -175,5 +185,25 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
         + `${counts.fatalErrorCount} fatal`,
     );
 
-    return { problems: runtime.problems, ...counts };
+    const result: LinterResult = {
+        problems: runtime.problems,
+        ...counts,
+    };
+
+    if (options.includeMetadata) {
+        result.metadata = {};
+
+        // iterate over problems and add metadata for each rule
+        for (const problem of runtime.problems) {
+            if (!problem.ruleId) {
+                continue;
+            }
+
+            if (!result.metadata[problem.ruleId]) {
+                result.metadata[problem.ruleId] = runtime.ruleRegistry.getRuleMeta(problem.ruleId);
+            }
+        }
+    }
+
+    return result;
 }

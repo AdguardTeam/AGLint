@@ -242,6 +242,7 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
             config: options.config,
             loadRule: options.loadRule,
             subParsers: options.subParsers,
+            includeMetadata: options.includeMetadata,
         });
         const fixesToApply = linterResult.problems
             .filter((problem) => {
@@ -293,6 +294,7 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
             loadRule: options.loadRule,
             subParsers: options.subParsers,
             debug,
+            includeMetadata: options.includeMetadata,
         });
     }
 

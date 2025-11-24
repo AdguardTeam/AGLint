@@ -2,7 +2,12 @@ import * as v from 'valibot';
 
 import { type LinterConfigParsed, type LinterRulesConfig } from '../config';
 import { type LinterReporter } from '../core/report';
-import { type LinterRuleBaseContext, linterRuleSchema, LinterRuleSeverity } from '../rule';
+import {
+    type LinterRuleBaseContext,
+    type LinterRuleMeta,
+    linterRuleSchema,
+    LinterRuleSeverity,
+} from '../rule';
 import { type LinterVisitorCollection } from '../source-code/visitor-collection';
 
 import { LinterRuleInstance } from './rule-instance';
@@ -262,6 +267,20 @@ export class LinterRuleRegistry {
         }
 
         return ruleData;
+    }
+
+    /**
+     * Retrieves the metadata for a rule from the registry.
+     *
+     * @param ruleName The name of the rule to retrieve metadata for.
+     *
+     * @returns The metadata for the rule.
+     *
+     * @throws Error if the rule is not found in the registry.
+     */
+    public getRuleMeta(ruleName: string): LinterRuleMeta {
+        const rule = this.getRuleFromStorageOrThrow(ruleName);
+        return rule.getMeta();
     }
 
     // public* [Symbol.iterator](): Generator<[string, LinterRuleInstance]> {
