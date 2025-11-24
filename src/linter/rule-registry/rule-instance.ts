@@ -283,6 +283,8 @@ export class LinterRuleInstance {
             ...baseContext,
             id: this.id,
             config: this.config,
+            // Create a rule-specific debug instance if debug is available
+            debug: baseContext.debug?.module(this.id),
             report: (problem) => {
                 reporter?.(problem, this);
             },

@@ -133,6 +133,24 @@ export class ModuleDebug {
     public log(message: string): void {
         this.debug.log(this.moduleName, message);
     }
+
+    /**
+     * Creates a sub-module debugger with a nested name.
+     *
+     * @param name Sub-module name (will be appended to parent module name).
+     *
+     * @returns ModuleDebug instance for the sub-module.
+     *
+     * @example
+     * ```typescript
+     * const linterDebug = debug.module('linter');
+     * const ruleDebug = linterDebug.module('rule:no-short-rules');
+     * // Logs as: [linter:rule:no-short-rules]
+     * ```
+     */
+    public module(name: string): ModuleDebug {
+        return new ModuleDebug(`${this.moduleName}:${name}`, this.debug);
+    }
 }
 
 /**

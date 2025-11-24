@@ -151,7 +151,7 @@ export function createLinterRuntime(
         sourceCode,
         syntax: config.syntax,
         getOffsetRangeForNode,
-        ...(debug ? { debug } : {}),
+        debug,
     } as LinterRuleBaseContext;
 
     if (debug) {
