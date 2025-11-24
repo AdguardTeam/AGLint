@@ -550,7 +550,35 @@ export class LinterTree {
             }
 
             if (await this.fs.exists(absPath)) {
-                if (!node.configFiles.includes(absPath)) {
+                // Special handling for package.json - only include if it has "aglint" property
+                if (fileName === PACKAGE_JSON) {
+                    try {
+                        const content = await this.fs.readFile(absPath);
+                        const parsed = JSON.parse(content);
+                        if (parsed.aglint) {
+                            if (!node.configFiles.includes(absPath)) {
+                                node.configFiles.push(absPath);
+                                if (this.debug) {
+                                    this.debug.log(`Added package.json with aglint property: ${absPath}`);
+                                }
+                            } else if (this.debug) {
+                                this.debug.log(`package.json with aglint property already in node: ${absPath}`);
+                            }
+                        } else {
+                            // package.json exists but doesn't have aglint property - remove it if present
+                            node.configFiles = node.configFiles.filter((p) => p !== absPath);
+                            if (this.debug) {
+                                this.debug.log(`Removed package.json without aglint property: ${absPath}`);
+                            }
+                        }
+                    } catch {
+                        // If we can't read/parse package.json, remove it if present
+                        node.configFiles = node.configFiles.filter((p) => p !== absPath);
+                        if (this.debug) {
+                            this.debug.log(`Removed invalid package.json: ${absPath}`);
+                        }
+                    }
+                } else if (!node.configFiles.includes(absPath)) {
                     node.configFiles.push(absPath);
                     if (this.debug) {
                         this.debug.log(`Added config file to node: ${absPath}`);
