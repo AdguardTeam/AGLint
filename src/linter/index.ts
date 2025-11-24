@@ -48,6 +48,7 @@ export {
 } from './visitor-creator';
 export { type LinterRuleLoader } from './rule-registry/rule-loader';
 export { type LinterFileProps } from './file-props';
+export { LinterConfigCommentType } from './config-comment-type';
 export { AGLINT_REPO_URL } from '../utils/repo-url';
 export {
     hasErrors,
