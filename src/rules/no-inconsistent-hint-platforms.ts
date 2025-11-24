@@ -1,6 +1,7 @@
 import { type Value } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -10,6 +11,7 @@ export default defineRule({
             // eslint-disable-next-line max-len
             description: 'Checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM() hint at the same time',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-inconsistent-hint-platforms'),
         },
         messages: {
             // eslint-disable-next-line max-len

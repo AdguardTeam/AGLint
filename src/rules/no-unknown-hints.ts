@@ -1,6 +1,7 @@
 import { type Hint } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 const NOT_OPTIMIZED = 'NOT_OPTIMIZED';
 const PLATFORM = 'PLATFORM';
@@ -22,6 +23,7 @@ export default defineRule({
             name: 'no-unknown-hints',
             description: 'Checks if hints are known',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-unknown-hints'),
         },
         messages: {
             unknownHintName: 'Unknown hint name "{{hintName}}"',

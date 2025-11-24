@@ -2,6 +2,7 @@ import { type SelectorListPlain } from '@adguard/ecss-tree';
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -10,6 +11,7 @@ export default defineRule({
             name: 'max-css-selectors',
             description: 'Checks if a CSS selector list contains more than the specified number of selectors',
             recommended: false,
+            url: getBuiltInRuleDocumentationUrl('max-css-selectors'),
         },
         messages: {
             multipleSelectors: 'This selector list contains {{count}} selectors, but only {{maxSelectors}} are allowed',

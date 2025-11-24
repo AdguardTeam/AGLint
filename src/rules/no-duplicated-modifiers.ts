@@ -1,6 +1,7 @@
 import { type Modifier } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -9,6 +10,7 @@ export default defineRule({
             name: 'no-duplicated-modifiers',
             description: 'Checks if a network rule contains multiple same modifiers',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-duplicated-modifiers'),
         },
         messages: {
             duplicatedModifiers: 'Duplicated modifier "{{modifier}}"',

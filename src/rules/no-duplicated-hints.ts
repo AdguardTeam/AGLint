@@ -1,6 +1,7 @@
 import { type Hint } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -9,6 +10,7 @@ export default defineRule({
             name: 'no-duplicated-hints',
             description: 'Checks if hints are duplicated within the same hint comment rule',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-duplicated-hints'),
         },
         messages: {
             duplicatedHints: 'Duplicated hint "{{hint}}"',

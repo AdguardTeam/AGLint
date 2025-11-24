@@ -1,6 +1,7 @@
 import { type Modifier, modifierValidator, type NetworkRule } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -9,6 +10,7 @@ export default defineRule({
             name: 'no-invalid-modifiers',
             description: 'Checks modifiers validity for basic (network) rules',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-invalid-modifiers'),
         },
         messages: {
             invalidModifier: 'Invalid modifier: "{{modifier}}", got "{{validationError}}"',

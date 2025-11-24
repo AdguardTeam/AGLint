@@ -4,6 +4,7 @@ import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { type LinterOffsetRange } from '../linter/source-code/source-code';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 /**
  * Supported Extended CSS pseudo-classes.
@@ -102,6 +103,7 @@ export default defineRule({
             name: 'no-unsupported-css-pseudo-class',
             description: 'Checks that CSS pseudo-classes are supported',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-unsupported-css-pseudo-class'),
         },
         messages: {
             unsupportedPseudoClass: 'Unsupported CSS pseudo-class: {{pseudoClass}}',

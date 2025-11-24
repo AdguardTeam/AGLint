@@ -2,6 +2,7 @@ import { type DeclarationPlain } from '@adguard/ecss-tree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { validateDeclaration } from '../utils/css-utils/css-validator';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -10,6 +11,7 @@ export default defineRule({
             name: 'no-invalid-css-declaration',
             description: 'Checks if CSS declarations are valid',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-invalid-css-declaration'),
         },
         correctExamples: [
             {

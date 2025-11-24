@@ -2,6 +2,7 @@ import { type PreProcessorCommentRule } from '@adguard/agtree';
 
 import { ELSE_DIRECTIVE, ENDIF_DIRECTIVE, IF_DIRECTIVE } from '../common/constants';
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -10,6 +11,7 @@ export default defineRule({
             name: 'if-directive-balance',
             description: 'Checks if conditional preprocessor directives are structured correctly',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('if-directive-balance'),
         },
         messages: {
             unclosedIf: 'Unclosed "{{directive}}" directive',

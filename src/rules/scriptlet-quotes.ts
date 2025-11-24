@@ -8,6 +8,7 @@ import {
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export const OPEN_CURLY_DOUBLE_QUOTE = '“';
 export const CLOSE_CURLY_DOUBLE_QUOTE = '”';
@@ -33,6 +34,7 @@ export default defineRule({
             name: 'scriptlet-quotes',
             description: 'Checks quotes in scriptlet',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('scriptlet-quotes'),
         },
         messages: {
             unexpectedQuote: 'Scriptlet argument should be quoted with {{quote}}, but {{actualQuote}} was found',

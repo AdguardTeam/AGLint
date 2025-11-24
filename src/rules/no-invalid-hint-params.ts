@@ -1,6 +1,7 @@
 import { type Hint } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
@@ -14,6 +15,7 @@ export default defineRule({
             name: 'no-invalid-hint-params',
             description: 'Checks if hints are parameterized correctly',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-invalid-hint-params'),
         },
         messages: {
             unknownPlatform: 'Unknown platform "{{platform}}" in hint "{{hintName}}"',
