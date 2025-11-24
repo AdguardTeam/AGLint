@@ -1,5 +1,7 @@
 import * as v from 'valibot';
 
+import { type ModuleDebug } from '../utils/debug';
+
 import { type LinterConfig, linterConfigSchema, type LinterSubParsersConfig } from './config';
 import { createReportFn } from './core/report';
 import { createLinterRuntime } from './core/runtime';
@@ -66,7 +68,7 @@ export type LinterRunOptions = {
     /**
      * Optional module debugger for logging.
      */
-    debug?: { log: (message: string) => void };
+    debug?: ModuleDebug;
 
     /**
      * Whether to include metadata of the rules that were run.
@@ -115,18 +117,20 @@ const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
  * ```
  */
 export async function lint(options: LinterRunOptions): Promise<LinterResult> {
-    const debug = options.debug || { log: () => {} };
+    const { debug } = options;
     const filePath = options.fileProps.filePath || 'unknown';
     const startTime = Date.now();
 
-    debug.log(`Starting lint for: ${filePath}`);
-    debug.log(`File size: ${options.fileProps.content.length} bytes`);
+    if (debug) {
+        debug.log(`Starting lint for: ${filePath}`);
+        debug.log(`File size: ${options.fileProps.content.length} bytes`);
+    }
 
     // Parse and validate config
     const configParseStart = Date.now();
     const parsedConfig = v.parse(linterConfigSchema, options.config);
-    debug.log(`Config parsed in ${Date.now() - configParseStart}ms`);
     if (debug) {
+        debug.log(`Config parsed in ${Date.now() - configParseStart}ms`);
         debug.log(`Linter config: ${JSON.stringify(parsedConfig)}`);
     }
 
@@ -139,7 +143,9 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
         options.subParsers ?? {},
         debug,
     );
-    debug.log(`Runtime created in ${Date.now() - runtimeStart}ms`);
+    if (debug) {
+        debug.log(`Runtime created in ${Date.now() - runtimeStart}ms`);
+    }
 
     const report = createReportFn(runtime);
     runtime.ruleRegistry.setReporter(report);
@@ -149,7 +155,9 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
 
     if (options.config.allowInlineConfig) {
         runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
-        debug.log('Inline config comments enabled');
+        if (debug) {
+            debug.log('Inline config comments enabled');
+        }
     }
 
     // Load rules
@@ -158,33 +166,45 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
         debug.log(`Loading ${Object.keys(parsedConfig.rules).length} rule(s)`);
     }
     await runtime.ruleRegistry.loadRules();
-    debug.log(`Rules loaded in ${Date.now() - ruleLoadStart}ms`);
+    if (debug) {
+        debug.log(`Rules loaded in ${Date.now() - ruleLoadStart}ms`);
+    }
 
     // AST walk
     const walkStart = Date.now();
-    debug.log('Starting AST walk');
+    if (debug) {
+        debug.log('Starting AST walk');
+    }
     runWalk(runtime);
-    debug.log(`AST walk completed in ${Date.now() - walkStart}ms`);
+    if (debug) {
+        debug.log(`AST walk completed in ${Date.now() - walkStart}ms`);
+    }
 
     // Apply disable directives
     const disableStart = Date.now();
-    debug.log(`Applying disable directives (${disabled.length} directive(s))`);
+    if (debug) {
+        debug.log(`Applying disable directives (${disabled.length} directive(s))`);
+    }
     applyDisableDirectives(
         runtime.problems,
         disabled,
         parsedConfig.reportUnusedDisableDirectives,
         parsedConfig.unusedDisableDirectivesSeverity,
     );
-    debug.log(`Disable directives applied in ${Date.now() - disableStart}ms`);
+    if (debug) {
+        debug.log(`Disable directives applied in ${Date.now() - disableStart}ms`);
+    }
 
     const counts = summarize(runtime.problems);
     const totalTime = Date.now() - startTime;
 
-    debug.log(
-        `Lint completed for ${filePath} in ${totalTime}ms: `
-        + `${counts.errorCount} error(s), ${counts.warningCount} warning(s), `
-        + `${counts.fatalErrorCount} fatal`,
-    );
+    if (debug) {
+        debug.log(
+            `Lint completed for ${filePath} in ${totalTime}ms: `
+            + `${counts.errorCount} error(s), ${counts.warningCount} warning(s), `
+            + `${counts.fatalErrorCount} fatal`,
+        );
+    }
 
     const result: LinterResult = {
         problems: runtime.problems,

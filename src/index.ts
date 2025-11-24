@@ -8,3 +8,13 @@ import { version as importedVersion } from '../package.json';
 const version = importedVersion;
 
 export { version };
+
+// Export debug utilities for external use (e.g., VS Code extensions)
+export {
+    type Logger,
+    type ColorFormatter,
+    type DebugOptions,
+    Debug,
+    ModuleDebug,
+    createDebug,
+} from './utils/debug';

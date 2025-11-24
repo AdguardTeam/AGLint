@@ -2,6 +2,7 @@ import * as v from 'valibot';
 import { parse as parseYaml } from 'yaml';
 
 import { type LinterConfig } from '../../../linter/config';
+import { type ModuleDebug } from '../../../utils/debug';
 import { deepMerge } from '../../../utils/deep-merge';
 import {
     EXT_JSON,
@@ -12,7 +13,6 @@ import {
     PACKAGE_JSON,
     RC_CONFIG_FILE,
 } from '../../config-file/config-file';
-import { type ModuleDebugger } from '../debug';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 import { type ConfigChainEntry } from '../tree-builder';
@@ -41,7 +41,7 @@ export class ConfigResolver {
     /**
      * Module debugger for logging.
      */
-    private debug?: ModuleDebugger;
+    private debug?: ModuleDebug;
 
     /**
      * Creates a new ConfigResolver instance.
@@ -55,7 +55,7 @@ export class ConfigResolver {
         private fs: FileSystemAdapter,
         private pathAdapter: PathAdapter,
         private options: ConfigResolverOptions,
-        debug?: ModuleDebugger,
+        debug?: ModuleDebug,
     ) {
         this.presetResolver = new PresetResolver(fs, pathAdapter, options.presetsRoot);
         this.debug = debug;
