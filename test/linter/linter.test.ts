@@ -827,4 +827,124 @@ describe('Linter E2E Tests', () => {
             expect(result.errorCount).toBe(2); // The two cosmetic rule errors
         });
     });
+
+    describe('includeMetadata option', () => {
+        test('should not include metadata by default', async () => {
+            const result = await lint('example.com##.ad', {
+                rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                allowInlineConfig: true,
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.metadata).toBeUndefined();
+        });
+
+        test('should include metadata when option is true', async () => {
+            const result = await lintFn({
+                fileProps: { content: 'example.com##.ad' },
+                config: {
+                    syntax: [AdblockSyntax.Adg],
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.metadata).toBeDefined();
+            expect(result.metadata).toHaveProperty('test-cosmetic-rule');
+            expect(result.metadata!['test-cosmetic-rule']).toHaveProperty('type');
+            expect(result.metadata!['test-cosmetic-rule']!.type).toBe(LinterRuleType.Problem);
+            expect(result.metadata!['test-cosmetic-rule']).toHaveProperty('docs');
+            expect(result.metadata!['test-cosmetic-rule']!.docs.name).toBe('test-cosmetic-rule');
+        });
+
+        test('should include metadata for all rules with problems', async () => {
+            const result = await lintFn({
+                fileProps: {
+                    content: [
+                        '||example.com^',
+                        'example.com##.ad',
+                        '! comment',
+                    ].join('\n'),
+                },
+                config: {
+                    syntax: [AdblockSyntax.Adg],
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                    },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(3);
+            expect(result.metadata).toBeDefined();
+            expect(Object.keys(result.metadata!)).toHaveLength(3);
+            expect(result.metadata).toHaveProperty('test-network-rule');
+            expect(result.metadata).toHaveProperty('test-cosmetic-rule');
+            expect(result.metadata).toHaveProperty('test-comment-warning');
+        });
+
+        test('should not include metadata for rules with no problems', async () => {
+            const result = await lintFn({
+                fileProps: { content: 'example.com##.ad' },
+                config: {
+                    syntax: [AdblockSyntax.Adg],
+                    rules: {
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-network-rule': LinterRuleSeverity.Error, // Enabled but no violations
+                    },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.metadata).toBeDefined();
+            expect(Object.keys(result.metadata!)).toHaveLength(1);
+            expect(result.metadata).toHaveProperty('test-cosmetic-rule');
+            expect(result.metadata).not.toHaveProperty('test-network-rule');
+        });
+
+        test('should handle empty metadata when no problems found', async () => {
+            const result = await lintFn({
+                fileProps: { content: '! just a comment' },
+                config: {
+                    syntax: [AdblockSyntax.Adg],
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(0);
+            expect(result.metadata).toBeDefined();
+            expect(Object.keys(result.metadata!)).toHaveLength(0);
+        });
+
+        test('should skip metadata for problems without ruleId', async () => {
+            const result = await lintFn({
+                fileProps: { content: '##[invalid syntax' },
+                config: {
+                    syntax: [AdblockSyntax.Adg],
+                    rules: {},
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            // Fatal errors don't have ruleId
+            expect(result.problems.length).toBeGreaterThan(0);
+            expect(result.metadata).toBeDefined();
+            // Should be empty since fatal errors have no ruleId
+            expect(Object.keys(result.metadata!)).toHaveLength(0);
+        });
+    });
 });
