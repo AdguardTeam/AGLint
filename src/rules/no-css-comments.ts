@@ -1,6 +1,7 @@
 import { type Comment } from '@adguard/ecss-tree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -9,6 +10,7 @@ export default defineRule({
             name: 'no-css-comments',
             description: 'Disallows CSS comments',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-css-comments'),
         },
         messages: {
             noComments: 'CSS comments are not allowed',

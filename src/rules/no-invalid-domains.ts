@@ -1,6 +1,7 @@
 import { type Domain, type DomainList, DomainUtils } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -9,6 +10,7 @@ export default defineRule({
             name: 'no-invalid-domains',
             description: 'Disallows invalid domains',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-invalid-domains'),
         },
         messages: {
             invalidDomain: 'Invalid domain "{{domain}}"',

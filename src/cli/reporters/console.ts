@@ -18,8 +18,7 @@ import {
 } from '../../common/constants';
 import { type AnyLinterResult } from '../../linter/fixer';
 import { type LinterProblem } from '../../linter/linter-problem';
-import { LinterRuleSeverity } from '../../linter/rule';
-import { getAglintRuleDocumentationUrl } from '../../utils/repo-url';
+import { type LinterRuleMeta, LinterRuleSeverity } from '../../linter/rule';
 
 import { type LinterCliReporter } from './reporter';
 
@@ -31,6 +30,11 @@ const ALIGN_CENTER = 'c';
  * is an array of problems.
  */
 type CollectedProblems = { [key: string]: LinterProblem[] };
+
+/**
+ * Type for the collected metadata from all linter results.
+ */
+type CollectedMetadata = { [ruleId: string]: LinterRuleMeta };
 
 /**
  * Implements a simple reporter that logs the problems to the console.
@@ -82,6 +86,11 @@ export class LinterConsoleReporter implements LinterCliReporter {
      */
     private problems: CollectedProblems = {};
 
+    /**
+     * Collected metadata from all linter results.
+     */
+    private metadata: CollectedMetadata = {};
+
     /** @inheritdoc */
     onCliStart = () => {
         // Save the start time
@@ -98,6 +107,11 @@ export class LinterConsoleReporter implements LinterCliReporter {
     onFileEnd = (file: ParsedPath, result: AnyLinterResult) => {
         // Initialize the problems array for the file as empty
         this.problems[path.join(file.dir, file.base)]?.push(...result.problems);
+
+        // Collect metadata if available
+        if (result.metadata) {
+            Object.assign(this.metadata, result.metadata);
+        }
 
         // Count the problems
         this.warnings += result.warningCount;
@@ -180,7 +194,13 @@ export class LinterConsoleReporter implements LinterCliReporter {
                     // Some terminals support links, so we can link to the rule documentation directly
                     // in this case.
                     if (terminalLink.isSupported) {
-                        row.push(terminalLink(problem.ruleId, getAglintRuleDocumentationUrl(problem.ruleId)));
+                        // Try to get URL from metadata first, fallback to undefined
+                        const ruleUrl = this.metadata[problem.ruleId]?.docs?.url;
+                        if (ruleUrl) {
+                            row.push(terminalLink(problem.ruleId, ruleUrl));
+                        } else {
+                            row.push(this.chalk.dim(problem.ruleId));
+                        }
                     } else {
                         row.push(this.chalk.dim(problem.ruleId));
                     }

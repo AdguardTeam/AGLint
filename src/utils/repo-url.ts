@@ -7,6 +7,6 @@ export const AGLINT_REPO_URL = 'https://github.com/AdguardTeam/AGLint';
  *
  * @returns Documentation URL.
  */
-export const getAglintRuleDocumentationUrl = (ruleId: string): string => {
+export const getBuiltInRuleDocumentationUrl = (ruleId: string): string => {
     return `${AGLINT_REPO_URL}/blob/master/docs/rules/${ruleId}.md`;
 };

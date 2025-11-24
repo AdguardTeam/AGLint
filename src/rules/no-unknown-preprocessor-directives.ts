@@ -2,6 +2,7 @@ import { type PreProcessorCommentRule } from '@adguard/agtree';
 
 import { SUPPORTED_PREPROCESSOR_DIRECTIVES } from '../common/constants';
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -10,6 +11,7 @@ export default defineRule({
             name: 'no-unknown-preprocessor-directives',
             description: 'Checks if a preprocessor directive is known',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-unknown-preprocessor-directives'),
         },
         messages: {
             unknownPreprocessorDirective: 'Unknown preprocessor directive "{{directive}}"',

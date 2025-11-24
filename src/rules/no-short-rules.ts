@@ -3,6 +3,7 @@ import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { createVisitorsForAnyCosmeticRule, createVisitorsForAnyNetworkRule } from '../linter/visitor-creator';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -11,6 +12,7 @@ export default defineRule({
             name: 'no-short-rules',
             description: 'Checks if a rule is too short',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-short-rules'),
         },
         messages: {
             // eslint-disable-next-line max-len

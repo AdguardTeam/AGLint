@@ -1,6 +1,7 @@
 import { type Value } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 // https://adguard.com/kb/general/ad-filtering/create-own-filters/#platform-and-not_platform-hints
 const KNOWN_PLATFORMS = new Set([
@@ -26,6 +27,7 @@ export default defineRule({
             name: 'no-unknown-hint-platforms',
             description: 'Checks if platforms in related hints are known',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-unknown-hint-platforms'),
         },
         messages: {
             unknownPlatform: 'Unknown platform "{{platform}}"',

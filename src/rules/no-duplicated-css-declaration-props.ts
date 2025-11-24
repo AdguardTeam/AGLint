@@ -10,6 +10,7 @@ import {
     TAB,
 } from '../common/constants';
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 /**
  * Checks if a character is whitespace.
@@ -29,6 +30,7 @@ export default defineRule({
             name: 'no-duplicated-css-declaration-props',
             description: 'Checks for duplicated CSS declaration properties within the same rule block',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-duplicated-css-declaration-props'),
         },
         messages: {
             duplicatedProperty: 'Duplicated CSS property "{{property}}"',

@@ -1,6 +1,7 @@
 import { type Hint, type ParameterList, type Value } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 const PLATFORM = 'PLATFORM';
 const NOT_PLATFORM = 'NOT_PLATFORM';
@@ -12,6 +13,7 @@ export default defineRule({
             name: 'no-duplicated-hint-platforms',
             description: 'Checks if a platform is used more than once within the same PLATFORM / NOT_PLATFORM hint',
             recommended: true,
+            url: getBuiltInRuleDocumentationUrl('no-duplicated-hint-platforms'),
         },
         messages: {
             duplicatedHintPlatforms: 'Duplicated platform "{{platform}}"',

@@ -3,6 +3,7 @@ import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { createVisitorsForAnyValidRule } from '../linter/visitor-creator';
+import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 export default defineRule({
     meta: {
@@ -11,6 +12,7 @@ export default defineRule({
             name: 'no-excluded-rules',
             description: 'Checks if any rule matches an excluded pattern',
             recommended: false,
+            url: getBuiltInRuleDocumentationUrl('no-excluded-rules'),
         },
         messages: {
             excludedRuleText: 'Rule matches an excluded rule text: {{ruleText}}',
