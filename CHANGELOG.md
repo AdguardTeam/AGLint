@@ -7,6 +7,34 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [4.0.0-alpha.8] - 2025-11-24
+
+### Added
+
+- JSON reporters and `--reporter` CLI option.
+- `LinterConfigCommentType` enum to public exports.
+- `getLinterConfigHash` to public exports.
+- Debugger utilities to public exports.
+
+### Changed
+
+- `FixApplier` class to standalone `applyFixes` function.
+- Improved and simplified debugging.
+- Improved invalid config detection.
+- Freeze ASTs to avoid side effects.
+- Sort file paths alphabetically in reporters.
+- Improved rule documentation handling.
+
+### Fixed
+
+- `changed` method in config resolver.
+- Deep merging for rule config array.
+
+### Removed
+
+- `getAglintRuleDocumentationUrl` from public exports.
+
+
 ## [4.0.0-alpha.7] - 2025-11-19
 
 ### Added
