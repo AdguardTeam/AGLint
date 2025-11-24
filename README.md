@@ -55,7 +55,7 @@ If you know ESLint, you'll feel at home with AGLint.
 - 🛠️ **Auto-fixing** — automatically correct common issues  
 - 🌐 **Multi-syntax support** — AdGuard, uBlock Origin, Adblock Plus, AdBlock  
 - ⚙️ **Flexible configuration** — `.aglintrc` files with inheritance and inline comments  
-- 🚫 **Smart ignoring** — `.aglintignore` with pattern matching  
+- 🚫 **Ignoring** — `.aglintignore` with pattern matching  
 - ⚡ **High performance** — parallel processing and caching  
 - 💡 **Dual API** — CLI tool and TypeScript/JavaScript library
 
