@@ -872,6 +872,189 @@ describe('tree-builder', () => {
                 }
             });
 
+            test('should handle package.json with aglint property when added', async () => {
+                const pkgTestDir = join(tmpdir(), `aglint-pkg-added-test-${Date.now()}`);
+                await mkdir(pkgTestDir, { recursive: true });
+
+                try {
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: pkgTestDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Add file initially - no package.json yet
+                    await writeFile(join(pkgTestDir, 'test.txt'), 'content');
+                    await tree.addFile(join(pkgTestDir, 'test.txt'));
+                    const node1 = tree.getNode(pkgTestDir);
+                    expect(node1?.configFiles).toEqual([]);
+
+                    // Add package.json WITH aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', aglint: { root: true } }),
+                    );
+
+                    // Notify of the addition
+                    await tree.changed(join(pkgTestDir, 'package.json'));
+
+                    // Should be recognized as config file
+                    const node2 = tree.getNode(pkgTestDir);
+                    expect(node2?.configFiles).toContain(join(pkgTestDir, 'package.json'));
+                } finally {
+                    await rm(pkgTestDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should not recognize package.json without aglint property when added', async () => {
+                const pkgTestDir = join(tmpdir(), `aglint-pkg-no-aglint-test-${Date.now()}`);
+                await mkdir(pkgTestDir, { recursive: true });
+
+                try {
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: pkgTestDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Add file initially
+                    await writeFile(join(pkgTestDir, 'test.txt'), 'content');
+                    await tree.addFile(join(pkgTestDir, 'test.txt'));
+
+                    // Add package.json WITHOUT aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', version: '1.0.0' }),
+                    );
+
+                    // Notify of the addition
+                    await tree.changed(join(pkgTestDir, 'package.json'));
+
+                    // Should NOT be recognized as config file
+                    const node = tree.getNode(pkgTestDir);
+                    expect(node?.configFiles).not.toContain(join(pkgTestDir, 'package.json'));
+                } finally {
+                    await rm(pkgTestDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should handle package.json modified to add aglint property', async () => {
+                const pkgTestDir = join(tmpdir(), `aglint-pkg-modify-add-test-${Date.now()}`);
+                await mkdir(pkgTestDir, { recursive: true });
+
+                try {
+                    // Create package.json WITHOUT aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', version: '1.0.0' }),
+                    );
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: pkgTestDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Add file - package.json should not be recognized
+                    await writeFile(join(pkgTestDir, 'test.txt'), 'content');
+                    await tree.addFile(join(pkgTestDir, 'test.txt'));
+                    const node1 = tree.getNode(pkgTestDir);
+                    expect(node1?.configFiles).not.toContain(join(pkgTestDir, 'package.json'));
+
+                    // Modify package.json to ADD aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', version: '1.0.0', aglint: { root: true } }),
+                    );
+
+                    // Notify of the change
+                    await tree.changed(join(pkgTestDir, 'package.json'));
+
+                    // Should NOW be recognized as config file
+                    const node2 = tree.getNode(pkgTestDir);
+                    expect(node2?.configFiles).toContain(join(pkgTestDir, 'package.json'));
+                } finally {
+                    await rm(pkgTestDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should handle package.json modified to remove aglint property', async () => {
+                const pkgTestDir = join(tmpdir(), `aglint-pkg-modify-remove-test-${Date.now()}`);
+                await mkdir(pkgTestDir, { recursive: true });
+
+                try {
+                    // Create package.json WITH aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', aglint: { root: true } }),
+                    );
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: pkgTestDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Add file - package.json should be recognized
+                    await writeFile(join(pkgTestDir, 'test.txt'), 'content');
+                    await tree.addFile(join(pkgTestDir, 'test.txt'));
+                    const node1 = tree.getNode(pkgTestDir);
+                    expect(node1?.configFiles).toContain(join(pkgTestDir, 'package.json'));
+
+                    // Modify package.json to REMOVE aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', version: '1.0.0' }),
+                    );
+
+                    // Notify of the change
+                    await tree.changed(join(pkgTestDir, 'package.json'));
+
+                    // Should NO LONGER be recognized as config file
+                    const node2 = tree.getNode(pkgTestDir);
+                    expect(node2?.configFiles).not.toContain(join(pkgTestDir, 'package.json'));
+                } finally {
+                    await rm(pkgTestDir, { recursive: true, force: true });
+                }
+            });
+
+            test('should handle package.json deletion', async () => {
+                const pkgTestDir = join(tmpdir(), `aglint-pkg-delete-test-${Date.now()}`);
+                await mkdir(pkgTestDir, { recursive: true });
+
+                try {
+                    // Create package.json WITH aglint property
+                    await writeFile(
+                        join(pkgTestDir, 'package.json'),
+                        JSON.stringify({ name: 'test', aglint: { root: true } }),
+                    );
+
+                    const tree = new LinterTree(fs, pathAdapter, {
+                        root: pkgTestDir,
+                        configFileNames: new Set(['package.json', '.aglintrc.json']),
+                        ignoreFileName: '.aglintignore',
+                    });
+
+                    // Add file - package.json should be recognized
+                    await writeFile(join(pkgTestDir, 'test.txt'), 'content');
+                    await tree.addFile(join(pkgTestDir, 'test.txt'));
+                    const node1 = tree.getNode(pkgTestDir);
+                    expect(node1?.configFiles).toContain(join(pkgTestDir, 'package.json'));
+
+                    // Delete package.json
+                    await rm(join(pkgTestDir, 'package.json'));
+
+                    // Notify of the deletion
+                    await tree.changed(join(pkgTestDir, 'package.json'));
+
+                    // Should be removed from config files
+                    const node2 = tree.getNode(pkgTestDir);
+                    expect(node2?.configFiles).not.toContain(join(pkgTestDir, 'package.json'));
+                } finally {
+                    await rm(pkgTestDir, { recursive: true, force: true });
+                }
+            });
+
             test('should invalidate multiple nested children when ancestor config changes', async () => {
                 const deepTestDir = join(tmpdir(), `aglint-deep-test-${Date.now()}`);
                 await mkdir(join(deepTestDir, 'level1', 'level2', 'level3'), { recursive: true });
