@@ -2,7 +2,7 @@ import cloneDeep from 'clone-deep';
 import { render } from 'micromustache';
 import * as v from 'valibot';
 
-import { deepMerge } from '../../utils/deepmerge';
+import { deepMerge } from '../../utils/deep-merge';
 import { getErrorMessage } from '../../utils/error';
 import { type LinterReporter } from '../core/report';
 import {
