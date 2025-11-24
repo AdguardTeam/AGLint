@@ -2,6 +2,8 @@
 import { type AdblockSyntax } from '@adguard/agtree';
 import * as v from 'valibot';
 
+import { type ModuleDebug } from '../utils/debug';
+
 import { type LinterFixCommand, type LinterFixGenerator } from './source-code/fix-generator';
 import { type LinterOffsetRange, type LinterPositionRange, type LinterSourceCode } from './source-code/source-code';
 import { type Visitor } from './source-code/visitor-collection';
@@ -349,6 +351,7 @@ export type LinterRuleBaseContext = {
     sourceCode: LinterSourceCode;
     syntax?: AdblockSyntax[];
     getOffsetRangeForNode(node: any): LinterOffsetRange | null;
+    debug?: ModuleDebug;
 };
 
 /**
