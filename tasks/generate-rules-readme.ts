@@ -10,7 +10,7 @@ import fg from 'fast-glob';
 
 import { applyFixesToResult } from '../src/linter/fixer';
 import { type LinterRule, type LinterRuleExample, LinterRuleSeverity } from '../src/linter/rule';
-import { FixApplier } from '../src/linter/source-code/fix-applier';
+import { applyFixes } from '../src/linter/source-code/fix-applier';
 import { AGLINT_REPO_URL } from '../src/utils/repo-url';
 import { lint } from '../test/rules/helpers/lint';
 
@@ -132,7 +132,7 @@ const processExamples = async (meta: LinterRule['meta'], examples: LinterRuleExa
                             'original',
                             'fixed',
                             example.code,
-                            new FixApplier(example.code).applyFixes([suggestion.fix]).fixedSource,
+                            applyFixes(example.code, [suggestion.fix]).fixedSource,
                         ).split(/\r?\n/).map((line) => `  ${line}`).join('\n'));
                         md.push('');
                     }
