@@ -9,6 +9,7 @@ import { version } from '../../package.json';
 import { type LinterConfig } from '../linter/config';
 import { type LinterResult, linterResultSchema } from '../linter/linter';
 
+import { getLinterConfigHash } from './utils/config-hash';
 import { toPosix } from './utils/to-posix';
 
 /**
@@ -117,21 +118,22 @@ export class LintResultCache {
 
     /**
      * Computes or retrieves cached hash of linter configuration.
+     * Wraps the utility function with a WeakMap cache for performance.
      *
      * @param config Linter configuration to hash.
      *
      * @returns Hash string.
      */
-    private static getLinterConfigHash = (config: LinterConfig): string => {
+    private static getCachedConfigHash(config: LinterConfig): string {
         if (LintResultCache.linterConfigHashCache.has(config)) {
             return LintResultCache.linterConfigHashCache.get(config)!;
         }
 
-        const hash = hashObject(config);
+        const hash = getLinterConfigHash(config);
         LintResultCache.linterConfigHashCache.set(config, hash);
 
         return hash;
-    };
+    }
 
     /**
      * Resolves the cache file path based on whether the provided parameter is
@@ -263,7 +265,7 @@ export class LintResultCache {
             return undefined;
         }
 
-        const configHash = LintResultCache.getLinterConfigHash(linterConfig);
+        const configHash = LintResultCache.getCachedConfigHash(linterConfig);
 
         // Check metadata-based cache
         if (strategy === LinterCacheStrategy.Metadata) {
@@ -304,7 +306,7 @@ export class LintResultCache {
     ): void {
         this.data.files[filePath] = {
             meta: { mtime, size },
-            linterConfigHash: LintResultCache.getLinterConfigHash(linterConfig),
+            linterConfigHash: LintResultCache.getCachedConfigHash(linterConfig),
             linterResult: result,
             ...(contentHash && { contentHash }),
         };
