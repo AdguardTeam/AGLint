@@ -10,7 +10,7 @@ import {
     test,
 } from 'vitest';
 
-import { ConfigResolver, PresetResolver } from '../../../src/cli/utils/config-resolver';
+import { ConfigResolver, InvalidConfigError, PresetResolver } from '../../../src/cli/utils/config-resolver';
 import { NodeFileSystemAdapter } from '../../../src/cli/utils/fs-adapter';
 import { NodePathAdapter } from '../../../src/cli/utils/path-adapter';
 import { type ConfigChainEntry } from '../../../src/cli/utils/tree-builder';
@@ -280,23 +280,24 @@ describe('config-resolver', () => {
             expect(path).toContain('all.json');
         });
 
-        test('should throw error for non-existent preset', async () => {
+        test('should throw InvalidConfigError for non-existent preset', async () => {
             const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
 
             await expect(
                 resolver.resolve('nonexistent'),
-            ).rejects.toThrow('Preset "nonexistent" not found');
+            ).rejects.toThrow(InvalidConfigError);
         });
 
-        test('should throw error with preset path in message', async () => {
+        test('should throw InvalidConfigError with preset path in message', async () => {
             const resolver = new PresetResolver(fs, pathAdapter, presetsDir);
 
             try {
                 await resolver.resolve('missing');
                 expect.fail('Should have thrown');
             } catch (error) {
-                expect((error as Error).message).toContain('missing');
-                expect((error as Error).message).toContain(presetsDir);
+                expect(error).toBeInstanceOf(InvalidConfigError);
+                expect((error as InvalidConfigError).message).toContain('missing');
+                expect((error as InvalidConfigError).filePath).toContain(presetsDir);
             }
         });
 
@@ -436,7 +437,8 @@ describe('config-resolver', () => {
 
                 expect(config).toBeDefined();
                 expect(config.syntax).toEqual(['Common']);
-                expect(config.rules?.['no-duplicated-modifiers']).toBe('error');
+                // YAML parsed values are transformed by schema, 'error' becomes LinterRuleSeverity.Error (2)
+                expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
             });
 
             test('should parse YML config', async () => {
@@ -461,14 +463,14 @@ describe('config-resolver', () => {
                 expect(config.syntax).toEqual(['UblockOrigin']);
             });
 
-            test('should throw error for invalid JSON', async () => {
+            test('should throw InvalidConfigError for invalid JSON', async () => {
                 const resolver = new ConfigResolver(fs, pathAdapter, {
                     presetsRoot: presetsDir,
                 });
 
                 await expect(
                     resolver.resolve(join(testDir, 'invalid.json')),
-                ).rejects.toThrow('Failed to parse config file');
+                ).rejects.toThrow(InvalidConfigError);
             });
 
             test('should throw error for non-existent file', async () => {
@@ -879,14 +881,14 @@ describe('config-resolver', () => {
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
             });
 
-            test('should throw error for package.json without aglint property', async () => {
+            test('should throw InvalidConfigError for package.json without aglint property', async () => {
                 const resolver = new ConfigResolver(fs, pathAdapter, {
                     presetsRoot: presetsDir,
                 });
 
                 await expect(
                     resolver.resolve(join(testDir, 'pkg-no-aglint', 'package.json')),
-                ).rejects.toThrow('No "aglint" property found in package.json');
+                ).rejects.toThrow(InvalidConfigError);
             });
 
             test('should resolve package.json with extends', async () => {
@@ -1204,6 +1206,199 @@ describe('config-resolver', () => {
 
                 // String severities are parsed to numbers by the schema
                 expect(config.rules?.['no-css-comments']).toBe(LinterRuleSeverity.Off);
+            });
+        });
+
+        describe('InvalidConfigError', () => {
+            test('should throw InvalidConfigError for invalid JSON with filename', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const invalidPath = join(testDir, 'invalid.json');
+
+                try {
+                    await resolver.resolve(invalidPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).filePath).toBe(pathAdapter.toPosix(invalidPath));
+                    expect((error as InvalidConfigError).message).toContain(invalidPath);
+                    expect((error as InvalidConfigError).message).toContain('Invalid JSON');
+                }
+            });
+
+            test('should throw InvalidConfigError with property path for schema validation errors', async () => {
+                await writeFile(
+                    join(testDir, 'invalid-schema.json'),
+                    JSON.stringify({
+                        syntax: 'not-an-array', // Should be an array
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const invalidPath = join(testDir, 'invalid-schema.json');
+
+                try {
+                    await resolver.resolve(invalidPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).filePath).toBe(pathAdapter.toPosix(invalidPath));
+                    expect((error as InvalidConfigError).propertyPath).toBeDefined();
+                    expect((error as InvalidConfigError).message).toContain(invalidPath);
+                }
+            });
+
+            test('should throw InvalidConfigError for invalid rules in config', async () => {
+                await writeFile(
+                    join(testDir, 'invalid-rules.json'),
+                    JSON.stringify({
+                        rules: {
+                            'some-rule': 'invalid-severity', // Should be 'off', 'warn', 'error', or 0, 1, 2
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const invalidPath = join(testDir, 'invalid-rules.json');
+
+                try {
+                    await resolver.resolve(invalidPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).filePath).toBe(pathAdapter.toPosix(invalidPath));
+                    expect((error as InvalidConfigError).propertyPath).toContain('rules');
+                }
+            });
+
+            test('should throw InvalidConfigError for package.json without aglint property', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const pkgPath = join(testDir, 'pkg-no-aglint', 'package.json');
+
+                try {
+                    await resolver.resolve(pkgPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).filePath).toBe(pathAdapter.toPosix(pkgPath));
+                    expect((error as InvalidConfigError).message).toContain('No "aglint" property');
+                }
+            });
+
+            test('should throw InvalidConfigError for package.json with invalid aglint schema', async () => {
+                const pkgInvalidDir = join(testDir, 'pkg-invalid-schema');
+                await mkdir(pkgInvalidDir, { recursive: true });
+
+                await writeFile(
+                    join(pkgInvalidDir, 'package.json'),
+                    JSON.stringify({
+                        name: 'test-package-invalid',
+                        version: '1.0.0',
+                        aglint: {
+                            extends: 123, // Should be an array of strings
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const pkgPath = join(pkgInvalidDir, 'package.json');
+
+                try {
+                    await resolver.resolve(pkgPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).filePath).toBe(pathAdapter.toPosix(pkgPath));
+                    expect((error as InvalidConfigError).propertyPath).toBe('aglint.extends');
+                }
+            });
+
+            test('should throw InvalidConfigError for invalid YAML with filename', async () => {
+                await writeFile(
+                    join(testDir, 'invalid.yaml'),
+                    'invalid: yaml: content: with: too: many: colons::',
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const invalidPath = join(testDir, 'invalid.yaml');
+
+                try {
+                    await resolver.resolve(invalidPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).filePath).toBe(pathAdapter.toPosix(invalidPath));
+                    expect((error as InvalidConfigError).message).toContain(invalidPath);
+                    expect((error as InvalidConfigError).message).toContain('Invalid YAML');
+                }
+            });
+
+            test('should throw InvalidConfigError for non-existent preset with filename', async () => {
+                await writeFile(
+                    join(testDir, 'nonexistent-preset.json'),
+                    JSON.stringify({
+                        extends: ['aglint:nonexistent-preset'],
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                try {
+                    await resolver.resolve(join(testDir, 'nonexistent-preset.json'));
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    expect((error as InvalidConfigError).message).toContain('Preset "nonexistent-preset" not found');
+                    expect((error as InvalidConfigError).filePath).toBeDefined();
+                }
+            });
+
+            test('should include property path in error message', async () => {
+                await writeFile(
+                    join(testDir, 'error-with-path.json'),
+                    JSON.stringify({
+                        rules: {
+                            'test-rule': { invalid: 'object' }, // Should be string or array
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const configPath = join(testDir, 'error-with-path.json');
+
+                try {
+                    await resolver.resolve(configPath);
+                    expect.fail('Should have thrown InvalidConfigError');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(InvalidConfigError);
+                    const err = error as InvalidConfigError;
+                    expect(err.message).toContain(configPath);
+                    if (err.propertyPath) {
+                        expect(err.message).toContain(err.propertyPath);
+                    }
+                }
             });
         });
     });

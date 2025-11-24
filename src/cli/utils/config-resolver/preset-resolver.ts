@@ -2,6 +2,8 @@ import { EXT_JSON } from '../../config-file/config-file';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 
+import { InvalidConfigError } from './error';
+
 /**
  * Resolves preset references like "aglint:recommended" to file paths.
  */
@@ -26,7 +28,7 @@ export class PresetResolver {
      *
      * @returns Absolute path to the preset file.
      *
-     * @throws If preset doesn't exist.
+     * @throws {InvalidConfigError} If preset doesn't exist.
      */
     public async resolve(presetName: string): Promise<string> {
         const presetPath = this.pathAdapter.toPosix(
@@ -34,7 +36,10 @@ export class PresetResolver {
         );
 
         if (!(await this.fs.exists(presetPath))) {
-            throw new Error(`Preset "${presetName}" not found at ${presetPath}`);
+            throw new InvalidConfigError(
+                `Preset "${presetName}" not found`,
+                presetPath,
+            );
         }
 
         return presetPath;

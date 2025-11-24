@@ -17,6 +17,7 @@ import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 import { type ConfigChainEntry } from '../tree-builder';
 
+import { InvalidConfigError } from './error';
 import { PresetResolver } from './preset-resolver';
 import { type ConfigCacheEntry, type ConfigResolverOptions } from './types';
 
@@ -296,30 +297,135 @@ export class ConfigResolver {
 
             // Check if this is a package.json file
             if (basename === PACKAGE_JSON) {
-                const parsed = JSON.parse(content);
+                let parsed: any;
+                try {
+                    parsed = JSON.parse(content);
+                } catch (jsonError) {
+                    throw new InvalidConfigError(
+                        `Invalid JSON: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`,
+                        filePath,
+                    );
+                }
+
                 // For package.json files, extract the "aglint" property
                 if (!parsed.aglint) {
-                    throw new Error('No "aglint" property found in package.json');
+                    throw new InvalidConfigError(
+                        'No "aglint" property found in package.json',
+                        filePath,
+                    );
                 }
-                return v.parse(linterConfigFileSchema, parsed.aglint);
+
+                try {
+                    return v.parse(linterConfigFileSchema, parsed.aglint);
+                } catch (valibotError) {
+                    if (v.isValiError(valibotError)) {
+                        const propertyPath = ConfigResolver.formatValibotPath(valibotError);
+                        throw new InvalidConfigError(
+                            valibotError.message,
+                            filePath,
+                            propertyPath ? `aglint.${propertyPath}` : 'aglint',
+                        );
+                    }
+                    throw valibotError;
+                }
             }
 
             const ext = this.pathAdapter.extname(filePath);
 
             if (ext === EXT_JSON || basename === RC_CONFIG_FILE) {
-                const parsed = JSON.parse(content);
-                return v.parse(linterConfigFileSchema, parsed);
+                let parsed: any;
+                try {
+                    parsed = JSON.parse(content);
+                } catch (jsonError) {
+                    throw new InvalidConfigError(
+                        `Invalid JSON: ${jsonError instanceof Error ? jsonError.message : String(jsonError)}`,
+                        filePath,
+                    );
+                }
+
+                try {
+                    return v.parse(linterConfigFileSchema, parsed);
+                } catch (valibotError) {
+                    if (v.isValiError(valibotError)) {
+                        const propertyPath = ConfigResolver.formatValibotPath(valibotError);
+                        throw new InvalidConfigError(
+                            valibotError.message,
+                            filePath,
+                            propertyPath,
+                        );
+                    }
+                    throw valibotError;
+                }
             }
 
             if (ext === EXT_YAML || ext === EXT_YML) {
-                // Note: YAML parsing would go here
-                // For now, assume JSON
-                return parseYaml(content);
+                let parsed: any;
+                try {
+                    parsed = parseYaml(content);
+                } catch (yamlError) {
+                    throw new InvalidConfigError(
+                        `Invalid YAML: ${yamlError instanceof Error ? yamlError.message : String(yamlError)}`,
+                        filePath,
+                    );
+                }
+
+                try {
+                    return v.parse(linterConfigFileSchema, parsed);
+                } catch (valibotError) {
+                    if (v.isValiError(valibotError)) {
+                        const propertyPath = ConfigResolver.formatValibotPath(valibotError);
+                        throw new InvalidConfigError(
+                            valibotError.message,
+                            filePath,
+                            propertyPath,
+                        );
+                    }
+                    throw valibotError;
+                }
             }
 
-            throw new Error(`Unsupported config file format: ${filePath}`);
+            throw new InvalidConfigError(
+                'Unsupported config file format',
+                filePath,
+            );
         } catch (error) {
-            throw new Error(`Failed to parse config file ${filePath}: ${error}`);
+            if (error instanceof InvalidConfigError) {
+                throw error;
+            }
+            throw new InvalidConfigError(
+                `Failed to parse config file: ${error instanceof Error ? error.message : String(error)}`,
+                filePath,
+            );
         }
+    }
+
+    /**
+     * Formats a valibot error path into a dot-separated property path.
+     *
+     * @param error The valibot error.
+     *
+     * @returns Dot-separated property path or empty string if no path.
+     */
+    private static formatValibotPath(error: v.ValiError<any>): string {
+        if (!error.issues || error.issues.length === 0) {
+            return '';
+        }
+
+        // Get the first issue's path
+        const issue = error.issues[0];
+        if (!issue || !issue.path || issue.path.length === 0) {
+            return '';
+        }
+
+        // Format path items into a dot-separated string
+        return issue.path
+            .map((item: any) => {
+                if (typeof item.key === 'string' || typeof item.key === 'number') {
+                    return String(item.key);
+                }
+                return '';
+            })
+            .filter(Boolean)
+            .join('.');
     }
 }
