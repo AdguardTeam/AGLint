@@ -1,6 +1,7 @@
 import { type Node } from '@adguard/agtree';
 import esquery from 'esquery';
 
+import { deepFreeze } from '../../utils/deep-freeze';
 import { getErrorMessage } from '../../utils/error';
 import {
     DEFAULT_CHILD_KEYS,
@@ -257,8 +258,11 @@ export class LinterSourceCodeWalker {
                     }
                 }
 
+                // Freeze the sub-AST to prevent accidental mutations
+                const frozenSubAst = deepFreeze(subAstObj);
+
                 const sub: SubAst = {
-                    ast: subAstObj,
+                    ast: frozenSubAst,
                     nodeTypeKey: parser.nodeTypeKey,
                     childNodeKeys: parser.childNodeKeys,
                 };

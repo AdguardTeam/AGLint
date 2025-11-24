@@ -3,6 +3,7 @@ import { defaultParserOptions } from '@adguard/agtree/parser';
 import * as v from 'valibot';
 
 import { CR, FF, LF } from '../../common/constants';
+import { deepFreeze } from '../../utils/deep-freeze';
 
 import { LinterSourceCodeError } from './error';
 import { type OnParseError } from './types';
@@ -125,7 +126,7 @@ export class LinterSourceCode {
 
         this.lineMeta = LinterSourceCode.computeLineMetadata(this.source);
 
-        this.ast = FilterListParser.parse(this.source, {
+        const parsedAst = FilterListParser.parse(this.source, {
             ...defaultParserOptions,
             tolerant: true,
             onParseError: (error: unknown) => {
@@ -147,6 +148,9 @@ export class LinterSourceCode {
                 this.onParseError(error);
             },
         });
+
+        // Freeze the AST to prevent accidental mutations
+        this.ast = deepFreeze(parsedAst);
     }
 
     /**
