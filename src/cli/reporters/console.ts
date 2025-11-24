@@ -135,7 +135,10 @@ export class LinterConsoleReporter implements LinterCliReporter {
         let fixableErrors = 0;
 
         // If there are problems, log them to the console
-        for (const [file, problems] of Object.entries(this.problems)) {
+        // Sort files to keep the order consistent even if multiple threads are used
+        const sortedFiles = Object.entries(this.problems).sort((a, b) => a[0].localeCompare(b[0]));
+
+        for (const [file, problems] of sortedFiles) {
             // Typically when found problems are fixed
             if (problems.length === 0) {
                 continue;
