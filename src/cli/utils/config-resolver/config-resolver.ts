@@ -2,7 +2,7 @@ import * as v from 'valibot';
 import { parse as parseYaml } from 'yaml';
 
 import { type LinterConfig } from '../../../linter/config';
-import { deepMerge } from '../../../utils/deepmerge';
+import { deepMerge } from '../../../utils/deep-merge';
 import {
     EXT_JSON,
     EXT_YAML,

@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { deepMerge } from '../../../utils/deepmerge';
+import { deepMerge } from '../../../utils/deep-merge';
 import { type LinterConfigFile, PACKAGE_JSON } from '../../config-file/config-file';
 import { type ModuleDebugger } from '../debug';
 import { type FileSystemAdapter } from '../fs-adapter';
