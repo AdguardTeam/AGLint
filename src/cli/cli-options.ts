@@ -6,6 +6,7 @@ import type { LinterRuleType } from '../linter/rule';
 
 import { CACHE_FILE_NAME, LinterCacheStrategy } from './cache';
 import { DEFAULT_PATTERN, IGNORE_FILE_NAME, SUPPORTED_FILE_EXTENSIONS } from './constants';
+import { REPORTER_TYPES, type ReporterType } from './reporters/reporter-types';
 import { threadOptionSchema, type ThreadsOption } from './utils/thread-manager';
 
 /**
@@ -104,6 +105,11 @@ export type LinterCliConfig = {
      * Whether to enable debug logging.
      */
     debug: boolean;
+
+    /**
+     * Output format for linting results.
+     */
+    reporter: ReporterType;
 };
 
 /**
@@ -185,6 +191,12 @@ export function buildCliProgram(): Command {
         .optionsGroup('Output')
         .option('--color', 'Force enable color output')
         .option('--no-color', 'Force disable color output')
+        .addOption(
+            new Option(
+                '--reporter <format>',
+                'Output format for linting results',
+            ).choices([...REPORTER_TYPES]).default('console'),
+        )
 
         .optionsGroup('Inline configuration comments')
         .option('--no-inline-config', 'Disable inline configuration comments')

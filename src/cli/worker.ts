@@ -190,6 +190,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
             },
             subParsers: defaultSubParsers,
             debug: debugFn,
+            includeMetadata: tasks.cliConfig.reporter === 'json-with-metadata',
         };
 
         if (tasks.cliConfig.fix) {

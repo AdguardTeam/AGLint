@@ -7,7 +7,7 @@ import { hasErrors } from '../linter/linter-helpers';
 
 import { type LintResultCache } from './cache';
 import type { LinterCliConfig } from './cli-options';
-import type { LinterConsoleReporter } from './reporters/console';
+import type { LinterCliReporter } from './reporters/reporter';
 import { type ScannedFile } from './utils/file-scanner';
 import runLinterWorker, { type LinterWorkerResults } from './worker';
 
@@ -30,7 +30,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export async function runSequential(
     files: Array<ScannedFile>,
     cliConfig: LinterCliConfig,
-    reporter: LinterConsoleReporter,
+    reporter: LinterCliReporter,
     cwd: string,
 ): Promise<boolean> {
     let foundErrors = false;
@@ -40,12 +40,12 @@ export async function runSequential(
         console.log(`[executor] Starting sequential processing of ${files.length} file(s)`);
     }
 
-    reporter.onLintStart();
+    reporter.onCliStart?.(cliConfig);
 
     for (const file of files) {
         const parsedFilePath = path.parse(file.path);
 
-        reporter.onFileStart(parsedFilePath);
+        reporter.onFileStart?.(parsedFilePath, file.config);
 
         // eslint-disable-next-line no-await-in-loop
         const { results } = await runLinterWorker({
@@ -63,10 +63,10 @@ export async function runSequential(
             foundErrors = true;
         }
 
-        reporter.onFileEnd(parsedFilePath, results[0]!.linterResult);
+        reporter.onFileEnd?.(parsedFilePath, results[0]!.linterResult, false);
     }
 
-    reporter.onLintEnd();
+    reporter.onCliEnd?.();
 
     return foundErrors;
 }
@@ -88,7 +88,7 @@ export async function runSequential(
 export async function runSequentialWithCache(
     files: Array<ScannedFile>,
     cliConfig: LinterCliConfig,
-    reporter: LinterConsoleReporter,
+    reporter: LinterCliReporter,
     cwd: string,
     cache: LintResultCache,
 ): Promise<boolean> {
@@ -101,12 +101,12 @@ export async function runSequentialWithCache(
         console.log(`[executor] Starting sequential processing with cache of ${files.length} file(s)`);
     }
 
-    reporter.onLintStart();
+    reporter.onCliStart?.(cliConfig);
 
     for (const file of files) {
         const parsedFilePath = path.parse(file.path);
 
-        reporter.onFileStart(parsedFilePath);
+        reporter.onFileStart?.(parsedFilePath, file.config);
 
         // Check if cached result is valid
         const cachedData = cache.getCachedResult(
@@ -124,7 +124,7 @@ export async function runSequentialWithCache(
                 // eslint-disable-next-line no-console
                 console.log(`[executor] Cache HIT for: ${file.path}`);
             }
-            reporter.onFileEnd(parsedFilePath, cachedData.linterResult);
+            reporter.onFileEnd?.(parsedFilePath, cachedData.linterResult, true);
 
             if (!foundErrors && hasErrors(cachedData.linterResult)) {
                 foundErrors = true;
@@ -162,11 +162,11 @@ export async function runSequentialWithCache(
                 results[0]!.linterResult,
             );
 
-            reporter.onFileEnd(parsedFilePath, results[0]!.linterResult);
+            reporter.onFileEnd?.(parsedFilePath, results[0]!.linterResult, false);
         }
     }
 
-    reporter.onLintEnd();
+    reporter.onCliEnd?.();
 
     if (cliConfig.debug) {
         const hitRate = files.length > 0 ? ((cacheHits / files.length) * 100).toFixed(1) : '0.0';
@@ -198,7 +198,7 @@ export async function runSequentialWithCache(
 export async function runParallel(
     buckets: ScannedFile[][],
     cliConfig: LinterCliConfig,
-    reporter: LinterConsoleReporter,
+    reporter: LinterCliReporter,
     cwd: string,
     maxThreads: number,
 ): Promise<boolean> {
@@ -220,7 +220,7 @@ export async function runParallel(
         maxThreads,
     });
 
-    reporter.onLintStart();
+    reporter.onCliStart?.(cliConfig);
 
     await Promise.all(
         buckets.map(async (bucket) => {
@@ -229,7 +229,7 @@ export async function runParallel(
             }
 
             for (const f of bucket) {
-                reporter.onFileStart(path.parse(f.path));
+                reporter.onFileStart?.(path.parse(f.path), f.config);
             }
 
             const result = await piscina.run({
@@ -242,7 +242,7 @@ export async function runParallel(
             }) as LinterWorkerResults;
 
             for (let i = 0; i < bucket.length; i += 1) {
-                reporter.onFileEnd(path.parse(bucket[i]!.path), result.results[i]!.linterResult);
+                reporter.onFileEnd?.(path.parse(bucket[i]!.path), result.results[i]!.linterResult, false);
 
                 if (!foundErrors && hasErrors(result.results[i]!.linterResult)) {
                     foundErrors = true;
@@ -251,7 +251,7 @@ export async function runParallel(
         }),
     );
 
-    reporter.onLintEnd();
+    reporter.onCliEnd?.();
 
     if (cliConfig.debug) {
         // eslint-disable-next-line no-console
@@ -280,7 +280,7 @@ export async function runParallel(
 export async function runParallelWithCache(
     buckets: ScannedFile[][],
     cliConfig: LinterCliConfig,
-    reporter: LinterConsoleReporter,
+    reporter: LinterCliReporter,
     cwd: string,
     maxThreads: number,
     cache: LintResultCache,
@@ -305,7 +305,7 @@ export async function runParallelWithCache(
         maxThreads,
     });
 
-    reporter.onLintStart();
+    reporter.onCliStart?.(cliConfig);
 
     await Promise.all(
         buckets.map(async (bucket) => {
@@ -315,7 +315,7 @@ export async function runParallelWithCache(
 
             // Report file start for all files
             for (const f of bucket) {
-                reporter.onFileStart(path.parse(f.path));
+                reporter.onFileStart?.(path.parse(f.path), f.config);
             }
 
             // Send all files to worker with cache data
@@ -360,7 +360,7 @@ export async function runParallelWithCache(
                 }
 
                 // Report result
-                reporter.onFileEnd(path.parse(file.path), workerResult.linterResult);
+                reporter.onFileEnd?.(path.parse(file.path), workerResult.linterResult, workerResult.fromCache);
 
                 if (!foundErrors && hasErrors(workerResult.linterResult)) {
                     foundErrors = true;
@@ -369,7 +369,7 @@ export async function runParallelWithCache(
         }),
     );
 
-    reporter.onLintEnd();
+    reporter.onCliEnd?.();
 
     if (cliConfig.debug) {
         const totalFiles = cacheHits + cacheMisses;
