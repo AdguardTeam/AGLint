@@ -62,6 +62,7 @@ export class LinterTree {
      * @param configResolver Optional config resolver.
      * @param configResolver.resolve Function to resolve config files.
      * @param configResolver.isRoot Function to check if config is root.
+     * @param configResolver.invalidate Optional function to invalidate config cache.
      * @param debug Optional debug instance for logging.
      */
     constructor(
@@ -71,6 +72,7 @@ export class LinterTree {
         private configResolver?: {
             resolve: (configPath: string) => Promise<LinterConfigFile>;
             isRoot: (configPath: string) => Promise<boolean>;
+            invalidate?: (configPath: string) => void;
         },
         debug?: ModuleDebugger,
     ) {
@@ -465,56 +467,102 @@ export class LinterTree {
      * Clears cached ignore and config chains for affected directories.
      *
      * @param changedPath Absolute path to the changed file.
-     *
-     * @throws Error if file does not exist.
      */
     public async changed(changedPath: string): Promise<void> {
         const absPath = this.pathAdapter.resolve(changedPath);
         const fileName = this.pathAdapter.basename(absPath);
         const dirPath = this.pathAdapter.dirname(absPath);
 
-        // Clear caches for this directory and all children
+        const isIgnoreFile = fileName === this.options.ignoreFileName;
+        const isConfigFile = this.options.configFileNames.has(fileName);
+
+        // If this is a config or ignore file, mark directory for rescan
+        if (isIgnoreFile || isConfigFile) {
+            this.scannedDirs.delete(dirPath);
+
+            if (this.debug) {
+                const fileType = isIgnoreFile ? 'ignore' : 'config';
+                this.debug.log(
+                    `Marking directory for rescan due to ${fileType} file change: ${dirPath}`,
+                );
+            }
+        }
+
+        // Clear caches for this directory and all children (descendant directories)
+        // Use proper path matching to avoid clearing sibling directories (e.g., /sub vs /subfolder)
+        const pathSep = this.pathAdapter.sep;
         for (const [cachedDir] of this.ignoreChainCache) {
-            if (cachedDir.startsWith(dirPath)) {
+            if (cachedDir === dirPath || cachedDir.startsWith(dirPath + pathSep)) {
                 this.ignoreChainCache.delete(cachedDir);
+                if (this.debug) {
+                    this.debug.log(`Cleared ignore chain cache for: ${cachedDir}`);
+                }
             }
         }
 
         for (const [cachedDir] of this.configChainCache) {
-            if (cachedDir.startsWith(dirPath)) {
+            if (cachedDir === dirPath || cachedDir.startsWith(dirPath + pathSep)) {
                 this.configChainCache.delete(cachedDir);
+                if (this.debug) {
+                    this.debug.log(`Cleared config chain cache for: ${cachedDir}`);
+                }
             }
         }
 
         for (const [cachedDir] of this.resolvedConfigCache) {
-            if (cachedDir.startsWith(dirPath)) {
+            if (cachedDir === dirPath || cachedDir.startsWith(dirPath + pathSep)) {
                 this.resolvedConfigCache.delete(cachedDir);
+                if (this.debug) {
+                    this.debug.log(`Cleared resolved config cache for: ${cachedDir}`);
+                }
             }
         }
 
-        // Update directory node
+        // Update directory node to reflect current file state
         const node = this.nodeCache.get(dirPath);
         if (!node) {
             return;
         }
 
         // Check if this is an ignore file
-        if (fileName === this.options.ignoreFileName) {
+        if (isIgnoreFile) {
             if (await this.fs.exists(absPath)) {
                 node.ignoreFile = absPath;
+                if (this.debug) {
+                    this.debug.log(`Updated ignore file in node: ${absPath}`);
+                }
             } else {
                 delete node.ignoreFile;
+                if (this.debug) {
+                    this.debug.log(`Removed ignore file from node: ${absPath}`);
+                }
             }
         }
 
         // Check if this is a config file
-        if (this.options.configFileNames.has(fileName)) {
+        if (isConfigFile) {
+            // Invalidate config resolver cache if available
+            if (this.configResolver?.invalidate) {
+                this.configResolver.invalidate(absPath);
+                if (this.debug) {
+                    this.debug.log(`Invalidated config resolver cache for: ${absPath}`);
+                }
+            }
+
             if (await this.fs.exists(absPath)) {
                 if (!node.configFiles.includes(absPath)) {
                     node.configFiles.push(absPath);
+                    if (this.debug) {
+                        this.debug.log(`Added config file to node: ${absPath}`);
+                    }
+                } else if (this.debug) {
+                    this.debug.log(`Config file already in node, will be rescanned: ${absPath}`);
                 }
             } else {
                 node.configFiles = node.configFiles.filter((p) => p !== absPath);
+                if (this.debug) {
+                    this.debug.log(`Removed config file from node: ${absPath}`);
+                }
             }
         }
     }
