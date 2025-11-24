@@ -956,5 +956,255 @@ describe('config-resolver', () => {
                 expect(config1).toBe(config2);
             });
         });
+
+        describe('rule config array merging', () => {
+            test('should replace rule config array when severity changes', async () => {
+                await writeFile(
+                    join(testDir, 'rule-severity-base.json'),
+                    JSON.stringify({
+                        rules: {
+                            'max-css-selectors': [1, { maxSelectors: 1 }],
+                        },
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'rule-severity-override.json'),
+                    JSON.stringify({
+                        extends: ['./rule-severity-base.json'],
+                        rules: {
+                            'max-css-selectors': [2, { maxSelectors: 1 }],
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'rule-severity-override.json'));
+
+                expect(config.rules?.['max-css-selectors']).toEqual([2, { maxSelectors: 1 }]);
+                // Ensure it's NOT concatenated like [1, { maxSelectors: 1 }, 2]
+                expect(Array.isArray(config.rules?.['max-css-selectors'])).toBe(true);
+                expect((config.rules?.['max-css-selectors'] as any[]).length).toBe(2);
+            });
+
+            test('should merge rule config options when options change', async () => {
+                await writeFile(
+                    join(testDir, 'rule-options-base.json'),
+                    JSON.stringify({
+                        rules: {
+                            'max-css-selectors': [1, { maxSelectors: 1, foo: 'bar' }],
+                        },
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'rule-options-override.json'),
+                    JSON.stringify({
+                        extends: ['./rule-options-base.json'],
+                        rules: {
+                            'max-css-selectors': [1, { maxSelectors: 5 }],
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'rule-options-override.json'));
+
+                // Options should be merged - maxSelectors overridden, foo preserved
+                expect(config.rules?.['max-css-selectors']).toEqual([1, { maxSelectors: 5, foo: 'bar' }]);
+            });
+
+            test('should replace rule config with string severity', async () => {
+                await writeFile(
+                    join(testDir, 'rule-string-base.json'),
+                    JSON.stringify({
+                        rules: {
+                            'no-css-comments': 'warn',
+                        },
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'rule-string-override.json'),
+                    JSON.stringify({
+                        extends: ['./rule-string-base.json'],
+                        rules: {
+                            'no-css-comments': 'error',
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'rule-string-override.json'));
+
+                // String severities are parsed to numbers by the schema
+                expect(config.rules?.['no-css-comments']).toBe(LinterRuleSeverity.Error);
+            });
+
+            test('should replace rule config from string to array', async () => {
+                await writeFile(
+                    join(testDir, 'rule-string-to-array-base.json'),
+                    JSON.stringify({
+                        rules: {
+                            'max-css-selectors': 'warn',
+                        },
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'rule-string-to-array-override.json'),
+                    JSON.stringify({
+                        extends: ['./rule-string-to-array-base.json'],
+                        rules: {
+                            'max-css-selectors': [2, { maxSelectors: 3 }],
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'rule-string-to-array-override.json'));
+
+                expect(config.rules?.['max-css-selectors']).toEqual([2, { maxSelectors: 3 }]);
+            });
+
+            test('should replace rule config in chain merging', async () => {
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const chain: ConfigChainEntry[] = [
+                    {
+                        path: join(testDir, 'child.json'),
+                        directory: testDir,
+                        config: {
+                            rules: {
+                                'max-css-selectors': [2, { maxSelectors: 10 }],
+                            },
+                        } as LinterConfig,
+                        isRoot: false,
+                    },
+                    {
+                        path: join(testDir, 'parent.json'),
+                        directory: testDir,
+                        config: {
+                            rules: {
+                                'max-css-selectors': [1, { maxSelectors: 1 }],
+                            },
+                        } as LinterConfig,
+                        isRoot: true,
+                    },
+                ];
+
+                const config = await resolver.resolveChain(chain);
+
+                // Child should override parent
+                expect(config.rules?.['max-css-selectors']).toEqual([2, { maxSelectors: 10 }]);
+            });
+
+            test('should handle multiple rule config overrides with option merging', async () => {
+                await writeFile(
+                    join(testDir, 'multi-rule-base.json'),
+                    JSON.stringify({
+                        rules: {
+                            'max-css-selectors': [1, { maxSelectors: 1, keepThis: true }],
+                            'no-short-rules': [1, { minLength: 5 }],
+                            'no-css-comments': 'warn',
+                        },
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'multi-rule-override.json'),
+                    JSON.stringify({
+                        extends: ['./multi-rule-base.json'],
+                        rules: {
+                            'max-css-selectors': [2, { maxSelectors: 3 }],
+                            'no-short-rules': 'error',
+                            'no-css-comments': [2],
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'multi-rule-override.json'));
+
+                // Options should be merged - keepThis preserved, maxSelectors overridden
+                expect(config.rules?.['max-css-selectors']).toEqual([2, { maxSelectors: 3, keepThis: true }]);
+                // String severities are parsed to numbers by the schema
+                expect(config.rules?.['no-short-rules']).toBe(LinterRuleSeverity.Error);
+                expect(config.rules?.['no-css-comments']).toEqual([2]);
+            });
+
+            test('should still concatenate syntax arrays correctly', async () => {
+                await writeFile(
+                    join(testDir, 'syntax-base.json'),
+                    JSON.stringify({
+                        syntax: ['Common'],
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'syntax-override.json'),
+                    JSON.stringify({
+                        extends: ['./syntax-base.json'],
+                        syntax: ['AdGuard'],
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'syntax-override.json'));
+
+                // Syntax arrays should be merged (concatenated with deduplication)
+                expect(config.syntax).toEqual(['Common', 'AdGuard']);
+            });
+
+            test('should handle rule config with off severity', async () => {
+                await writeFile(
+                    join(testDir, 'rule-off-base.json'),
+                    JSON.stringify({
+                        rules: {
+                            'no-css-comments': [2, { someOption: true }],
+                        },
+                    }),
+                );
+
+                await writeFile(
+                    join(testDir, 'rule-off-override.json'),
+                    JSON.stringify({
+                        extends: ['./rule-off-base.json'],
+                        rules: {
+                            'no-css-comments': 'off',
+                        },
+                    }),
+                );
+
+                const resolver = new ConfigResolver(fs, pathAdapter, {
+                    presetsRoot: presetsDir,
+                });
+
+                const config = await resolver.resolve(join(testDir, 'rule-off-override.json'));
+
+                // String severities are parsed to numbers by the schema
+                expect(config.rules?.['no-css-comments']).toBe(LinterRuleSeverity.Off);
+            });
+        });
     });
 });
