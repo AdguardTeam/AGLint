@@ -1,7 +1,14 @@
 import { lint, type LinterResult, type LinterRunOptions } from './linter';
 import { type LinterRuleType } from './rule';
-import { FixApplier } from './source-code/fix-applier';
+import { applyFixes } from './source-code/fix-applier';
 import { type LinterFixCommand } from './source-code/fix-generator';
+
+/**
+ * After fixing the source code, we may still have some ignored fixes due to conflicts.
+ * In such cases, we run the linter again and again until all fixes are applied
+ * or until we reach the maximum number of rounds.
+ */
+export const MAX_FIX_ROUNDS = 10;
 
 /**
  * Result of linting with fixes applied.
@@ -46,7 +53,7 @@ export type AnyLinterResult = LinterResult | LinterFixerResult;
 export type LinterFixerRunOptions = LinterRunOptions & {
     /**
      * Maximum number of fix rounds to perform.
-     * Defaults to FixApplier.MAX_FIX_ROUNDS (10).
+     * Defaults to MAX_FIX_ROUNDS (10).
      */
     maxFixRounds?: number;
 
@@ -120,7 +127,7 @@ export type ApplyFixesOptions = {
  * ```
  */
 export function applyFixesToResult(options: ApplyFixesOptions): string {
-    const maxFixRounds = options.maxFixRounds ?? FixApplier.MAX_FIX_ROUNDS;
+    const maxFixRounds = options.maxFixRounds ?? MAX_FIX_ROUNDS;
     let source = options.sourceContent;
     let fixRoundsCount = 0;
     let remainingFixes: LinterFixCommand[] = [];
@@ -151,8 +158,7 @@ export function applyFixesToResult(options: ApplyFixesOptions): string {
     // Apply fixes in rounds
     let currentFixes = fixesToApply;
     do {
-        const fixApplier = new FixApplier(source);
-        const fixApplicationResult = fixApplier.applyFixes(currentFixes);
+        const fixApplicationResult = applyFixes(source, currentFixes);
 
         remainingFixes = fixApplicationResult.remainingFixes;
         source = fixApplicationResult.fixedSource;
@@ -204,7 +210,7 @@ export function applyFixesToResult(options: ApplyFixesOptions): string {
  * ```
  */
 export async function lintWithFixes(options: LinterFixerRunOptions): Promise<LinterFixerResult> {
-    const maxFixRounds = options.maxFixRounds ?? FixApplier.MAX_FIX_ROUNDS;
+    const maxFixRounds = options.maxFixRounds ?? MAX_FIX_ROUNDS;
     const { debug } = options;
 
     if (debug) {
@@ -237,7 +243,6 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
             loadRule: options.loadRule,
             subParsers: options.subParsers,
         });
-        const fixApplier = new FixApplier(source);
         const fixesToApply = linterResult.problems
             .filter((problem) => {
                 if (!problem.fix) {
@@ -256,7 +261,7 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
             })
             .map((problem) => problem.fix!);
 
-        const fixApplicationResult = fixApplier.applyFixes(fixesToApply);
+        const fixApplicationResult = applyFixes(source, fixesToApply);
 
         remainingFixes = fixApplicationResult.remainingFixes;
         source = fixApplicationResult.fixedSource;
