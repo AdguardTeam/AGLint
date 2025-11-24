@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
+import { type ModuleDebug } from '../../../utils/debug';
 import { deepMerge } from '../../../utils/deep-merge';
 import { type LinterConfigFile, PACKAGE_JSON } from '../../config-file/config-file';
-import { type ModuleDebugger } from '../debug';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 
@@ -51,7 +51,7 @@ export class LinterTree {
     /**
      * Module debugger for logging.
      */
-    private debug?: ModuleDebugger;
+    private debug?: ModuleDebug;
 
     /**
      * Creates a new linter tree instance.
@@ -74,7 +74,7 @@ export class LinterTree {
             isRoot: (configPath: string) => Promise<boolean>;
             invalidate?: (configPath: string) => void;
         },
-        debug?: ModuleDebugger,
+        debug?: ModuleDebug,
     ) {
         const rootPath = this.pathAdapter.resolve(options.root);
         this.root = {

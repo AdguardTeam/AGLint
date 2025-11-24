@@ -42,6 +42,12 @@ export {
 } from './utils/file-scanner';
 
 export {
-    DebugLogger,
-    createDebugLogger,
-} from './utils/debug';
+    type Logger,
+    type ColorFormatter,
+    type DebugOptions,
+    Debug,
+    ModuleDebug,
+    createDebug,
+} from '../utils/debug';
+
+export { chalkColorFormatter } from './utils/debug-colors';

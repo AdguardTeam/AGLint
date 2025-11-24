@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
+import { type ModuleDebug } from '../../../utils/debug';
 import { type ConfigResolver } from '../config-resolver';
-import { type ModuleDebugger } from '../debug';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type LinterTree } from '../tree-builder';
 
@@ -14,7 +14,7 @@ export class LinterFileScanner {
     /**
      * Module debugger for logging.
      */
-    private debug?: ModuleDebugger;
+    private debug?: ModuleDebug;
 
     /**
      * Creates a new LinterFileScanner instance.
@@ -28,7 +28,7 @@ export class LinterFileScanner {
         private tree: LinterTree,
         private configResolver: ConfigResolver,
         private fs: FileSystemAdapter,
-        debug?: ModuleDebugger,
+        debug?: ModuleDebug,
     ) {
         this.debug = debug;
     }

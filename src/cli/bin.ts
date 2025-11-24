@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { inspect } from 'node:util';
 
 import { version } from '../../package.json';
+import { Debug } from '../utils/debug';
 import { getFormattedError } from '../utils/error';
 
 import { LintResultCache } from './cache';
@@ -23,7 +24,7 @@ import { LinterConsoleReporter } from './reporters/console';
 import { LinterJsonReporter } from './reporters/json';
 import { type LinterCliReporter } from './reporters/reporter';
 import { ConfigResolver } from './utils/config-resolver';
-import { createDebugLogger } from './utils/debug';
+import { chalkColorFormatter } from './utils/debug-colors';
 import { LinterFileScanner } from './utils/file-scanner';
 import { NodeFileSystemAdapter } from './utils/fs-adapter';
 import { NodePathAdapter } from './utils/path-adapter';
@@ -58,11 +59,15 @@ const main = async () => {
         const options = program.opts() as LinterCliConfig;
 
         // Initialize debug logger
-        const debugLogger = createDebugLogger(options.debug || false);
-        const debug = debugLogger.createDebugger('cli');
+        const debug = new Debug({
+            enabled: options.debug || false,
+            colors: options.color ?? true,
+            colorFormatter: chalkColorFormatter,
+        });
+        const cliDebug = debug.module('cli');
 
         if (options.debug) {
-            debug.log('Debug mode enabled');
+            cliDebug.log('Debug mode enabled');
         }
 
         enforceSoloOptions(program, ['init']);
@@ -77,7 +82,7 @@ const main = async () => {
         const fsAdapter = new NodeFileSystemAdapter();
         const pathAdapter = new NodePathAdapter();
 
-        debug.log('Initializing config resolver');
+        cliDebug.log('Initializing config resolver');
         const configResolver = new ConfigResolver(
             fsAdapter,
             pathAdapter,
@@ -85,10 +90,10 @@ const main = async () => {
                 presetsRoot: pathAdapter.join(__dirname, '../../config-presets'),
                 baseConfig: {},
             },
-            debugLogger.createDebugger('config-resolver'),
+            debug.module('config-resolver'),
         );
 
-        debug.log('Building linter tree');
+        cliDebug.log('Building linter tree');
         const tree = new LinterTree(
             fsAdapter,
             pathAdapter,
@@ -101,11 +106,11 @@ const main = async () => {
                 resolve: (p) => configResolver.resolve(p),
                 isRoot: (p) => configResolver.isRoot(p),
             },
-            debugLogger.createDebugger('linter-tree'),
+            debug.module('linter-tree'),
         );
 
         if (options.debug) {
-            debug.log(`Matching patterns: ${program.args.length > 0 ? program.args.join(', ') : DEFAULT_PATTERN}`);
+            cliDebug.log(`Matching patterns: ${program.args.length > 0 ? program.args.join(', ') : DEFAULT_PATTERN}`);
         }
         const matchedPatterns = await matchPatterns(
             program.args.length > 0 ? program.args : [DEFAULT_PATTERN],
@@ -116,7 +121,7 @@ const main = async () => {
                 defaultIgnorePatterns: [...DEFAULT_IGNORE_PATTERNS],
                 followSymlinks: false,
                 dot: true,
-                debug: debugLogger.createDebugger('pattern-matcher'),
+                debug: debug.module('pattern-matcher'),
             },
         );
 
@@ -124,15 +129,15 @@ const main = async () => {
             tree.addFile(pattern);
         }
 
-        debug.log('Initializing file scanner');
+        cliDebug.log('Initializing file scanner');
         const scanner = new LinterFileScanner(
             tree,
             configResolver,
             fsAdapter,
-            debugLogger.createDebugger('file-scanner'),
+            debug.module('file-scanner'),
         );
 
-        debug.log('Scanning files');
+        cliDebug.log('Scanning files');
         const files = await scanner.scanAll(matchedPatterns.files);
 
         if (options.printConfig) {
@@ -165,10 +170,10 @@ const main = async () => {
             : undefined;
 
         if (cache) {
-            debug.log(`Cache enabled: ${options.cacheLocation}`);
-            debug.log(`Cache strategy: ${options.cacheStrategy}`);
+            cliDebug.log(`Cache enabled: ${options.cacheLocation}`);
+            cliDebug.log(`Cache strategy: ${options.cacheStrategy}`);
         } else {
-            debug.log('Cache disabled');
+            cliDebug.log('Cache disabled');
         }
 
         let reporter: LinterCliReporter;
@@ -178,7 +183,7 @@ const main = async () => {
             reporter = new LinterConsoleReporter(options.color);
         }
 
-        debug.log(`Reporter initialized: ${options.reporter}`);
+        cliDebug.log(`Reporter initialized: ${options.reporter}`);
 
         // Calculate thread configuration
         const threadsOpt = options.threads as ThreadsOption;
@@ -188,27 +193,27 @@ const main = async () => {
         const totalSize = getTotalSize(files);
         const isSmall = isSmallProject(files.length, totalSize);
 
-        debug.log(`Thread configuration: ${maxThreads} max threads (auto: ${isAutoMode})`);
-        debug.log(`Project size: ${files.length} files, ${totalSize} bytes (small: ${isSmall})`);
+        cliDebug.log(`Thread configuration: ${maxThreads} max threads (auto: ${isAutoMode})`);
+        cliDebug.log(`Project size: ${files.length} files, ${totalSize} bytes (small: ${isSmall})`);
 
         let hasErrors = false;
 
         // Run sequentially if single-threaded or auto mode with small project
         if (maxThreads === 1 || (isAutoMode && isSmall)) {
-            debug.log('Running in sequential mode');
+            cliDebug.log('Running in sequential mode');
             if (cache) {
                 hasErrors = await runSequentialWithCache(files, options, reporter, cwd, cache);
             } else {
                 hasErrors = await runSequential(files, options, reporter, cwd);
             }
         } else {
-            debug.log(`Running in parallel mode with ${maxThreads} threads`);
+            cliDebug.log(`Running in parallel mode with ${maxThreads} threads`);
             // Run in parallel with bucketed tasks
             const buckets = createFileTaskBuckets(files, maxThreads);
             if (options.debug) {
                 const bucketSizes = buckets.map((b) => b.length);
                 const avgBucketSize = (files.length / buckets.length).toFixed(1);
-                debug.log(
+                cliDebug.log(
                     `Created ${buckets.length} bucket(s): `
                     + `[${bucketSizes.join(', ')}] (avg: ${avgBucketSize} files/bucket)`,
                 );
@@ -222,18 +227,18 @@ const main = async () => {
 
         // Save cache after execution
         if (cache) {
-            debug.log('Saving cache');
+            cliDebug.log('Saving cache');
             await cache.save();
         }
 
-        debug.log(`Linting completed. Errors: ${hasErrors}`);
+        cliDebug.log(`Linting completed. Errors: ${hasErrors}`);
 
         if (hasErrors) {
-            debug.log('Exiting with error code 1');
+            cliDebug.log('Exiting with error code 1');
             process.exit(1);
         }
 
-        debug.log('Exiting successfully');
+        cliDebug.log('Exiting successfully');
     } catch (error: unknown) {
         const prefix = [
             'Oops! Something went wrong! :(',

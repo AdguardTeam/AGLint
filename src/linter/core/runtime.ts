@@ -1,3 +1,4 @@
+import { type ModuleDebug } from '../../utils/debug';
 import { type LinterConfigParsed, type LinterSubParsersConfig } from '../config';
 import { type LinterFileProps } from '../file-props';
 import { type LinterProblem } from '../linter-problem';
@@ -82,8 +83,7 @@ export type LinterRuntime = {
  * @param config Parsed linter configuration.
  * @param loadRule Function to dynamically load rule modules.
  * @param subParsers Configuration for sub-parsers (e.g., CSS, HTML).
- * @param debug Optional debug logger with log method.
- * @param debug.log Debug logging function.
+ * @param debug Optional module debugger for logging.
  *
  * @returns A fully initialized linter runtime ready for rule loading and AST traversal.
  */
@@ -92,7 +92,7 @@ export function createLinterRuntime(
     config: LinterConfigParsed,
     loadRule: LinterRuleLoader,
     subParsers: LinterSubParsersConfig,
-    debug?: { log: (message: string) => void },
+    debug?: ModuleDebug,
 ): LinterRuntime {
     const problems: LinterProblem[] = [];
 

@@ -1,4 +1,4 @@
-import { type ModuleDebugger } from '../debug';
+import { type ModuleDebug } from '../../../utils/debug';
 
 /**
  * Result of pattern matching.
@@ -43,5 +43,5 @@ export interface PatternMatchOptions {
     /**
      * Optional module debugger for logging.
      */
-    debug?: ModuleDebugger;
+    debug?: ModuleDebug;
 }

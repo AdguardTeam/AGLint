@@ -5,10 +5,11 @@ import { defaultSubParsers } from '../linter/default-subparsers';
 import { type AnyLinterResult, applyFixesToResult, lintWithFixes } from '../linter/fixer';
 import { lint, type LinterRunOptions } from '../linter/linter';
 import { type LinterRule } from '../linter/rule';
+import { Debug } from '../utils/debug';
 
 import { type CacheFileData, getFileHash, LinterCacheStrategy } from './cache';
 import { type LinterCliConfig } from './cli-options';
-import { createDebugLogger } from './utils/debug';
+import { chalkColorFormatter } from './utils/debug-colors';
 
 const fsPromises = import('node:fs/promises');
 const { readFile, writeFile } = await fsPromises;
@@ -105,8 +106,12 @@ const ruleCache = new Map<string, LinterRule>();
  */
 const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerResults> => {
     // Create debug logger for worker thread
-    const workerDebugLogger = createDebugLogger(tasks.cliConfig.debug ?? false);
-    const workerDebug = workerDebugLogger.createDebugger('worker');
+    const debug = new Debug({
+        enabled: tasks.cliConfig.debug ?? false,
+        colors: tasks.cliConfig.color ?? true,
+        colorFormatter: chalkColorFormatter,
+    });
+    const workerDebug = debug.module('worker');
 
     if (tasks.cliConfig.debug) {
         workerDebug.log(`Processing ${tasks.tasks.length} task(s) in worker thread`);
@@ -164,7 +169,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
 
         // Create debug object for linter if debug mode is enabled
         const debugFn = tasks.cliConfig.debug
-            ? workerDebugLogger.createDebugger('linter')
+            ? debug.module('linter')
             : undefined;
 
         const commonLinterRunOptions: LinterRunOptions = {
