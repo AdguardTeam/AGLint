@@ -20,6 +20,8 @@ import {
 } from './executor';
 import { LinterCliInitWizard } from './init-wizard';
 import { LinterConsoleReporter } from './reporters/console';
+import { LinterJsonReporter } from './reporters/json';
+import { type LinterCliReporter } from './reporters/reporter';
 import { ConfigResolver } from './utils/config-resolver';
 import { createDebugLogger } from './utils/debug';
 import { LinterFileScanner } from './utils/file-scanner';
@@ -169,9 +171,14 @@ const main = async () => {
             debug.log('Cache disabled');
         }
 
-        const reporter = new LinterConsoleReporter(options.color);
+        let reporter: LinterCliReporter;
+        if (options.reporter === 'json' || options.reporter === 'json-with-metadata') {
+            reporter = new LinterJsonReporter();
+        } else {
+            reporter = new LinterConsoleReporter(options.color);
+        }
 
-        debug.log('Reporter initialized');
+        debug.log(`Reporter initialized: ${options.reporter}`);
 
         // Calculate thread configuration
         const threadsOpt = options.threads as ThreadsOption;

@@ -83,7 +83,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
     private problems: CollectedProblems = {};
 
     /** @inheritdoc */
-    onLintStart = () => {
+    onCliStart = () => {
         // Save the start time
         this.startTime = performance.now();
     };
@@ -106,7 +106,7 @@ export class LinterConsoleReporter implements LinterCliReporter {
     };
 
     /** @inheritdoc */
-    onLintEnd = () => {
+    onCliEnd = () => {
         // Calculate the linting time
         // eslint-disable-next-line max-len
         const lintTime = Math.round(((this.startTime ? performance.now() - this.startTime : 0) + Number.EPSILON) * 100) / 100;
