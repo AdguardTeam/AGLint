@@ -144,6 +144,14 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     const report = createReportFn(runtime);
     runtime.ruleRegistry.setReporter(report);
 
+    // Inline config comments
+    const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
+
+    if (options.config.allowInlineConfig) {
+        runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
+        debug.log('Inline config comments enabled');
+    }
+
     // Load rules
     const ruleLoadStart = Date.now();
     if (debug) {
@@ -151,13 +159,6 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     }
     await runtime.ruleRegistry.loadRules();
     debug.log(`Rules loaded in ${Date.now() - ruleLoadStart}ms`);
-
-    const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
-
-    if (options.config.allowInlineConfig) {
-        runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
-        debug.log('Inline config comments enabled');
-    }
 
     // AST walk
     const walkStart = Date.now();
