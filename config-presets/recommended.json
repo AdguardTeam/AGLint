@@ -28,15 +28,6 @@
       {
         "fuzzyThreshold": 0.6
       }
-    ],
-    "scriptlet-quotes": [
-      2,
-      {
-        "adg": "double",
-        "ubo": "none",
-        "abp": "none",
-        "disallowCurlyQuotes": true
-      }
     ]
   }
 }
