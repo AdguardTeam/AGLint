@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@adguard/agtree':
-        specifier: ^3.2.4
-        version: 3.2.4
+        specifier: ^3.3.1
+        version: 3.3.1
       '@adguard/ecss-tree':
         specifier: ^2.0.1
         version: 2.0.1
@@ -201,8 +201,8 @@ importers:
 
 packages:
 
-  '@adguard/agtree@3.2.4':
-    resolution: {integrity: sha512-Zn5YzCQuCXRxsYvXHtb6IvwbeZ4C6Sn7sQQrME3RxSeIZnSH2Qdt4POY5L2k1icR3Ecxvdm22kHdYUfZhLAsSw==}
+  '@adguard/agtree@3.3.1':
+    resolution: {integrity: sha512-WfJH2IbvtGi3CThD48Ok1C/NNtELxDfs24G/CACUT92/hPxXc7uvVxxxwou0sr4jNJa1Z5Eh5tmfvjBOFAsKmQ==}
     engines: {node: '>=22'}
 
   '@adguard/css-tokenizer@1.2.0':
@@ -2852,7 +2852,7 @@ packages:
 
 snapshots:
 
-  '@adguard/agtree@3.2.4':
+  '@adguard/agtree@3.3.1':
     dependencies:
       '@adguard/css-tokenizer': 1.2.0
       camelcase-keys: 7.0.2
