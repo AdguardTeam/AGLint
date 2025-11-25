@@ -1,4 +1,9 @@
-import { type Domain, type DomainList, DomainUtils } from '@adguard/agtree';
+import {
+    type Domain,
+    type DomainList,
+    DomainUtils,
+    RegExpUtils,
+} from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
@@ -54,6 +59,11 @@ export default defineRule({
             },
             Domain: (node: Domain) => {
                 if (DomainUtils.isValidDomainOrHostname(node.value)) {
+                    return;
+                }
+
+                // ignore regexps, we handle them in a different rule
+                if (RegExpUtils.isRegexPattern(node.value)) {
                     return;
                 }
 
