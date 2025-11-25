@@ -39,17 +39,27 @@ export default defineRule({
         ],
     },
     create: (context) => {
+        // Handle regular and exceptional modifiers separately
+        // It's needed because we do not want to report duplicated modifiers for `$modifier,~modifier`
+        // case; this should be done by a different linter rule
         const history = new Set<string>();
+        const exceptionHistory = new Set<string>();
 
         return {
             'ModifierList:exit': () => {
                 history.clear();
+                exceptionHistory.clear();
             },
             Modifier: (node: Modifier) => {
                 const name = node.name.value;
                 const nameToLowerCase = name.toLowerCase();
 
-                if (!history.has(nameToLowerCase)) {
+                if (node.exception && !exceptionHistory.has(nameToLowerCase)) {
+                    exceptionHistory.add(nameToLowerCase);
+                    return;
+                }
+
+                if (!node.exception && !history.has(nameToLowerCase)) {
                     history.add(nameToLowerCase);
                     return;
                 }
