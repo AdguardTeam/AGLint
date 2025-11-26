@@ -6,10 +6,10 @@ import { LinterRuleSeverity } from '../../src/linter/rule';
 import { lint } from './helpers/lint';
 
 const rulesConfig: LinterRulesConfig = {
-    'no-invalid-separator': LinterRuleSeverity.Error,
+    'no-invalid-cosmetic-separator': LinterRuleSeverity.Error,
 };
 
-describe('no-invalid-separator', () => {
+describe('no-invalid-cosmetic-separator', () => {
     describe('should ignore non-problematic cases', () => {
         test.each([
             '##div:has(> table)',
@@ -27,7 +27,7 @@ describe('no-invalid-separator', () => {
                 expected: [
                     {
                         category: 'problem',
-                        ruleId: 'no-invalid-separator',
+                        ruleId: 'no-invalid-cosmetic-separator',
                         severity: LinterRuleSeverity.Error,
                         messageId: 'useExtendedSeparator',
                         data: {
@@ -69,7 +69,7 @@ describe('no-invalid-separator', () => {
                 expected: [
                     {
                         category: 'problem',
-                        ruleId: 'no-invalid-separator',
+                        ruleId: 'no-invalid-cosmetic-separator',
                         severity: LinterRuleSeverity.Error,
                         messageId: 'removeOnlyWithExtended',
                         data: {
@@ -110,7 +110,7 @@ describe('no-invalid-separator', () => {
                 expected: [
                     {
                         category: 'problem',
-                        ruleId: 'no-invalid-separator',
+                        ruleId: 'no-invalid-cosmetic-separator',
                         severity: LinterRuleSeverity.Error,
                         messageId: 'useNativeSeparator',
                         data: {
@@ -152,7 +152,7 @@ describe('no-invalid-separator', () => {
                 expected: [
                     {
                         category: 'problem',
-                        ruleId: 'no-invalid-separator',
+                        ruleId: 'no-invalid-cosmetic-separator',
                         severity: LinterRuleSeverity.Error,
                         messageId: 'useNativeSeparator',
                         data: {

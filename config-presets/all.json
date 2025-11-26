@@ -23,6 +23,7 @@
       }
     ],
     "no-inconsistent-hint-platforms": 2,
+    "no-invalid-cosmetic-separator": 2,
     "no-invalid-css-declaration": 2,
     "no-invalid-domains": 2,
     "no-invalid-hint-params": 2,

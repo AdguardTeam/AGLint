@@ -9,7 +9,7 @@ export default defineRule({
     meta: {
         type: LinterRuleType.Problem,
         docs: {
-            name: 'no-invalid-separator',
+            name: 'no-invalid-cosmetic-separator',
             description: 'Validates that rule separator matches selector/declaration capabilities',
             recommended: true,
         },
