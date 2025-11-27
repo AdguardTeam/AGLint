@@ -7,7 +7,7 @@ import { createReportFn } from './core/report';
 import { createLinterRuntime } from './core/runtime';
 import { type LinterFileProps } from './file-props';
 import { linterProblemSchema } from './linter-problem';
-import { makeConfigCommentVisitor } from './phase/inline-config';
+import { createConfigCommentVisitor } from './phase/inline-config';
 import { applyDisableDirectives, summarize } from './phase/postprocess';
 import { runWalk } from './phase/walk';
 import { linterRuleMetaSchema } from './rule';
@@ -151,7 +151,7 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     runtime.ruleRegistry.setReporter(report);
 
     // Inline config comments
-    const { onConfigComment, disabled } = makeConfigCommentVisitor(runtime);
+    const { onConfigComment, disabled } = createConfigCommentVisitor(runtime);
 
     if (options.config.allowInlineConfig) {
         runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);

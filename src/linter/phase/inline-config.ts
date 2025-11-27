@@ -52,7 +52,7 @@ export type DisableComment = {
  * - `onConfigComment`: Visitor function to attach to ConfigCommentRule nodes
  * - `disabled`: Array of disable directives found during traversal.
  */
-export function makeConfigCommentVisitor(runtime: LinterRuntime) {
+export function createConfigCommentVisitor(runtime: LinterRuntime) {
     const disabled: DisableComment[] = [];
     const { debug } = runtime as any;
     const toPos = (node: any) => {
