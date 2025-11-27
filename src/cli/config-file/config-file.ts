@@ -44,12 +44,36 @@ export enum LinterConfigFileFormat {
     PackageJson = 'package.json',
 }
 
-export const linterConfigFileSchema = v.object({
-    root: v.optional(v.boolean(), false),
-    extends: v.optional(v.array(v.pipe(v.string(), v.minLength(1)))),
-    syntax: v.optional(syntaxArraySchema),
-    rules: v.optional(linterRulesConfigSchema),
-});
+export const linterConfigFileSchema = v.pipe(
+    v.object({
+        root: v.pipe(
+            v.optional(v.boolean(), false),
+            v.description(
+                'Indicates whether this configuration file is the root. When true, AGLint stops looking for '
+                + 'configuration files in parent directories.',
+            ),
+        ),
+        extends: v.pipe(
+            v.optional(v.array(v.pipe(v.string(), v.minLength(1)))),
+            v.description(
+                'List of configuration files or presets to extend from. Configurations are merged with later '
+                + 'entries overriding earlier ones. Presets can be referenced with the "aglint:" prefix.',
+            ),
+        ),
+        syntax: v.pipe(
+            v.optional(syntaxArraySchema),
+            v.description('AdBlock syntax variants to support'),
+        ),
+        rules: v.pipe(
+            v.optional(linterRulesConfigSchema),
+            v.description(
+                'Rule configurations as key-value pairs where keys are rule names and values are severity '
+                + 'levels or arrays with severity and options.',
+            ),
+        ),
+    }),
+    v.description('AGLint configuration file schema for aglint.config.json, .aglintrc.json, or package.json'),
+);
 
 export type LinterConfigFile = v.InferInput<typeof linterConfigFileSchema>;
 

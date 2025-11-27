@@ -38,37 +38,66 @@ const linterRuleSeverityMap = {
     error: LinterRuleSeverity.Error,
 } as const;
 
-const linterRuleNumberSeveritySchema = v.enum(LinterRuleSeverity);
+/**
+ * String literal type for text-based severity values.
+ */
+type LinterRuleTextSeverity = keyof typeof linterRuleSeverityMap;
 
-const linterRuleTextSeveritySchema = v.pipe(
-    v.picklist([
-        'off',
-        'warn',
-        'error',
-    ] as const),
-    v.transform((s) => linterRuleSeverityMap[s]),
+const linterRuleNumberSeveritySchema = v.pipe(
+    v.enum(LinterRuleSeverity),
+    v.description('Rule severity as numeric value'),
 );
 
-const linterRuleSeveritySchema = v.union([
-    linterRuleNumberSeveritySchema,
-    linterRuleTextSeveritySchema,
-]);
+const linterRuleTextSeveritySchema = v.pipe(
+    v.picklist(Object.keys(linterRuleSeverityMap) as [LinterRuleTextSeverity, ...LinterRuleTextSeverity[]]),
+    v.description('Rule severity as string'),
+);
+
+const linterRuleSeveritySchema = v.pipe(
+    v.union([
+        linterRuleNumberSeveritySchema,
+        linterRuleTextSeveritySchema,
+    ]),
+    v.description('Rule severity level controlling whether the rule is disabled, reports warnings, or reports errors'),
+);
 
 /**
  * Schema for validating rule configuration.
  * Can be a severity level or a tuple with severity and options.
  */
-export const linterRuleConfigSchema = v.union([
-    linterRuleSeveritySchema,
-    v.looseTuple([
+export const linterRuleConfigSchema = v.pipe(
+    v.union([
         linterRuleSeveritySchema,
+        v.looseTuple([
+            linterRuleSeveritySchema,
+        ]),
     ]),
-]);
+    v.description(
+        'Rule configuration: either a severity level alone, or an array with severity and additional options',
+    ),
+);
 
 /**
  * Type representing a rule configuration value.
  */
 export type LinterRuleConfig = v.InferOutput<typeof linterRuleConfigSchema>;
+
+/**
+ * Helper function to normalize text severity to enum value.
+ * This provides the same runtime behavior as the previous transform.
+ *
+ * @param severity The severity value to normalize.
+ *
+ * @returns The normalized severity as LinterRuleSeverity enum.
+ */
+export function normalizeSeverity(
+    severity: LinterRuleSeverity | LinterRuleTextSeverity,
+): LinterRuleSeverity {
+    if (typeof severity === 'string') {
+        return linterRuleSeverityMap[severity];
+    }
+    return severity;
+}
 
 /* =========================
  * Config schema helpers (Valibot → TS types)

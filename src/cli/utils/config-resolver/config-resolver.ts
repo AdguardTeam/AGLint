@@ -2,6 +2,7 @@ import * as v from 'valibot';
 import { parse as parseYaml } from 'yaml';
 
 import { type LinterConfig } from '../../../linter/config';
+import { normalizeSeverity } from '../../../linter/rule';
 import { type ModuleDebug } from '../../../utils/debug';
 import { deepMerge } from '../../../utils/deep-merge';
 import {
@@ -156,7 +157,7 @@ export class ConfigResolver {
         if (this.debug) {
             this.debug.log(`Final merged config: ${JSON.stringify(merged)}`);
         }
-        return merged;
+        return ConfigResolver.normalizeConfig(merged);
     }
 
     /**
@@ -270,9 +271,12 @@ export class ConfigResolver {
             this.debug.log(`Flattened config for ${absPath}: ${JSON.stringify(flattened)}`);
         }
 
+        // Normalize severity values before caching
+        const normalized = ConfigResolver.normalizeConfig(flattened);
+
         // Cache result
         const entry: ConfigCacheEntry = {
-            config: flattened,
+            config: normalized,
             isRoot: parsed.root === true,
             timestamp: Date.now(),
         };
@@ -281,6 +285,39 @@ export class ConfigResolver {
         seen.delete(absPath);
 
         return entry;
+    }
+
+    /**
+     * Normalizes rule severity values from strings to enum values.
+     *
+     * @param config The config to normalize.
+     *
+     * @returns The normalized config.
+     */
+    private static normalizeConfig(config: LinterConfig): LinterConfig {
+        if (!config.rules) {
+            return config;
+        }
+
+        const normalizedRules: typeof config.rules = {};
+
+        for (const [ruleName, ruleConfig] of Object.entries(config.rules)) {
+            if (Array.isArray(ruleConfig)) {
+                // Tuple format: [severity, ...options]
+                normalizedRules[ruleName] = [
+                    normalizeSeverity(ruleConfig[0]),
+                    ...ruleConfig.slice(1),
+                ] as any;
+            } else {
+                // Single severity
+                normalizedRules[ruleName] = normalizeSeverity(ruleConfig);
+            }
+        }
+
+        return {
+            ...config,
+            rules: normalizedRules,
+        };
     }
 
     /**

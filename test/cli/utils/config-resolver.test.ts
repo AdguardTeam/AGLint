@@ -598,8 +598,8 @@ describe('config-resolver', () => {
                 const config = await resolver.resolveChain(chain);
 
                 expect(config.syntax).toEqual(['Parent', 'Child']);
-                expect(config.rules?.['child-rule']).toBe('error');
-                expect(config.rules?.['parent-rule']).toBe('warn');
+                expect(config.rules?.['child-rule']).toBe(LinterRuleSeverity.Error);
+                expect(config.rules?.['parent-rule']).toBe(LinterRuleSeverity.Warning);
             });
 
             test('should apply base config before chain', async () => {
@@ -629,8 +629,8 @@ describe('config-resolver', () => {
                 const config = await resolver.resolveChain(chain);
 
                 expect(config.syntax).toEqual(['Base']);
-                expect(config.rules?.['base-rule']).toBe('off');
-                expect(config.rules?.['override-rule']).toBe('error');
+                expect(config.rules?.['base-rule']).toBe(LinterRuleSeverity.Off);
+                expect(config.rules?.['override-rule']).toBe(LinterRuleSeverity.Error);
             });
 
             test('should handle single entry chain', async () => {
@@ -684,7 +684,7 @@ describe('config-resolver', () => {
 
                 const config = await resolver.resolveChain(chain);
 
-                expect(config.rules?.['shared-rule']).toBe('error');
+                expect(config.rules?.['shared-rule']).toBe(LinterRuleSeverity.Error);
             });
         });
 

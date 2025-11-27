@@ -142,7 +142,8 @@
     "files": [
         "dist/**",
         "!dist/build.txt",
-        "config-presets/**"
+        "config-presets/**",
+        "schema/**"
     ],
     "engines": {
         "node": ">=20"
@@ -159,7 +160,8 @@
         "prepare": "node .husky/install.js",
         "increment": "pnpm version patch --no-git-tag-version",
         "test": "vitest",
-        "rules:update": "npx tsx tasks/generate-rule-exports.ts && npx tsx tasks/generate-rules-readme.ts && npx tsx tasks/generate-presets.ts"
+        "rules:update": "npx tsx tasks/generate-rule-exports.ts && npx tsx tasks/generate-rules-readme.ts && npx tsx tasks/generate-presets.ts",
+        "schema:generate": "npx tsx tasks/generate-config-schema.ts"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^25.0.2",

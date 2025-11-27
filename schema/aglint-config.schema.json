@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/AdguardTeam/AGLint/schema/aglint-config.schema.json",
+  "title": "AGLint Configuration",
+  "description": "AGLint configuration file schema for aglint.config.json, .aglintrc.json, or package.json",
+  "type": "object",
+  "properties": {
+    "root": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indicates whether this configuration file is the root. When true, AGLint stops looking for configuration files in parent directories."
+    },
+    "extends": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "List of configuration files or presets to extend from. Configurations are merged with later entries overriding earlier ones. Presets can be referenced with the \"aglint:\" prefix."
+    },
+    "syntax": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "Common",
+          "AdblockPlus",
+          "UblockOrigin",
+          "AdGuard"
+        ]
+      },
+      "description": "AdBlock syntax variants to support"
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "anyOf": [
+              {
+                "enum": [
+                  0,
+                  1,
+                  2
+                ],
+                "description": "Rule severity as numeric value"
+              },
+              {
+                "enum": [
+                  "off",
+                  "warn",
+                  "error"
+                ],
+                "description": "Rule severity as string"
+              }
+            ],
+            "description": "Rule severity level controlling whether the rule is disabled, reports warnings, or reports errors"
+          },
+          {
+            "type": "array",
+            "items": [
+              {
+                "anyOf": [
+                  {
+                    "enum": [
+                      0,
+                      1,
+                      2
+                    ],
+                    "description": "Rule severity as numeric value"
+                  },
+                  {
+                    "enum": [
+                      "off",
+                      "warn",
+                      "error"
+                    ],
+                    "description": "Rule severity as string"
+                  }
+                ],
+                "description": "Rule severity level controlling whether the rule is disabled, reports warnings, or reports errors"
+              }
+            ],
+            "minItems": 1
+          }
+        ],
+        "description": "Rule configuration: either a severity level alone, or an array with severity and additional options"
+      },
+      "description": "Rule configurations as key-value pairs where keys are rule names and values are severity levels or arrays with severity and options."
+    }
+  },
+  "required": []
+}

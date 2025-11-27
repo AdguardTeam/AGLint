@@ -19,6 +19,7 @@ import {
     type LinterRuleSeverity,
     type LinterRuleType,
     type LinterRuleVisitors,
+    normalizeSeverity,
     type WithMessages,
 } from '../rule';
 
@@ -201,7 +202,7 @@ export class LinterRuleInstance {
             // [severity[, ...config]] case
 
             // eslint-disable-next-line prefer-destructuring
-            this.severity = parsedConfig[0];
+            this.severity = normalizeSeverity(parsedConfig[0]);
 
             // If there are more than one element in the array, it means that there are additional config options
             // In this case we need to validate them against the rule's config schema
@@ -232,7 +233,7 @@ export class LinterRuleInstance {
             }
         } else {
             // severity-only case
-            this.severity = parsedConfig;
+            this.severity = normalizeSeverity(parsedConfig);
 
             if (this.rule.meta.configSchema) {
                 this.config.length = 0;
