@@ -2,10 +2,12 @@ import cloneDeep from 'clone-deep';
 import { render } from 'micromustache';
 import * as v from 'valibot';
 
+import { deepFreeze } from '../../utils/deep-freeze';
 import { deepMerge } from '../../utils/deep-merge';
 import { getErrorMessage } from '../../utils/error';
 import { type LinterReporter } from '../core/report';
 import {
+    type LinterProblemReport,
     type LinterRule,
     type LinterRuleBaseConfig,
     type LinterRuleBaseContext,
@@ -57,6 +59,12 @@ export class LinterRuleInstance {
     private readonly config: LinterRuleBaseConfig;
 
     /**
+     * Cached frozen clone of the config.
+     * Updated only when setConfig is called to avoid expensive cloning on every access.
+     */
+    private cachedFrozenConfig: Readonly<LinterRuleBaseConfig>;
+
+    /**
      * Creates a new linter rule instance.
      *
      * @param id The unique identifier for this rule.
@@ -69,6 +77,7 @@ export class LinterRuleInstance {
         this.id = id;
         this.rule = rule;
         this.config = [];
+        this.cachedFrozenConfig = [];
 
         this.setConfig(config);
     }
@@ -190,6 +199,9 @@ export class LinterRuleInstance {
                 // because we pass the array to the visitors context
                 this.config.length = 0;
                 this.config.push(...parsedRestConfig);
+
+                // Update cached frozen config
+                this.updateCachedFrozenConfig();
             }
         } else {
             // severity-only case
@@ -207,7 +219,20 @@ export class LinterRuleInstance {
                     throw new Error(`Rule '${this.rule.meta.docs.name}' has invalid default configuration: ${getErrorMessage(e)}`);
                 }
             }
+
+            // Update cached frozen config
+            this.updateCachedFrozenConfig();
         }
+    }
+
+    /**
+     * Updates the cached frozen config.
+     * Called only when config changes via setConfig().
+     */
+    private updateCachedFrozenConfig(): void {
+        // Deep clone and freeze the config
+        // This is only called when config changes, not on every access
+        this.cachedFrozenConfig = deepFreeze(cloneDeep(this.config)) as Readonly<LinterRuleBaseConfig>;
     }
 
     /**
@@ -279,17 +304,28 @@ export class LinterRuleInstance {
         baseContext: LinterRuleBaseContext,
         reporter?: LinterReporter,
     ): LinterRuleVisitors {
-        const context: LinterRuleContext = {
+        // Create context object with a getter for config
+        // This ensures rules always get a frozen config,
+        // preventing accidental modifications while allowing inline config updates
+        const context = {
             ...baseContext,
             id: this.id,
-            config: this.config,
             // Create a rule-specific debug instance if debug is available
             debug: baseContext.debug?.module(this.id),
-            report: (problem) => {
+            report: (problem: LinterProblemReport) => {
                 reporter?.(problem, this);
             },
         };
 
-        return this.rule.create(context);
+        // Define config as a getter that returns the cached frozen config
+        // The cache is updated only when setConfig() is called, avoiding expensive
+        // cloning on every access while still supporting inline config changes
+        Object.defineProperty(context, 'config', {
+            get: () => this.cachedFrozenConfig,
+            enumerable: true,
+            configurable: false,
+        });
+
+        return this.rule.create(context as LinterRuleContext);
     }
 }

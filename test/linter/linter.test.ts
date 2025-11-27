@@ -1,5 +1,6 @@
 import { AdblockSyntax } from '@adguard/agtree/utils';
 import { type ReadonlyRecord } from '@adguard/ecss-tree';
+import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
 
 import { type LinterConfig } from '../../src/linter/config';
@@ -51,13 +52,74 @@ const testRuleCommentWarning = defineRule({
     }),
 });
 
-const testRules: ReadonlyRecord<string, LinterRule> = {
+// Test rule with configurable options to test inline config modifications
+const testRuleConfigurable = defineRule({
+    meta: {
+        type: LinterRuleType.Problem,
+        docs: {
+            name: 'test-configurable-rule',
+            description: 'Test rule with configurable options',
+            recommended: false,
+        },
+        messages: {
+            networkRuleDetected:
+                'Network rule detected with minLength={{minLength}} and requireDomain={{requireDomain}}',
+        },
+        configSchema: v.tuple([
+            v.strictObject({
+                minLength: v.pipe(
+                    v.optional(v.number(), 5),
+                    v.minValue(1),
+                    v.description('Minimum length of the network rule pattern'),
+                ),
+                requireDomain: v.pipe(
+                    v.optional(v.boolean(), false),
+                    v.description('Whether to require a domain in the rule'),
+                ),
+            }),
+        ]),
+        defaultConfig: [
+            {
+                minLength: 5,
+                requireDomain: false,
+            },
+        ],
+    },
+    create: (context) => ({
+        '[category=Network]': (node: any) => {
+            // Read config during visitor execution, not at creation time
+            // This allows inline config comments to take effect
+            const { minLength, requireDomain } = context.config[0];
+
+            const nodeText = context.sourceCode.getSlicedPart(node.start, node.end);
+
+            // Check minLength
+            if (nodeText.length < minLength) {
+                return;
+            }
+
+            // Check requireDomain
+            if (requireDomain && !nodeText.includes('.')) {
+                return;
+            }
+
+            context.report({
+                messageId: 'networkRuleDetected',
+                data: { minLength, requireDomain },
+                node,
+            });
+        },
+    }),
+});
+
+const testRules: ReadonlyRecord<string, LinterRule<any, any>> = {
     'test-network-rule': testRuleNetworkRule,
     'test-cosmetic-rule': testRuleCosmeticRule,
     'test-comment-warning': testRuleCommentWarning,
+    'test-configurable-rule': testRuleConfigurable,
 };
 
-const createRuleLoader = (additionalRules?: Record<string, LinterRule>): LinterRuleLoader => {
+const createRuleLoader = (additionalRules?: Record<string, LinterRule<any, any>>): LinterRuleLoader => {
     const allRules = { ...testRules, ...additionalRules };
     return async (ruleName: string) => {
         const rule = allRules[ruleName];
@@ -239,6 +301,119 @@ describe('Linter E2E Tests', () => {
                 { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: false },
             );
             expect(result.problems).toHaveLength(2);
+        });
+
+        test('should modify rule options via inline config', async () => {
+            const result = await lint(
+                [
+                    '||a.com^',
+                    '! aglint "test-configurable-rule": ["error", { "minLength": 10 }]',
+                    '||b.com^',
+                    '||verylongdomain.com^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5 }] },
+                    allowInlineConfig: true,
+                },
+            );
+
+            // First rule matches default minLength: 5 (7 chars: ||a.com^)
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.message).toContain('minLength=5');
+
+            // After inline config, only rules with minLength >= 10 are reported
+            // ||verylongdomain.com^ is 20 chars
+            expect(result.problems[1]?.position.start.line).toBe(4);
+            expect(result.problems[1]?.message).toContain('minLength=10');
+        });
+
+        test('should merge rule options via inline config', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint "test-configurable-rule": ["error", { "requireDomain": true }]',
+                    '||test.org^',
+                    '||block^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5, requireDomain: false }] },
+                    allowInlineConfig: true,
+                },
+            );
+
+            // First rule: minLength=5, requireDomain=false (should match)
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.message).toContain('requireDomain=false');
+
+            // After inline config: minLength=5 (inherited), requireDomain=true
+            // ||test.org^ has domain, so it matches
+            expect(result.problems[1]?.position.start.line).toBe(3);
+            expect(result.problems[1]?.message).toContain('requireDomain=true');
+
+            // ||block^ has no domain (no dot), so it's filtered out
+        });
+
+        test('should handle multiple inline config changes with options', async () => {
+            const result = await lint(
+                [
+                    '||a.com^',
+                    '! aglint "test-configurable-rule": ["error", { "minLength": 15 }]',
+                    '||b.com^',
+                    '||verylongdomain.com^',
+                    '! aglint "test-configurable-rule": ["warn", { "minLength": 5, "requireDomain": true }]',
+                    '||c.com^',
+                    '||block^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5, requireDomain: false }] },
+                    allowInlineConfig: true,
+                },
+            );
+
+            expect(result.problems).toHaveLength(3);
+
+            // First rule: minLength=5, requireDomain=false
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.severity).toBe(LinterRuleSeverity.Error);
+            expect(result.problems[0]?.message).toContain('minLength=5');
+
+            // After first inline config: minLength=15
+            // Only ||verylongdomain.com^ (20 chars) matches
+            expect(result.problems[1]?.position.start.line).toBe(4);
+            expect(result.problems[1]?.severity).toBe(LinterRuleSeverity.Error);
+            expect(result.problems[1]?.message).toContain('minLength=15');
+
+            // After second inline config: severity=warn, minLength=5, requireDomain=true
+            // ||c.com^ has domain and is long enough
+            expect(result.problems[2]?.position.start.line).toBe(6);
+            expect(result.problems[2]?.severity).toBe(LinterRuleSeverity.Warning);
+            expect(result.problems[2]?.message).toContain('minLength=5');
+            expect(result.problems[2]?.message).toContain('requireDomain=true');
+
+            // ||block^ has no domain, so it's filtered out
+        });
+
+        test('should preserve config immutability with inline changes', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint "test-configurable-rule": ["error", { "minLength": 20 }]',
+                    '||test.org^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5 }] },
+                    allowInlineConfig: true,
+                },
+            );
+
+            // Both rules should be processed - first with minLength=5, second with minLength=20
+            // ||example.com^ is 14 chars, so it matches minLength=5
+            // ||test.org^ is 11 chars, doesn't match minLength=20
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.message).toContain('minLength=5');
         });
 
         test('should not process inline config when allowInlineConfig is undefined', async () => {
