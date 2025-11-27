@@ -18,7 +18,7 @@ import {
 } from '../../common/constants';
 import { type AnyLinterResult } from '../../linter/fixer';
 import { type LinterProblem } from '../../linter/linter-problem';
-import { type LinterRuleMeta, LinterRuleSeverity } from '../../linter/rule';
+import { type LinterRuleMetaSerializable, LinterRuleSeverity } from '../../linter/rule';
 
 import { type LinterCliReporter } from './reporter';
 
@@ -34,7 +34,7 @@ type CollectedProblems = { [key: string]: LinterProblem[] };
 /**
  * Type for the collected metadata from all linter results.
  */
-type CollectedMetadata = { [ruleId: string]: LinterRuleMeta };
+type CollectedMetadata = { [ruleId: string]: LinterRuleMetaSerializable };
 
 /**
  * Implements a simple reporter that logs the problems to the console.

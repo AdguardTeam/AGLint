@@ -10,7 +10,7 @@ import { linterProblemSchema } from './linter-problem';
 import { createConfigCommentVisitor } from './phase/inline-config';
 import { applyDisableDirectives, summarize } from './phase/postprocess';
 import { runWalk } from './phase/walk';
-import { linterRuleMetaSchema } from './rule';
+import { linterRuleMetaSerializableSchema } from './rule';
 import { type LinterRuleLoader } from './rule-registry/rule-loader';
 
 export const linterResultSchema = v.object({
@@ -19,9 +19,9 @@ export const linterResultSchema = v.object({
      */
     problems: v.array(linterProblemSchema),
     /**
-     * Metadata of the rules that were run.
+     * Metadata of the rules that were run (JSON-serializable).
      */
-    metadata: v.optional(v.record(v.string(), linterRuleMetaSchema)),
+    metadata: v.optional(v.record(v.string(), linterRuleMetaSerializableSchema)),
     /**
      * Count of warnings (just for convenience, can be calculated from problems array).
      */

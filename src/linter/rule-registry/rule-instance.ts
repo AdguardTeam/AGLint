@@ -1,3 +1,4 @@
+import { toJsonSchema } from '@valibot/to-json-schema';
 import cloneDeep from 'clone-deep';
 import { render } from 'micromustache';
 import * as v from 'valibot';
@@ -14,7 +15,7 @@ import {
     type LinterRuleConfig,
     linterRuleConfigSchema,
     type LinterRuleContext,
-    type LinterRuleMeta,
+    type LinterRuleMetaSerializable,
     type LinterRuleSeverity,
     type LinterRuleType,
     type LinterRuleVisitors,
@@ -137,12 +138,38 @@ export class LinterRuleInstance {
     }
 
     /**
-     * Returns the metadata for this rule.
+     * Returns JSON-serializable metadata for this rule.
      *
-     * @returns The rule metadata.
+     * This method converts the rule's metadata to a format that can be safely
+     * serialized to JSON.
+     *
+     * - Valibot configSchema is converted to JSON Schema format (if possible).
+     * - defaultConfig is excluded (contains runtime-only values).
+     * - If schema conversion fails, configSchema field is omitted without error.
+     *
+     * @returns JSON-serializable rule metadata suitable for API responses or storage.
      */
-    public getMeta(): LinterRuleMeta {
-        return cloneDeep(this.rule.meta);
+    public getSerializableMeta(): LinterRuleMetaSerializable {
+        const { configSchema, defaultConfig, ...rest } = this.rule.meta;
+
+        let serializedConfigSchema;
+        if (configSchema) {
+            try {
+                // Try to convert Valibot schema to JSON Schema
+                serializedConfigSchema = toJsonSchema(configSchema);
+            } catch {
+                // If conversion fails (e.g., custom validators, transformations),
+                // silently skip the configSchema field
+                serializedConfigSchema = undefined;
+            }
+        }
+
+        const serializedMeta = {
+            ...rest,
+            ...(serializedConfigSchema ? { configSchema: serializedConfigSchema } : {}),
+        };
+
+        return cloneDeep(serializedMeta as LinterRuleMetaSerializable);
     }
 
     /**

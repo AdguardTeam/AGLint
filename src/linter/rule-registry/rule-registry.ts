@@ -4,7 +4,7 @@ import { type LinterConfigParsed, type LinterRulesConfig } from '../config';
 import { type LinterReporter } from '../core/report';
 import {
     type LinterRuleBaseContext,
-    type LinterRuleMeta,
+    type LinterRuleMetaSerializable,
     linterRuleSchema,
     LinterRuleSeverity,
 } from '../rule';
@@ -267,17 +267,20 @@ export class LinterRuleRegistry {
     }
 
     /**
-     * Retrieves the metadata for a rule from the registry.
+     * Retrieves JSON-serializable metadata for a rule from the registry.
+     *
+     * Returns metadata that can be safely serialized to JSON, with Valibot schemas
+     * converted to JSON Schema format when possible.
      *
      * @param ruleName The name of the rule to retrieve metadata for.
      *
-     * @returns The metadata for the rule.
+     * @returns JSON-serializable rule metadata.
      *
      * @throws Error if the rule is not found in the registry.
      */
-    public getRuleMeta(ruleName: string): LinterRuleMeta {
+    public getRuleMeta(ruleName: string): LinterRuleMetaSerializable {
         const rule = this.getRuleFromStorageOrThrow(ruleName);
-        return rule.getMeta();
+        return rule.getSerializableMeta();
     }
 
     // public* [Symbol.iterator](): Generator<[string, LinterRuleInstance]> {

@@ -268,6 +268,59 @@ export const linterRuleMetaSchema = v.object({
 
 export type LinterRuleMeta = v.InferOutput<typeof linterRuleMetaSchema>;
 
+/**
+ * Schema for validating JSON-serializable rule metadata.
+ * The configSchema is serialized to JSON Schema format, and defaultConfig is excluded.
+ */
+export const linterRuleMetaSerializableSchema = v.object({
+    /**
+     * The type of the rule.
+     */
+    type: linterRuleTypeSchema,
+
+    /**
+     * The documentation of the rule.
+     */
+    docs: linterRuleDocsSchema,
+
+    /**
+     * Examples of incorrect code for the rule.
+     */
+    incorrectExamples: v.optional(v.array(linterRuleExampleSchema)),
+
+    /**
+     * Examples of correct code for the rule.
+     */
+    correctExamples: v.optional(v.array(linterRuleExampleSchema)),
+
+    /**
+     * Whether the rule has suggestions.
+     */
+    hasSuggestions: v.optional(v.boolean()),
+
+    /**
+     * Whether the rule has a fix.
+     */
+    hasFix: v.optional(v.boolean()),
+
+    /**
+     * The messages of the rule.
+     */
+    messages: v.optional(linterRuleMessagesSchema),
+
+    /**
+     * The configuration schema in JSON Schema format (serialized from Valibot schema).
+     */
+    configSchema: v.optional(v.any()),
+
+    /**
+     * The linter version in which this rule was added.
+     */
+    version: v.optional(v.string()),
+});
+
+export type LinterRuleMetaSerializable = v.InferOutput<typeof linterRuleMetaSerializableSchema>;
+
 /* =========================
  * Message typing (messages → messageId keys)
  * ========================= */
