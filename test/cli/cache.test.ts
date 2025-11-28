@@ -7,7 +7,6 @@ import {
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { AdblockSyntax } from '@adguard/agtree';
 import {
     afterAll,
     beforeAll,
@@ -198,7 +197,7 @@ describe('cache', () => {
                     '/test/file.txt',
                     1000,
                     100,
-                    { syntax: [AdblockSyntax.Common], rules: {} },
+                    { platforms: [], rules: {} },
                     LinterCacheStrategy.Metadata,
                 );
 
@@ -207,7 +206,7 @@ describe('cache', () => {
 
             test('should return cached result with metadata strategy', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
                 const mockResult = createMockResult();
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, mockResult);
@@ -226,7 +225,7 @@ describe('cache', () => {
 
             test('should invalidate cache on mtime change with metadata strategy', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult());
 
@@ -243,7 +242,7 @@ describe('cache', () => {
 
             test('should invalidate cache on size change with metadata strategy', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult());
 
@@ -260,8 +259,8 @@ describe('cache', () => {
 
             test('should invalidate cache on config change', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config1 = { syntax: [AdblockSyntax.Common], rules: {} };
-                const config2 = { syntax: [AdblockSyntax.Adg], rules: {} };
+                const config1 = { platforms: [], rules: {} };
+                const config2 = { platforms: ['adg_any'], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config1, createMockResult());
 
@@ -278,7 +277,7 @@ describe('cache', () => {
 
             test('should return cached result with content strategy', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
                 const mockResult = createMockResult();
                 const contentHash = 'hash123';
 
@@ -298,7 +297,7 @@ describe('cache', () => {
 
             test('should allow mtime/size mismatch with content strategy', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult(), 'hash123');
 
@@ -318,7 +317,7 @@ describe('cache', () => {
         describe('setCachedResult', () => {
             test('should store result in cache', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
                 const mockResult = createMockResult();
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, mockResult);
@@ -331,7 +330,7 @@ describe('cache', () => {
 
             test('should store content hash when provided', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
                 const contentHash = 'hash123';
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult(), contentHash);
@@ -342,7 +341,7 @@ describe('cache', () => {
 
             test('should overwrite existing cache entry', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult());
                 cache.setCachedResult('/test/file.txt', 2000, 200, config, createMockResult());
@@ -354,7 +353,7 @@ describe('cache', () => {
 
             test('should store results for multiple files', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 cache.setCachedResult('/test/file1.txt', 1000, 100, config, createMockResult());
                 cache.setCachedResult('/test/file2.txt', 2000, 200, config, createMockResult());
@@ -365,7 +364,7 @@ describe('cache', () => {
 
             test('should cache config hash efficiently', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 // Set multiple times with same config
                 cache.setCachedResult('/test/file1.txt', 1000, 100, config, createMockResult());
@@ -383,7 +382,7 @@ describe('cache', () => {
             test('should save cache to disk', async () => {
                 const cacheFilePath = join(cacheDir, '.aglintcache');
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult());
 
@@ -395,7 +394,7 @@ describe('cache', () => {
 
             test('should persist and reload cache', async () => {
                 const cacheFilePath = '.aglintcache';
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
 
                 // Create and save cache
                 const cache1 = await LintResultCache.create(cacheDir, cacheFilePath);
@@ -439,7 +438,7 @@ describe('cache', () => {
         describe('integration', () => {
             test('should handle complete workflow', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: { 'rule-1': LinterRuleSeverity.Error } };
+                const config = { platforms: [], rules: { 'rule-1': LinterRuleSeverity.Error } };
                 const mockResult = createMockResult();
 
                 // Set result
@@ -480,7 +479,7 @@ describe('cache', () => {
 
             test('should work with both cache strategies', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { syntax: [AdblockSyntax.Common], rules: {} };
+                const config = { platforms: [], rules: {} };
                 const contentHash = getFileHash('||example.com^');
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult(), contentHash);

@@ -9,7 +9,7 @@ describe('task-scheduler', () => {
         path,
         size,
         mtime: Date.now(),
-        config: { syntax: ['Common'], rules: {} },
+        config: { platforms: [], rules: {} },
         configChain: [],
     });
 

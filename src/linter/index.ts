@@ -38,6 +38,7 @@ export {
     type LinterRuleExample,
     LinterRuleType,
     LinterRuleSeverity,
+    severityToText,
 } from './rule';
 export {
     createVisitorsForAnyCommentRule,

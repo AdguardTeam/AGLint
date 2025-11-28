@@ -1,5 +1,4 @@
-// rule.ts
-import { type AdblockSyntax } from '@adguard/agtree';
+import { type PlatformsByProduct } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { type ModuleDebug } from '../utils/debug';
@@ -83,6 +82,15 @@ export const linterRuleConfigSchema = v.pipe(
 export type LinterRuleConfig = v.InferOutput<typeof linterRuleConfigSchema>;
 
 /**
+ * Reverse mapping from enum to text severity.
+ */
+const linterRuleSeverityToTextMap: Record<LinterRuleSeverity, LinterRuleTextSeverity> = {
+    [LinterRuleSeverity.Off]: 'off',
+    [LinterRuleSeverity.Warning]: 'warn',
+    [LinterRuleSeverity.Error]: 'error',
+};
+
+/**
  * Helper function to normalize text severity to enum value.
  * This provides the same runtime behavior as the previous transform.
  *
@@ -97,6 +105,17 @@ export function normalizeSeverity(
         return linterRuleSeverityMap[severity];
     }
     return severity;
+}
+
+/**
+ * Helper function to convert enum severity to text format.
+ *
+ * @param severity The severity enum value.
+ *
+ * @returns The text representation of the severity.
+ */
+export function severityToText(severity: LinterRuleSeverity): LinterRuleTextSeverity {
+    return linterRuleSeverityToTextMap[severity];
 }
 
 /* =========================
@@ -431,7 +450,8 @@ export type LinterRuleBaseContext = {
     filePath?: string;
     cwd?: string;
     sourceCode: LinterSourceCode;
-    syntax?: AdblockSyntax[];
+    platforms: number;
+    platformsByProduct: PlatformsByProduct;
     getOffsetRangeForNode(node: any): LinterOffsetRange | null;
     debug?: ModuleDebug;
 };

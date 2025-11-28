@@ -75,7 +75,7 @@ const combineMerge = (target: any[], source: any[], options: ArrayMergeOptions) 
         return mergeRuleConfigs(target, source);
     }
 
-    // Default behavior for other arrays (like syntax arrays, extends arrays, etc.)
+    // Default behavior for other arrays (like platforms arrays, extends arrays, etc.)
     const destination = target.slice();
 
     source.forEach((item, index) => {

@@ -1,4 +1,4 @@
-import { AdblockSyntax } from '@adguard/agtree/utils';
+import { GenericPlatform } from '@adguard/agtree';
 import { type ReadonlyRecord } from '@adguard/ecss-tree';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
@@ -138,8 +138,9 @@ const lint = async (
     return lintFn({
         fileProps: { content },
         config: {
-            syntax: [AdblockSyntax.Adg],
             ...config,
+            // Only set default platforms if not already specified in config
+            platforms: config.platforms ?? ['adg_any'],
         },
         loadRule: ruleLoader ?? createRuleLoader(),
         subParsers: defaultSubParsers,
@@ -217,6 +218,51 @@ describe('Linter E2E Tests', () => {
             expect(result.problems).toHaveLength(3);
             expect(result.warningCount).toBe(2);
             expect(result.errorCount).toBe(1);
+        });
+
+        test('should pass platforms', async () => {
+            let platform: number | undefined;
+
+            await lint(
+                '',
+                {
+                    rules: {
+                        'test-platform': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                    platforms: ['adg_any'],
+                },
+                createRuleLoader({
+                    'test-platform': defineRule({
+                        meta: {
+                            type: LinterRuleType.Layout,
+                            docs: { name: 'test-platform', description: 'Test rule for platforms', recommended: false },
+                        },
+                        create: (context) => {
+                            platform = context.platforms;
+                            return {
+                                '*': () => {
+                                    // do nothing
+                                },
+                            };
+                        },
+                    }),
+                }),
+            );
+            expect(platform).toBe(GenericPlatform.AdgAny);
+        });
+
+        test('should throw on invalid platforms', async () => {
+            await expect(
+                lint(
+                    '',
+                    {
+                        rules: {},
+                        allowInlineConfig: true,
+                        platforms: ['adg_any2'],
+                    },
+                ),
+            ).rejects.toThrow('adg_any2');
         });
     });
 
@@ -423,7 +469,7 @@ describe('Linter E2E Tests', () => {
                     '! aglint "test-cosmetic-rule": "off"',
                     'example.com##.banner',
                 ].join('\n'),
-                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error } },
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: false },
             );
             expect(result.problems).toHaveLength(2);
         });
@@ -1017,7 +1063,7 @@ describe('Linter E2E Tests', () => {
             const result = await lintFn({
                 fileProps: { content: 'example.com##.ad' },
                 config: {
-                    syntax: [AdblockSyntax.Adg],
+                    platforms: ['adg_any'],
                     rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
                     allowInlineConfig: true,
                 },
@@ -1044,7 +1090,7 @@ describe('Linter E2E Tests', () => {
                     ].join('\n'),
                 },
                 config: {
-                    syntax: [AdblockSyntax.Adg],
+                    platforms: ['adg_any'],
                     rules: {
                         'test-network-rule': LinterRuleSeverity.Error,
                         'test-cosmetic-rule': LinterRuleSeverity.Error,
@@ -1068,7 +1114,7 @@ describe('Linter E2E Tests', () => {
             const result = await lintFn({
                 fileProps: { content: 'example.com##.ad' },
                 config: {
-                    syntax: [AdblockSyntax.Adg],
+                    platforms: ['adg_any'],
                     rules: {
                         'test-cosmetic-rule': LinterRuleSeverity.Error,
                         'test-network-rule': LinterRuleSeverity.Error, // Enabled but no violations
@@ -1090,7 +1136,7 @@ describe('Linter E2E Tests', () => {
             const result = await lintFn({
                 fileProps: { content: '! just a comment' },
                 config: {
-                    syntax: [AdblockSyntax.Adg],
+                    platforms: ['adg_any'],
                     rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
                     allowInlineConfig: true,
                 },
@@ -1107,7 +1153,7 @@ describe('Linter E2E Tests', () => {
             const result = await lintFn({
                 fileProps: { content: '##[invalid syntax' },
                 config: {
-                    syntax: [AdblockSyntax.Adg],
+                    platforms: ['adg_any'],
                     rules: {},
                     allowInlineConfig: true,
                 },

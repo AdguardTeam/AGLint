@@ -28,7 +28,7 @@ describe('file-scanner', () => {
 
         mockConfigResolver = {
             resolveChain: vi.fn().mockResolvedValue({
-                syntax: ['Common'],
+                platforms: [],
                 rules: {},
             } as LinterConfig),
         } as unknown as ConfigResolver;
@@ -50,12 +50,12 @@ describe('file-scanner', () => {
                 {
                     path: '/path/.aglintrc.json',
                     directory: '/path',
-                    config: { syntax: ['Common'] } as LinterConfig,
+                    config: { platforms: [], rules: {} } as LinterConfig,
                     isRoot: false,
                 },
             ];
             const config: LinterConfig = {
-                syntax: ['Common'],
+                platforms: [],
                 rules: { 'rule-1': LinterRuleSeverity.Error },
             };
 
@@ -200,12 +200,12 @@ describe('file-scanner', () => {
                 {
                     path: '/.aglintrc.json',
                     directory: '/',
-                    config: { syntax: ['Common'] } as LinterConfig,
+                    config: { platforms: [], rules: {} } as LinterConfig,
                     isRoot: true,
                 },
             ];
             const config: LinterConfig = {
-                syntax: ['Common'],
+                platforms: [],
                 rules: { 'rule-1': LinterRuleSeverity.Error },
             };
 

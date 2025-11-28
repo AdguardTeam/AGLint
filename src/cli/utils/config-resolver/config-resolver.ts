@@ -9,7 +9,7 @@ import {
     EXT_JSON,
     EXT_YAML,
     EXT_YML,
-    type LinterConfigFile,
+    type LinterConfigFileParsed,
     linterConfigFileSchema,
     PACKAGE_JSON,
     RC_CONFIG_FILE,
@@ -328,7 +328,7 @@ export class ConfigResolver {
      *
      * @returns The parsed config file.
      */
-    private parseConfig(content: string, filePath: string): LinterConfigFile {
+    private parseConfig(content: string, filePath: string): LinterConfigFileParsed {
         try {
             const basename = this.pathAdapter.basename(filePath);
 

@@ -12,9 +12,15 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 ### Added
 
 - JSON schema for config files. [#210]
+- Configuration field for compatibility flags. [#230]
+
+### Removed
+
+- `syntax` field from config files.
 
 [Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-alpha.8...HEAD
 [#210]: https://github.com/AdguardTeam/AGLint/issues/210
+[#230]: https://github.com/AdguardTeam/AGLint/issues/230
 
 ## [4.0.0-alpha.8] - 2025-11-24
 

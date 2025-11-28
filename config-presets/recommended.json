@@ -1,30 +1,27 @@
 {
-  "syntax": [
-    "Common"
-  ],
   "rules": {
-    "if-directive-balance": 2,
-    "no-css-comments": 1,
-    "no-duplicated-css-declaration-props": 2,
-    "no-duplicated-hint-platforms": 2,
-    "no-duplicated-hints": 2,
-    "no-duplicated-modifiers": 2,
-    "no-inconsistent-hint-platforms": 2,
-    "no-invalid-css-declaration": 2,
-    "no-invalid-domains": 2,
-    "no-invalid-hint-params": 2,
-    "no-invalid-modifiers": 2,
+    "if-directive-balance": "error",
+    "no-css-comments": "warn",
+    "no-duplicated-css-declaration-props": "error",
+    "no-duplicated-hint-platforms": "error",
+    "no-duplicated-hints": "error",
+    "no-duplicated-modifiers": "error",
+    "no-inconsistent-hint-platforms": "error",
+    "no-invalid-css-declaration": "error",
+    "no-invalid-domains": "error",
+    "no-invalid-hint-params": "error",
+    "no-invalid-modifiers": "error",
     "no-short-rules": [
-      2,
+      "error",
       {
         "minLength": 4
       }
     ],
-    "no-unknown-hint-platforms": 2,
-    "no-unknown-hints": 2,
-    "no-unknown-preprocessor-directives": 2,
+    "no-unknown-hint-platforms": "error",
+    "no-unknown-hints": "error",
+    "no-unknown-preprocessor-directives": "error",
     "no-unsupported-css-pseudo-class": [
-      2,
+      "error",
       {
         "fuzzyThreshold": 0.6
       }

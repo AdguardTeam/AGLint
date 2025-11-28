@@ -167,6 +167,8 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
             fileHash = getFileHash(content);
         }
 
+        v.assert(linterConfigSchema, task.linterConfig);
+
         // Create debug object for linter if debug mode is enabled
         const debugFn = tasks.cliConfig.debug
             ? debug.module('linter')
@@ -179,7 +181,7 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
                 cwd: task.cwd,
             },
             config: {
-                ...v.parse(linterConfigSchema, task.linterConfig),
+                ...task.linterConfig,
                 reportUnusedDisableDirectives: tasks.cliConfig.reportUnusedDisableDirectives,
                 unusedDisableDirectivesSeverity: tasks.cliConfig.unusedDisableDirectivesSeverity,
             },

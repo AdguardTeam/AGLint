@@ -1,21 +1,40 @@
-import { readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+/* eslint-disable no-console */
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import {
+    basename,
+    dirname,
+    extname,
+    join,
+} from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { AdblockSyntax } from '@adguard/agtree';
-import checkbox from '@inquirer/checkbox';
+import {
+    AdblockProduct,
+    getHumanReadablePlatformName,
+    getHumanReadableProductName,
+    getProductSpecificPlatforms,
+    PLATFORM_SEPARATOR,
+    stringifyPlatforms,
+} from '@adguard/agtree';
+import checkbox, { Separator } from '@inquirer/checkbox';
+import confirm from '@inquirer/confirm';
 import select from '@inquirer/select';
+import { inflect } from 'inflection';
 import { stringify as yamlStringify } from 'yaml';
 
 import { NEWLINE } from '../common/constants';
+import { AGLINT_REPO_URL } from '../linter';
 import { formatJson } from '../utils/format-json';
 
 import {
     CONFIG_FILE_NAMES,
+    EXT_JSON,
     JSON_CONFIG_FILE_NAME,
     JSON_RC_CONFIG_FILE_NAME,
     type LinterConfigFile,
     LinterConfigFileFormat,
     PACKAGE_JSON,
+    PRESET_PREFIX,
     RC_CONFIG_FILE,
     YAML_CONFIG_FILE_NAME,
     YAML_RC_CONFIG_FILE_NAME,
@@ -24,10 +43,33 @@ import {
 } from './config-file/config-file';
 import { fileExists } from './utils/file-exists';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 /**
  * Linter CLI initialization wizard.
  */
 export class LinterCliInitWizard {
+    /**
+     * URL to the configuration documentation.
+     */
+    private static readonly CONFIGURATION_URL = `${AGLINT_REPO_URL}/blob/master/docs/configuration.md`;
+
+    /**
+     * Path to the config presets directory.
+     */
+    private static readonly CONFIG_PRESETS_DIR = join(__dirname, '../../config-presets');
+
+    /**
+     * Name of the recommended preset.
+     */
+    private static readonly PRESET_RECOMMENDED = 'recommended';
+
+    /**
+     * Name of the all preset.
+     */
+    private static readonly PRESET_ALL = 'all';
+
     /**
      * Current working directory.
      */
@@ -69,11 +111,11 @@ export class LinterCliInitWizard {
 
                     // Successfully parsed - check for aglint property
                     if (parsed.aglint) {
-                        throw new Error(`Config found in "aglint" property of "${configFileName}" in "${cwd}"`);
+                        throw new Error(`Config found in "aglint" property of "${join(cwd, configFileName)}"`);
                     }
                     // No "aglint" property, continue checking other config files
                 } else {
-                    throw new Error(`Config file "${configFileName}" already exists in "${cwd}"`);
+                    throw new Error(`Config file "${join(cwd, configFileName)}" already exists`);
                 }
             }
         }
@@ -88,14 +130,14 @@ export class LinterCliInitWizard {
      */
     private static async promptFormat(cwd: string): Promise<LinterConfigFileFormat> {
         const choices = [
-            { value: LinterConfigFileFormat.Yaml },
-            { value: LinterConfigFileFormat.Json },
+            { name: 'YAML', value: LinterConfigFileFormat.Yaml },
+            { name: 'JSON', value: LinterConfigFileFormat.Json },
         ];
 
         // Only offer package.json option if it already exists
         const packageJsonPath = join(cwd, PACKAGE_JSON);
         if (await fileExists(packageJsonPath)) {
-            choices.push({ value: LinterConfigFileFormat.PackageJson });
+            choices.push({ name: 'package.json', value: LinterConfigFileFormat.PackageJson });
         }
 
         return select({
@@ -147,39 +189,199 @@ export class LinterCliInitWizard {
     }
 
     /**
-     * Prompts user to select adblock syntaxes.
+     * Discovers available presets from the config-presets directory.
      *
-     * @returns Selected syntaxes.
+     * @returns List of available presets.
      */
-    private static async promptSyntaxes(): Promise<AdblockSyntax[]> {
+    private static async discoverPresets(): Promise<Array<{ name: string; description?: string }>> {
+        try {
+            const files = await readdir(LinterCliInitWizard.CONFIG_PRESETS_DIR);
+            const presets: Array<{ name: string; description?: string }> = [];
+
+            for (const file of files) {
+                const ext = extname(file);
+                if (ext === EXT_JSON) {
+                    const presetName = basename(file, ext);
+                    let description: string | undefined;
+
+                    // Add descriptions for known presets
+                    if (presetName === LinterCliInitWizard.PRESET_RECOMMENDED) {
+                        description = 'suitable for most projects';
+                    } else if (presetName === LinterCliInitWizard.PRESET_ALL) {
+                        description = 'includes all rules';
+                    }
+
+                    presets.push({ name: presetName, description });
+                }
+            }
+
+            // Sort presets to have 'recommended' first, then 'all', then others alphabetically
+            presets.sort((a, b) => {
+                if (a.name === LinterCliInitWizard.PRESET_RECOMMENDED) {
+                    return -1;
+                }
+                if (b.name === LinterCliInitWizard.PRESET_RECOMMENDED) {
+                    return 1;
+                }
+                if (a.name === LinterCliInitWizard.PRESET_ALL) {
+                    return -1;
+                }
+                if (b.name === LinterCliInitWizard.PRESET_ALL) {
+                    return 1;
+                }
+                return a.name.localeCompare(b.name);
+            });
+
+            return presets;
+        } catch {
+            // Fallback to empty array if directory reading fails
+            return [];
+        }
+    }
+
+    /**
+     * Prompts user to select adblock products.
+     *
+     * @returns Selected products.
+     */
+    private static async promptProducts(): Promise<AdblockProduct[]> {
         return checkbox({
-            message: 'Select which adblock syntax(es) you want to use.\n"Common" is to be used if none is chosen.\n',
+            message: 'Select which adblock product(s) you want to support.\n',
             choices: [
-                { value: AdblockSyntax.Abp },
-                { value: AdblockSyntax.Adg },
-                { value: AdblockSyntax.Ubo },
+                { name: getHumanReadableProductName(AdblockProduct.Abp), value: AdblockProduct.Abp },
+                { name: getHumanReadableProductName(AdblockProduct.Adg), value: AdblockProduct.Adg },
+                { name: getHumanReadableProductName(AdblockProduct.Ubo), value: AdblockProduct.Ubo },
             ],
         });
+    }
+
+    /**
+     * Prompts user to select presets to extend.
+     *
+     * @returns Selected presets.
+     */
+    private static async promptPresets(): Promise<string[]> {
+        const presets = await LinterCliInitWizard.discoverPresets();
+
+        if (presets.length === 0) {
+            // No presets available, return empty array
+            return [];
+        }
+
+        const choices = presets.map((preset, index) => {
+            const value = `${PRESET_PREFIX}${preset.name}`;
+            const displayName = preset.description
+                ? `${value} (${preset.description})`
+                : value;
+
+            return {
+                value,
+                name: displayName,
+                // Check 'recommended' by default
+                checked: preset.name === LinterCliInitWizard.PRESET_RECOMMENDED && index === 0,
+            };
+        });
+
+        return checkbox({
+            message: 'Select which preset(s) you want to extend (or none).\n',
+            choices,
+            validate: (selected) => {
+                const values = selected.map((choice) => choice.value);
+                const hasRecommended = values.includes(`${PRESET_PREFIX}${LinterCliInitWizard.PRESET_RECOMMENDED}`);
+                const hasAll = values.includes(`${PRESET_PREFIX}${LinterCliInitWizard.PRESET_ALL}`);
+
+                if (hasRecommended && hasAll) {
+                    // eslint-disable-next-line max-len
+                    return `Cannot select both "${PRESET_PREFIX}${LinterCliInitWizard.PRESET_RECOMMENDED}" and "${PRESET_PREFIX}${LinterCliInitWizard.PRESET_ALL}". Please choose one or none.`;
+                }
+
+                return true;
+            },
+        });
+    }
+
+    /**
+     * Prompts user to specify if they want to set root option.
+     *
+     * @returns Whether to set root option.
+     */
+    private static async promptRootOption(): Promise<boolean> {
+        const url = `${LinterCliInitWizard.CONFIGURATION_URL}#why-the-root-option-is-important`;
+        return confirm({
+            message:
+                'Do you want to specify this config as root? '
+                + '(recommended if this is the project root directory)\n'
+                + `Learn more: ${url}\n`,
+            default: true,
+        });
+    }
+
+    /**
+     * Prompts user to select platforms.
+     *
+     * @param products Selected products.
+     *
+     * @returns Selected platforms.
+     */
+    private static async promptPlatforms(products: AdblockProduct[]): Promise<string[]> {
+        const specificPlatformsArray = await checkbox({
+            // eslint-disable-next-line max-len
+            message: `Select which platform(s) you want to support for the selected ${inflect('product', products.length)}.\n`,
+            choices: products.flatMap((product) => {
+                return [
+                    new Separator(`--- ${getHumanReadableProductName(product)} ---`),
+                    ...getProductSpecificPlatforms(product).map((platform) => {
+                        const rawPlatform = getHumanReadablePlatformName(platform);
+                        return {
+                            name: rawPlatform,
+                            value: platform,
+                        };
+                    }),
+                ];
+            }),
+            required: true,
+        });
+
+        const platforms = specificPlatformsArray.reduce((acc, platform) => {
+            return acc | platform;
+        }, 0);
+
+        return stringifyPlatforms(platforms).split(PLATFORM_SEPARATOR);
     }
 
     /**
      * Creates a content of the config file.
      *
      * @param chosenFormat Format chosen by the user.
-     * @param chosenSyntaxes Syntaxes chosen by the user.
+     * @param chosenPresets Presets chosen by the user.
+     * @param chosenPlatforms Platforms chosen by the user.
+     * @param isRoot Whether to set root option.
      *
      * @returns Config file content.
      */
-    private static getConfigFileContent(chosenFormat: LinterConfigFileFormat, chosenSyntaxes: AdblockSyntax[]): string {
+    private static getConfigFileContent(
+        chosenFormat: LinterConfigFileFormat,
+        chosenPresets: string[],
+        chosenPlatforms: string[],
+        isRoot: boolean,
+    ): string {
         // Prepare config object
-        const preparedConfig: LinterConfigFile = {
-            root: true,
-            extends: [
-                'aglint:recommended',
-            ],
-            // set Common syntax as default if nothing is chosen
-            syntax: chosenSyntaxes.length === 0 ? [AdblockSyntax.Common] : chosenSyntaxes,
-        };
+        const preparedConfig: LinterConfigFile = {};
+
+        // Only add root if user chose to
+        if (isRoot) {
+            preparedConfig.root = true;
+        }
+
+        // Only add extends if user selected presets
+        if (chosenPresets.length > 0) {
+            preparedConfig.extends = chosenPresets;
+        }
+
+        // Only add platforms if user selected platforms
+        if (chosenPlatforms.length > 0) {
+            preparedConfig.platforms = chosenPlatforms;
+        }
 
         // Serialize config object to a string based on the chosen format
         let serializedConfig: string;
@@ -189,7 +391,7 @@ export class LinterCliInitWizard {
                 // YAML supports comments, so we can add some useful info to the beginning of the file
                 serializedConfig = [
                     '# AGLint config file',
-                    '# Documentation: https://github.com/AdguardTeam/AGLint#configuration',
+                    `# Documentation: ${LinterCliInitWizard.CONFIGURATION_URL}`,
                 ].join(NEWLINE);
                 serializedConfig += NEWLINE;
                 // Serialize config object to YAML. This will add the final newline automatically
@@ -251,24 +453,20 @@ export class LinterCliInitWizard {
      */
     private notifySuccess(configFileName: string): void {
         if (configFileName === PACKAGE_JSON) {
-            // eslint-disable-next-line no-console
-            console.log(`Config was added successfully to "${configFileName}" in directory "${this.cwd}"`);
+            console.log(`Config was added successfully to "${join(this.cwd, configFileName)}"`);
         } else {
-            // eslint-disable-next-line no-console
-            console.log(`Config file was created successfully in directory "${this.cwd}" as "${configFileName}"`);
+            console.log(`Config file was created successfully at "${join(this.cwd, configFileName)}"`);
         }
-
-        // Notify user about root: true option
-        // eslint-disable-next-line no-console, max-len
-        console.log('Note: "root: true" option was added to the config file. Please make sure that the config file is located in the root directory of your project.');
-        // eslint-disable-next-line no-console
-        console.log('You can learn more at https://github.com/AdguardTeam/AGLint#why-the-root-option-is-important');
     }
 
     /**
      * Runs the init wizard.
      */
     public async run(): Promise<void> {
+        // Display welcome message
+        console.log('Welcome to AGLint configuration wizard!');
+        console.log(`This wizard will help you create a new AGLint config file in "${this.cwd}"\n`);
+
         // Check if config file already exists
         await LinterCliInitWizard.checkExistingConfig(this.cwd);
 
@@ -278,11 +476,29 @@ export class LinterCliInitWizard {
         // Ask user to specify which config file name to use
         const configFileName = await LinterCliInitWizard.promptConfigFileName(chosenFormat);
 
-        // Ask user to specify which syntaxes to use
-        const chosenSyntaxes = await LinterCliInitWizard.promptSyntaxes();
+        // Ask user to specify which products to use
+        const chosenProducts = await LinterCliInitWizard.promptProducts();
 
-        // Generate config file content based on the chosen format and syntaxes
-        const configContent = LinterCliInitWizard.getConfigFileContent(chosenFormat, chosenSyntaxes);
+        let chosenPlatforms: string[] = [];
+
+        if (chosenProducts.length > 0) {
+            // Ask user to specify which platforms to use
+            chosenPlatforms = await LinterCliInitWizard.promptPlatforms(chosenProducts);
+        }
+
+        // Ask user to select presets
+        const chosenPresets = await LinterCliInitWizard.promptPresets();
+
+        // Ask user if they want to set root option
+        const isRoot = await LinterCliInitWizard.promptRootOption();
+
+        // Generate config file content based on the chosen format and products
+        const configContent = LinterCliInitWizard.getConfigFileContent(
+            chosenFormat,
+            chosenPresets,
+            chosenPlatforms,
+            isRoot,
+        );
 
         // Write the config file to the current working directory
         await this.writeConfigFile(configFileName, configContent);

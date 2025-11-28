@@ -170,23 +170,22 @@ describe('deep-merge', () => {
     });
 
     describe('non-rule array handling', () => {
-        test('should concatenate syntax arrays', () => {
-            const a = { syntax: ['Common'] };
-            const b = { syntax: ['AdGuard'] };
+        test('should concatenate platforms arrays', () => {
+            const a = { platforms: [] };
+            const b = { platforms: ['adg_any'] };
             const result = deepMerge(a, b);
 
-            expect(result.syntax).toEqual(['Common', 'AdGuard']);
+            expect(result.platforms).toEqual(['adg_any']);
         });
 
         test('should deduplicate concatenated arrays', () => {
-            const a = { syntax: ['Common', 'AdGuard'] };
-            const b = { syntax: ['AdGuard', 'UblockOrigin'] };
+            const a = { platforms: [], platforms2: ['adg_any'] };
+            const b = { platforms2: ['adg_any', 'ubo_any'] };
             const result = deepMerge(a, b);
 
-            // Should not duplicate 'AdGuard'
-            expect(result.syntax).toContain('Common');
-            expect(result.syntax).toContain('AdGuard');
-            expect(result.syntax).toContain('UblockOrigin');
+            // Should not duplicate 'adg_any'
+            expect(result.platforms2).toContain('adg_any');
+            expect(result.platforms2).toContain('ubo_any');
         });
 
         test('should handle extends arrays', () => {
@@ -302,22 +301,22 @@ describe('deep-merge', () => {
                 rules: {
                     'rule-1': [1, { opt1: true }],
                 },
-                syntax: ['Common'],
+                platforms: [],
                 extends: ['base.json'],
             };
             const b = {
                 rules: {
                     'rule-1': [2, { opt2: true }],
                 },
-                syntax: ['AdGuard'],
+                platforms: ['adg_any'],
                 extends: ['override.json'],
             };
             const result = deepMerge(a, b);
 
             // Rule options should be merged
             expect(result.rules['rule-1']).toEqual([2, { opt1: true, opt2: true }]);
-            // Syntax should be concatenated
-            expect(result.syntax).toEqual(['Common', 'AdGuard']);
+            // Platforms should be concatenated
+            expect(result.platforms).toEqual(['adg_any']);
             // Extends should be concatenated
             expect(result.extends).toEqual(['base.json', 'override.json']);
         });

@@ -153,7 +153,7 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     // Inline config comments
     const { onConfigComment, disabled } = createConfigCommentVisitor(runtime);
 
-    if (options.config.allowInlineConfig) {
+    if (parsedConfig.allowInlineConfig) {
         runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
         if (debug) {
             debug.log('Inline config comments enabled');

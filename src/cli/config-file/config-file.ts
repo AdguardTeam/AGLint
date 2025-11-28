@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-import { linterRulesConfigSchema, syntaxArraySchema } from '../../linter/config';
+import { linterRulesConfigSchema, platformsSchema } from '../../linter/config';
 
 export const CONFIG_FILE = 'aglint.config';
 export const RC_CONFIG_FILE = '.aglintrc';
@@ -18,6 +18,11 @@ export const YAML_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_YAML}`;
 export const YML_RC_CONFIG_FILE_NAME = `${RC_CONFIG_FILE}${EXT_YML}`;
 
 export const PACKAGE_JSON = 'package.json';
+
+/**
+ * Preset prefix for built-in presets.
+ */
+export const PRESET_PREFIX = 'aglint:';
 
 /**
  * Possible names of the config file.
@@ -60,9 +65,9 @@ export const linterConfigFileSchema = v.pipe(
                 + 'entries overriding earlier ones. Presets can be referenced with the "aglint:" prefix.',
             ),
         ),
-        syntax: v.pipe(
-            v.optional(syntaxArraySchema),
-            v.description('AdBlock syntax variants to support'),
+        platforms: v.pipe(
+            v.optional(platformsSchema, []),
+            v.description('Supported platforms'),
         ),
         rules: v.pipe(
             v.optional(linterRulesConfigSchema),

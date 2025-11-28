@@ -1,11 +1,7 @@
-import { AdblockSyntax } from '@adguard/agtree/utils';
+import { type LinterConfig } from '../../../src/linter/config';
 
-import { type LinterConfigParsed } from '../../../src/linter/config';
-
-export const commonLinterConfig: Omit<LinterConfigParsed, 'rules'> = {
-    syntax: [
-        AdblockSyntax.Adg,
-    ],
+export const commonLinterConfig: Omit<LinterConfig, 'rules'> = {
+    platforms: [],
     allowInlineConfig: true,
     reportUnusedDisableDirectives: false,
     unusedDisableDirectivesSeverity: 'warn',

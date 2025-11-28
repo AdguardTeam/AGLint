@@ -1,4 +1,4 @@
-import { AdblockSyntax } from '@adguard/agtree';
+import { AdblockSyntax, getAllPlatformNames, PLATFORM_NEGATION } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { linterRuleConfigSchema } from './rule';
@@ -156,6 +156,23 @@ const adblockSyntaxSchema = v.enum(AdblockSyntax);
  */
 export const syntaxArraySchema = v.array(adblockSyntaxSchema);
 
+const platformNames = getAllPlatformNames();
+
+/**
+ * Schema for validating an array of compatibility platforms.
+ */
+export const platformSchema = v.picklist([
+    ...platformNames.specificPlatformNames,
+    ...platformNames.genericPlatformNames,
+    ...platformNames.specificPlatformNames.map((platform) => `${PLATFORM_NEGATION}${platform}`),
+    ...platformNames.genericPlatformNames.map((platform) => `${PLATFORM_NEGATION}${platform}`),
+]);
+
+/**
+ * Schema for validating an array of platforms.
+ */
+export const platformsSchema = v.array(platformSchema);
+
 /**
  * Schema for validating the complete linter configuration.
  */
@@ -172,10 +189,9 @@ export const linterConfigSchema = v.object({
     allowInlineConfig: v.optional(v.boolean(), true),
 
     /**
-     * Array of adblock syntaxes to support.
-     * Defaults to [AdblockSyntax.Common].
+     * Array of compatibility supported platforms.
      */
-    syntax: v.optional(syntaxArraySchema, [AdblockSyntax.Common]),
+    platforms: v.optional(platformsSchema, []),
 
     /**
      * Whether to report unused disable directives as problems.

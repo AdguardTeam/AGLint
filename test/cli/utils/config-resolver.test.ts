@@ -33,7 +33,7 @@ describe('config-resolver', () => {
         await writeFile(
             join(presetsDir, 'recommended.json'),
             JSON.stringify({
-                syntax: ['Common'],
+                platforms: [],
                 rules: {
                     'no-duplicated-modifiers': 'error',
                 },
@@ -43,7 +43,7 @@ describe('config-resolver', () => {
         await writeFile(
             join(presetsDir, 'all.json'),
             JSON.stringify({
-                syntax: ['AdGuard', 'UblockOrigin'],
+                platforms: ['adg_any', 'ubo_any'],
                 rules: {
                     'no-duplicated-modifiers': 'error',
                     'no-invalid-modifiers': 'error',
@@ -55,7 +55,7 @@ describe('config-resolver', () => {
         await writeFile(
             join(testDir, 'simple.json'),
             JSON.stringify({
-                syntax: ['Common'],
+                platforms: [],
                 rules: {
                     'no-duplicated-modifiers': 'warn',
                 },
@@ -66,7 +66,7 @@ describe('config-resolver', () => {
             join(testDir, 'root.json'),
             JSON.stringify({
                 root: true,
-                syntax: ['Common'],
+                platforms: [],
             }),
         );
 
@@ -137,19 +137,19 @@ describe('config-resolver', () => {
         // Create YAML config
         await writeFile(
             join(testDir, 'config.yaml'),
-            'syntax:\n  - Common\nrules:\n  no-duplicated-modifiers: error\n',
+            'platforms: []\nrules:\n  no-duplicated-modifiers: error\n',
         );
 
         await writeFile(
             join(testDir, 'config.yml'),
-            'syntax:\n  - AdGuard\nrules:\n  no-invalid-modifiers: warn\n',
+            'platforms:\n  - adg_any\nrules:\n  no-invalid-modifiers: warn\n',
         );
 
         // Create .aglintrc without extension
         await writeFile(
             join(testDir, '.aglintrc'),
             JSON.stringify({
-                syntax: ['UblockOrigin'],
+                platforms: ['ubo_any'],
             }),
         );
 
@@ -198,7 +198,7 @@ describe('config-resolver', () => {
                 name: 'test-package',
                 version: '1.0.0',
                 aglint: {
-                    syntax: ['Common'],
+                    platforms: [],
                     rules: {
                         'no-duplicated-modifiers': 'error',
                     },
@@ -238,7 +238,7 @@ describe('config-resolver', () => {
                 version: '1.0.0',
                 aglint: {
                     extends: ['aglint:recommended'],
-                    syntax: ['AdGuard'],
+                    platforms: ['adg_any'],
                 },
             }),
         );
@@ -251,7 +251,7 @@ describe('config-resolver', () => {
                 version: '1.0.0',
                 aglint: {
                     root: true,
-                    syntax: ['UblockOrigin'],
+                    platforms: ['ubo_any'],
                 },
             }),
         );
@@ -324,7 +324,7 @@ describe('config-resolver', () => {
                 const resolver = new ConfigResolver(fs, pathAdapter, {
                     presetsRoot: presetsDir,
                     baseConfig: {
-                        syntax: ['Common'],
+                        platforms: [],
                     },
                 });
 
@@ -341,7 +341,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'simple.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
             });
 
@@ -353,7 +353,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'with-extends.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
                 expect(config.rules?.['no-invalid-modifiers']).toBe(LinterRuleSeverity.Error);
             });
@@ -366,7 +366,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'with-preset.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
                 expect(config.rules?.['no-invalid-modifiers']).toBe(LinterRuleSeverity.Warning);
             });
@@ -404,7 +404,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'no-ext-extends.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
             });
 
             test('should cache resolved configs', async () => {
@@ -436,7 +436,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'config.yaml'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
                 // YAML parsed values are transformed by schema, 'error' becomes LinterRuleSeverity.Error (2)
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
             });
@@ -449,7 +449,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'config.yml'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['AdGuard']);
+                expect(config.platforms).toEqual(['adg_any']);
             });
 
             test('should parse .aglintrc without extension', async () => {
@@ -460,7 +460,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, '.aglintrc'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['UblockOrigin']);
+                expect(config.platforms).toEqual(['ubo_any']);
             });
 
             test('should throw InvalidConfigError for invalid JSON', async () => {
@@ -555,14 +555,14 @@ describe('config-resolver', () => {
                 const resolver = new ConfigResolver(fs, pathAdapter, {
                     presetsRoot: presetsDir,
                     baseConfig: {
-                        syntax: ['Base' as any],
+                        platforms: ['Base' as any],
                     },
                 });
 
                 const config = await resolver.resolveChain([]);
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Base']);
+                expect(config.platforms).toEqual(['Base']);
             });
 
             test('should merge config chain from root to closest', async () => {
@@ -575,7 +575,7 @@ describe('config-resolver', () => {
                         path: join(testDir, 'child.json'),
                         directory: testDir,
                         config: {
-                            syntax: ['Child' as any],
+                            platforms: ['Child' as any],
                             rules: {
                                 'child-rule': 'error',
                             },
@@ -586,7 +586,7 @@ describe('config-resolver', () => {
                         path: join(testDir, 'parent.json'),
                         directory: testDir,
                         config: {
-                            syntax: ['Parent' as any],
+                            platforms: ['Parent' as any],
                             rules: {
                                 'parent-rule': 'warn',
                             },
@@ -597,7 +597,7 @@ describe('config-resolver', () => {
 
                 const config = await resolver.resolveChain(chain);
 
-                expect(config.syntax).toEqual(['Parent', 'Child']);
+                expect(config.platforms).toEqual(['Parent', 'Child']);
                 expect(config.rules?.['child-rule']).toBe(LinterRuleSeverity.Error);
                 expect(config.rules?.['parent-rule']).toBe(LinterRuleSeverity.Warning);
             });
@@ -606,7 +606,7 @@ describe('config-resolver', () => {
                 const resolver = new ConfigResolver(fs, pathAdapter, {
                     presetsRoot: presetsDir,
                     baseConfig: {
-                        syntax: ['Base' as any],
+                        platforms: ['Base' as any],
                         rules: {
                             'base-rule': 'off',
                         },
@@ -628,7 +628,7 @@ describe('config-resolver', () => {
 
                 const config = await resolver.resolveChain(chain);
 
-                expect(config.syntax).toEqual(['Base']);
+                expect(config.platforms).toEqual(['Base']);
                 expect(config.rules?.['base-rule']).toBe(LinterRuleSeverity.Off);
                 expect(config.rules?.['override-rule']).toBe(LinterRuleSeverity.Error);
             });
@@ -643,7 +643,7 @@ describe('config-resolver', () => {
                         path: join(testDir, 'single.json'),
                         directory: testDir,
                         config: {
-                            syntax: ['Single' as any],
+                            platforms: ['Single' as any],
                         } as LinterConfig,
                         isRoot: true,
                     },
@@ -651,7 +651,7 @@ describe('config-resolver', () => {
 
                 const config = await resolver.resolveChain(chain);
 
-                expect(config.syntax).toEqual(['Single']);
+                expect(config.platforms).toEqual(['Single']);
             });
 
             test('should override rules correctly in chain', async () => {
@@ -764,7 +764,7 @@ describe('config-resolver', () => {
                 await writeFile(
                     join(testDir, 'empty-rules.json'),
                     JSON.stringify({
-                        syntax: ['Common'],
+                        platforms: [],
                         rules: {},
                     }),
                 );
@@ -783,7 +783,7 @@ describe('config-resolver', () => {
                 await writeFile(
                     join(testDir, 'no-rules.json'),
                     JSON.stringify({
-                        syntax: ['Common'],
+                        platforms: [],
                     }),
                 );
 
@@ -794,7 +794,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'no-rules.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
             });
 
             test('should handle Windows paths', async () => {
@@ -812,7 +812,7 @@ describe('config-resolver', () => {
                     join(testDir, 'empty-extends.json'),
                     JSON.stringify({
                         extends: [],
-                        syntax: ['Common'],
+                        platforms: [],
                     }),
                 );
 
@@ -823,7 +823,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'empty-extends.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
             });
 
             test('should handle deeply nested extends', async () => {
@@ -877,7 +877,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'pkg', 'package.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
             });
 
@@ -899,7 +899,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'pkg-extends', 'package.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common']);
+                expect(config.platforms).toEqual([]);
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Warning);
                 expect(config.rules?.['no-invalid-modifiers']).toBe(LinterRuleSeverity.Warning);
             });
@@ -912,7 +912,7 @@ describe('config-resolver', () => {
                 const config = await resolver.resolve(join(testDir, 'pkg-preset', 'package.json'));
 
                 expect(config).toBeDefined();
-                expect(config.syntax).toEqual(['Common', 'AdGuard']);
+                expect(config.platforms).toEqual(['adg_any']);
                 expect(config.rules?.['no-duplicated-modifiers']).toBe(LinterRuleSeverity.Error);
             });
 
@@ -1152,19 +1152,19 @@ describe('config-resolver', () => {
                 expect(config.rules?.['no-css-comments']).toEqual([2]);
             });
 
-            test('should still concatenate syntax arrays correctly', async () => {
+            test('should still concatenate platforms arrays correctly', async () => {
                 await writeFile(
-                    join(testDir, 'syntax-base.json'),
+                    join(testDir, 'platforms-base.json'),
                     JSON.stringify({
-                        syntax: ['Common'],
+                        platforms: [],
                     }),
                 );
 
                 await writeFile(
-                    join(testDir, 'syntax-override.json'),
+                    join(testDir, 'platforms-override.json'),
                     JSON.stringify({
-                        extends: ['./syntax-base.json'],
-                        syntax: ['AdGuard'],
+                        extends: ['./platforms-base.json'],
+                        platforms: ['adg_any'],
                     }),
                 );
 
@@ -1172,10 +1172,10 @@ describe('config-resolver', () => {
                     presetsRoot: presetsDir,
                 });
 
-                const config = await resolver.resolve(join(testDir, 'syntax-override.json'));
+                const config = await resolver.resolve(join(testDir, 'platforms-override.json'));
 
-                // Syntax arrays should be merged (concatenated with deduplication)
-                expect(config.syntax).toEqual(['Common', 'AdGuard']);
+                // Platforms arrays should be merged (concatenated with deduplication)
+                expect(config.platforms).toEqual(['adg_any']);
             });
 
             test('should handle rule config with off severity', async () => {
@@ -1232,7 +1232,7 @@ describe('config-resolver', () => {
                 await writeFile(
                     join(testDir, 'invalid-schema.json'),
                     JSON.stringify({
-                        syntax: 'not-an-array', // Should be an array
+                        platforms: 'not-an-array', // Should be an array
                     }),
                 );
 
