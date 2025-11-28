@@ -46,6 +46,11 @@ export {
     createVisitorsForAnyNetworkRule,
     createVisitorsForAnyRule,
     createVisitorsForAnyValidRule,
+    createExitVisitorsForAnyCommentRule,
+    createExitVisitorsForAnyCosmeticRule,
+    createExitVisitorsForAnyNetworkRule,
+    createExitVisitorsForAnyRule,
+    createExitVisitorsForAnyValidRule,
 } from './visitor-creator';
 export { type LinterRuleLoader } from './rule-registry/rule-loader';
 export { type LinterFileProps } from './file-props';
