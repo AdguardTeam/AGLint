@@ -52,11 +52,20 @@ If you know ESLint, you'll feel at home with AGLint.
 ## Features
 
 - 🧠 **Built-in rules** — detect syntax errors, invalid domains, CSS issues, and more  
-- 🛠️ **Auto-fixing** — automatically correct common issues  
+- 🛠️ **Auto-fixing and suggestions** — automatically fix issues or get suggestions for manual fixes  
+- 🎯 **Granular fix control** — limit fixes by rule type or specific rules  
 - 🌐 **Multi-syntax support** — AdGuard, uBlock Origin, Adblock Plus, AdBlock  
-- ⚙️ **Flexible configuration** — `.aglintrc` files with inheritance and inline comments  
-- 🚫 **Ignoring** — `.aglintignore` with pattern matching  
-- ⚡ **High performance** — parallel processing and caching  
+- 🎨 **Platform-specific validation** — validate rules for specific adblock products and platforms  
+- ⚙️ **Flexible configuration** — `.aglintrc`, `.aglintrc.json`, `package.json` with inheritance  
+- 💬 **Inline configuration comments** — enable/disable rules directly in filter lists  
+- 🧙 **Interactive setup wizard** — quick config file generation with `--init`  
+- 🚫 **Smart ignoring** — `.aglintignore` with glob patterns and inline disable directives  
+- 🔍 **Unused directive detection** — find and report unnecessary disable comments  
+- ⚡ **High performance** — multi-threaded linting with intelligent caching  
+- 📊 **Multiple output formats** — console and JSON reporters  
+- 🐛 **Debug mode** — comprehensive logging for troubleshooting  
+- 🔧 **Config inspection** — view effective configuration for any file  
+- 🖥️ **Editor integration** — VSCode extension for real-time linting  
 - 💡 **Dual API** — CLI tool and TypeScript/JavaScript library
 
 ## Quick Start

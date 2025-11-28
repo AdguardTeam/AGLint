@@ -7,126 +7,32 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-## [Unreleased]
+## [4.0.0-beta.0] - 2025-11-28
 
 ### Added
 
+- Autofix and Suggestions API. [#200]
+- Debug mode with comprehensive logging. [#199]
 - JSON schema for config files. [#210]
 - Configuration field for compatibility flags. [#230]
-
-### Removed
-
-- `syntax` field from config files.
-
-[Unreleased]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-alpha.8...HEAD
-[#210]: https://github.com/AdguardTeam/AGLint/issues/210
-[#230]: https://github.com/AdguardTeam/AGLint/issues/230
-
-## [4.0.0-alpha.8] - 2025-11-24
-
-### Added
-
-- JSON reporters and `--reporter` CLI option.
-- `LinterConfigCommentType` enum to public exports.
-- `getLinterConfigHash` to public exports.
-- Debugger utilities to public exports.
-
-### Changed
-
-- `FixApplier` class to standalone `applyFixes` function.
-- Improved and simplified debugging.
-- Improved invalid config detection.
-- Freeze ASTs to avoid side effects.
-- Sort file paths alphabetically in reporters.
-- Improved rule documentation handling.
-
-### Fixed
-
-- `changed` method in config resolver.
-- Deep merging for rule config array.
-
-### Removed
-
-- `getAglintRuleDocumentationUrl` from public exports.
-
-[4.0.0-alpha.8]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-alpha.7...v4.0.0-alpha.8
-
-
-## [4.0.0-alpha.7] - 2025-11-19
-
-### Added
-
-- `hasErrors`, `assertLinterFixCommand`, `assertLinterSuggestions`,
-  `isLinterFixCommand`, `isLinterSuggestions` helpers.
-
-[4.0.0-alpha.7]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-alpha.6...v4.0.0-alpha.7
-
-## [4.0.0-alpha.6] - 2025-11-19
-
-### Added
-
-- Ability to print config for a file. [#158]
-- `no-css-comments` linter rule. [#235]
-- Debug mode with comprehensive logging. [#199]
-- Support for `package.json` configuration file. [#245]
-
-[4.0.0-alpha.6]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-alpha.5...v4.0.0-alpha.6
-[#158]: https://github.com/AdguardTeam/AGLint/issues/158
-[#235]: https://github.com/AdguardTeam/AGLint/issues/235
-[#199]: https://github.com/AdguardTeam/AGLint/issues/199
-[#245]: https://github.com/AdguardTeam/AGLint/issues/245
-
-## [4.0.0-alpha.5] - 2025-11-03
-
-### Added
-
-- More exports.
-
-## [4.0.0-alpha.4] - 2025-11-03
-
-### Added
-
-- Support for NodeNext ESM resolution in `.d.ts` files.
-
-## [4.0.0-alpha.3] - 2025-11-03
-
-### Changed
-
-- Renamed CLI entry point file for clarity.
-
-### Fixed
-
-- Build config.
-
-## [4.0.0-alpha.2] - 2025-11-03
-
-### Changed
-
-- Split exports into `@adguard/aglint/linter` and `@adguard/aglint/cli`.
-
-## [4.0.0-alpha.1] - 2025-10-31
-
-### Fixed
-
-- Preset files are now included in the tarball.
-
-## [4.0.0-alpha.0] - 2025-10-31
-
-### Added
-
-- Support for multi-threaded linting. [#208]
-- Autofix and Suggestions API. [#200]
-- Possibility to detect unused disable comments. [#197]
 - Cache for previous linting results. [#188]
+- Ability to print config for a file. [#158]
+- Support for `package.json` configuration file. [#245]
+- Support for multi-threaded linting. [#208]
+- Possibility to detect unused disable comments. [#197]
+- Full-fledged config file creation wizard. [#119]
+- `no-css-comments` linter rule. [#235]
 - `scriptlet-quotes` linter rule. [#258]
 - `no-duplicated-css-declaration-props` linter rule. [#234]
 - `no-unsupported-css-pseudo-class` linter rule. [#205]
+- JSON reporters.
 
 ### Changed
 
 - Linter core and CLI are completely rewritten, API is changed.
 - Library exports are completely changed because of the new API.
 - Minimum Node.js version is `v20`.
+- Split exports into `@adguard/aglint/linter` and `@adguard/aglint/cli`.
 - Implemented more performant walking. [#241]
 - Improved rule management via rules registry. [#217]
 - Linter rules are renamed, now they have consistent names. [#231]
@@ -134,20 +40,36 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 - Replaced `superstruct` with `valibot`. [#218]
 - Moved rule documentations to the `docs/rules` directory. [#72]
 
-[4.0.0-alpha.0]: https://github.com/AdguardTeam/AGLint/compare/v3.0.0...v4.0.0-alpha.0
+### Fixed
+
+- CLI hint marked as invalid. [#261]
+
+### Removed
+
+- `syntax` field from config files, `platforms` should be used instead.
+
+[4.0.0-beta.0]: https://github.com/AdguardTeam/AGLint/compare/v3.0.0...v4.0.0-beta.0
 [#72]: https://github.com/AdguardTeam/AGLint/issues/72
+[#119]: https://github.com/AdguardTeam/AGLint/issues/119
+[#158]: https://github.com/AdguardTeam/AGLint/issues/158
 [#188]: https://github.com/AdguardTeam/AGLint/issues/188
 [#197]: https://github.com/AdguardTeam/AGLint/issues/197
 [#198]: https://github.com/AdguardTeam/AGLint/issues/198
+[#199]: https://github.com/AdguardTeam/AGLint/issues/199
 [#200]: https://github.com/AdguardTeam/AGLint/issues/200
 [#205]: https://github.com/AdguardTeam/AGLint/issues/205
 [#208]: https://github.com/AdguardTeam/AGLint/issues/208
+[#210]: https://github.com/AdguardTeam/AGLint/issues/210
 [#217]: https://github.com/AdguardTeam/AGLint/issues/217
 [#218]: https://github.com/AdguardTeam/AGLint/issues/218
+[#230]: https://github.com/AdguardTeam/AGLint/issues/230
 [#231]: https://github.com/AdguardTeam/AGLint/issues/231
 [#234]: https://github.com/AdguardTeam/AGLint/issues/234
+[#235]: https://github.com/AdguardTeam/AGLint/issues/235
 [#241]: https://github.com/AdguardTeam/AGLint/issues/241
+[#245]: https://github.com/AdguardTeam/AGLint/issues/245
 [#258]: https://github.com/AdguardTeam/AGLint/issues/258
+[#261]: https://github.com/AdguardTeam/AGLint/issues/261
 
 ## [3.0.0] - 2025-05-21
 
