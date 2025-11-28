@@ -5,6 +5,8 @@ import { LinterRuleSeverity } from '../rule';
 
 import { type DisableComment } from './inline-config';
 
+export const UNUSED_DISABLE_DIRECTIVE_RULE_ID = 'unused-disable-directive';
+
 /**
  * Converts unused disable directives to linter problems.
  *
@@ -31,7 +33,7 @@ function convertUnusedDirectivesToProblems(
         }
 
         return {
-            ruleId: 'unused-disable-directive',
+            ruleId: UNUSED_DISABLE_DIRECTIVE_RULE_ID,
             message,
             severity: ruleSeverity,
             position: directive.position,

@@ -1,6 +1,6 @@
 {
     "name": "@adguard/aglint",
-    "version": "4.0.0-beta.0",
+    "version": "4.0.0-beta.1",
     "description": "Linter for adblock filter lists.",
     "keywords": [
         "adblock",

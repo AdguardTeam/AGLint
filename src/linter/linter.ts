@@ -8,7 +8,7 @@ import { createLinterRuntime } from './core/runtime';
 import { type LinterFileProps } from './file-props';
 import { linterProblemSchema } from './linter-problem';
 import { createConfigCommentVisitor } from './phase/inline-config';
-import { applyDisableDirectives, summarize } from './phase/postprocess';
+import { applyDisableDirectives, summarize, UNUSED_DISABLE_DIRECTIVE_RULE_ID } from './phase/postprocess';
 import { runWalk } from './phase/walk';
 import { linterRuleMetaSerializableSchema } from './rule';
 import { type LinterRuleLoader } from './rule-registry/rule-loader';
@@ -216,7 +216,7 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
 
         // iterate over problems and add metadata for each rule
         for (const problem of runtime.problems) {
-            if (!problem.ruleId) {
+            if (!problem.ruleId || problem.ruleId === UNUSED_DISABLE_DIRECTIVE_RULE_ID) {
                 continue;
             }
 
