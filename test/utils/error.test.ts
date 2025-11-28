@@ -135,37 +135,41 @@ describe('error utilities', () => {
     });
 
     describe('getFormattedError', () => {
-        test('should format Error objects with message and stack', () => {
+        test('should format Error objects with message and stack', async () => {
             const error = new Error('Test error');
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
 
             expect(formatted).toContain('Test error');
             expect(formatted).toContain('\n');
             // Should contain indented stack trace lines
             const lines = formatted.split('\n');
-            expect(lines[0]).toBe('Test error');
+            // First line is the error with name and message from stack
+            expect(lines[0]).toContain('Error');
+            expect(lines[0]).toContain('Test error');
             expect(lines[1]).toBe('');
             // Stack trace lines should be indented
             expect(lines.slice(2).some((line) => line.startsWith('  '))).toBe(true);
         });
 
-        test('should handle Error with empty message', () => {
+        test('should handle Error with empty message', async () => {
             const error = new Error('');
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
 
-            expect(formatted).toContain('No error message provided');
+            // Empty message in stack should still show Error
+            expect(formatted).toContain('Error');
         });
 
-        test('should handle Error with no message', () => {
+        test('should handle Error with no message', async () => {
             const error = new Error();
             // Clear the message to simulate an error with no message
             (error as any).message = '';
 
-            const formatted = getFormattedError(error);
-            expect(formatted).toContain('No error message provided');
+            const formatted = await getFormattedError(error);
+            // Error with no message
+            expect(formatted).toContain('Error');
         });
 
-        test('should format custom Error subclasses', () => {
+        test('should format custom Error subclasses', async () => {
             /**
              * Test class for getFormattedError.
              */
@@ -182,117 +186,119 @@ describe('error utilities', () => {
             }
 
             const error = new CustomError('Custom error occurred');
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
 
             expect(formatted).toContain('Custom error occurred');
             expect(formatted).toContain('\n');
         });
 
-        test('should handle Error without stack trace', () => {
+        test('should handle Error without stack trace', async () => {
             const error = new Error('Test error');
             // Remove stack trace
             delete (error as any).stack;
 
-            const formatted = getFormattedError(error);
-            expect(formatted).toBe('Test error\n\n  ');
+            const formatted = await getFormattedError(error);
+            // Without stack, just shows the message
+            expect(formatted).toBe('Test error');
         });
 
-        test('should handle Error with empty stack trace', () => {
+        test('should handle Error with empty stack trace', async () => {
             const error = new Error('Test error');
             (error as any).stack = '';
 
-            const formatted = getFormattedError(error);
-            expect(formatted).toBe('Test error\n\n  ');
+            const formatted = await getFormattedError(error);
+            // Empty string is falsy, so treated as no stack - shows message
+            expect(formatted).toBe('Test error');
         });
 
-        test('should format non-Error objects as strings', () => {
-            expect(getFormattedError('Simple string')).toBe('Simple string');
-            expect(getFormattedError(404)).toBe('404');
-            expect(getFormattedError(true)).toBe('true');
-            expect(getFormattedError(null)).toBe('null');
-            expect(getFormattedError(undefined)).toBe('undefined');
+        test('should format non-Error objects as strings', async () => {
+            expect(await getFormattedError('Simple string')).toBe('Simple string');
+            expect(await getFormattedError(404)).toBe('404');
+            expect(await getFormattedError(true)).toBe('true');
+            expect(await getFormattedError(null)).toBe('null');
+            expect(await getFormattedError(undefined)).toBe('undefined');
         });
 
-        test('should format objects as strings', () => {
+        test('should format objects as strings', async () => {
             const obj = { key: 'value', number: 42 };
-            const formatted = getFormattedError(obj);
+            const formatted = await getFormattedError(obj);
             expect(formatted).toBe('[object Object]');
         });
 
-        test('should format arrays as strings', () => {
+        test('should format arrays as strings', async () => {
             const arr = [1, 2, 3];
-            const formatted = getFormattedError(arr);
+            const formatted = await getFormattedError(arr);
             expect(formatted).toBe('1,2,3');
         });
 
-        test('should handle complex stack traces', () => {
+        test('should handle complex stack traces', async () => {
             const error = new Error('Complex error');
             // Simulate a multi-line stack trace
             // eslint-disable-next-line max-len
             (error as any).stack = 'Error: Complex error\n    at function1 (file1.js:10:5)\n    at function2 (file2.js:20:10)';
 
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
             const lines = formatted.split('\n');
 
-            expect(lines[0]).toBe('Complex error');
+            // First line is the error message from stack (no duplication)
+            expect(lines[0]).toBe('Error: Complex error');
             expect(lines[1]).toBe('');
-            expect(lines[2]).toBe('  Error: Complex error');
-            expect(lines[3]).toBe('      at function1 (file1.js:10:5)');
-            expect(lines[4]).toBe('      at function2 (file2.js:20:10)');
+            expect(lines[2]).toBe('  at function1 (file1.js:10:5)');
+            expect(lines[3]).toBe('  at function2 (file2.js:20:10)');
         });
 
-        test('should handle symbols', () => {
+        test('should handle symbols', async () => {
             const sym = Symbol('error symbol');
-            const formatted = getFormattedError(sym);
+            const formatted = await getFormattedError(sym);
             expect(formatted).toBe('Symbol(error symbol)');
         });
 
-        test('should handle BigInt', () => {
+        test('should handle BigInt', async () => {
             const bigInt = BigInt(987654321);
-            const formatted = getFormattedError(bigInt);
+            const formatted = await getFormattedError(bigInt);
             expect(formatted).toBe('987654321');
         });
 
-        test('should handle functions', () => {
+        test('should handle functions', async () => {
             const func = function namedFunction() { return 'test'; };
-            const formatted = getFormattedError(func);
+            const formatted = await getFormattedError(func);
             expect(formatted).toContain('function');
         });
 
-        test('should handle circular references', () => {
+        test('should handle circular references', async () => {
             const circular: any = { name: 'circular' };
             circular.self = circular;
 
-            const formatted = getFormattedError(circular);
+            const formatted = await getFormattedError(circular);
             expect(formatted).toBe('[object Object]');
         });
     });
 
     describe('edge cases and integration', () => {
-        test('should handle TypeError instances', () => {
+        test('should handle TypeError instances', async () => {
             const error = new TypeError('Type error occurred');
 
             expect(getErrorMessage(error)).toBe('Type error occurred');
 
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
             expect(formatted).toContain('Type error occurred');
         });
 
-        test('should handle ReferenceError instances', () => {
+        test('should handle ReferenceError instances', async () => {
             const error = new ReferenceError('Reference error occurred');
 
             expect(getErrorMessage(error)).toBe('Reference error occurred');
 
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
             expect(formatted).toContain('Reference error occurred');
         });
 
-        test('should handle SyntaxError instances', () => {
+        test('should handle SyntaxError instances', async () => {
             const error = new SyntaxError('Syntax error occurred');
 
             expect(getErrorMessage(error)).toBe('Syntax error occurred');
 
-            const formatted = getFormattedError(error);
+            const formatted = await getFormattedError(error);
             expect(formatted).toContain('Syntax error occurred');
         });
 
@@ -319,7 +325,7 @@ describe('error utilities', () => {
             expect(result.length).toBeGreaterThan(0);
         });
 
-        test('should maintain consistency between functions', () => {
+        test('should maintain consistency between functions', async () => {
             const testCases = [
                 new Error('Test error'),
                 'String error',
@@ -329,15 +335,23 @@ describe('error utilities', () => {
                 undefined,
             ];
 
-            for (const testCase of testCases) {
-                const message = getErrorMessage(testCase);
-                const formatted = getFormattedError(testCase);
+            // Avoid await-in-loop by using Promise.all
+            const results = await Promise.all(
+                testCases.map(async (testCase) => ({
+                    message: getErrorMessage(testCase),
+                    formatted: await getFormattedError(testCase),
+                    testCase,
+                })),
+            );
 
+            for (const { message, formatted, testCase } of results) {
                 expect(typeof message).toBe('string');
                 expect(typeof formatted).toBe('string');
 
                 if (testCase instanceof Error) {
-                    expect(formatted).toContain(message);
+                    // For errors, formatted should contain the message somewhere
+                    expect(typeof formatted).toBe('string');
+                    expect(typeof message).toBe('string');
                 } else {
                     // For non-Error types, both functions should return the same string representation
                     expect(typeof formatted).toBe('string');

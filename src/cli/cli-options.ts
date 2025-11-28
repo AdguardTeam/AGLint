@@ -53,8 +53,9 @@ export type LinterCliConfig = {
 
     /**
      * Whether to enable colored output.
+     * If undefined, colors will be auto-detected based on TTY.
      */
-    color: boolean;
+    color?: boolean;
 
     /**
      * Whether to allow inline configuration comments.

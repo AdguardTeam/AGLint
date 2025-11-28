@@ -50,18 +50,24 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * 8. Reports results and exits with appropriate code.
  */
 const main = async () => {
+    let options: LinterCliConfig | undefined;
+
     try {
         const cwd = process.cwd();
         const program = buildCliProgram();
 
         program.parse(process.argv);
 
-        const options = program.opts() as LinterCliConfig;
+        options = program.opts() as LinterCliConfig;
+
+        // Auto-detect TTY for color output if not explicitly set
+        // Default to true if stdout is a TTY (terminal), false otherwise (e.g., piped output)
+        const useColors = options.color ?? (process.stdout.isTTY ?? false);
 
         // Initialize debug logger
         const debug = new Debug({
             enabled: options.debug || false,
-            colors: options.color ?? true,
+            colors: useColors,
             colorFormatter: chalkColorFormatter,
         });
         const cliDebug = debug.module('cli');
@@ -149,7 +155,7 @@ const main = async () => {
             const config = await tree.getResolvedConfig(file);
 
             console.log(inspect(config, {
-                colors: options.color,
+                colors: useColors,
                 depth: Infinity,
             }));
             return;
@@ -180,7 +186,7 @@ const main = async () => {
         if (options.reporter === 'json' || options.reporter === 'json-with-metadata') {
             reporter = new LinterJsonReporter();
         } else {
-            reporter = new LinterConsoleReporter(options.color);
+            reporter = new LinterConsoleReporter(useColors);
         }
 
         cliDebug.log(`Reporter initialized: ${options.reporter}`);
@@ -248,7 +254,9 @@ const main = async () => {
             '',
         ].join('\n');
 
-        console.error(prefix + getFormattedError(error));
+        // Use color option if available, otherwise auto-detect TTY
+        const useColors = options?.color ?? (process.stderr.isTTY ?? false);
+        console.error(prefix + await getFormattedError(error, { colors: useColors }));
 
         process.exit(2);
     }

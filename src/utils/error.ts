@@ -54,25 +54,77 @@ export function getErrorMessage(error: unknown): string {
  * Formats error to the string.
  *
  * @param error Error to format.
+ * @param options Options for formatting.
+ * @param options.colors Whether to include colors in the output.
  *
  * @returns Formatted error.
  */
-export function getFormattedError(error: unknown): string {
+export async function getFormattedError(
+    error: unknown,
+    options: { colors?: boolean } = {},
+): Promise<string> {
+    const { colors = false } = options;
+
+    // Dynamically import chalk to avoid issues with ESM
+    const chalk = colors ? (await import('chalk')).default : undefined;
+
     const lines: string[] = [];
 
     if (error instanceof Error) {
-        const { message, stack } = error;
+        const { name, message, stack } = error;
 
-        lines.push(message || 'No error message provided');
-        lines.push('');
+        if (stack) {
+            // Parse stack trace to avoid duplicating the message
+            const stackLines = stack.split('\n');
 
-        // Very basic stack trace formatting
-        lines.push(
-            ...(stack || '').split('\n').map((line) => `  ${line}`),
-        );
+            // First line usually contains the error name and message
+            const firstLine = stackLines[0] ?? 'Unknown error';
+            if (colors && chalk) {
+                lines.push(chalk.red.bold(firstLine));
+            } else {
+                lines.push(firstLine);
+            }
+
+            // Add stack trace lines (skip the first line as it's already added)
+            const traceLines = stackLines.slice(1).filter((traceLine) => traceLine.trim());
+            if (traceLines.length > 0) {
+                lines.push('');
+                for (const traceLine of traceLines) {
+                    const trimmed = traceLine.trim();
+                    if (colors && chalk) {
+                        // Highlight file paths and line numbers
+                        const formatted = trimmed.replace(
+                            /\((.+):(\d+):(\d+)\)/g,
+                            (_, file, lineNum, colNum) => {
+                                const fileColored = chalk.cyan(file);
+                                const lineColored = chalk.yellow(lineNum);
+                                const colColored = chalk.yellow(colNum);
+                                return chalk.gray(`(${fileColored}:${lineColored}:${colColored})`);
+                            },
+                        );
+                        lines.push(chalk.gray(`  ${formatted}`));
+                    } else {
+                        lines.push(`  ${trimmed}`);
+                    }
+                }
+            }
+        } else {
+            // No stack trace, format name and message manually
+            const errorTitle = name && name !== 'Error' ? `${name}: ${message}` : message;
+            if (colors && chalk) {
+                lines.push(chalk.red.bold(errorTitle || 'No error message provided'));
+            } else {
+                lines.push(errorTitle || 'No error message provided');
+            }
+        }
     } else {
         // Convert any unknown error to string
-        lines.push(String(error));
+        const errorString = String(error);
+        if (colors && chalk) {
+            lines.push(chalk.red(errorString));
+        } else {
+            lines.push(errorString);
+        }
     }
 
     return lines.join('\n');
