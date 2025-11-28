@@ -7,10 +7,6 @@ import { type LinterFixCommand, type LinterFixGenerator } from './source-code/fi
 import { type LinterOffsetRange, type LinterPositionRange, type LinterSourceCode } from './source-code/source-code';
 import { type Visitor } from './source-code/visitor-collection';
 
-/* =========================
- * Severity
- * ========================= */
-
 /**
  * Represents the severity of a linter rule.
  */
@@ -31,6 +27,9 @@ export enum LinterRuleSeverity {
     Error,
 }
 
+/**
+ * Mapping from text severity strings to enum values.
+ */
 const linterRuleSeverityMap = {
     off: LinterRuleSeverity.Off,
     warn: LinterRuleSeverity.Warning,
@@ -42,16 +41,25 @@ const linterRuleSeverityMap = {
  */
 type LinterRuleTextSeverity = keyof typeof linterRuleSeverityMap;
 
+/**
+ * Schema for numeric severity values.
+ */
 const linterRuleNumberSeveritySchema = v.pipe(
     v.enum(LinterRuleSeverity),
     v.description('Rule severity as numeric value'),
 );
 
+/**
+ * Schema for text-based severity values.
+ */
 const linterRuleTextSeveritySchema = v.pipe(
     v.picklist(Object.keys(linterRuleSeverityMap) as [LinterRuleTextSeverity, ...LinterRuleTextSeverity[]]),
     v.description('Rule severity as string'),
 );
 
+/**
+ * Schema accepting either numeric or text severity values.
+ */
 const linterRuleSeveritySchema = v.pipe(
     v.union([
         linterRuleNumberSeveritySchema,
@@ -78,11 +86,12 @@ export const linterRuleConfigSchema = v.pipe(
 
 /**
  * Type representing a rule configuration value.
+ * Inferred from the schema to avoid duplication.
  */
 export type LinterRuleConfig = v.InferOutput<typeof linterRuleConfigSchema>;
 
 /**
- * Reverse mapping from enum to text severity.
+ * Reverse mapping from severity enum values to text representation.
  */
 const linterRuleSeverityToTextMap: Record<LinterRuleSeverity, LinterRuleTextSeverity> = {
     [LinterRuleSeverity.Off]: 'off',
@@ -118,14 +127,19 @@ export function severityToText(severity: LinterRuleSeverity): LinterRuleTextSeve
     return linterRuleSeverityToTextMap[severity];
 }
 
-/* =========================
- * Config schema helpers (Valibot → TS types)
- * ========================= */
-
-type TupleOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
+/**
+ * Type alias for tuple schemas used in rule configuration.
+ * Provides better type safety and IDE support.
+ */
+export type TupleOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
   v.TupleSchema<Elements, undefined>;
 
-export type { TupleOf };
+/**
+ * Type alias for extracting the output type from a configuration tuple.
+ * Uses Valibot's InferOutput to derive the type automatically.
+ */
+export type ConfigOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
+  v.InferOutput<TupleOf<Elements>>;
 
 /**
  * Helper to define a configuration schema tuple.
@@ -138,7 +152,7 @@ export const defineConfigSchema = <
     const Elements extends readonly v.BaseSchema<any, any, any>[],
 >(
     ...els: Elements
-) => v.tuple(els) as TupleOf<Elements>;
+): TupleOf<Elements> => v.tuple(els) as TupleOf<Elements>;
 
 /**
  * Default empty tuple schema for rules without configuration.
@@ -147,17 +161,9 @@ export const DEFAULT_TUPLE_SCHEMA: TupleOf<[]> = v.tuple([]);
 
 /**
  * Base configuration type for rules.
+ * Inferred from default tuple schema to avoid duplication.
  */
-export type LinterRuleBaseConfig = v.InferInput<typeof DEFAULT_TUPLE_SCHEMA>;
-
-type ConfigOf<Elements extends readonly v.BaseSchema<any, any, any>[]> =
-  v.InferOutput<TupleOf<Elements>>;
-
-export type { ConfigOf };
-
-/* =========================
- * Rule types / metadata
- * ========================= */
+export type LinterRuleBaseConfig = v.InferOutput<typeof DEFAULT_TUPLE_SCHEMA>;
 
 /**
  * Categories of linter rules.
@@ -179,10 +185,13 @@ export enum LinterRuleType {
     Layout = 'layout',
 }
 
+/**
+ * Schema for validating rule type values.
+ */
 const linterRuleTypeSchema = v.enum(LinterRuleType);
 
 /**
- * Schema for rule example config (config parameters without severity).
+ * Schema for rule example configuration (config parameters without severity).
  */
 const linterRuleExampleConfigSchema = v.optional(v.array(v.any()));
 
@@ -209,11 +218,12 @@ export const linterRuleExampleSchema = v.object({
 
 /**
  * Type representing a rule example.
+ * Inferred from schema to avoid duplication.
  */
 export type LinterRuleExample = v.InferOutput<typeof linterRuleExampleSchema>;
 
 /**
- * Represents the documentation of a linter rule.
+ * Schema representing the documentation of a linter rule.
  */
 export const linterRuleDocsSchema = v.object({
     /**
@@ -246,7 +256,12 @@ export const linterRuleDocsSchema = v.object({
      */
     whenNotToUseIt: v.optional(v.string()),
 });
-type LinterRuleDocs = v.InferOutput<typeof linterRuleDocsSchema>;
+
+/**
+ * Type representing the documentation of a linter rule.
+ * Inferred from schema to avoid duplication.
+ */
+export type LinterRuleDocs = v.InferOutput<typeof linterRuleDocsSchema>;
 
 /**
  * Schema for rule message templates.
@@ -255,13 +270,15 @@ export const linterRuleMessagesSchema = v.record(v.string(), v.string());
 
 /**
  * Type for rule message templates mapping message IDs to template strings.
+ * Inferred from schema to avoid duplication.
  */
 export type LinterRuleMessages = v.InferOutput<typeof linterRuleMessagesSchema>;
 
 /**
- * Schema for validating rule metadata.
+ * Base schema containing common metadata fields shared between runtime and serializable versions.
+ * This schema is used as a foundation for both `linterRuleMetaSchema` and `linterRuleMetaSerializableSchema`.
  */
-export const linterRuleMetaSchema = v.object({
+const linterRuleMetaBaseSchema = v.object({
     /**
      * The type of the rule.
      */
@@ -299,14 +316,8 @@ export const linterRuleMetaSchema = v.object({
 
     /**
      * The configuration schema of the rule.
-     * No need to define it here, as it is runtime-attached in defineRule.
      */
     configSchema: v.optional(v.any()),
-
-    /**
-     * Default configuration for the rule.
-     */
-    defaultConfig: v.optional(v.any()),
 
     /**
      * The linter version in which this rule was added.
@@ -314,64 +325,38 @@ export const linterRuleMetaSchema = v.object({
     version: v.optional(v.string()),
 });
 
+/**
+ * Schema for validating rule metadata.
+ * Extends base schema with runtime-only fields.
+ */
+export const linterRuleMetaSchema = v.object({
+    ...linterRuleMetaBaseSchema.entries,
+
+    /**
+     * Default configuration for the rule.
+     * This field is runtime-only and excluded from serializable schema.
+     */
+    defaultConfig: v.optional(v.any()),
+});
+
+/**
+ * Type representing rule metadata.
+ * Inferred from schema to avoid duplication.
+ */
 export type LinterRuleMeta = v.InferOutput<typeof linterRuleMetaSchema>;
 
 /**
  * Schema for validating JSON-serializable rule metadata.
- * The configSchema is serialized to JSON Schema format, and defaultConfig is excluded.
+ * Uses the same base schema but excludes runtime-only fields (defaultConfig).
+ * The configSchema is serialized to JSON Schema format.
  */
-export const linterRuleMetaSerializableSchema = v.object({
-    /**
-     * The type of the rule.
-     */
-    type: linterRuleTypeSchema,
+export const linterRuleMetaSerializableSchema = linterRuleMetaBaseSchema;
 
-    /**
-     * The documentation of the rule.
-     */
-    docs: linterRuleDocsSchema,
-
-    /**
-     * Examples of incorrect code for the rule.
-     */
-    incorrectExamples: v.optional(v.array(linterRuleExampleSchema)),
-
-    /**
-     * Examples of correct code for the rule.
-     */
-    correctExamples: v.optional(v.array(linterRuleExampleSchema)),
-
-    /**
-     * Whether the rule has suggestions.
-     */
-    hasSuggestions: v.optional(v.boolean()),
-
-    /**
-     * Whether the rule has a fix.
-     */
-    hasFix: v.optional(v.boolean()),
-
-    /**
-     * The messages of the rule.
-     */
-    messages: v.optional(linterRuleMessagesSchema),
-
-    /**
-     * The configuration schema in JSON Schema format (serialized from Valibot schema).
-     */
-    configSchema: v.optional(v.any()),
-
-    /**
-     * The linter version in which this rule was added.
-     */
-    version: v.optional(v.string()),
-});
-
+/**
+ * Type representing JSON-serializable rule metadata.
+ * Inferred from schema to avoid duplication.
+ */
 export type LinterRuleMetaSerializable = v.InferOutput<typeof linterRuleMetaSerializableSchema>;
-
-/* =========================
- * Message typing (messages → messageId keys)
- * ========================= */
 
 /**
  * Schema for message template data.
@@ -380,12 +365,19 @@ export const linterMessageDataSchema = v.record(v.string(), v.unknown());
 
 /**
  * Type for data passed to message templates.
+ * Inferred from schema to avoid duplication.
  */
 export type LinterMessageData = v.InferOutput<typeof linterMessageDataSchema>;
 
+/**
+ * Helper type to extract message ID keys from a message record type.
+ */
 type MessageIdOf<Msgs> =
   Msgs extends Record<infer K extends string, string> ? K : never;
 
+/**
+ * Helper type for objects that can have either a direct message string or a messageId with optional data.
+ */
 type WithRuleMessages<Msgs, T extends {} = {}> =
   | (T & { message: string; messageId?: never; data?: never })
   | (T & { message?: never; messageId: MessageIdOf<Msgs>; data?: LinterMessageData });
@@ -395,12 +387,14 @@ type WithRuleMessages<Msgs, T extends {} = {}> =
  */
 export type WithMessages<T extends {} = {}> = WithRuleMessages<Record<string, string>, T>;
 
-/* =========================
- * Report / Suggestion / Fix types
- * ========================= */
-
+/**
+ * Function type for creating fix commands.
+ */
 type FixerFunction = (fixer: LinterFixGenerator) => LinterFixCommand | null;
 
+/**
+ * Base type for suggestion objects.
+ */
 type SuggestionBase = { fix: FixerFunction };
 
 /**
@@ -408,6 +402,9 @@ type SuggestionBase = { fix: FixerFunction };
  */
 export type Suggestion<Msgs = Record<string, string>> = WithRuleMessages<Msgs, SuggestionBase>;
 
+/**
+ * Type defining fix and suggestion fields for problem reports.
+ */
 type LinterProblemReportFixes<Msgs> = {
     /**
      * Fix for the problem.
@@ -428,6 +425,10 @@ type LinterProblemReportFixes<Msgs> = {
     suggest?: Suggestion<Msgs>[];
 };
 
+/**
+ * Type defining position information for problem reports.
+ * Can specify either node, position, or both.
+ */
 type LinterProblemReportPositions =
   | { node: any; position?: LinterPositionRange }
   | { node?: any; position: LinterPositionRange }
@@ -438,10 +439,6 @@ type LinterProblemReportPositions =
  */
 export type LinterProblemReport<Msgs = Record<string, string>> =
   WithRuleMessages<Msgs, LinterProblemReportFixes<Msgs> & LinterProblemReportPositions>;
-
-/* =========================
- * Rule context / visitors
- * ========================= */
 
 /**
  * Base context available to all rules.
@@ -473,36 +470,29 @@ export type LinterRuleContext<
  */
 export type LinterRuleVisitors = { [selector: string]: Visitor };
 
+/**
+ * Function type for creating rule visitor functions.
+ */
 type LinterRuleCreatorFunction<
     Elements extends readonly v.BaseSchema<any, any, any>[] = [],
     Msgs extends Record<string, string> = Record<string, string>,
 > = (context: LinterRuleContext<Elements, Msgs>) => LinterRuleVisitors;
 
 /**
- * Interface representing a complete linter rule.
+ * Type representing a complete linter rule.
+ * Inherits base structure from LinterRuleMeta and overrides generic fields.
  */
-export interface LinterRule<
+export type LinterRule<
     Elements extends readonly v.BaseSchema<any, any, any>[] = [],
     Msgs extends Record<string, string> = Record<string, string>,
-> {
-    meta: {
-        type: LinterRuleType;
-        docs: LinterRuleDocs;
-        hasSuggestions?: boolean;
-        hasFix?: boolean;
+> = {
+    meta: Omit<LinterRuleMeta, 'messages' | 'configSchema' | 'defaultConfig'> & {
         messages?: Msgs;
         configSchema?: TupleOf<Elements>;
         defaultConfig?: ConfigOf<Elements>;
-        correctExamples?: LinterRuleExample[];
-        incorrectExamples?: LinterRuleExample[];
-        version?: string;
     };
     create: LinterRuleCreatorFunction<Elements, Msgs>;
-}
-
-/* =========================
- * defineRule (overloads keep DX nice)
- * ========================= */
+};
 
 export function defineRule<
     const Elements extends readonly v.BaseSchema<any, any, any>[],
@@ -544,11 +534,6 @@ export function defineRule(rule: any): any {
         },
     };
 }
-
-/* =========================
- * (Optional) runtime schema for whole rule shape
- * – useful if you want to validate dynamic rule modules.
- * ========================= */
 
 /**
  * Runtime schema for validating dynamically loaded rule modules.
