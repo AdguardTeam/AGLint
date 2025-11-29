@@ -1,5 +1,6 @@
 import isGlob from 'is-glob';
 
+import { SUPPORTED_FILE_EXTENSIONS } from '../../constants';
 import { type FileSystemAdapter } from '../fs-adapter';
 import { type PathAdapter } from '../path-adapter';
 
@@ -90,8 +91,9 @@ export async function matchPatterns(
                     expandedPatterns.push(absPath);
                     patternMap.set(pattern, []);
                 } else if (stats.isDirectory) {
-                    // Directory - expand to glob pattern
-                    const dirGlob = `${absPath.replace(/\/+$/, '')}/**/*`;
+                    // Directory - expand to glob pattern with supported file extensions
+                    const extensions = Array.from(SUPPORTED_FILE_EXTENSIONS).map((e) => e.slice(1)).join(',');
+                    const dirGlob = `${absPath.replace(/\/+$/, '')}/**/*.{${extensions}}`;
                     if (debug) {
                         debug.log(`Pattern "${pattern}" is a directory, expanding to: ${dirGlob}`);
                     }

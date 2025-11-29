@@ -36,6 +36,8 @@ describe('pattern-matcher', () => {
         await writeFile(join(testDir, 'src', 'index.ts'), 'typescript');
         await writeFile(join(testDir, 'src', 'utils.ts'), 'utils');
         await writeFile(join(testDir, 'src', 'test.js'), 'test');
+        await writeFile(join(testDir, 'src', 'filter.txt'), 'filter');
+        await writeFile(join(testDir, 'src', 'rules.adblock'), 'rules');
 
         await mkdir(join(testDir, 'docs'), { recursive: true });
         await writeFile(join(testDir, 'docs', 'readme.md'), 'readme');
@@ -143,7 +145,7 @@ describe('pattern-matcher', () => {
     });
 
     describe('matchPatterns - directory patterns', () => {
-        test('should expand directory to all files', async () => {
+        test('should expand directory to files with supported extensions', async () => {
             const result = await matchPatterns(
                 ['src'],
                 fs,
@@ -151,9 +153,14 @@ describe('pattern-matcher', () => {
                 { cwd: testDir },
             );
 
-            expect(result.files.length).toBeGreaterThan(0);
+            // Should only match .txt and .adblock files, not .ts or .js files
+            expect(result.files.length).toBe(2);
             expect(result.files.every((f) => f.includes('/src/'))).toBe(true);
-            expect(result.patternMap.get('src')?.length).toBeGreaterThan(0);
+            expect(result.files.some((f) => f.endsWith('filter.txt'))).toBe(true);
+            expect(result.files.some((f) => f.endsWith('rules.adblock'))).toBe(true);
+            expect(result.files.some((f) => f.endsWith('.ts'))).toBe(false);
+            expect(result.files.some((f) => f.endsWith('.js'))).toBe(false);
+            expect(result.patternMap.get('src')?.length).toBe(2);
         });
 
         test('should match files in nested directory', async () => {
