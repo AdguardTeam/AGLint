@@ -131,8 +131,11 @@ const main = async () => {
             },
         );
 
+        // Pre-populate tree structure. Must be sequential to avoid race conditions
+        // where multiple files in the same directory scan config/ignore files concurrently.
         for (const pattern of matchedPatterns.files) {
-            tree.addFile(pattern);
+            // eslint-disable-next-line no-await-in-loop
+            await tree.addFile(pattern);
         }
 
         cliDebug.log('Initializing file scanner');
