@@ -73,7 +73,8 @@ const main = async () => {
         const cliDebug = debug.module('cli');
 
         if (options.debug) {
-            cliDebug.log('Debug mode enabled');
+            cliDebug.log(`CLI args: ${inspect(process.argv.slice(2), { colors: useColors })}`);
+            cliDebug.log(`CLI options: ${inspect(options, { colors: useColors, depth: 2, breakLength: Infinity })}`);
         }
 
         enforceSoloOptions(program, ['init']);
