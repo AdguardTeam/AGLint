@@ -7,6 +7,19 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [4.0.0-beta.2] - 2025-12-01
+
+### Changed
+
+- Debug mode to more focused.
+
+### Fixed
+
+- Handling glob patterns for `.`.
+
+[4.0.0-beta.2]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-beta.1...v4.0.0-beta.2
+
+
 ## [4.0.0-beta.1] - 2025-11-28
 
 ### Fixed
