@@ -1,3 +1,4 @@
+import cj from 'color-json';
 import * as v from 'valibot';
 import { parse as parseYaml } from 'yaml';
 
@@ -75,18 +76,15 @@ export class ConfigResolver {
         // Check cache
         if (this.cache.has(absPath)) {
             if (this.debug) {
-                this.debug.log(`Using cached config: ${absPath}`);
+                this.debug.log(`Cached: ${absPath}`);
             }
             return this.cache.get(absPath)!.config;
         }
 
         if (this.debug) {
-            this.debug.log(`Resolving config: ${absPath}`);
+            this.debug.log(`Resolving: ${absPath}`);
         }
         const result = await this.resolveRecursive(absPath, new Set());
-        if (this.debug) {
-            this.debug.log(`Resolved config from ${absPath}: ${JSON.stringify(result.config)}`);
-        }
         return result.config;
     }
 
@@ -122,41 +120,42 @@ export class ConfigResolver {
      */
     public async resolveChain(configChain: ConfigChainEntry[]): Promise<LinterConfig> {
         if (configChain.length === 0) {
-            if (this.debug) {
-                this.debug.log('No config chain, using base config only');
-            }
-            const baseConfig = deepMerge({}, this.options.baseConfig || {}) as LinterConfig;
-            if (this.debug) {
-                this.debug.log(`Base config: ${JSON.stringify(baseConfig)}`);
-            }
-            return baseConfig;
+            return deepMerge({}, this.options.baseConfig || {}) as LinterConfig;
         }
 
-        // Log chain paths
+        // Log config chain hierarchy
         if (this.debug) {
+            const targetPath = configChain[0]!.path;
             const chainPaths = configChain.map((entry) => entry.path).join(' <- ');
-            this.debug.log(`Config chain (${configChain.length} file(s)): ${chainPaths}`);
+            this.debug.log(`Config chain for ${targetPath} is: ${chainPaths}`);
         }
 
         // Start with base config
         let merged = deepMerge({}, this.options.baseConfig || {}) as LinterConfig;
-        if (this.debug && Object.keys(merged).length > 0) {
-            this.debug.log(`Starting with base config: ${JSON.stringify(merged)}`);
-        }
 
         // Merge chain from farthest (root) to closest
+        const totalSteps = configChain.length;
         for (let i = configChain.length - 1; i >= 0; i -= 1) {
             const entry = configChain[i]!;
+            const stepNum = totalSteps - i;
+            const sourcePath = entry.path;
+
             if (this.debug) {
-                const configJson = JSON.stringify(entry.config);
-                this.debug.log(`Merging config [${i + 1}/${configChain.length}] from ${entry.path}: ${configJson}`);
+                if (i === configChain.length - 1) {
+                    this.debug.log(`[${stepNum}/${totalSteps}] Merge base config to ${sourcePath}`);
+                } else {
+                    const previousPath = configChain[i + 1]!.path;
+                    this.debug.log(`[${stepNum}/${totalSteps}] Merge ${previousPath} to ${sourcePath}`);
+                }
             }
+
             merged = deepMerge(merged, entry.config) as LinterConfig;
+
+            if (this.debug) {
+                this.debug.log(`Result for ${sourcePath}: ${ConfigResolver.formatConfigJson(merged)}`);
+            }
         }
 
-        if (this.debug) {
-            this.debug.log(`Final merged config: ${JSON.stringify(merged)}`);
-        }
         return ConfigResolver.normalizeConfig(merged);
     }
 
@@ -210,17 +209,13 @@ export class ConfigResolver {
         const parsed = this.parseConfig(content, absPath);
         const configDir = this.pathAdapter.dirname(absPath);
 
-        if (this.debug) {
-            this.debug.log(`Parsed config from ${absPath}: ${JSON.stringify(parsed)}`);
-        }
-
         // Resolve extends
         let mergedFromExtends: LinterConfig = {} as LinterConfig;
 
         if (parsed.extends?.length) {
             if (this.debug) {
                 const extendsRefs = parsed.extends.join(', ');
-                this.debug.log(`Config extends: [${extendsRefs}]`);
+                this.debug.log(`Config ${absPath} extends: [${extendsRefs}]`);
             }
             for (const ref of parsed.extends) {
                 let refPath: string;
@@ -228,13 +223,10 @@ export class ConfigResolver {
                 if (ref.startsWith(AGLINT_PREFIX)) {
                     // Preset reference
                     const presetName = ref.slice(AGLINT_PREFIX.length);
-                    if (this.debug) {
-                        this.debug.log(`Resolving preset: "${presetName}"`);
-                    }
                     // eslint-disable-next-line no-await-in-loop
                     refPath = await this.presetResolver.resolve(presetName);
                     if (this.debug) {
-                        this.debug.log(`Preset "${presetName}" resolved to: ${refPath}`);
+                        this.debug.log(`Config ${absPath} extends preset "${presetName}" -> ${refPath}`);
                     }
                 } else {
                     // Relative path reference
@@ -246,30 +238,17 @@ export class ConfigResolver {
 
                 // eslint-disable-next-line no-await-in-loop
                 const extendedEntry = await this.resolveRecursive(refPath, new Set(seen));
-                if (this.debug) {
-                    const extendedJson = JSON.stringify(extendedEntry.config);
-                    this.debug.log(`Extended config from "${ref}": ${extendedJson}`);
-                }
                 mergedFromExtends = deepMerge(
                     mergedFromExtends,
                     extendedEntry.config,
                 ) as LinterConfig;
-            }
-            if (this.debug) {
-                this.debug.log(`Merged all extends: ${JSON.stringify(mergedFromExtends)}`);
             }
         }
 
         // Merge local config (drop extends and root)
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const { extends: _extends, root: _root, ...localRest } = parsed;
-        if (this.debug) {
-            this.debug.log(`Local config (without extends/root): ${JSON.stringify(localRest)}`);
-        }
         const flattened = deepMerge(mergedFromExtends, localRest) as LinterConfig;
-        if (this.debug) {
-            this.debug.log(`Flattened config for ${absPath}: ${JSON.stringify(flattened)}`);
-        }
 
         // Normalize severity values before caching
         const normalized = ConfigResolver.normalizeConfig(flattened);
@@ -434,6 +413,18 @@ export class ConfigResolver {
                 filePath,
             );
         }
+    }
+
+    /**
+     * Formats a config as colorized JSON for debug logging.
+     *
+     * @param config The config to format.
+     *
+     * @returns Colorized JSON string (inline, not pretty-printed).
+     */
+    private static formatConfigJson(config: LinterConfig): string {
+        // Stringify without formatting (inline), then colorize
+        return cj(config, undefined, undefined, 0);
     }
 
     /**

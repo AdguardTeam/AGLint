@@ -32,6 +32,9 @@ importers:
       clone-deep:
         specifier: ^4.0.1
         version: 4.0.1
+      color-json:
+        specifier: ^3.0.5
+        version: 3.0.5
       commander:
         specifier: ^14.0.1
         version: 14.0.1
@@ -1190,6 +1193,10 @@ packages:
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
+
+  color-json@3.0.5:
+    resolution: {integrity: sha512-DG4zae1GmHDBNsYTUe+GJiDnuKutxs2vVSkPRQqbeA6oEGBRQyRixV+HmIByasCfyf9L0CwHo8vOoiHqe7Lzng==}
+    engines: {node: '>=12'}
 
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
@@ -3767,6 +3774,8 @@ snapshots:
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
+
+  color-json@3.0.5: {}
 
   color-name@1.1.4: {}
 
