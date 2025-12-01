@@ -130,13 +130,12 @@ export class ConfigResolver {
         }
 
         const targetPath = configChain[0]!.path;
-        const isFirstTimeLogging = !this.loggedConfigs.has(targetPath);
+        const isFirstTimeLoggingTarget = !this.loggedConfigs.has(targetPath);
 
-        // Log config chain hierarchy (only first time)
-        if (this.debug && isFirstTimeLogging) {
+        // Log config chain hierarchy (only first time for target)
+        if (this.debug && isFirstTimeLoggingTarget) {
             const chainPaths = configChain.map((entry) => entry.path).join(' <- ');
             this.debug.log(`Config chain for ${targetPath} is: ${chainPaths}`);
-            this.loggedConfigs.add(targetPath);
         }
 
         // Start with base config
@@ -147,9 +146,10 @@ export class ConfigResolver {
             const entry = configChain[i]!;
             merged = deepMerge(merged, entry.config) as LinterConfig;
 
-            // Log result (only first time)
-            if (this.debug && isFirstTimeLogging) {
+            // Log result (only first time for each config)
+            if (this.debug && !this.loggedConfigs.has(entry.path)) {
                 this.debug.log(`Resolved config for ${entry.path}: ${ConfigResolver.formatConfigJson(merged)}`);
+                this.loggedConfigs.add(entry.path);
             }
         }
 
