@@ -32,9 +32,6 @@ importers:
       clone-deep:
         specifier: ^4.0.1
         version: 4.0.1
-      color-json:
-        specifier: ^3.0.5
-        version: 3.0.5
       commander:
         specifier: ^14.0.1
         version: 14.0.1
@@ -71,6 +68,9 @@ importers:
       micromustache:
         specifier: ^8.0.3
         version: 8.0.3
+      object-inspect:
+        specifier: ^1.13.4
+        version: 1.13.4
       ohash:
         specifier: ^2.0.11
         version: 2.0.11
@@ -123,6 +123,9 @@ importers:
       '@types/node':
         specifier: ^18.11.7
         version: 18.19.86
+      '@types/object-inspect':
+        specifier: ^1.13.0
+        version: 1.13.0
       '@types/text-table':
         specifier: ^0.2.2
         version: 0.2.5
@@ -887,6 +890,9 @@ packages:
   '@types/node@18.19.86':
     resolution: {integrity: sha512-fifKayi175wLyKyc5qUfyENhQ1dCNI1UNjp653d8kuYcPQN5JhX3dGuP/XmvPTg/xRBn1VTLpbmi+H/Mr7tLfQ==}
 
+  '@types/object-inspect@1.13.0':
+    resolution: {integrity: sha512-lwGTVESDDV+XsQ1pH4UifpJ1f7OtXzQ6QBOX2Afq2bM/T3oOt8hF6exJMjjIjtEWeAN2YAo25J7HxWh97CCz9w==}
+
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
@@ -1193,10 +1199,6 @@ packages:
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
-
-  color-json@3.0.5:
-    resolution: {integrity: sha512-DG4zae1GmHDBNsYTUe+GJiDnuKutxs2vVSkPRQqbeA6oEGBRQyRixV+HmIByasCfyf9L0CwHo8vOoiHqe7Lzng==}
-    engines: {node: '>=12'}
 
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
@@ -3422,6 +3424,8 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
+  '@types/object-inspect@1.13.0': {}
+
   '@types/resolve@1.20.2': {}
 
   '@types/semver@7.7.0': {}
@@ -3774,8 +3778,6 @@ snapshots:
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
-
-  color-json@3.0.5: {}
 
   color-name@1.1.4: {}
 

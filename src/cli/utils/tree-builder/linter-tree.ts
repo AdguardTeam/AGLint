@@ -99,10 +99,6 @@ export class LinterTree {
         const absPath = this.pathAdapter.resolve(filePath);
         const dir = this.pathAdapter.dirname(absPath);
 
-        if (this.debug) {
-            this.debug.log(`Adding file: ${absPath}`);
-        }
-
         // Ensure directory node exists
         await this.ensureDirectory(dir);
 
@@ -110,9 +106,6 @@ export class LinterTree {
         const node = this.nodeCache.get(dir);
         if (node) {
             node.files.add(absPath);
-            if (this.debug) {
-                this.debug.log(`File added to directory node: ${dir}`);
-            }
         }
     }
 
@@ -132,9 +125,6 @@ export class LinterTree {
 
         if (!node) {
             // Create new node
-            if (this.debug) {
-                this.debug.log(`Creating directory node: ${absDirPath}`);
-            }
             node = {
                 path: absDirPath,
                 children: new Map(),
@@ -148,9 +138,6 @@ export class LinterTree {
                 const parent = await this.ensureDirectory(parentPath);
                 node.parent = parent;
                 parent.children.set(this.pathAdapter.basename(absDirPath), node);
-                if (this.debug) {
-                    this.debug.log(`Linked ${absDirPath} to parent: ${parentPath}`);
-                }
             }
 
             this.nodeCache.set(absDirPath, node);
@@ -158,21 +145,10 @@ export class LinterTree {
 
         // Scan for config/ignore files if not already scanned
         if (!this.scannedDirs.has(absDirPath)) {
-            if (this.debug) {
-                this.debug.log(`Scanning directory for config/ignore files: ${absDirPath}`);
-            }
-
             // Scan for .aglintignore
             const ignoreFilePath = this.pathAdapter.join(absDirPath, this.options.ignoreFileName);
             if (await this.fs.exists(ignoreFilePath)) {
                 node.ignoreFile = ignoreFilePath;
-                if (this.debug) {
-                    this.debug.log(`Found ignore file: ${ignoreFilePath}`);
-                }
-            }
-
-            if (this.debug && !node.ignoreFile) {
-                this.debug.log(`No ignore file in: ${absDirPath}`);
             }
 
             // Scan for config files
@@ -186,18 +162,12 @@ export class LinterTree {
                             const parsed = JSON.parse(content);
                             if (parsed.aglint && !node.configFiles.includes(configPath)) {
                                 node.configFiles.push(configPath);
-                                if (this.debug) {
-                                    this.debug.log(`Found config in package.json: ${configPath}`);
-                                }
                             }
                         } catch {
                             // If we can't read/parse package.json, skip it
                         }
                     } else if (!node.configFiles.includes(configPath)) {
                         node.configFiles.push(configPath);
-                        if (this.debug) {
-                            this.debug.log(`Found config file: ${configPath}`);
-                        }
                     }
                 }
             }
@@ -209,12 +179,6 @@ export class LinterTree {
                     `Multiple config files found in "${absDirPath}": ${fileNames}. `
                     + 'Please use only one config file per directory.',
                 );
-            }
-
-            if (node.configFiles.length === 0) {
-                if (this.debug) {
-                    this.debug.log(`No config file in: ${absDirPath}`);
-                }
             }
 
             this.scannedDirs.add(absDirPath);
@@ -238,16 +202,7 @@ export class LinterTree {
 
         // Check cache
         if (this.ignoreChainCache.has(dirPath)) {
-            const chain = this.ignoreChainCache.get(dirPath)!;
-            const chainPaths = chain.map((entry) => entry.path).join(' <- ');
-            if (this.debug) {
-                this.debug.log(`Using cached ignore chain (${chain.length} file(s)) for ${dirPath}: ${chainPaths}`);
-            }
-            return chain;
-        }
-
-        if (this.debug) {
-            this.debug.log(`Building ignore chain for: ${dirPath}`);
+            return this.ignoreChainCache.get(dirPath)!;
         }
 
         // Build chain by walking up
@@ -264,15 +219,6 @@ export class LinterTree {
                     .split(/\r?\n/)
                     .map((line) => line.trim())
                     .filter((line) => line && !line.startsWith('#'));
-
-                if (this.debug) {
-                    this.debug.log(`Adding ignore file to chain: ${node.ignoreFile} (${patterns.length} pattern(s))`);
-                }
-                if (patterns.length > 0) {
-                    if (this.debug) {
-                        this.debug.log(`Patterns: [${patterns.join(', ')}]`);
-                    }
-                }
 
                 chain.push({
                     path: node.ignoreFile,
@@ -291,17 +237,11 @@ export class LinterTree {
 
         // Cache and return
         this.ignoreChainCache.set(dirPath, chain);
-        if (this.debug) {
-            if (chain.length > 0) {
-                const chainPaths = chain.map((entry) => entry.path).join(' <- ');
-                const totalPatterns = chain.reduce((sum, entry) => sum + entry.patterns.length, 0);
-                this.debug.log(
-                    `Built ignore chain with ${chain.length} file(s), ${totalPatterns} total pattern(s) `
-                    + `for ${dirPath}: ${chainPaths}`,
-                );
-            } else {
-                this.debug.log(`No ignore files in chain for: ${dirPath}`);
-            }
+        if (this.debug && chain.length > 0) {
+            const totalPatterns = chain.reduce((sum, entry) => sum + entry.patterns.length, 0);
+            this.debug.log(
+                `Built ignore chain: ${chain.length} file(s), ${totalPatterns} pattern(s)`,
+            );
         }
         return chain;
     }
@@ -321,18 +261,7 @@ export class LinterTree {
 
         // Check cache
         if (this.configChainCache.has(dirPath)) {
-            const chain = this.configChainCache.get(dirPath)!;
-            if (this.debug) {
-                const chainPaths = chain.map((entry) => entry.path).join(' <- ');
-                this.debug.log(
-                    `Using cached config chain (${chain.length} config(s)) for ${dirPath}: ${chainPaths}`,
-                );
-            }
-            return chain;
-        }
-
-        if (this.debug) {
-            this.debug.log(`Building config chain for: ${dirPath}`);
+            return this.configChainCache.get(dirPath)!;
         }
 
         // Build chain by walking up
@@ -354,17 +283,9 @@ export class LinterTree {
                 if (this.configResolver) {
                     config = await this.configResolver.resolve(configPath);
                     isRoot = await this.configResolver.isRoot(configPath);
-                    if (this.debug) {
-                        this.debug.log(
-                            `Adding config to chain: ${configPath} (root: ${isRoot})`,
-                        );
-                    }
                 } else {
                     // Fallback: just mark as empty config
                     config = {} as LinterConfigFile;
-                    if (this.debug) {
-                        this.debug.log(`Adding config to chain (no resolver): ${configPath}`);
-                    }
                 }
 
                 chain.push({
@@ -375,9 +296,6 @@ export class LinterTree {
                 });
 
                 if (isRoot) {
-                    if (this.debug) {
-                        this.debug.log(`Stopping at root config: ${configPath}`);
-                    }
                     foundRoot = true;
                     break;
                 }
@@ -393,16 +311,11 @@ export class LinterTree {
 
         // Cache and return
         this.configChainCache.set(dirPath, chain);
-        if (this.debug) {
-            if (chain.length > 0) {
-                const chainPaths = chain.map((entry) => entry.path).join(' <- ');
-                const rootMarkers = chain.map((entry) => (entry.isRoot ? 'R' : '-')).join('');
-                this.debug.log(
-                    `Built config chain with ${chain.length} config(s) [${rootMarkers}] for ${dirPath}: ${chainPaths}`,
-                );
-            } else {
-                this.debug.log(`No config files in chain for: ${dirPath}`);
-            }
+        if (this.debug && chain.length > 0) {
+            const hasRoot = chain.some((entry) => entry.isRoot);
+            this.debug.log(
+                `Built config chain: ${chain.length} file(s)${hasRoot ? ' (root found)' : ''}`,
+            );
         }
         return chain;
     }
@@ -423,15 +336,8 @@ export class LinterTree {
         const stats = await this.fs.stat(absPath);
         const dirPath = stats.isDirectory ? absPath : this.pathAdapter.dirname(absPath);
 
-        if (this.debug) {
-            this.debug.log(`Getting resolved config for: ${targetPath}`);
-        }
-
         // Check cache
         if (this.resolvedConfigCache.has(dirPath)) {
-            if (this.debug) {
-                this.debug.log(`Using cached resolved config for: ${dirPath}`);
-            }
             return this.resolvedConfigCache.get(dirPath)!;
         }
 

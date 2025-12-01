@@ -120,28 +120,14 @@ export function createLinterRuntime(
         });
     };
 
-    if (debug) {
-        debug.log('Parsing source code');
-    }
     const parseStart = Date.now();
     const sourceCode = new LinterSourceCode(file.content, onParseError);
     if (debug) {
-        debug.log(`Source code parsed in ${Date.now() - parseStart}ms`);
+        debug.log(`Parsing source code completed in ${Date.now() - parseStart}ms`);
     }
 
-    if (debug) {
-        debug.log('Creating walker with sub-parsers');
-    }
     const walker = new LinterSourceCodeWalker(sourceCode, subParsers, onParseError);
-
-    if (debug) {
-        debug.log('Initializing visitor collection');
-    }
     const visitors = new LinterVisitorCollection();
-
-    if (debug) {
-        debug.log('Creating fix generator');
-    }
     const fixGen = new LinterFixGenerator(sourceCode);
 
     const getOffsetRangeForNode = (node: any): LinterOffsetRange | null => {
@@ -168,9 +154,6 @@ export function createLinterRuntime(
         debug,
     } as LinterRuleBaseContext;
 
-    if (debug) {
-        debug.log('Creating rule registry');
-    }
     const ruleRegistry = new LinterRuleRegistry(
         config,
         visitors,

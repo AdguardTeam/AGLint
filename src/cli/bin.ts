@@ -3,8 +3,7 @@
 /* eslint-disable n/no-process-exit */
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import colorJson from 'color-json';
+import { inspect } from 'node:util';
 
 import { version } from '../../package.json';
 import { Debug } from '../utils/debug';
@@ -76,9 +75,15 @@ const main = async () => {
         const patterns = program.args.length > 0 ? program.args : [DEFAULT_PATTERN];
 
         if (options.debug) {
-            cliDebug.log(`CLI args: ${colorJson(process.argv.slice(2), undefined, undefined, 0)}`);
-            cliDebug.log(`CLI options: ${colorJson(options, undefined, undefined, 0)}`);
-            cliDebug.log(`Patterns: ${colorJson(patterns, undefined, undefined, 0)}`);
+            const inspectOpts = {
+                colors: useColors,
+                depth: Infinity,
+                compact: true,
+                breakLength: Infinity,
+            };
+            cliDebug.log(`CLI args: ${inspect(process.argv.slice(2), inspectOpts)}`);
+            cliDebug.log(`CLI options: ${inspect(options, inspectOpts)}`);
+            cliDebug.log(`Patterns: ${inspect(patterns, inspectOpts)}`);
         }
 
         enforceSoloOptions(program, ['init']);
@@ -156,9 +161,10 @@ const main = async () => {
             const config = await tree.getResolvedConfig(file);
 
             console.log(
-                useColors
-                    ? colorJson(config)
-                    : JSON.stringify(config, null, 2),
+                inspect(config, {
+                    colors: useColors,
+                    depth: Infinity,
+                }),
             );
             return;
         }

@@ -53,17 +53,11 @@ export class LinterFileScanner {
             // Check if ignored
             const isIgnored = await this.tree.isIgnored(filePath);
             if (isIgnored) {
-                if (this.debug) {
-                    this.debug.log(`Skipping ignored file: ${filePath}`);
-                }
                 continue; // Skip ignored files
             }
 
             // Get config chain
             const configChain = await this.tree.getConfigChain(filePath);
-            if (this.debug) {
-                this.debug.log(`File "${filePath}" has ${configChain.length} config(s) in chain`);
-            }
 
             // Resolve final config from chain
             const config = await this.configResolver.resolveChain(configChain);
@@ -91,11 +85,35 @@ export class LinterFileScanner {
      */
     public async scanAll(filePaths: string[]): Promise<ScannedFile[]> {
         const results: ScannedFile[] = [];
-        for await (const file of this.scan(filePaths)) {
-            results.push(file);
+        let skippedCount = 0;
+
+        for (const filePath of filePaths) {
+            await this.tree.addFile(filePath);
+
+            const isIgnored = await this.tree.isIgnored(filePath);
+            if (isIgnored) {
+                skippedCount += 1;
+                continue;
+            }
+
+            const configChain = await this.tree.getConfigChain(filePath);
+            const config = await this.configResolver.resolveChain(configChain);
+            const stats = await this.fs.stat(filePath);
+
+            results.push({
+                path: filePath,
+                config,
+                configChain,
+                size: stats.size,
+                mtime: stats.mtime,
+            });
         }
+
         if (this.debug) {
-            this.debug.log(`Scan completed: ${results.length} file(s) ready for linting`);
+            const msg = skippedCount > 0
+                ? `Scan completed: ${results.length} file(s) ready, ${skippedCount} ignored`
+                : `Scan completed: ${results.length} file(s) ready for linting`;
+            this.debug.log(msg);
         }
         return results;
     }

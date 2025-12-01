@@ -54,7 +54,6 @@ export type DisableComment = {
  */
 export function createConfigCommentVisitor(runtime: LinterRuntime) {
     const disabled: DisableComment[] = [];
-    const { debug } = runtime as any;
     const toPos = (node: any) => {
         const range = runtime.getOffsetRangeForNode(node)!;
         return runtime.sourceCode.getLinterPositionRangeFromOffsetRange(range)!;
@@ -74,10 +73,6 @@ export function createConfigCommentVisitor(runtime: LinterRuntime) {
             try {
                 const rulesConfig = v.parse(linterRulesConfigSchema, node.params.value);
                 runtime.ruleRegistry.applyConfig(rulesConfig);
-                if (debug) {
-                    const ruleNames = Object.keys(rulesConfig);
-                    debug.log(`Applied inline config for ${ruleNames.length} rule(s): ${ruleNames.join(', ')}`);
-                }
             } catch (e) {
                 runtime.problems.push({
                     severity: LinterRuleSeverity.Error,

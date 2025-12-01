@@ -215,14 +215,6 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
 
     if (debug) {
         debug.log(`Starting fix mode (max ${maxFixRounds} round(s))`);
-        if (options.categories) {
-            const cats = Array.from(options.categories).join(', ');
-            debug.log(`Fix categories filter: ${cats}`);
-        }
-        if (options.ruleIds) {
-            const rules = Array.from(options.ruleIds).join(', ');
-            debug.log(`Fix rules filter: ${rules}`);
-        }
     }
 
     let source = options.fileProps.content;
@@ -281,10 +273,6 @@ export async function lintWithFixes(options: LinterFixerRunOptions): Promise<Lin
 
     // Final verification lint, ensures offsets match the fixed source
     if (appliedFixesCount > 0) {
-        if (debug) {
-            debug.log('Running final verification lint on fixed source');
-        }
-
         linterResult = await lint({
             fileProps: {
                 ...options.fileProps,

@@ -190,15 +190,9 @@ export class LinterRuleRegistry {
         // Log results if debug is available (passed through base context)
         const { debug } = this.baseRuleContext as any;
         if (debug) {
-            const loadedResults = results.filter((r) => r?.loaded);
-            const loaded = loadedResults.length;
+            const loaded = results.filter((r) => r?.loaded).length;
             const skipped = results.length - loaded;
-            const totalSelectors = loadedResults.reduce((sum, r) => sum + (r?.selectors ?? 0), 0);
-
-            debug.log(
-                `Loaded ${loaded}/${ruleNames.length} rule(s) in ${loadTime}ms`
-                + ` (${skipped} disabled, ${totalSelectors} selector(s) registered)`,
-            );
+            debug.log(`Loaded ${loaded}/${ruleNames.length} rule(s) in ${loadTime}ms (${skipped} disabled)`);
         }
     }
 

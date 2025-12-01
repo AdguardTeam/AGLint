@@ -122,20 +122,13 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     const startTime = Date.now();
 
     if (debug) {
-        debug.log(`Starting lint for: ${filePath}`);
-        debug.log(`File size: ${options.fileProps.content.length} bytes`);
+        debug.log(`Linting ${filePath}`);
     }
 
     // Parse and validate config
-    const configParseStart = Date.now();
     const parsedConfig = v.parse(linterConfigSchema, options.config);
-    if (debug) {
-        debug.log(`Config parsed in ${Date.now() - configParseStart}ms`);
-        debug.log(`Linter config: ${JSON.stringify(parsedConfig)}`);
-    }
 
     // Create runtime (includes source code parsing)
-    const runtimeStart = Date.now();
     const runtime = createLinterRuntime(
         options.fileProps,
         parsedConfig,
@@ -143,9 +136,6 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
         options.subParsers ?? {},
         debug,
     );
-    if (debug) {
-        debug.log(`Runtime created in ${Date.now() - runtimeStart}ms`);
-    }
 
     const report = createReportFn(runtime);
     runtime.ruleRegistry.setReporter(report);
@@ -155,45 +145,21 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
 
     if (parsedConfig.allowInlineConfig) {
         runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
-        if (debug) {
-            debug.log('Inline config comments enabled');
-        }
     }
 
     // Load rules
-    const ruleLoadStart = Date.now();
-    if (debug) {
-        debug.log(`Loading ${Object.keys(parsedConfig.rules).length} rule(s)`);
-    }
     await runtime.ruleRegistry.loadRules();
-    if (debug) {
-        debug.log(`Rules loaded in ${Date.now() - ruleLoadStart}ms`);
-    }
 
     // AST walk
-    const walkStart = Date.now();
-    if (debug) {
-        debug.log('Starting AST walk');
-    }
     runWalk(runtime);
-    if (debug) {
-        debug.log(`AST walk completed in ${Date.now() - walkStart}ms`);
-    }
 
     // Apply disable directives
-    const disableStart = Date.now();
-    if (debug) {
-        debug.log(`Applying disable directives (${disabled.length} directive(s))`);
-    }
     applyDisableDirectives(
         runtime.problems,
         disabled,
         parsedConfig.reportUnusedDisableDirectives,
         parsedConfig.unusedDisableDirectivesSeverity,
     );
-    if (debug) {
-        debug.log(`Disable directives applied in ${Date.now() - disableStart}ms`);
-    }
 
     const counts = summarize(runtime.problems);
     const totalTime = Date.now() - startTime;
