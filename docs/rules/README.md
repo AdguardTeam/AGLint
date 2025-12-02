@@ -1,7 +1,7 @@
 <!-- markdownlint-disable -->
 # Rules
 
-| Name | Description | Recommended | Fixable | Suggestions |
+| Name | Description | Recommended | Has autofix | Has suggestions |
 | --- | --- | :---: | :---: | :---: |
 | [if-directive-balance](./if-directive-balance.md) | Checks if conditional preprocessor directives are structured correctly | ✅ | 🔧 |  |
 | [max-css-selectors](./max-css-selectors.md) | Checks if a CSS selector list contains more than the specified number of selectors |  | 🔧 |  |
@@ -22,3 +22,11 @@
 | [no-unknown-preprocessor-directives](./no-unknown-preprocessor-directives.md) | Checks if a preprocessor directive is known | ✅ |  |  |
 | [no-unsupported-css-pseudo-class](./no-unsupported-css-pseudo-class.md) | Checks that CSS pseudo-classes are supported | ✅ |  | 💡 |
 | [scriptlet-quotes](./scriptlet-quotes.md) | Checks quotes in scriptlet |  | 🔧 |  |
+
+Legend
+
+| Emoji | Description |
+| --- | --- |
+| ✅ | Rule is enabled in `aglint:recommended` preset |
+| 🔧 | Some or all problems reported by this rule can be fixed automatically |
+| 💡 | Some or all problems reported by this rule can be fixed via suggestions |

@@ -295,7 +295,7 @@ async function main() {
     md.push('<!-- markdownlint-disable -->');
     md.push('# Rules');
     md.push('');
-    md.push('| Name | Description | Recommended | Fixable | Suggestions |');
+    md.push('| Name | Description | Recommended | Has autofix | Has suggestions |');
     md.push('| --- | --- | :---: | :---: | :---: |');
 
     for (const file of files) {
@@ -311,6 +311,15 @@ async function main() {
         await generateRuleDocumentation(fileName, rule);
     }
 
+    md.push('');
+
+    md.push('Legend');
+    md.push('');
+    md.push('| Emoji | Description |');
+    md.push('| --- | --- |');
+    md.push('| ✅ | Rule is enabled in `aglint:recommended` preset |');
+    md.push('| 🔧 | Some or all problems reported by this rule can be fixed automatically |');
+    md.push('| 💡 | Some or all problems reported by this rule can be fixed via suggestions |');
     md.push('');
 
     await writeFile(path.join(__dirname, '../docs/rules/README.md'), md.join('\n'));
