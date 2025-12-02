@@ -25,6 +25,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Project, SyntaxKind } from 'ts-morph';
@@ -38,7 +39,7 @@ const INDEX_DTS = `${INDEX_BASENAME}${EXT_DTS}`;
 const INDEX_JS = `${INDEX_BASENAME}${EXT_JS}`;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const project = new Project({
     skipFileDependencyResolution: true,

@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-loop-func */
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { toJsonSchema } from '@valibot/to-json-schema';
 import { createTwoFilesPatch } from 'diff';
@@ -15,7 +16,7 @@ import { AGLINT_REPO_URL } from '../src/utils/repo-url';
 import { lint } from '../test/rules/helpers/lint';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-const __dirname = new URL('.', import.meta.url).pathname;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // eslint-disable-next-line no-underscore-dangle
 (global as any).__IS_TEST__ = true;

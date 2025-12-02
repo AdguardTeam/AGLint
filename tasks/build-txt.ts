@@ -3,10 +3,10 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import * as url from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const UPPER_LEVEL = '../';
 

@@ -1,13 +1,14 @@
 /* eslint-disable no-await-in-loop */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import fg from 'fast-glob';
 
 import { formatJson } from '../src/utils/format-json';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-const __dirname = new URL('.', import.meta.url).pathname;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const packageJsonPath = path.join(__dirname, '../package.json');
 

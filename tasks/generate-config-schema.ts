@@ -6,14 +6,14 @@
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import * as url from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 import { toJsonSchema } from '@valibot/to-json-schema';
 
 import { linterConfigFileSchema } from '../src/cli/config-file/config-file.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const UPPER_LEVEL = '../';
 const SCHEMA_FOLDER_NAME = 'schema';
