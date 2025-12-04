@@ -48,10 +48,10 @@ Build:
             pnpm lint
             pnpm test
 
-            # Create build, this will also create build.txt file with build number
+            # Run build
             pnpm build
 
-            # Create build.txt file with version number
+            # Create build.txt file with version number. This is needed for Bamboo variable injection
             npx tsx tasks/build-txt.ts
 
             # Pack build into tarball
