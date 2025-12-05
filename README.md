@@ -997,9 +997,9 @@ resources, please let us know.
 <!--markdownlint-enable MD013-->
 
 [ab-url]: https://getadblock.com
-[abp-ext-css]: https://help.eyeo.com/adblockplus/how-to-write-filters#elemhide-emulation
-[abp-filters]: https://help.eyeo.com/adblockplus/how-to-write-filters
-[abp-snippets]: https://help.eyeo.com/adblockplus/snippet-filters-tutorial#snippets-ref
+[abp-ext-css]: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#elemhide-emulation
+[abp-filters]: https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters
+[abp-snippets]: https://help.adblockplus.org/hc/en-us/articles/1500002338501-Snippet-filters-tutorial
 [abp-url]: https://adblockplus.org
 [adg-compatibility-table]: https://github.com/AdguardTeam/Scriptlets/blob/master/wiki/compatibility-table.md
 [adg-ext-css]: https://github.com/AdguardTeam/ExtendedCss/blob/master/README.md
