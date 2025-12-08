@@ -41,7 +41,7 @@ During development, you can use the following commands (listed in `package.json`
 - `pnpm increment` - increment the version number (patch)
 - `pnpm lint` - run all linters (types, TS, and Markdown)
 - `pnpm lint:md` - lint Markdown files with [markdownlint][markdownlint]
-- `pnpm lint:ts` - lint TypeScript code with [ESLint][eslint]
+- `pnpm lint:code` - lint code with [ESLint][eslint]
 - `pnpm test` - run tests with [Vitest][vitest] (you can also run a specific test with `pnpm test <test-name>`)
 - `pnpm rules:update` - regenerate rule exports, documentation, and presets
 
