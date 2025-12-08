@@ -221,6 +221,20 @@ const N_PLUGIN_RULES = {
     // Prefer `/promises` API for `fs` and `dns` modules, if the corresponding imports are used.
     'n/prefer-promises/fs': 'error',
     'n/prefer-promises/dns': 'error',
+
+    'n/hashbang': [
+        'error',
+        {
+            // This rule reads the bin property from package.json, and only allows shebangs for that file.
+            // But since we transform the source files to the dist folder, we need to convert the paths.
+            convertPath: [
+                {
+                    include: ['src/**/*.ts'],
+                    replace: ['^src/(.+)\\.ts$', 'dist/$1.js'],
+                },
+            ],
+        },
+    ],
 };
 
 /**
