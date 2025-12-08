@@ -43,7 +43,7 @@ export default defineRule({
 
 ## The Rule Definition
 
-Use the `defineRule` helper function to define rules with type-safe configuration and message handling:
+Use the `defineRule` helper function to define rules with type-safe configuration:
 
 ```typescript
 import { defineRule, LinterRuleType } from '../linter/rule';
@@ -91,7 +91,6 @@ The `meta` object contains information about the rule:
 
 - **`messages`**: Object mapping message IDs to template strings
     - Use `{{placeholder}}` syntax for dynamic values
-    - Provides type-safe message references in `context.report()`
 
 - **`hasFix`**: Set to `true` if the rule can automatically fix problems
 
@@ -202,7 +201,6 @@ This interactive tool lets you:
 
 - Input adblock filter rules and see their parsed AST
 - Explore node types, properties, and structure
-- Test selectors to see which nodes they match
 - Understand the hierarchy and relationships between nodes
 
 For example, entering `example.com##.ad` shows you the `ElementHidingRule` node with its children, helping you
@@ -415,9 +413,10 @@ The `data` object values will replace `{{placeholders}}` in your message templat
 
 Always prefer `messageId` over direct `message` strings for several reasons:
 
-1. **Centralized messaging** - All messages are defined in one place (`meta.messages`)
-2. **Better testability** - Tests can verify the correct `messageId` was used
-3. **Consistency** - Ensures consistent wording across similar issues
+- **Centralized messaging** - All messages are defined in one place (`meta.messages`)
+- **Better testability** - Tests can verify the correct `messageId` was used (messageId is included in test output)
+- **Consistency** - Ensures consistent wording across similar issues
+- **Validation** - AGLint validates that the referenced `messageId` exists at runtime
 
 ```typescript
 // ✅ Good - Using messageId
@@ -489,25 +488,76 @@ export default defineRule({
 
 ### Fixer Methods
 
-The `fixer` object provides:
+The `fixer` object provides the following methods:
 
-- **`replaceWithText(range, text)`**: Replace text at the given offset range
+#### `replaceWithText(range, text)`
+
+Replace text at the given offset range.
+
+- **Parameters:**
     - `range`: `[start, end]` offset array
-    - `text`: New text to insert
-
-Example from `scriptlet-quotes` rule:
+    - `text`: Replacement text
+- **Returns:** Fix command or `null` if range is invalid
 
 ```typescript
 fix(fixer) {
-    const range = context.getOffsetRangeForNode(scriptletArgument);
-    if (!range) {
-        return null;
-    }
+    const range = context.getOffsetRangeForNode(node);
+    if (!range) return null;
     
-    const { value } = scriptletArgument;
-    const newValue = QuoteUtils.setStringQuoteType(value, expectedQuoteType);
+    return fixer.replaceWithText(range, 'new text');
+}
+```
+
+#### `insertTextBefore(range, text)`
+
+Insert text before the specified range.
+
+- **Parameters:**
+    - `range`: `[start, end]` offset array
+    - `text`: Text to insert
+- **Returns:** Fix command or `null` if range is invalid
+
+```typescript
+fix(fixer) {
+    const range = context.getOffsetRangeForNode(node);
+    if (!range) return null;
     
-    return fixer.replaceWithText(range, newValue);
+    return fixer.insertTextBefore(range, '! ');
+}
+```
+
+#### `insertTextAfter(range, text)`
+
+Insert text after the specified range.
+
+- **Parameters:**
+    - `range`: `[start, end]` offset array
+    - `text`: Text to insert
+- **Returns:** Fix command or `null` if range is invalid
+
+```typescript
+fix(fixer) {
+    const range = context.getOffsetRangeForNode(node);
+    if (!range) return null;
+    
+    return fixer.insertTextAfter(range, ' $important');
+}
+```
+
+#### `remove(range)`
+
+Remove text at the specified range.
+
+- **Parameters:**
+    - `range`: `[start, end]` offset array
+- **Returns:** Fix command or `null` if range is invalid
+
+```typescript
+fix(fixer) {
+    const range = context.getOffsetRangeForNode(node);
+    if (!range) return null;
+    
+    return fixer.remove(range);
 }
 ```
 
@@ -915,7 +965,7 @@ test('should apply fixes', async () => {
 
 ## Best Practices
 
-### 1. Use Type-Safe Messages
+### 1. Use Message IDs
 
 Define messages in `meta.messages` and use `messageId` instead of inline strings:
 
