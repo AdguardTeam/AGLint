@@ -1,4 +1,3 @@
-<!-- markdownlint-disable -->
 # Writing Linter Rules
 
 This guide explains how to write custom linter rules for AGLint. AGLint uses a visitor pattern similar to ESLint,
@@ -78,21 +77,21 @@ The `meta` object contains information about the rule:
 ### Required Fields
 
 - **`type`**: One of:
-  - `LinterRuleType.Problem` - Identifies code that will cause errors or confusing behavior
-  - `LinterRuleType.Suggestion` - Identifies code that could be improved but isn't necessarily wrong
-  - `LinterRuleType.Layout` - Concerns formatting and whitespace
+    - `LinterRuleType.Problem` - Identifies code that will cause errors or confusing behavior
+    - `LinterRuleType.Suggestion` - Identifies code that could be improved but isn't necessarily wrong
+    - `LinterRuleType.Layout` - Concerns formatting and whitespace
 
 - **`docs`**: Documentation object with:
-  - `name` - The rule name (kebab-case)
-  - `description` - Short description of what the rule checks
-  - `recommended` - Whether the rule is enabled in the recommended config
-  - `url` - (Optional) Link to full documentation
+    - `name` - The rule name (kebab-case)
+    - `description` - Short description of what the rule checks
+    - `recommended` - Whether the rule is enabled in the recommended config
+    - `url` - (Optional) Link to full documentation
 
 ### Optional Fields
 
 - **`messages`**: Object mapping message IDs to template strings
-  - Use `{{placeholder}}` syntax for dynamic values
-  - Provides type-safe message references in `context.report()`
+    - Use `{{placeholder}}` syntax for dynamic values
+    - Provides type-safe message references in `context.report()`
 
 - **`hasFix`**: Set to `true` if the rule can automatically fix problems
 
@@ -120,7 +119,8 @@ export default defineRule({
             recommended: true,
         },
         messages: {
-            tooShortRule: 'Rule is too short, its length is {{length}}, but at least {{minLength}} characters are required',
+            tooShortRule: 'Rule is too short, its length is {{length}}, '
+                + 'but at least {{minLength}} characters are required',
         },
         configSchema: v.tuple([
             v.strictObject({
@@ -189,7 +189,8 @@ create: (context) => {
 
 ## Writing Visitors with Selectors
 
-AGLint uses **esquery** for selecting AST nodes, similar to how CSS selectors work with DOM elements. The `create` function returns an object mapping selectors to visitor functions.
+AGLint uses **esquery** for selecting AST nodes, similar to how CSS selectors work with DOM elements.
+The `create` function returns an object mapping selectors to visitor functions.
 
 ### Exploring the AST
 
@@ -198,13 +199,14 @@ To understand the structure of the AST and what node types are available, use th
 **[https://scripthunter7.github.io/agtree-astexplorer/](https://scripthunter7.github.io/agtree-astexplorer/)**
 
 This interactive tool lets you:
+
 - Input adblock filter rules and see their parsed AST
 - Explore node types, properties, and structure
 - Test selectors to see which nodes they match
 - Understand the hierarchy and relationships between nodes
 
-For example, entering `example.com##.ad` shows you the `ElementHidingRule` node with its children,
-helping you write accurate selectors for your rules.
+For example, entering `example.com##.ad` shows you the `ElementHidingRule` node with its children, helping you
+write accurate selectors for your rules.
 
 ### Basic Node Type Selectors
 
@@ -342,8 +344,10 @@ create: (context) => {
 Here are some frequently used node types in adblock filter rules:
 
 - **Network Rules**: `NetworkRule`, `HostRule`
-- **Cosmetic Rules**: `CssInjectionRule`, `ElementHidingRule`, `ScriptletInjectionRule`, `HtmlFilteringRule`, `JsInjectionRule`
-- **Comment Rules**: `CommentRule`, `HintCommentRule`, `ConfigCommentRule`, `MetadataCommentRule`, `PreProcessorCommentRule`
+- **Cosmetic Rules**: `CssInjectionRule`, `ElementHidingRule`, `ScriptletInjectionRule`, `HtmlFilteringRule`,
+  `JsInjectionRule`
+- **Comment Rules**: `CommentRule`, `HintCommentRule`, `ConfigCommentRule`, `MetadataCommentRule`,
+  `PreProcessorCommentRule`
 - **CSS Selectors**: `SelectorList`, `Selector`, `PseudoClassSelector`, `AttributeSelector`
 - **Hints**: `Hint`, `HintValue`
 - **Others**: `Value`, `ParameterList`, `Modifier`, `ModifierList`
@@ -372,6 +376,7 @@ create: (context) => {
 ```
 
 Available helpers:
+
 - `createVisitorsForAnyNetworkRule(handler)` - Network and host rules
 - `createVisitorsForAnyCosmeticRule(handler)` - All cosmetic rules
 - `createVisitorsForAnyCommentRule(handler)` - All comment rules
@@ -429,8 +434,8 @@ context.report({
 });
 ```
 
-**Note:** If a report contains both `messageId` and `message`, the (direct) `message` takes precedence. The `messageId` will be
-ignored in this case. However, you should never provide both in practice—choose one approach and stick with it.
+**Note:** If a report contains both `messageId` and `message`, the (direct) `message` takes precedence. The `messageId`
+will be ignored in this case. However, you should never provide both in practice—choose one approach and stick with it.
 
 ### With Custom Position
 
@@ -479,16 +484,16 @@ export default defineRule({
 });
 ```
 
-**Important:** The `hasFix` property is mandatory for fixable rules. If you provide a `fix` function in `context.report()`
-without setting `meta.hasFix: true`, the linter will throw an error.
+**Important:** The `hasFix` property is mandatory for fixable rules. If you provide a `fix` function in
+`context.report()` without setting `meta.hasFix: true`, the linter will throw an error.
 
 ### Fixer Methods
 
 The `fixer` object provides:
 
 - **`replaceWithText(range, text)`**: Replace text at the given offset range
-  - `range`: `[start, end]` offset array
-  - `text`: New text to insert
+    - `range`: `[start, end]` offset array
+    - `text`: New text to insert
 
 Example from `scriptlet-quotes` rule:
 
@@ -545,8 +550,8 @@ export default defineRule({
 });
 ```
 
-**Important:** The `hasSuggestions` property is mandatory for rules that provide suggestions. If you provide a `suggest`
-array in `context.report()` without setting `meta.hasSuggestions: true`, the linter will throw an error.
+**Important:** The `hasSuggestions` property is mandatory for rules that provide suggestions. If you provide a
+`suggest` array in `context.report()` without setting `meta.hasSuggestions: true`, the linter will throw an error.
 
 ## Rule Configuration
 
@@ -660,7 +665,8 @@ export default defineRule({
             recommended: true,
         },
         messages: {
-            tooShortRule: 'Rule is too short, its length is {{length}}, but at least {{minLength}} characters are required',
+            tooShortRule: 'Rule is too short, its length is {{length}}, '
+                + 'but at least {{minLength}} characters are required',
         },
         configSchema: v.tuple([
             v.strictObject({
@@ -1064,6 +1070,7 @@ fix(fixer) {
 ### 10. Test Thoroughly
 
 Test various scenarios:
+
 - Valid code that should pass
 - Invalid code that should fail
 - Edge cases (empty strings, special characters, etc.)
@@ -1079,11 +1086,13 @@ pnpm run rules:update
 ```
 
 This script executes three tasks:
+
 - **generate-rule-exports.ts** - Updates rule exports for the package
 - **generate-rules-readme.ts** - Regenerates the rules documentation with up-to-date information
 - **generate-presets.ts** - Updates preset configurations (e.g., recommended rules)
 
-Running this script ensures that rule documentation, exports, and presets stay synchronized with your rule implementation.
+Running this script ensures that rule documentation, exports, and presets stay synchronized with your rule
+implementation.
 
 ## Additional Resources
 
