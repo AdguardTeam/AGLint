@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [3.0.1] - 2025-12-08
+
+### Fixed
+
+- Pin `@adguard/agtree` to `v.3.3.1` to fix validator handling.
+
+[3.0.1]: https://github.com/AdguardTeam/AGLint/compare/v3.0.0...v3.0.1
+
 ## [3.0.0] - 2025-05-21
 
 ### Changed
