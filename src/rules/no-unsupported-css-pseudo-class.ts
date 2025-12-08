@@ -1,3 +1,4 @@
+import { GenericPlatform } from '@adguard/agtree';
 import { type PseudoClassSelectorPlain } from '@adguard/ecss-tree';
 import { search } from 'fast-fuzzy';
 import * as v from 'valibot';
@@ -13,7 +14,7 @@ import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
  *
  * Please keep this list sorted alphabetically.
  */
-export const SUPPORTED_EXT_CSS_PSEUDO_CLASSES = new Set([
+const SUPPORTED_ADG_PSEUDO_CLASSES: ReadonlySet<string> = new Set([
     /**
      * Pseudo-classes :is(), and :not() may use native implementation.
      *
@@ -44,8 +45,52 @@ export const SUPPORTED_EXT_CSS_PSEUDO_CLASSES = new Set([
     'remove',
     'upward',
     'xpath',
-    'style',
+]);
+
+/**
+ * Supported ABP Extended CSS pseudo-classes.
+ *
+ * These pseudo-classes are not supported by browsers natively, so we need Extended CSS library to support them.
+ *
+ * Please keep this list sorted alphabetically.
+ *
+ * @see {@link https://help.adblockplus.org/hc/en-us/articles/360062733293-How-to-write-filters#elemhide-emulation}
+ */
+const SUPPORTED_ABP_PSEUDO_CLASSES: ReadonlySet<string> = new Set([
+    '-abp-contains',
+    '-abp-has',
+    '-abp-properties',
+    'xpath',
+]);
+
+/**
+ * Supported uBlock procedural pseudo-classes.
+ *
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#procedural-cosmetic-filters}
+ * @see {@link https://github.com/gorhill/uBlock/wiki/Static-filter-syntax#action-operators}
+ */
+const SUPPORTED_UBO_PSEUDO_CLASSES: ReadonlySet<string> = new Set([
+    'has',
+    'has-text',
+    'matches-attr',
+    'matches-css',
+    'matches-css-after',
+    'matches-css-before',
     'matches-media',
+    'matches-path',
+    'matches-prop',
+    'min-text-length',
+    'not',
+    'others',
+    'upward',
+    'watch-attr',
+    'xpath',
+
+    // Action operators
+    'remove',
+    'remove-attr',
+    'remove-class',
+    'style',
 ]);
 
 /**
@@ -153,20 +198,33 @@ export default defineRule({
     },
     create: (context) => {
         const config = context.config[0];
-        const supportedCssPseudoClasses = new Set(
-            [...SUPPORTED_CSS_PSEUDO_CLASSES, ...(config.additionalSupportedCssPseudoClasses ?? [])],
-        );
-        const supportedExtCssPseudoClasses = new Set(
-            [...SUPPORTED_EXT_CSS_PSEUDO_CLASSES, ...(config.additionalSupportedExtCssPseudoClasses ?? [])],
-        );
-        const allSupportedPseudoClasses = [
-            ...supportedCssPseudoClasses,
-            ...supportedExtCssPseudoClasses,
-        ];
+
+        // Build a unified set of all supported pseudo-classes based on platforms
+        const allSupportedPseudoClassesSet = new Set<string>([
+            ...SUPPORTED_CSS_PSEUDO_CLASSES,
+            ...(config.additionalSupportedCssPseudoClasses ?? []),
+            ...(config.additionalSupportedExtCssPseudoClasses ?? []),
+        ]);
+
+        if (context.platforms & GenericPlatform.AbpAny) {
+            SUPPORTED_ABP_PSEUDO_CLASSES.forEach((cls) => allSupportedPseudoClassesSet.add(cls));
+        }
+
+        if (context.platforms & GenericPlatform.AdgAny) {
+            SUPPORTED_ADG_PSEUDO_CLASSES.forEach((cls) => allSupportedPseudoClassesSet.add(cls));
+        }
+
+        if (context.platforms & GenericPlatform.UboAny) {
+            SUPPORTED_UBO_PSEUDO_CLASSES.forEach((cls) => allSupportedPseudoClassesSet.add(cls));
+        }
+
+        // Convert to array for fuzzy search
+        const allSupportedPseudoClasses = [...allSupportedPseudoClassesSet];
 
         return {
             PseudoClassSelector: (node: PseudoClassSelectorPlain) => {
-                if (supportedCssPseudoClasses.has(node.name) || supportedExtCssPseudoClasses.has(node.name)) {
+                // Single set lookup replaces multiple conditional checks
+                if (allSupportedPseudoClassesSet.has(node.name)) {
                     return;
                 }
 
