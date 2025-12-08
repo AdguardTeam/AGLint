@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
+## [4.0.0-beta.3] - 2025-12-08
+
+### Added
+
+- Support for more pseudo-classes in `no-unsupported-css-pseudo-class` linter rule.
+
+[4.0.0-beta.3]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-beta.2...v4.0.0-beta.3
+
+
 ## [4.0.0-beta.2] - 2025-12-01
 
 ### Changed
