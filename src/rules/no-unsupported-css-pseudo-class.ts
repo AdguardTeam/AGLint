@@ -7,6 +7,9 @@ import { defineRule, LinterRuleType } from '../linter/rule';
 import { type LinterOffsetRange } from '../linter/source-code/source-code';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
+// TODO: Use compatibility tables once they support Extended CSS pseudo-classes.
+// https://github.com/AdguardTeam/tsurlfilter/issues/175
+
 /**
  * Supported Extended CSS pseudo-classes.
  *
