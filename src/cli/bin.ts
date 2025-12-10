@@ -13,12 +13,7 @@ import { LintResultCache } from './cache';
 import { buildCliProgram, enforceSoloOptions, type LinterCliConfig } from './cli-options';
 import { CONFIG_FILE_NAMES } from './config-file/config-file';
 import { DEFAULT_PATTERN, IGNORE_FILE_NAME } from './constants';
-import {
-    runParallel,
-    runParallelWithCache,
-    runSequential,
-    runSequentialWithCache,
-} from './executor';
+import { runParallel, runSequential } from './executor';
 import { LinterCliInitWizard } from './init-wizard';
 import { LinterConsoleReporter } from './reporters/console';
 import { LinterJsonReporter } from './reporters/json';
@@ -208,11 +203,7 @@ const main = async () => {
         // Run sequentially if single-threaded or auto mode with small project
         if (maxThreads === 1 || (isAutoMode && isSmall)) {
             cliDebug.log('Running in sequential mode');
-            if (cache) {
-                foundErrors = await runSequentialWithCache(files, options, reporter, cwd, cache);
-            } else {
-                foundErrors = await runSequential(files, options, reporter, cwd);
-            }
+            foundErrors = await runSequential(files, options, reporter, cwd, cache);
         } else {
             cliDebug.log(`Running in parallel mode with ${maxThreads} threads`);
             // Run in parallel with bucketed tasks
@@ -225,11 +216,7 @@ const main = async () => {
                     + `[${bucketSizes.join(', ')}] (avg: ${avgBucketSize} files/bucket)`,
                 );
             }
-            if (cache) {
-                foundErrors = await runParallelWithCache(buckets, options, reporter, cwd, maxThreads, cache);
-            } else {
-                foundErrors = await runParallel(buckets, options, reporter, cwd, maxThreads);
-            }
+            foundErrors = await runParallel(buckets, options, reporter, cwd, maxThreads, cache);
         }
 
         // Save cache after execution
