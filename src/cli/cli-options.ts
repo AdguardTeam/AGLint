@@ -174,7 +174,18 @@ export function buildCliProgram(): Command {
             new Option(
                 '--max-fix-rounds <number>',
                 'Maximum number of fix rounds to apply',
-            ).default(10),
+            )
+                .default(10)
+                .argParser((rawValue: string) => {
+                    const num = Number.parseInt(rawValue, 10);
+                    if (Number.isNaN(num) || !/^[1-9]\d*$/.test(rawValue)) {
+                        throw new Error('--max-fix-rounds must be a positive integer without leading zeros');
+                    }
+                    if (num < 1) {
+                        throw new Error('--max-fix-rounds must be at least 1');
+                    }
+                    return num;
+                }),
         )
         .addOption(
             new Option(
