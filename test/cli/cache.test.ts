@@ -16,7 +16,12 @@ import {
     test,
 } from 'vitest';
 
-import { getFileHash, LintResultCache } from '../../src/cli/cache';
+import {
+    type CacheFileData,
+    getFileHash,
+    LinterCacheStrategy,
+    LintResultCache,
+} from '../../src/cli/cache';
 import { type LinterResult } from '../../src/linter/linter';
 import { LinterRuleSeverity } from '../../src/linter/rule';
 
@@ -299,6 +304,114 @@ describe('cache', () => {
                 expect(data.files['/test/file1.txt']?.linterConfigHash).toBe(
                     data.files['/test/file2.txt']?.linterConfigHash,
                 );
+            });
+        });
+
+        describe('validateCacheData', () => {
+            test('should validate metadata strategy with matching mtime and size', () => {
+                const cachedData: CacheFileData = {
+                    meta: { mtime: 1000, size: 100 },
+                    linterConfigHash: 'config-hash',
+                    linterResult: createMockResult(),
+                };
+
+                const isValid = LintResultCache.validateCacheData(cachedData, {
+                    strategy: LinterCacheStrategy.Metadata,
+                    mtime: 1000,
+                    size: 100,
+                });
+
+                expect(isValid).toBe(true);
+            });
+
+            test('should invalidate metadata strategy with mismatched mtime', () => {
+                const cachedData: CacheFileData = {
+                    meta: { mtime: 1000, size: 100 },
+                    linterConfigHash: 'config-hash',
+                    linterResult: createMockResult(),
+                };
+
+                const isValid = LintResultCache.validateCacheData(cachedData, {
+                    strategy: LinterCacheStrategy.Metadata,
+                    mtime: 2000, // Different mtime
+                    size: 100,
+                });
+
+                expect(isValid).toBe(false);
+            });
+
+            test('should invalidate metadata strategy with mismatched size', () => {
+                const cachedData: CacheFileData = {
+                    meta: { mtime: 1000, size: 100 },
+                    linterConfigHash: 'config-hash',
+                    linterResult: createMockResult(),
+                };
+
+                const isValid = LintResultCache.validateCacheData(cachedData, {
+                    strategy: LinterCacheStrategy.Metadata,
+                    mtime: 1000,
+                    size: 200, // Different size
+                });
+
+                expect(isValid).toBe(false);
+            });
+
+            test('should validate content strategy with matching file content', () => {
+                const fileContent = '||example.com^';
+                const contentHash = getFileHash(fileContent);
+
+                const cachedData: CacheFileData = {
+                    meta: { mtime: 1000, size: 100 },
+                    linterConfigHash: 'config-hash',
+                    linterResult: createMockResult(),
+                    contentHash,
+                };
+
+                const isValid = LintResultCache.validateCacheData(cachedData, {
+                    strategy: LinterCacheStrategy.Content,
+                    fileContent,
+                });
+
+                expect(isValid).toBe(true);
+            });
+
+            test('should invalidate content strategy with different file content', () => {
+                const oldContent = '||example.com^';
+                const newContent = '||different.com^';
+                const oldHash = getFileHash(oldContent);
+
+                const cachedData: CacheFileData = {
+                    meta: { mtime: 1000, size: 100 },
+                    linterConfigHash: 'config-hash',
+                    linterResult: createMockResult(),
+                    contentHash: oldHash,
+                };
+
+                const isValid = LintResultCache.validateCacheData(cachedData, {
+                    strategy: LinterCacheStrategy.Content,
+                    fileContent: newContent, // Different content
+                });
+
+                expect(isValid).toBe(false);
+            });
+
+            test('should work with empty file content', () => {
+                const fileContent = '';
+                const contentHash = getFileHash(fileContent);
+
+                const cachedData: CacheFileData = {
+                    meta: { mtime: 1000, size: 0 },
+                    linterConfigHash: 'config-hash',
+                    linterResult: createMockResult(),
+                    contentHash,
+                };
+
+                const isValid = LintResultCache.validateCacheData(cachedData, {
+                    strategy: LinterCacheStrategy.Content,
+                    fileContent,
+                });
+
+                expect(isValid).toBe(true);
             });
         });
 
