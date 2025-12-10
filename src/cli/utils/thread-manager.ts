@@ -13,12 +13,25 @@ const getAvailableThreads = () => os.availableParallelism?.() ?? os.cpus().lengt
 
 /**
  * Schema for validating thread configuration options.
- * Accepts 'off', 'auto', or a number between 1 and available CPU cores.
+ * Accepts 'off', 'auto', or a number (as string or number) between 1 and available CPU cores.
  */
-export const threadOptionSchema = v.union([
-    v.pipe(v.string(), v.toLowerCase(), v.union([v.literal('off'), v.literal('auto')])),
-    v.pipe(v.number(), v.minValue(1), v.maxValue(getAvailableThreads())),
-]);
+export const threadOptionSchema = v.union(
+    [
+        // String literals: 'off' or 'auto'
+        v.pipe(v.string(), v.toLowerCase(), v.union([v.literal('off'), v.literal('auto')])),
+        // Numeric string: validate integer format and convert to number
+        v.pipe(
+            v.string(),
+            v.regex(/^[1-9]\d*$/, 'Must be a positive integer without leading zeros'),
+            v.transform((val) => Number.parseInt(val, 10)),
+            v.minValue(1),
+            v.maxValue(getAvailableThreads()),
+        ),
+        // Direct number input (for programmatic use)
+        v.pipe(v.number(), v.integer('Must be an integer'), v.minValue(1), v.maxValue(getAvailableThreads())),
+    ],
+    `Must be "off", "auto", or a positive integer between 1 and ${getAvailableThreads()}`,
+);
 
 /**
  * Valid thread configuration options.
