@@ -18,21 +18,34 @@ import { toPosix } from './utils/to-posix';
 export const CACHE_FILE_NAME = '.aglintcache';
 
 /**
- * Cache invalidation strategies.
+ * Cache strategy for determining when to invalidate cache.
  */
 export enum LinterCacheStrategy {
     /**
-     * Invalidate cache based on file content hash.
-     * More accurate but slower as it requires reading file contents.
-     */
-    Content = 'content',
-
-    /**
-     * Invalidate cache based on file metadata (mtime, size).
-     * Faster but less accurate.
+     * Cache is invalidated when file metadata (mtime, size) changes.
      */
     Metadata = 'metadata',
+
+    /**
+     * Cache is invalidated when file content hash changes.
+     */
+    Content = 'content',
 }
+
+/**
+ * Parameters for validating cached data.
+ * Uses discriminated union to ensure correct parameters based on strategy.
+ */
+export type CacheDataValidatorParams =
+    | {
+        strategy: LinterCacheStrategy.Metadata;
+        mtime: number;
+        size: number;
+    }
+    | {
+        strategy: LinterCacheStrategy.Content;
+        fileContent: string;
+    };
 
 const cacheFileMetaSchema = v.object({
     mtime: v.number(),
@@ -242,23 +255,18 @@ export class LintResultCache {
     }
 
     /**
-     * Gets cached result for a file if valid.
+     * Gets cached data for a file.
+     *
+     * Note: Returns data without validation. Validation is delegated to the worker
+     * to avoid double I/O - the executor doesn't need to read file content just
+     * for cache validation when the worker will read it anyway for linting.
      *
      * @param filePath Absolute file path.
-     * @param mtime File modification time.
-     * @param size File size.
      * @param linterConfig Linter configuration.
-     * @param strategy Cache strategy to use.
      *
-     * @returns Cached data if valid, undefined otherwise.
+     * @returns Cached data (without validation), undefined if not in cache or config mismatch.
      */
-    public getCachedResult(
-        filePath: string,
-        mtime: number,
-        size: number,
-        linterConfig: LinterConfig,
-        strategy: LinterCacheStrategy,
-    ): CacheFileData | undefined {
+    public getCacheData(filePath: string, linterConfig: LinterConfig): CacheFileData | undefined {
         const cached = this.data.files[filePath];
 
         if (!cached) {
@@ -267,23 +275,46 @@ export class LintResultCache {
 
         const configHash = LintResultCache.getCachedConfigHash(linterConfig);
 
-        // Check metadata-based cache
-        if (strategy === LinterCacheStrategy.Metadata) {
-            if (
-                cached.meta.mtime === mtime
-                && cached.meta.size === size
-                && cached.linterConfigHash === configHash
-            ) {
-                return cached;
-            }
+        // Config must always match
+        if (cached.linterConfigHash !== configHash) {
+            return undefined;
         }
 
-        // For content-based caching, return if config matches (content hash checked in worker)
-        if (strategy === LinterCacheStrategy.Content && cached.linterConfigHash === configHash) {
-            return cached;
+        // Return cached data without validation
+        // Worker will validate based on strategy (mtime/size or content hash)
+        return cached;
+    }
+
+    /**
+     * Validates cached data based on the cache strategy.
+     *
+     * This method is called by the worker to validate cache before using it.
+     * Validation is done in the worker (not executor) to avoid double I/O:
+     * - For metadata strategy: Compare mtime/size (already from scanner).
+     * - For content strategy: Read file once for both validation and linting.
+     *
+     * @param cachedData The cached data to validate.
+     * @param validatorParams Validation parameters with strategy and required data.
+     *
+     * @returns True if cache is valid, false otherwise.
+     */
+    public static validateCacheData(
+        cachedData: CacheFileData,
+        validatorParams: CacheDataValidatorParams,
+    ): boolean {
+        if (validatorParams.strategy === LinterCacheStrategy.Metadata) {
+            // For metadata strategy, validate mtime/size
+            return cachedData.meta.mtime === validatorParams.mtime
+                && cachedData.meta.size === validatorParams.size;
         }
 
-        return undefined;
+        if (validatorParams.strategy === LinterCacheStrategy.Content) {
+            // For content strategy, validate file content hash
+            const currentHash = getFileHash(validatorParams.fileContent);
+            return cachedData.contentHash === currentHash;
+        }
+
+        return false;
     }
 
     /**

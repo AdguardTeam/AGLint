@@ -16,7 +16,7 @@ import {
     test,
 } from 'vitest';
 
-import { getFileHash, LinterCacheStrategy, LintResultCache } from '../../src/cli/cache';
+import { getFileHash, LintResultCache } from '../../src/cli/cache';
 import { type LinterResult } from '../../src/linter/linter';
 import { LinterRuleSeverity } from '../../src/linter/rule';
 
@@ -189,93 +189,41 @@ describe('cache', () => {
             });
         });
 
-        describe('getCachedResult', () => {
+        describe('getCacheData', () => {
             test('should return undefined for non-existent file', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
 
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    { platforms: [], rules: {} },
-                    LinterCacheStrategy.Metadata,
-                );
+                const result = cache.getCacheData('/test/file.txt', { platforms: [], rules: {} });
 
                 expect(result).toBeUndefined();
             });
 
-            test('should return cached result with metadata strategy', async () => {
+            test('should return cached data when file exists', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
                 const config = { platforms: [], rules: {} };
                 const mockResult = createMockResult();
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, mockResult);
 
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
+                const result = cache.getCacheData('/test/file.txt', config);
 
                 expect(result).toBeDefined();
                 expect(result?.linterResult).toEqual(mockResult);
             });
 
-            test('should invalidate cache on mtime change with metadata strategy', async () => {
-                const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { platforms: [], rules: {} };
-
-                cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult());
-
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    2000, // Different mtime
-                    100,
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
-
-                expect(result).toBeUndefined();
-            });
-
-            test('should invalidate cache on size change with metadata strategy', async () => {
-                const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { platforms: [], rules: {} };
-
-                cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult());
-
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    200, // Different size
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
-
-                expect(result).toBeUndefined();
-            });
-
-            test('should invalidate cache on config change', async () => {
+            test('should return undefined on config change', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
                 const config1 = { platforms: [], rules: {} };
                 const config2 = { platforms: ['adg_any'], rules: {} };
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config1, createMockResult());
 
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config2, // Different config
-                    LinterCacheStrategy.Metadata,
-                );
+                const result = cache.getCacheData('/test/file.txt', config2); // Different config
 
                 expect(result).toBeUndefined();
             });
 
-            test('should return cached result with content strategy', async () => {
+            test('should return cached data with content hash', async () => {
                 const cache = await LintResultCache.create(cacheDir, '.aglintcache');
                 const config = { platforms: [], rules: {} };
                 const mockResult = createMockResult();
@@ -283,34 +231,10 @@ describe('cache', () => {
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, mockResult, contentHash);
 
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config,
-                    LinterCacheStrategy.Content,
-                );
+                const result = cache.getCacheData('/test/file.txt', config);
 
                 expect(result).toBeDefined();
                 expect(result?.contentHash).toBe(contentHash);
-            });
-
-            test('should allow mtime/size mismatch with content strategy', async () => {
-                const cache = await LintResultCache.create(cacheDir, '.aglintcache');
-                const config = { platforms: [], rules: {} };
-
-                cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult(), 'hash123');
-
-                // Content strategy doesn't check mtime/size, only config
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    2000, // Different mtime
-                    200, // Different size
-                    config,
-                    LinterCacheStrategy.Content,
-                );
-
-                expect(result).toBeDefined();
             });
         });
 
@@ -403,13 +327,7 @@ describe('cache', () => {
 
                 // Load cache again
                 const cache2 = await LintResultCache.create(cacheDir, cacheFilePath);
-                const result = cache2.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
+                const result = cache2.getCacheData('/test/file.txt', config);
 
                 expect(result).toBeDefined();
             });
@@ -445,13 +363,7 @@ describe('cache', () => {
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, mockResult);
 
                 // Get result
-                const result = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
+                const result = cache.getCacheData('/test/file.txt', config);
 
                 expect(result).toBeDefined();
 
@@ -460,13 +372,7 @@ describe('cache', () => {
 
                 // Reload
                 const cache2 = await LintResultCache.create(cacheDir, '.aglintcache');
-                const result2 = cache2.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
+                const result2 = cache2.getCacheData('/test/file.txt', config);
 
                 expect(result2).toBeDefined();
                 // After reload, schema validation may strip optional fields
@@ -484,25 +390,10 @@ describe('cache', () => {
 
                 cache.setCachedResult('/test/file.txt', 1000, 100, config, createMockResult(), contentHash);
 
-                // Metadata strategy
-                const result1 = cache.getCachedResult(
-                    '/test/file.txt',
-                    1000,
-                    100,
-                    config,
-                    LinterCacheStrategy.Metadata,
-                );
-                expect(result1).toBeDefined();
-
-                // Content strategy
-                const result2 = cache.getCachedResult(
-                    '/test/file.txt',
-                    2000, // Different mtime, should still work with content strategy
-                    100,
-                    config,
-                    LinterCacheStrategy.Content,
-                );
-                expect(result2).toBeDefined();
+                // Get cached data (validation happens in worker)
+                const result = cache.getCacheData('/test/file.txt', config);
+                expect(result).toBeDefined();
+                expect(result?.contentHash).toBe(contentHash);
             });
         });
     });

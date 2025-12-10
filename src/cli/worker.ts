@@ -7,7 +7,12 @@ import { lint, type LinterRunOptions } from '../linter/linter';
 import { type LinterRule } from '../linter/rule';
 import { Debug } from '../utils/debug';
 
-import { type CacheFileData, getFileHash, LinterCacheStrategy } from './cache';
+import {
+    type CacheFileData,
+    getFileHash,
+    LinterCacheStrategy,
+    LintResultCache,
+} from './cache';
 import { type LinterCliConfig } from './cli-options';
 import { chalkColorFormatter } from './utils/debug-colors';
 
@@ -32,6 +37,16 @@ export type LinterWorkerTask = {
      * Linter configuration for this file.
      */
     linterConfig: LinterConfig;
+
+    /**
+     * File modification time (from scanner).
+     */
+    mtime: number;
+
+    /**
+     * File size in bytes (from scanner).
+     */
+    size: number;
 
     /**
      * Optional cached data if cache is enabled.
@@ -123,27 +138,35 @@ const runLinterWorker = async (tasks: LinterWorkerTasks): Promise<LinterWorkerRe
             const strategy = tasks.cliConfig.cacheStrategy!;
             let cacheValid = false;
             let fileHash: string | undefined;
+            let fileContent: string | undefined;
 
             if (strategy === LinterCacheStrategy.Metadata) {
-                // For metadata strategy, executor already validated mtime/size
-                cacheValid = true;
+                // For metadata strategy, validate using mtime/size from scanner
+                cacheValid = LintResultCache.validateCacheData(task.fileCacheData, {
+                    strategy: LinterCacheStrategy.Metadata,
+                    mtime: task.mtime,
+                    size: task.size,
+                });
             } else if (strategy === LinterCacheStrategy.Content) {
-                // For content strategy, read file and check hash
-                const content = await readFile(task.filePath, 'utf8');
-                fileHash = getFileHash(content);
-                cacheValid = task.fileCacheData.contentHash === fileHash;
+                // For content strategy, read file once for validation and potential linting
+                fileContent = await readFile(task.filePath, 'utf8');
+                fileHash = getFileHash(fileContent);
+                cacheValid = LintResultCache.validateCacheData(task.fileCacheData, {
+                    strategy: LinterCacheStrategy.Content,
+                    fileContent,
+                });
 
                 // If cache valid and fix mode, apply fixes from cached result
                 if (cacheValid && tasks.cliConfig.fix) {
                     const fixedSource = applyFixesToResult({
                         linterResult: task.fileCacheData.linterResult,
-                        sourceContent: content,
+                        sourceContent: fileContent,
                         maxFixRounds: tasks.cliConfig.maxFixRounds,
                         categories: tasks.cliConfig.fixTypes ? new Set(tasks.cliConfig.fixTypes) : undefined,
                         ruleIds: tasks.cliConfig.fixRules ? new Set(tasks.cliConfig.fixRules) : undefined,
                     });
 
-                    if (fixedSource !== content) {
+                    if (fixedSource !== fileContent) {
                         await writeFile(task.filePath, fixedSource);
                     }
                 }

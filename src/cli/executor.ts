@@ -60,6 +60,8 @@ export async function runSequential(
                     filePath: file.path,
                     cwd,
                     linterConfig: file.config,
+                    mtime: file.mtime,
+                    size: file.size,
                 },
             ],
             cliConfig,
@@ -118,53 +120,51 @@ export async function runSequentialWithCache(
 
         reporter.onFileStart?.(parsedFilePath, file.config);
 
-        // Check if cached result is valid
-        const cachedData = cache.getCachedResult(
-            file.path,
-            file.mtime,
-            file.size,
-            file.config,
-            cliConfig.cacheStrategy!,
-        );
+        // Get cached data - worker will validate based on strategy
+        const cachedData = cache.getCacheData(file.path, file.config);
 
-        if (cachedData) {
-            // Cache hit - use cached result
+        // Always call worker to validate/lint
+        // Worker will use cache if valid, or lint if invalid/missing
+        // eslint-disable-next-line no-await-in-loop
+        const { results } = await runLinterWorker({
+            tasks: [
+                {
+                    filePath: file.path,
+                    cwd,
+                    linterConfig: file.config,
+                    mtime: file.mtime,
+                    size: file.size,
+                    fileCacheData: cachedData,
+                },
+            ],
+            cliConfig,
+        });
+
+        const result = results[0]!;
+
+        // Update stats based on whether cache was used
+        if (result.fromCache) {
             cacheHits += 1;
-            reporter.onFileEnd?.(parsedFilePath, cachedData.linterResult, true);
-
-            if (!foundErrors && hasErrors(cachedData.linterResult)) {
-                foundErrors = true;
-            }
         } else {
-            // Cache miss - run linter
             cacheMisses += 1;
+        }
 
-            // eslint-disable-next-line no-await-in-loop
-            const { results } = await runLinterWorker({
-                tasks: [
-                    {
-                        filePath: file.path,
-                        cwd,
-                        linterConfig: file.config,
-                    },
-                ],
-                cliConfig,
-            });
-
-            if (!foundErrors && hasErrors(results[0]!.linterResult)) {
-                foundErrors = true;
-            }
-
-            // Store result in cache
+        // Store result in cache with content hash if available
+        if (!result.fromCache || result.fileHash) {
             cache.setCachedResult(
                 file.path,
                 file.mtime,
                 file.size,
                 file.config,
-                results[0]!.linterResult,
+                result.linterResult,
+                result.fileHash,
             );
+        }
 
-            reporter.onFileEnd?.(parsedFilePath, results[0]!.linterResult, false);
+        reporter.onFileEnd?.(parsedFilePath, result.linterResult, result.fromCache);
+
+        if (!foundErrors && hasErrors(result.linterResult)) {
+            foundErrors = true;
         }
     }
 
@@ -239,6 +239,8 @@ export async function runParallel(
                     filePath: f.path,
                     cwd,
                     linterConfig: f.config,
+                    mtime: f.mtime,
+                    size: f.size,
                 })),
                 cliConfig,
             }) as LinterWorkerResults;
@@ -323,18 +325,15 @@ export async function runParallelWithCache(
             // Send all files to worker with cache data
             const workerResults = await piscina.run({
                 tasks: bucket.map((f) => {
-                    const cachedData = cache.getCachedResult(
-                        f.path,
-                        f.mtime,
-                        f.size,
-                        f.config,
-                        cliConfig.cacheStrategy!,
-                    );
+                    // Get cached data - worker will validate based on strategy
+                    const cachedData = cache.getCacheData(f.path, f.config);
 
                     return {
                         filePath: f.path,
                         cwd,
                         linterConfig: f.config,
+                        mtime: f.mtime,
+                        size: f.size,
                         fileCacheData: cachedData ?? undefined,
                     };
                 }),
