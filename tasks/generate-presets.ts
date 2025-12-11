@@ -19,6 +19,18 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
+ * Override severity or config for specific rules in preset generation.
+ * If you want to change the default severity or config for a rule, add it here.
+ *
+ * Examples:
+ * - 'rule-name': 'error' (Override severity only).
+ * - 'rule-name': ['warn', { option: true }] (Override severity with config).
+ */
+const RULE_OVERRIDES: Readonly<Record<string, LinterRuleConfig>> = {
+    // TODO: Add overrides here
+};
+
+/**
  * Generates presets for rules.
  */
 async function main() {
@@ -46,11 +58,25 @@ async function main() {
             ruleConfig = severity;
         }
 
-        if (rule.meta.docs.recommended) {
-            recommended.rules![rule.meta.docs.name] = ruleConfig;
+        let finalConfig: LinterRuleConfig = ruleConfig;
+        const override = RULE_OVERRIDES[rule.meta.docs.name];
+        if (override !== undefined) {
+            if (typeof override === 'string') {
+                if (rule.meta.configSchema && rule.meta.defaultConfig) {
+                    finalConfig = [override, ...rule.meta.defaultConfig];
+                } else {
+                    finalConfig = override;
+                }
+            } else {
+                finalConfig = override as LinterRuleConfig;
+            }
         }
 
-        all.rules![rule.meta.docs.name] = ruleConfig;
+        if (rule.meta.docs.recommended) {
+            recommended.rules![rule.meta.docs.name] = finalConfig;
+        }
+
+        all.rules![rule.meta.docs.name] = finalConfig;
     }
 
     await writeFile(path.join(__dirname, '../config-presets/all.json'), JSON.stringify(all, null, 2));
