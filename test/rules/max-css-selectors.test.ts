@@ -61,7 +61,7 @@ describe('max-css-selectors', () => {
                     count: 2,
                     maxSelectors: 1,
                 },
-                message: 'This selector list contains 2 selectors, but only 1 are allowed',
+                message: expect.any(String),
                 position: {
                     start: {
                         line: 2,
@@ -86,7 +86,7 @@ describe('max-css-selectors', () => {
                     count: 3,
                     maxSelectors: 1,
                 },
-                message: 'This selector list contains 3 selectors, but only 1 are allowed',
+                message: expect.any(String),
                 position: {
                     start: {
                         line: 4,

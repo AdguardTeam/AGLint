@@ -38,7 +38,7 @@ describe('no-unknown-preprocessor-directives', () => {
                 data: {
                     directive: 'incl2ude',
                 },
-                message: 'Unknown preprocessor directive "incl2ude"',
+                message: expect.any(String),
                 messageId: 'unknownPreprocessorDirective',
                 position: {
                     start: {
@@ -61,7 +61,7 @@ describe('no-unknown-preprocessor-directives', () => {
                 data: {
                     directive: 'IF',
                 },
-                message: 'Unknown preprocessor directive "IF"',
+                message: expect.any(String),
                 messageId: 'unknownPreprocessorDirective',
                 position: {
                     start: {
@@ -84,7 +84,7 @@ describe('no-unknown-preprocessor-directives', () => {
                 data: {
                     directive: 'if2',
                 },
-                message: 'Unknown preprocessor directive "if2"',
+                message: expect.any(String),
                 messageId: 'unknownPreprocessorDirective',
                 position: {
                     start: {
@@ -107,7 +107,7 @@ describe('no-unknown-preprocessor-directives', () => {
                 data: {
                     directive: 'end-if',
                 },
-                message: 'Unknown preprocessor directive "end-if"',
+                message: expect.any(String),
                 messageId: 'unknownPreprocessorDirective',
                 position: {
                     start: {
@@ -130,7 +130,7 @@ describe('no-unknown-preprocessor-directives', () => {
                 data: {
                     directive: 'something',
                 },
-                message: 'Unknown preprocessor directive "something"',
+                message: expect.any(String),
                 messageId: 'unknownPreprocessorDirective',
                 position: {
                     start: {

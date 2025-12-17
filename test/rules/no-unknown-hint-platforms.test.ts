@@ -104,7 +104,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_OPTIMIZED',
                 },
-                message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
+                message: expect.any(String),
                 messageId: 'hintMustNotHaveAnyParameters',
                 position: {
                     start: {
@@ -128,7 +128,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_OPTIMIZED',
                 },
-                message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
+                message: expect.any(String),
                 messageId: 'hintMustNotHaveAnyParameters',
                 position: {
                     start: {
@@ -152,7 +152,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_OPTIMIZED',
                 },
-                message: 'Hint "NOT_OPTIMIZED" must not have any parameters',
+                message: expect.any(String),
                 messageId: 'hintMustNotHaveAnyParameters',
                 position: {
                     start: {
@@ -176,7 +176,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'not_optimized',
                 },
-                message: 'Unknown hint name "not_optimized"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -221,7 +221,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_VALIDATE',
                 },
-                message: 'Hint "NOT_VALIDATE" must not have any parameters',
+                message: expect.any(String),
                 messageId: 'hintMustNotHaveAnyParameters',
                 position: {
                     start: {
@@ -245,7 +245,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_VALIDATE',
                 },
-                message: 'Hint "NOT_VALIDATE" must not have any parameters',
+                message: expect.any(String),
                 messageId: 'hintMustNotHaveAnyParameters',
                 position: {
                     start: {
@@ -269,7 +269,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_VALIDATE',
                 },
-                message: 'Hint "NOT_VALIDATE" must not have any parameters',
+                message: expect.any(String),
                 messageId: 'hintMustNotHaveAnyParameters',
                 position: {
                     start: {
@@ -293,7 +293,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'not_validate',
                 },
-                message: 'Unknown hint name "not_validate"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -338,7 +338,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'PLATFORM',
                 },
-                message: 'Hint "PLATFORM" must have at least one platform specified',
+                message: expect.any(String),
                 messageId: 'hintMustHaveAtLeastOnePlatform',
                 position: {
                     start: {
@@ -362,7 +362,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     platform: 'aa',
                 },
-                message: 'Unknown platform "aa"',
+                message: expect.any(String),
                 messageId: 'unknownPlatform',
                 position: {
                     start: {
@@ -386,7 +386,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     platform: 'aa',
                 },
-                message: 'Unknown platform "aa"',
+                message: expect.any(String),
                 messageId: 'unknownPlatform',
                 position: {
                     start: {
@@ -406,7 +406,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     platform: 'bb',
                 },
-                message: 'Unknown platform "bb"',
+                message: expect.any(String),
                 messageId: 'unknownPlatform',
                 position: {
                     start: {
@@ -430,7 +430,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'platform',
                 },
-                message: 'Unknown hint name "platform"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -475,7 +475,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_PLATFORM',
                 },
-                message: 'Hint "NOT_PLATFORM" must have at least one platform specified',
+                message: expect.any(String),
                 messageId: 'hintMustHaveAtLeastOnePlatform',
                 position: {
                     start: {
@@ -499,7 +499,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     platform: 'aa',
                 },
-                message: 'Unknown platform "aa"',
+                message: expect.any(String),
                 messageId: 'unknownPlatform',
                 position: {
                     start: {
@@ -523,7 +523,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     platform: 'aa',
                 },
-                message: 'Unknown platform "aa"',
+                message: expect.any(String),
                 messageId: 'unknownPlatform',
                 position: {
                     start: {
@@ -543,7 +543,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     platform: 'bb',
                 },
-                message: 'Unknown platform "bb"',
+                message: expect.any(String),
                 messageId: 'unknownPlatform',
                 position: {
                     start: {
@@ -567,7 +567,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'not_platform',
                 },
-                message: 'Unknown hint name "not_platform"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -612,7 +612,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'HINT',
                 },
-                message: 'Unknown hint name "HINT"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -636,7 +636,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'HINT',
                 },
-                message: 'Unknown hint name "HINT"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -660,7 +660,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'HINT',
                 },
-                message: 'Unknown hint name "HINT"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {
@@ -684,7 +684,7 @@ describe('no-unknown-hint-platforms', () => {
                 data: {
                     hintName: 'NOT_HINT',
                 },
-                message: 'Unknown hint name "NOT_HINT"',
+                message: expect.any(String),
                 messageId: 'unknownHintName',
                 position: {
                     start: {

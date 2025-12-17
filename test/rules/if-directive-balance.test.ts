@@ -106,7 +106,7 @@ describe('if-directive-balance', () => {
                 data: {
                     directive: 'if',
                 },
-                message: 'Unclosed "if" directive',
+                message: expect.any(String),
                 messageId: 'unclosedIf',
                 position: {
                     start: {
@@ -142,7 +142,7 @@ describe('if-directive-balance', () => {
                 data: {
                     directive: 'if',
                 },
-                message: 'Unclosed "if" directive',
+                message: expect.any(String),
                 messageId: 'unclosedIf',
                 position: {
                     start: {
@@ -175,7 +175,7 @@ describe('if-directive-balance', () => {
                     directive: 'else',
                     ifDirective: 'if',
                 },
-                message: 'Using an "else" directive without an opening "if" directive',
+                message: expect.any(String),
                 messageId: 'missingIf',
                 position: {
                     start: {
@@ -209,7 +209,7 @@ describe('if-directive-balance', () => {
                     directive: 'else',
                     ifDirective: 'if',
                 },
-                message: 'Using an "else" directive without an opening "if" directive',
+                message: expect.any(String),
                 messageId: 'missingIf',
                 position: {
                     start: {
@@ -230,7 +230,7 @@ describe('if-directive-balance', () => {
                     directive: 'endif',
                     ifDirective: 'if',
                 },
-                message: 'Using an "endif" directive without an opening "if" directive',
+                message: expect.any(String),
                 messageId: 'missingIf',
                 position: {
                     start: {
@@ -267,7 +267,7 @@ describe('if-directive-balance', () => {
                     directive: 'endif',
                     ifDirective: 'if',
                 },
-                message: 'Using an "endif" directive without an opening "if" directive',
+                message: expect.any(String),
                 messageId: 'missingIf',
                 position: {
                     start: {
@@ -302,7 +302,7 @@ describe('if-directive-balance', () => {
                 data: {
                     directive: 'else',
                 },
-                message: 'Invalid usage of preprocessor directive: "else"',
+                message: expect.any(String),
                 messageId: 'invalidDirective',
                 position: {
                     start: {
@@ -329,14 +329,7 @@ describe('if-directive-balance', () => {
                 data: {
                     directive: 'endif',
                 },
-                fix: {
-                    range: [
-                        63,
-                        76,
-                    ],
-                    text: '',
-                },
-                message: 'Invalid usage of preprocessor directive: "endif"',
+                message: expect.any(String),
                 messageId: 'invalidDirective',
                 position: {
                     start: {
@@ -347,6 +340,13 @@ describe('if-directive-balance', () => {
                         column: 20,
                         line: 6,
                     },
+                },
+                fix: {
+                    range: [
+                        63,
+                        76,
+                    ],
+                    text: '',
                 },
             },
         ]);

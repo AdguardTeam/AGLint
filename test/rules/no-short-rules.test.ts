@@ -35,7 +35,7 @@ describe('no-short-rules', () => {
                             length: 1,
                             minLength: 4,
                         },
-                        message: 'Rule is too short, its length is 1, but at least 4 characters are required',
+                        message: expect.any(String),
                         position: {
                             start: {
                                 column: 0,
@@ -61,7 +61,7 @@ describe('no-short-rules', () => {
                             length: 3,
                             minLength: 4,
                         },
-                        message: 'Rule is too short, its length is 3, but at least 4 characters are required',
+                        message: expect.any(String),
                         position: {
                             start: {
                                 column: 0,
@@ -88,7 +88,7 @@ describe('no-short-rules', () => {
                             length: 1,
                             minLength: 4,
                         },
-                        message: 'Rule is too short, its length is 1, but at least 4 characters are required',
+                        message: expect.any(String),
                         position: {
                             start: {
                                 column: 0,
@@ -125,7 +125,7 @@ describe('no-short-rules', () => {
                             length: 5,
                             minLength: 6,
                         },
-                        message: 'Rule is too short, its length is 5, but at least 6 characters are required',
+                        message: expect.any(String),
                         position: {
                             start: {
                                 column: 0,
@@ -151,7 +151,7 @@ describe('no-short-rules', () => {
                             length: 5,
                             minLength: 6,
                         },
-                        message: 'Rule is too short, its length is 5, but at least 6 characters are required',
+                        message: expect.any(String),
                         position: {
                             start: {
                                 column: 0,

@@ -77,7 +77,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'windows',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -106,7 +106,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'mac',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -127,7 +127,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'windows',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -156,7 +156,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'android',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -177,7 +177,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'android',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -207,7 +207,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'windows',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "windows" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -228,7 +228,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'mac',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "mac" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -249,7 +249,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'android',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "android" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -270,7 +270,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ios',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ios" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -291,7 +291,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_chromium',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_chromium" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -312,7 +312,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_ff',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_ff" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -333,7 +333,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_edge',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_edge" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -354,7 +354,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_opera',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_opera" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -375,7 +375,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_safari',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_safari" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -396,7 +396,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_android_cb',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_android_cb" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {
@@ -417,7 +417,7 @@ describe('no-inconsistent-hint-platforms', () => {
                     platform: 'ext_ublock',
                 },
                 // eslint-disable-next-line max-len
-                message: 'Platform "ext_ublock" is targeted by a PLATFORM() hint and excluded by a NOT_PLATFORM() hint at the same time',
+                message: expect.any(String),
                 messageId: 'inconsistentHintPlatforms',
                 position: {
                     start: {

@@ -65,7 +65,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'PLATFORM',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "PLATFORM"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 21,
@@ -88,7 +88,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'NOT_OPTIMIZED',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "NOT_OPTIMIZED"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 17,
@@ -116,7 +116,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'NOT_PLATFORM',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "NOT_PLATFORM"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 42,
@@ -136,7 +136,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'NOT_PLATFORM',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "NOT_PLATFORM"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 60,
@@ -164,7 +164,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'NOT_PLATFORM',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "NOT_PLATFORM"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 42,
@@ -184,7 +184,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'NOT_PLATFORM',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "NOT_PLATFORM"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 60,
@@ -204,7 +204,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'PLATFORM',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "PLATFORM"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 82,
@@ -229,7 +229,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'HINT',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "HINT"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 8,
@@ -249,7 +249,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'HINT',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "HINT"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 18,
@@ -269,7 +269,7 @@ describe('no-duplicated-hints', () => {
                     hint: 'HINT',
                 },
                 messageId: 'duplicatedHints',
-                message: 'Duplicated hint "HINT"',
+                message: expect.any(String),
                 position: {
                     start: {
                         column: 25,

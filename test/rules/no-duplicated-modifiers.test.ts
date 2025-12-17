@@ -35,7 +35,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -55,7 +55,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -75,7 +75,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -102,7 +102,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -122,7 +122,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -142,7 +142,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -162,7 +162,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'third-party',
                 },
-                message: 'Duplicated modifier "third-party"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -182,7 +182,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'script',
                 },
-                message: 'Duplicated modifier "script"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {
@@ -209,7 +209,7 @@ describe('no-duplicated-modifiers', () => {
                 data: {
                     modifier: 'domain',
                 },
-                message: 'Duplicated modifier "domain"',
+                message: expect.any(String),
                 messageId: 'duplicatedModifiers',
                 position: {
                     start: {

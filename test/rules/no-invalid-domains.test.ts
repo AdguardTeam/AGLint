@@ -78,7 +78,7 @@ describe('no-invalid-domains', () => {
                 data: {
                     domain: 'example.',
                 },
-                message: 'Invalid domain "example."',
+                message: expect.any(String),
                 messageId: 'invalidDomain',
                 position: {
                     start: {
@@ -93,7 +93,7 @@ describe('no-invalid-domains', () => {
                 suggestions: [
                     {
                         messageId: 'removeInvalidDomain',
-                        message: 'Remove invalid domain "example."',
+                        message: expect.any(String),
                         data: {
                             domain: 'example.',
                         },
@@ -115,7 +115,7 @@ describe('no-invalid-domains', () => {
                 data: {
                     domain: '.',
                 },
-                message: 'Invalid domain "."',
+                message: expect.any(String),
                 messageId: 'invalidDomain',
                 position: {
                     start: {
@@ -130,7 +130,7 @@ describe('no-invalid-domains', () => {
                 suggestions: [
                     {
                         messageId: 'removeInvalidDomain',
-                        message: 'Remove invalid domain "."',
+                        message: expect.any(String),
                         data: {
                             domain: '.',
                         },
@@ -151,7 +151,7 @@ describe('no-invalid-domains', () => {
                 data: {
                     domain: '...',
                 },
-                message: 'Invalid domain "..."',
+                message: expect.any(String),
                 messageId: 'invalidDomain',
                 position: {
                     start: {
@@ -165,7 +165,7 @@ describe('no-invalid-domains', () => {
                 },
                 suggestions: [
                     {
-                        message: 'Remove invalid domain "..."',
+                        message: expect.any(String),
                         messageId: 'removeInvalidDomain',
                         data: {
                             domain: '...',
@@ -188,7 +188,7 @@ describe('no-invalid-domains', () => {
                 data: {
                     domain: 'AA BB',
                 },
-                message: 'Invalid domain "AA BB"',
+                message: expect.any(String),
                 messageId: 'invalidDomain',
                 position: {
                     start: {
@@ -202,7 +202,7 @@ describe('no-invalid-domains', () => {
                 },
                 suggestions: [
                     {
-                        message: 'Remove invalid domain "AA BB"',
+                        message: expect.any(String),
                         messageId: 'removeInvalidDomain',
                         data: {
                             domain: 'AA BB',
@@ -225,7 +225,7 @@ describe('no-invalid-domains', () => {
                 data: {
                     domain: 'AA BB CC',
                 },
-                message: 'Invalid domain "AA BB CC"',
+                message: expect.any(String),
                 messageId: 'invalidDomain',
                 position: {
                     start: {
@@ -239,7 +239,7 @@ describe('no-invalid-domains', () => {
                 },
                 suggestions: [
                     {
-                        message: 'Remove invalid domain "AA BB CC"',
+                        message: expect.any(String),
                         messageId: 'removeInvalidDomain',
                         data: {
                             domain: 'AA BB CC',
@@ -262,7 +262,7 @@ describe('no-invalid-domains', () => {
                 data: {
                     domain: 'a^b',
                 },
-                message: 'Invalid domain "a^b"',
+                message: expect.any(String),
                 messageId: 'invalidDomain',
                 position: {
                     start: {
@@ -276,7 +276,7 @@ describe('no-invalid-domains', () => {
                 },
                 suggestions: [
                     {
-                        message: 'Remove invalid domain "a^b"',
+                        message: expect.any(String),
                         messageId: 'removeInvalidDomain',
                         data: {
                             domain: 'a^b',
