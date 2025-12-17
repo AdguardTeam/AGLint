@@ -54,7 +54,8 @@ Build:
         scripts:
           - "./bamboo-specs/scripts/cleanup.sh aglint.tgz"
   requirements:
-    - adg-docker: true
+    - adg-docker: 'true'
+    - extension: 'true'
 
 branches:
   create: for-pull-request

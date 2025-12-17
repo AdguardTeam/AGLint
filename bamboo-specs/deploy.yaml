@@ -42,6 +42,7 @@ npmjs: &npmjs
             npm publish aglint.tgz $bamboo_publishArgs
   requirements:
     - adg-docker: 'true'
+    - extension: 'true'
   notifications:
     - events:
         - deployment-started-and-finished
