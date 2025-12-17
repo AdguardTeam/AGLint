@@ -15,12 +15,90 @@ Problem. Identifies parts that causes errors or confusing behavior. High priorit
 
 This rule can be configured using the following options.
 
-### Options schema
+### Options overview
+
+```typescript
+[
+  {
+    minLength: number // Minimum rule length
+  }
+]
+```
+
+### Options valibot schema
 
 <details>
 <summary>Click to expand</summary>
 
-```json
+```typescript
+{
+  "kind": "schema",
+  "type": "tuple",
+  "expects": "Array",
+  "async": false,
+  "items": [
+    {
+      "kind": "schema",
+      "type": "strict_object",
+      "expects": "Object",
+      "async": false,
+      "entries": {
+        "minLength": {
+          "kind": "schema",
+          "type": "number",
+          "expects": "number",
+          "async": false,
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          },
+          "pipe": [
+            {
+              "kind": "schema",
+              "type": "number",
+              "expects": "number",
+              "async": false,
+              "~standard": {
+                "version": 1,
+                "vendor": "valibot"
+              }
+            },
+            {
+              "kind": "validation",
+              "type": "min_value",
+              "async": false,
+              "expects": ">=1",
+              "requirement": 1
+            },
+            {
+              "kind": "metadata",
+              "type": "description",
+              "description": "Minimum rule length"
+            }
+          ]
+        }
+      },
+      "~standard": {
+        "version": 1,
+        "vendor": "valibot"
+      }
+    }
+  ],
+  "~standard": {
+    "version": 1,
+    "vendor": "valibot"
+  }
+}
+```
+
+</details>
+
+### Options JSON schema
+
+<details>
+<summary>Click to expand</summary>
+
+```typescript
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "array",

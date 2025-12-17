@@ -15,6 +15,8 @@ import { applyFixes } from '../src/linter/source-code/fix-applier';
 import { AGLINT_REPO_URL } from '../src/utils/repo-url';
 import { lint } from '../test/rules/helpers/lint';
 
+import { prettyPrintValibotSchema } from './valibot-pretty-print';
+
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -212,18 +214,42 @@ const generateRuleDocumentation = async (file: string, rule: LinterRule) => {
         md.push('This rule can be configured using the following options.');
         md.push('');
 
-        md.push('### Options schema');
+        md.push('### Options overview');
+        md.push('');
+        md.push('```typescript');
+        md.push(prettyPrintValibotSchema(rule.meta.configSchema));
+        md.push('```');
         md.push('');
 
+        md.push('### Options valibot schema');
+        md.push('');
         md.push('<details>');
         md.push('<summary>Click to expand</summary>');
         md.push('');
-        md.push('```json');
-        md.push(`${JSON.stringify(toJsonSchema(rule.meta.configSchema), null, 2)}`);
+        md.push('```typescript');
+        md.push(JSON.stringify(rule.meta.configSchema, null, 2));
         md.push('```');
         md.push('');
         md.push('</details>');
         md.push('');
+
+        try {
+            const jsonSchema = toJsonSchema(rule.meta.configSchema);
+
+            md.push('### Options JSON schema');
+            md.push('');
+            md.push('<details>');
+            md.push('<summary>Click to expand</summary>');
+            md.push('');
+            md.push('```typescript');
+            md.push(JSON.stringify(jsonSchema, null, 2));
+            md.push('```');
+            md.push('');
+            md.push('</details>');
+            md.push('');
+        } catch {
+            // do nothing
+        }
 
         md.push('### Default options');
         md.push('');

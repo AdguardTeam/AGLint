@@ -17,12 +17,112 @@ Layout. Focuses on how filters look, not how they work.
 
 This rule can be configured using the following options.
 
-### Options schema
+### Options overview
+
+```typescript
+[
+  {
+    maxSelectors?: number | undefined // The maximum number of selectors allowed in a selector list
+  }
+]
+```
+
+### Options valibot schema
 
 <details>
 <summary>Click to expand</summary>
 
-```json
+```typescript
+{
+  "kind": "schema",
+  "type": "tuple",
+  "expects": "Array",
+  "async": false,
+  "items": [
+    {
+      "kind": "schema",
+      "type": "strict_object",
+      "expects": "Object",
+      "async": false,
+      "entries": {
+        "maxSelectors": {
+          "kind": "schema",
+          "type": "optional",
+          "expects": "(number | undefined)",
+          "async": false,
+          "wrapped": {
+            "kind": "schema",
+            "type": "number",
+            "expects": "number",
+            "async": false,
+            "~standard": {
+              "version": 1,
+              "vendor": "valibot"
+            }
+          },
+          "default": 1,
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          },
+          "pipe": [
+            {
+              "kind": "schema",
+              "type": "optional",
+              "expects": "(number | undefined)",
+              "async": false,
+              "wrapped": {
+                "kind": "schema",
+                "type": "number",
+                "expects": "number",
+                "async": false,
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                }
+              },
+              "default": 1,
+              "~standard": {
+                "version": 1,
+                "vendor": "valibot"
+              }
+            },
+            {
+              "kind": "validation",
+              "type": "min_value",
+              "async": false,
+              "expects": ">=1",
+              "requirement": 1
+            },
+            {
+              "kind": "metadata",
+              "type": "description",
+              "description": "The maximum number of selectors allowed in a selector list"
+            }
+          ]
+        }
+      },
+      "~standard": {
+        "version": 1,
+        "vendor": "valibot"
+      }
+    }
+  ],
+  "~standard": {
+    "version": 1,
+    "vendor": "valibot"
+  }
+}
+```
+
+</details>
+
+### Options JSON schema
+
+<details>
+<summary>Click to expand</summary>
+
+```typescript
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "array",

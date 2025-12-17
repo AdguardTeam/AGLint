@@ -1,7 +1,7 @@
 import { type AnyRule, RegExpUtils } from '@adguard/agtree';
 import * as v from 'valibot';
 
-import { defineRule, LinterRuleType } from '../linter/rule';
+import { defineRule, type FixerFunction, LinterRuleType } from '../linter/rule';
 import { createVisitorsForAnyValidRule } from '../linter/visitor-creator';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
@@ -18,7 +18,6 @@ export default defineRule({
             excludedRuleText: 'Rule matches an excluded rule text: {{ruleText}}',
             excludedPattern: 'Rule matches an excluded pattern: {{pattern}}',
         },
-        // TODO: Improve schema with transformation: https://github.com/AdguardTeam/AGLint/issues/217)
         configSchema: v.tuple([
             v.strictObject({
                 excludedRuleTexts: v.pipe(
@@ -26,7 +25,19 @@ export default defineRule({
                     v.description('List of rule texts to exclude'),
                 ),
                 excludedRegExpPatterns: v.pipe(
-                    v.array(v.string()),
+                    v.array(
+                        v.pipe(
+                            v.string(),
+                            v.minLength(1, 'RegExp pattern cannot be empty'),
+                            v.transform((pattern) => {
+                                return new RegExp(
+                                    RegExpUtils.isRegexPattern(pattern)
+                                        ? pattern.slice(1, -1)
+                                        : pattern,
+                                );
+                            }),
+                        ),
+                    ),
                     v.description('List of RegExp patterns to exclude'),
                 ),
             }),
@@ -79,78 +90,56 @@ export default defineRule({
         version: '2.0.10',
     },
     create: (context) => {
-        const cache: WeakMap<string[], RegExp[]> = new WeakMap();
+        const getFixerFunction = (node: AnyRule): FixerFunction => {
+            return (fixer) => {
+                const lineNumber = context.sourceCode.getLineNumberForOffset(node.start!);
 
-        const getRegExpList = (): RegExp[] => {
-            const patterns = context.config[0].excludedRegExpPatterns;
+                if (!lineNumber) {
+                    return null;
+                }
 
-            if (cache.has(patterns)) {
-                return cache.get(patterns)!;
-            }
+                const lineRange = context.sourceCode.getLineRange(lineNumber, true);
 
-            const regexps: RegExp[] = patterns.map(
-                (pattern) => {
-                    let processedRawPattern = pattern;
-                    if (RegExpUtils.isRegexPattern(pattern)) {
-                        processedRawPattern = pattern.slice(1, -1);
-                    }
-                    return new RegExp(processedRawPattern);
-                },
-            );
+                if (!lineRange) {
+                    return null;
+                }
 
-            cache.set(patterns, regexps);
-
-            return regexps;
+                return fixer.remove(lineRange);
+            };
         };
 
         const handler = (node: AnyRule) => {
-            const excludeRuleTexts = context.config[0].excludedRuleTexts;
+            const ruleText = node.raws!.text!;
 
-            if (excludeRuleTexts.includes(node.raws!.text!)) {
+            const { excludedRuleTexts } = context.config[0];
+
+            if (excludedRuleTexts.includes(ruleText)) {
                 context.report({
                     messageId: 'excludedRuleText',
                     data: {
-                        ruleText: node.raws!.text!,
+                        ruleText,
                     },
-                    fix(fixer) {
-                        const lineNumber = context.sourceCode.getLineNumberForOffset(node.start!);
-                        if (!lineNumber) {
-                            return null;
-                        }
-                        const lineRange = context.sourceCode.getLineRange(lineNumber, true);
-                        if (!lineRange) {
-                            return null;
-                        }
-                        return fixer.remove(lineRange);
-                    },
+                    fix: getFixerFunction(node),
                     node,
                 });
             }
 
-            const excludePatterns = getRegExpList();
+            const { excludedRegExpPatterns } = context.config[0];
 
-            for (const pattern of excludePatterns) {
-                if (pattern.test(node.raws!.text!)) {
-                    context.report({
-                        messageId: 'excludedPattern',
-                        data: {
-                            pattern: pattern.source,
-                        },
-                        fix(fixer) {
-                            const lineNumber = context.sourceCode.getLineNumberForOffset(node.start!);
-                            if (!lineNumber) {
-                                return null;
-                            }
-                            const lineRange = context.sourceCode.getLineRange(lineNumber, true);
-                            if (!lineRange) {
-                                return null;
-                            }
-                            return fixer.remove(lineRange);
-                        },
-                        node,
-                    });
-                    break;
+            for (const regExp of excludedRegExpPatterns) {
+                if (!regExp.test(ruleText)) {
+                    continue;
                 }
+
+                context.report({
+                    messageId: 'excludedPattern',
+                    data: {
+                        pattern: regExp.toString(),
+                    },
+                    fix: getFixerFunction(node),
+                    node,
+                });
+                break;
             }
         };
 

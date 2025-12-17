@@ -17,42 +17,190 @@ Problem. Identifies parts that causes errors or confusing behavior. High priorit
 
 This rule can be configured using the following options.
 
-### Options schema
+### Options overview
+
+```typescript
+[
+  {
+    excludedRuleTexts: string[] // List of rule texts to exclude
+    excludedRegExpPatterns: string[] // List of RegExp patterns to exclude
+  }
+]
+```
+
+### Options valibot schema
 
 <details>
 <summary>Click to expand</summary>
 
-```json
+```typescript
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "array",
+  "kind": "schema",
+  "type": "tuple",
+  "expects": "Array",
+  "async": false,
   "items": [
     {
-      "type": "object",
-      "properties": {
+      "kind": "schema",
+      "type": "strict_object",
+      "expects": "Object",
+      "async": false,
+      "entries": {
         "excludedRuleTexts": {
+          "kind": "schema",
           "type": "array",
-          "items": {
-            "type": "string"
+          "expects": "Array",
+          "async": false,
+          "item": {
+            "kind": "schema",
+            "type": "string",
+            "expects": "string",
+            "async": false,
+            "~standard": {
+              "version": 1,
+              "vendor": "valibot"
+            }
           },
-          "description": "List of rule texts to exclude"
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          },
+          "pipe": [
+            {
+              "kind": "schema",
+              "type": "array",
+              "expects": "Array",
+              "async": false,
+              "item": {
+                "kind": "schema",
+                "type": "string",
+                "expects": "string",
+                "async": false,
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                }
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "valibot"
+              }
+            },
+            {
+              "kind": "metadata",
+              "type": "description",
+              "description": "List of rule texts to exclude"
+            }
+          ]
         },
         "excludedRegExpPatterns": {
+          "kind": "schema",
           "type": "array",
-          "items": {
-            "type": "string"
+          "expects": "Array",
+          "async": false,
+          "item": {
+            "kind": "schema",
+            "type": "string",
+            "expects": "string",
+            "async": false,
+            "~standard": {
+              "version": 1,
+              "vendor": "valibot"
+            },
+            "pipe": [
+              {
+                "kind": "schema",
+                "type": "string",
+                "expects": "string",
+                "async": false,
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                }
+              },
+              {
+                "kind": "validation",
+                "type": "min_length",
+                "async": false,
+                "expects": ">=1",
+                "requirement": 1,
+                "message": "RegExp pattern cannot be empty"
+              },
+              {
+                "kind": "transformation",
+                "type": "transform",
+                "async": false
+              }
+            ]
           },
-          "description": "List of RegExp patterns to exclude"
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          },
+          "pipe": [
+            {
+              "kind": "schema",
+              "type": "array",
+              "expects": "Array",
+              "async": false,
+              "item": {
+                "kind": "schema",
+                "type": "string",
+                "expects": "string",
+                "async": false,
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                },
+                "pipe": [
+                  {
+                    "kind": "schema",
+                    "type": "string",
+                    "expects": "string",
+                    "async": false,
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  },
+                  {
+                    "kind": "validation",
+                    "type": "min_length",
+                    "async": false,
+                    "expects": ">=1",
+                    "requirement": 1,
+                    "message": "RegExp pattern cannot be empty"
+                  },
+                  {
+                    "kind": "transformation",
+                    "type": "transform",
+                    "async": false
+                  }
+                ]
+              },
+              "~standard": {
+                "version": 1,
+                "vendor": "valibot"
+              }
+            },
+            {
+              "kind": "metadata",
+              "type": "description",
+              "description": "List of RegExp patterns to exclude"
+            }
+          ]
         }
       },
-      "required": [
-        "excludedRuleTexts",
-        "excludedRegExpPatterns"
-      ],
-      "additionalProperties": false
+      "~standard": {
+        "version": 1,
+        "vendor": "valibot"
+      }
     }
   ],
-  "minItems": 1
+  "~standard": {
+    "version": 1,
+    "vendor": "valibot"
+  }
 }
 ```
 
@@ -162,7 +310,7 @@ with the following rule config:
 should be reported as:
 
 ```shell
-2:0 Rule matches an excluded pattern: \.org
+2:0 Rule matches an excluded pattern: /\.org/
 ```
 
 and should be fixed as:

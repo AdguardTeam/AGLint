@@ -17,12 +17,135 @@ Problem. Identifies parts that causes errors or confusing behavior. High priorit
 
 This rule can be configured using the following options.
 
-### Options schema
+### Options overview
+
+```typescript
+[
+  {
+    adg: "none" | "single" | "double" | "backtick"
+    ubo: "none" | "single" | "double" | "backtick"
+    abp: "none" | "single" | "double" | "backtick"
+    disallowCurlyQuotes: boolean
+  }
+]
+```
+
+### Options valibot schema
 
 <details>
 <summary>Click to expand</summary>
 
-```json
+```typescript
+{
+  "kind": "schema",
+  "type": "tuple",
+  "expects": "Array",
+  "async": false,
+  "items": [
+    {
+      "kind": "schema",
+      "type": "strict_object",
+      "expects": "Object",
+      "async": false,
+      "entries": {
+        "adg": {
+          "kind": "schema",
+          "type": "enum",
+          "expects": "(\"none\" | \"single\" | \"double\" | \"backtick\")",
+          "async": false,
+          "enum": {
+            "None": "none",
+            "Single": "single",
+            "Double": "double",
+            "Backtick": "backtick"
+          },
+          "options": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ],
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        },
+        "ubo": {
+          "kind": "schema",
+          "type": "enum",
+          "expects": "(\"none\" | \"single\" | \"double\" | \"backtick\")",
+          "async": false,
+          "enum": {
+            "None": "none",
+            "Single": "single",
+            "Double": "double",
+            "Backtick": "backtick"
+          },
+          "options": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ],
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        },
+        "abp": {
+          "kind": "schema",
+          "type": "enum",
+          "expects": "(\"none\" | \"single\" | \"double\" | \"backtick\")",
+          "async": false,
+          "enum": {
+            "None": "none",
+            "Single": "single",
+            "Double": "double",
+            "Backtick": "backtick"
+          },
+          "options": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ],
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        },
+        "disallowCurlyQuotes": {
+          "kind": "schema",
+          "type": "boolean",
+          "expects": "boolean",
+          "async": false,
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        }
+      },
+      "~standard": {
+        "version": 1,
+        "vendor": "valibot"
+      }
+    }
+  ],
+  "~standard": {
+    "version": 1,
+    "vendor": "valibot"
+  }
+}
+```
+
+</details>
+
+### Options JSON schema
+
+<details>
+<summary>Click to expand</summary>
+
+```typescript
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "array",

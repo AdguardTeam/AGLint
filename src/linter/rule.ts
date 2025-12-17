@@ -390,7 +390,7 @@ export type WithMessages<T extends {} = {}> = WithRuleMessages<Record<string, st
 /**
  * Function type for creating fix commands.
  */
-type FixerFunction = (fixer: LinterFixGenerator) => LinterFixCommand | null;
+export type FixerFunction = (fixer: LinterFixGenerator) => LinterFixCommand | null;
 
 /**
  * Base type for suggestion objects.
