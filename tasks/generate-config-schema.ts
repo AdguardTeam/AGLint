@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file Generate JSON schema for AGLint configuration files.
  *
@@ -50,10 +51,8 @@ const main = async (): Promise<void> => {
             'utf-8',
         );
 
-        // eslint-disable-next-line no-console
         console.log(`✓ Successfully generated JSON schema at ${outputFileLocation}`);
     } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('✗ Failed to generate JSON schema:', error);
         throw error;
     }

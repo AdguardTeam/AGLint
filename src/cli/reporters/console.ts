@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import path, { type ParsedPath } from 'node:path';
 
 import { Chalk, type ChalkInstance, type Options as ChalkOptions } from 'chalk';
@@ -140,7 +141,6 @@ export class LinterConsoleReporter implements LinterCliReporter {
             output += DOUBLE_NEWLINE;
             output += timeOutput;
 
-            // eslint-disable-next-line no-console
             console.log(output);
             return;
         }
@@ -275,7 +275,6 @@ export class LinterConsoleReporter implements LinterCliReporter {
         // Linting time
         output += timeOutput;
 
-        // eslint-disable-next-line no-console
         console[anyErrors ? 'error' : 'warn'](output);
     };
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import path, { type ParsedPath } from 'node:path';
 
 import { type AnyLinterResult } from '../../linter/fixer';
@@ -40,7 +41,6 @@ export class LinterJsonReporter implements LinterCliReporter {
         }
 
         // Output as JSON
-        // eslint-disable-next-line no-console
         console.log(JSON.stringify(sortedResults, null, 2));
     };
 }

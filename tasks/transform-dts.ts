@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file Fixes import/export paths in generated `.d.ts` files to conform to NodeNext ESM resolution rules.
  *
@@ -119,5 +120,4 @@ for (const sf of project.getSourceFiles()) {
 
 await project.save();
 
-// eslint-disable-next-line no-console
 console.log(`✔ ${EXT_DTS} imports fixed to NodeNext module resolution`);

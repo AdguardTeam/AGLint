@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * @file Output the version number to a build.txt file.
  */
@@ -37,7 +38,6 @@ const main = (): void => {
     const file = path.resolve(distFolderLocation, OUTPUT_FILE_NAME);
     fs.writeFileSync(file, content);
 
-    // eslint-disable-next-line no-console
     console.log(`Wrote ${content} to ${file} was successful`);
 };
 

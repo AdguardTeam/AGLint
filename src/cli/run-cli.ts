@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Main CLI execution logic.
  *
@@ -307,7 +308,6 @@ export async function runCli(context?: Partial<CliContext>): Promise<CliResult> 
         const useColors = options?.color ?? (ctx.stderr.isTTY ?? false);
         const errorMessage = prefix + await getFormattedError(error, { colors: useColors });
 
-        // eslint-disable-next-line no-console
         console.error(errorMessage);
 
         return { exitCode: 2, error: errorMessage };
