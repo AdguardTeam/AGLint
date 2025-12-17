@@ -17,46 +17,46 @@ const rulesConfig: LinterRulesConfig = {
 describe('no-invalid-domains', () => {
     test('should ignore non-problematic cases', async () => {
         // No domain at all
-        await expect(lint('##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard-only
-        await expect(lint('*##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('*##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Simple domain
-        await expect(lint('example.com##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('example.com##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard TLD
-        await expect(lint('example.*##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('example.*##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard subdomain
-        await expect(lint('*.example.com##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('*.example.com##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard subdomain and TLD
-        await expect(lint('*.example.*##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('*.example.*##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // IP address
-        await expect(lint('127.0.0.1##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('127.0.0.1##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Unicode domain (IDN)
-        await expect(lint('한글코딩.org##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('한글코딩.org##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Simple domain exception
-        await expect(lint('~example.com##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('~example.com##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard TLD exception
-        await expect(lint('~example.*##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('~example.*##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard subdomain exception
-        await expect(lint('~*.example.com##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('~*.example.com##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Wildcard subdomain and TLD exception
-        await expect(lint('~*.example.*##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('~*.example.*##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // IP address exception
-        await expect(lint('~127.0.0.1##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('~127.0.0.1##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Unicode domain (IDN) exception
-        await expect(lint('~한글코딩.org##.banner', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('~한글코딩.org##.banner', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Mixed
         await expect(
@@ -65,7 +65,7 @@ describe('no-invalid-domains', () => {
                 'example.com,~example.com,example.*,~example.*,*.example.com,~*.example.com,*.example.*,~*.example.*,127.0.0.1,~127.0.0.1,한글코딩.org,~한글코딩.org##.banner',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {

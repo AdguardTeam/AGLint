@@ -19,25 +19,25 @@ const rulesConfig: LinterRulesConfig = {
 describe('no-unknown-hint-platforms', () => {
     test('should ignore non-problematic cases', async () => {
         // NOT_OPTIMIZED
-        await expect(lint('!+ NOT_OPTIMIZED', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ NOT_OPTIMIZED', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // NOT_VALIDATE
-        await expect(lint('!+ NOT_VALIDATE', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ NOT_VALIDATE', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // PLATFORM single
-        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(mac)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(cli)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(android)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ios)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_chromium_mv3)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_chromium)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_ff)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_edge)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_opera)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_safari)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_android_cb)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ PLATFORM(ext_ublock)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(mac)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(cli)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(android)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ios)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_chromium_mv3)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_chromium)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_ff)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_edge)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_opera)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_safari)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_android_cb)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ PLATFORM(ext_ublock)', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // PLATFORM mixed
         await expect(
@@ -46,22 +46,22 @@ describe('no-unknown-hint-platforms', () => {
                 '!+ PLATFORM(windows, mac, cli, android, ios, ext_chromium_mv3, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         // NOT_PLATFORM single
-        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(mac)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(cli)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(android)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ios)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_chromium_mv3)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_chromium)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_ff)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_edge)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_opera)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_safari)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_android_cb)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!+ NOT_PLATFORM(ext_ublock)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(mac)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(cli)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(android)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ios)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_chromium_mv3)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_chromium)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_ff)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_edge)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_opera)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_safari)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_android_cb)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!+ NOT_PLATFORM(ext_ublock)', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // NOT_PLATFORM mixed
         await expect(
@@ -70,7 +70,7 @@ describe('no-unknown-hint-platforms', () => {
                 '!+ NOT_PLATFORM(windows, mac, cli, android, ios, ext_chromium_mv3, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {

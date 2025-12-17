@@ -48,10 +48,12 @@ describe('no-invalid-css-declaration', () => {
                 ].join(NEWLINE),
                 rulesConfig,
             )).problems,
-        ).toMatchObject([
+        ).toStrictEqual([
             {
-                ruleId: 'no-invalid-css-declaration',
-                severity: 2,
+                category: 'problem',
+                data: undefined,
+                messageId: undefined,
+                message: "Invalid value for 'color' property, mismatch with syntax <color>",
                 position: {
                     start: {
                         line: 1,
@@ -62,12 +64,15 @@ describe('no-invalid-css-declaration', () => {
                         column: 20,
                     },
                 },
-                message: "Invalid value for 'color' property, mismatch with syntax <color>",
-                category: 'problem',
-            },
-            {
                 ruleId: 'no-invalid-css-declaration',
                 severity: 2,
+            },
+            {
+                category: 'problem',
+                data: undefined,
+                messageId: undefined,
+                // eslint-disable-next-line max-len
+                message: "Invalid value for 'background' property, mismatch with syntax [ <bg-layer> , ]* <final-bg-layer>",
                 position: {
                     start: {
                         line: 2,
@@ -78,13 +83,14 @@ describe('no-invalid-css-declaration', () => {
                         column: 40,
                     },
                 },
-                // eslint-disable-next-line max-len
-                message: "Invalid value for 'background' property, mismatch with syntax [ <bg-layer> , ]* <final-bg-layer>",
-                category: 'problem',
-            },
-            {
                 ruleId: 'no-invalid-css-declaration',
                 severity: 2,
+            },
+            {
+                category: 'problem',
+                data: undefined,
+                messageId: undefined,
+                message: 'Unknown property `foo`',
                 position: {
                     start: {
                         line: 3,
@@ -95,8 +101,8 @@ describe('no-invalid-css-declaration', () => {
                         column: 27,
                     },
                 },
-                message: 'Unknown property `foo`',
-                category: 'problem',
+                ruleId: 'no-invalid-css-declaration',
+                severity: 2,
             },
         ]);
     });

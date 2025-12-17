@@ -29,9 +29,7 @@ describe('if-directive-balance', () => {
                 ].join(NEWLINE),
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({
-            problems: [],
-        });
+        ).resolves.toHaveProperty('problems', []);
 
         // both if-s are closed properly
         await expect(
@@ -48,9 +46,7 @@ describe('if-directive-balance', () => {
                 ].join(NEWLINE),
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({
-            problems: [],
-        });
+        ).resolves.toHaveProperty('problems', []);
 
         // 'if' block with 'else' branch
         await expect(
@@ -66,9 +62,7 @@ describe('if-directive-balance', () => {
                 ].join(NEWLINE),
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({
-            problems: [],
-        });
+        ).resolves.toHaveProperty('problems', []);
 
         // 'include' directive inside 'if' block
         await expect(
@@ -81,9 +75,7 @@ describe('if-directive-balance', () => {
                 ].join(NEWLINE),
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({
-            problems: [],
-        });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     test('should detect unclosed if-s', async () => {

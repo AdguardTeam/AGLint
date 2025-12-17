@@ -39,7 +39,7 @@ describe('scriptlet-quotes', () => {
         expect((await lint(
             "example.com,~example.net#%#//scriptlet('scriptlet0', 'arg0', 'arg1')",
             rulesConfig,
-        )).problems).toMatchObject([
+        )).problems).toStrictEqual([
             {
                 category: 'problem',
                 data: {
@@ -53,6 +53,7 @@ describe('scriptlet-quotes', () => {
                     ],
                     text: '"scriptlet0"',
                 },
+                message: expect.any(String),
                 messageId: 'unexpectedQuote',
                 position: {
                     end: {
@@ -80,6 +81,7 @@ describe('scriptlet-quotes', () => {
                     ],
                     text: '"arg0"',
                 },
+                message: expect.any(String),
                 messageId: 'unexpectedQuote',
                 position: {
                     end: {
@@ -107,6 +109,7 @@ describe('scriptlet-quotes', () => {
                     ],
                     text: '"arg1"',
                 },
+                message: expect.any(String),
                 messageId: 'unexpectedQuote',
                 position: {
                     end: {
@@ -129,7 +132,7 @@ describe('scriptlet-quotes', () => {
             // eslint-disable-next-line @typescript-eslint/quotes
             "example.com,~example.net#$#‘scriptlet0’ ‘arg0 arg1’",
             rulesConfig,
-        )).problems).toMatchObject([{
+        )).problems).toStrictEqual([{
             category: 'problem',
             data: undefined,
             fix: {
@@ -139,6 +142,7 @@ describe('scriptlet-quotes', () => {
                 ],
                 text: 'scriptlet0',
             },
+            message: expect.any(String),
             messageId: 'curlyQuotesDisallowed',
             position: {
                 end: {

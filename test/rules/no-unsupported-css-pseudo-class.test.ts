@@ -20,16 +20,16 @@ describe('no-unsupported-css-pseudo-class', () => {
     test('should work in severity-only mode', async () => {
         expect((await lint('##div:not(.foo)', {
             'no-unsupported-css-pseudo-class': LinterRuleSeverity.Error,
-        })).problems).toStrictEqual([]);
+        })).problems).toEqual([]);
     });
 
     test('should ignore non-problematic cases', async () => {
-        expect((await lint('##div:not(.foo)', rulesConfig)).problems).toStrictEqual([]);
-        expect((await lint('##input:checked', rulesConfig)).problems).toStrictEqual([]);
+        expect((await lint('##div:not(.foo)', rulesConfig)).problems).toEqual([]);
+        expect((await lint('##input:checked', rulesConfig)).problems).toEqual([]);
     });
 
     it('should suggest a fix', async () => {
-        expect((await lint('##div:rot', rulesConfig)).problems).toMatchObject([
+        expect((await lint('##div:rot', rulesConfig)).problems).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-unsupported-css-pseudo-class',
@@ -37,6 +37,7 @@ describe('no-unsupported-css-pseudo-class', () => {
                 data: {
                     pseudoClass: 'rot',
                 },
+                message: expect.any(String),
                 messageId: 'unsupportedPseudoClass',
                 position: {
                     start: {
@@ -57,6 +58,7 @@ describe('no-unsupported-css-pseudo-class', () => {
                             range: [6, 9],
                             text: suggestedPseudoClass,
                         },
+                        message: expect.any(String),
                         messageId: 'changePseudoClass',
                     }),
                 ),
@@ -72,9 +74,9 @@ describe('no-unsupported-css-pseudo-class', () => {
             }],
         };
 
-        expect((await lint('##div:foo', customConfig)).problems).toStrictEqual([]);
+        expect((await lint('##div:foo', customConfig)).problems).toEqual([]);
 
-        expect((await lint('##div:bar', customConfig)).problems).toMatchObject([
+        expect((await lint('##div:bar', customConfig)).problems).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-unsupported-css-pseudo-class',
@@ -82,7 +84,10 @@ describe('no-unsupported-css-pseudo-class', () => {
                 data: {
                     pseudoClass: 'bar',
                 },
+                message: expect.any(String),
                 messageId: 'unsupportedPseudoClass',
+                position: expect.any(Object),
+                suggestions: expect.any(Array),
             },
         ]);
     });
@@ -95,9 +100,9 @@ describe('no-unsupported-css-pseudo-class', () => {
             }],
         };
 
-        expect((await lint('#?#div:custom-ext(selector)', customConfig)).problems).toStrictEqual([]);
+        expect((await lint('#?#div:custom-ext(selector)', customConfig)).problems).toEqual([]);
 
-        expect((await lint('#?#div:unknown-ext', customConfig)).problems).toMatchObject([
+        expect((await lint('#?#div:unknown-ext', customConfig)).problems).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-unsupported-css-pseudo-class',
@@ -105,7 +110,10 @@ describe('no-unsupported-css-pseudo-class', () => {
                 data: {
                     pseudoClass: 'unknown-ext',
                 },
+                message: expect.any(String),
                 messageId: 'unsupportedPseudoClass',
+                position: expect.any(Object),
+                suggestions: expect.any(Array),
             },
         ]);
     });
@@ -256,7 +264,7 @@ describe('no-unsupported-css-pseudo-class', () => {
 
     describe('edge cases', () => {
         it('should handle multiple pseudo-classes in one selector', async () => {
-            expect((await lint('##div:not(.foo):has(.bar)', rulesConfig)).problems).toStrictEqual([]);
+            expect((await lint('##div:not(.foo):has(.bar)', rulesConfig)).problems).toEqual([]);
 
             expect((await lint('##div:invalid1:invalid2', rulesConfig)).problems).toHaveLength(2);
         });
@@ -282,12 +290,12 @@ describe('no-unsupported-css-pseudo-class', () => {
 
         it('should handle native CSS pseudo-classes that are also supported by extended CSS', async () => {
             // :has() is supported both natively and as extended CSS
-            expect((await lint('##div:has(.selector)', rulesConfig)).problems).toStrictEqual([]);
-            expect((await lint('#?#div:has(.selector)', rulesConfig)).problems).toStrictEqual([]);
+            expect((await lint('##div:has(.selector)', rulesConfig)).problems).toEqual([]);
+            expect((await lint('#?#div:has(.selector)', rulesConfig)).problems).toEqual([]);
 
             // :not() and :is() are also dual-purpose
-            expect((await lint('##div:not(.selector)', rulesConfig)).problems).toStrictEqual([]);
-            expect((await lint('##div:is(.selector)', rulesConfig)).problems).toStrictEqual([]);
+            expect((await lint('##div:not(.selector)', rulesConfig)).problems).toEqual([]);
+            expect((await lint('##div:is(.selector)', rulesConfig)).problems).toEqual([]);
         });
     });
 });

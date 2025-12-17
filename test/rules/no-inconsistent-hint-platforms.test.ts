@@ -16,7 +16,7 @@ const rulesConfig: LinterRulesConfig = {
 
 describe('no-inconsistent-hint-platforms', () => {
     test('should ignore non-problematic cases', async () => {
-        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         await expect(
             lint(
@@ -24,9 +24,9 @@ describe('no-inconsistent-hint-platforms', () => {
                 '!+ PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
-        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         await expect(
             lint(
@@ -34,37 +34,35 @@ describe('no-inconsistent-hint-platforms', () => {
                 '!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         await expect(
             lint(
                 '!+ NOT_OPTIMIZED PLATFORM(windows)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         await expect(
             lint(
                 '!+ PLATFORM(windows) NOT_PLATFORM(mac)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         await expect(
             lint(
                 '!+ PLATFORM(mac) NOT_PLATFORM(windows)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         await expect(
             lint(
                 '!+ PLATFORM(mac) NOT_PLATFORM(windows) NOT_PLATFORM(android)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({
-            problems: [],
-        });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {

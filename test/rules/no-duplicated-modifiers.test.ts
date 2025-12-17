@@ -17,10 +17,10 @@ const rulesConfig: LinterRulesConfig = {
 describe('no-duplicated-modifiers', () => {
     test('should ignore non-problematic cases', async () => {
         // Cosmetic rule
-        await expect(lint('example.com##.ad', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('example.com##.ad', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // Network rule, but no duplicates
-        await expect(lint('||example.com^$script,third-party', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('||example.com^$script,third-party', rulesConfig)).resolves.toHaveProperty('problems', []);
     });
     it('should detect problematic cases', async () => {
         // 4x script

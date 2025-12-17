@@ -16,27 +16,27 @@ const rulesConfig: LinterRulesConfig = {
 
 describe('no-duplicated-hint-platforms', () => {
     test('should ignore non-problematic cases', async () => {
-        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
         await expect(
             lint(
                 // eslint-disable-next-line max-len
                 '!+ PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
-        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
         await expect(
             lint(
                 // eslint-disable-next-line max-len
                 '!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {
-        expect((await lint('!+ PLATFORM(windows, windows)', rulesConfig)).problems).toMatchObject([
+        expect((await lint('!+ PLATFORM(windows, windows)', rulesConfig)).problems).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
@@ -66,7 +66,7 @@ describe('no-duplicated-hint-platforms', () => {
             },
         ]);
 
-        expect((await lint('!+ NOT_PLATFORM(windows, windows)', rulesConfig)).problems).toMatchObject([
+        expect((await lint('!+ NOT_PLATFORM(windows, windows)', rulesConfig)).problems).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
@@ -102,7 +102,7 @@ describe('no-duplicated-hint-platforms', () => {
                 '!+ PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
                 rulesConfig,
             )).problems,
-        ).toMatchObject([
+        ).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',
@@ -192,7 +192,7 @@ describe('no-duplicated-hint-platforms', () => {
                 '!+ NOT_PLATFORM(windows, mac, android, ios, windows, windows, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_safari, ext_ublock)',
                 rulesConfig,
             )).problems,
-        ).toMatchObject([
+        ).toStrictEqual([
             {
                 category: 'problem',
                 ruleId: 'no-duplicated-hint-platforms',

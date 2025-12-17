@@ -41,7 +41,7 @@ describe('no-css-comments', () => {
                 ].join(NEWLINE),
                 rulesConfig,
             )).problems,
-        ).toMatchObject([
+        ).toStrictEqual([
             {
                 ruleId: 'no-css-comments',
                 severity: 2,
@@ -55,7 +55,9 @@ describe('no-css-comments', () => {
                         column: 31,
                     },
                 },
+                message: expect.any(String),
                 messageId: 'noComments',
+                data: undefined,
                 fix: {
                     range: [
                         36,
@@ -78,7 +80,9 @@ describe('no-css-comments', () => {
                         column: 37,
                     },
                 },
+                message: expect.any(String),
                 messageId: 'noComments',
+                data: undefined,
                 fix: {
                     range: [
                         92,

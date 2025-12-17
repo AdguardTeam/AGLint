@@ -16,17 +16,17 @@ const rulesConfig: LinterRulesConfig = {
 
 describe('no-unknown-preprocessor-directives', () => {
     test('should ignore non-problematic cases', async () => {
-        await expect(lint('!#include https://example.org/path/includedfile.txt', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#if (conditions)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#if (conditions_2)', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#else', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#endif', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#safari_cb_affinity', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#safari_cb_affinity()', rulesConfig)).resolves.toMatchObject({ problems: [] });
-        await expect(lint('!#safari_cb_affinity(params)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!#include https://example.org/path/includedfile.txt', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#if (conditions)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#if (conditions_2)', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#else', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#endif', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#safari_cb_affinity', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#safari_cb_affinity()', rulesConfig)).resolves.toHaveProperty('problems', []);
+        await expect(lint('!#safari_cb_affinity(params)', rulesConfig)).resolves.toHaveProperty('problems', []);
         await expect(
             lint('!#safari_cb_affinity(general,privacy)', rulesConfig),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {

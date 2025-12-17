@@ -17,7 +17,7 @@ const rulesConfig: LinterRulesConfig = {
 describe('no-duplicated-hints', () => {
     test('should ignore non-problematic cases', async () => {
         // PLATFORM with single parameter
-        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // PLATFORM with multiple parameters
         await expect(
@@ -26,10 +26,10 @@ describe('no-duplicated-hints', () => {
                 '!+ PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         // NOT_PLATFORM with single parameter
-        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toMatchObject({ problems: [] });
+        await expect(lint('!+ NOT_PLATFORM(windows)', rulesConfig)).resolves.toHaveProperty('problems', []);
 
         // NOT_PLATFORM with multiple parameters
         await expect(
@@ -38,18 +38,18 @@ describe('no-duplicated-hints', () => {
                 '!+ NOT_PLATFORM(windows, mac, android, ios, ext_chromium, ext_ff, ext_edge, ext_opera, ext_safari, ext_android_cb, ext_ublock)',
                 rulesConfig,
             ),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
 
         // Multiple hints within the same rule, but no duplicates
         await expect(
             lint('!+ NOT_OPTIMIZED PLATFORM(windows)', rulesConfig),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
         await expect(
             lint('!+ PLATFORM(windows) NOT_PLATFORM(mac)', rulesConfig),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
         await expect(
             lint('!+ PLATFORM(mac) NOT_PLATFORM(windows)', rulesConfig),
-        ).resolves.toMatchObject({ problems: [] });
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {
