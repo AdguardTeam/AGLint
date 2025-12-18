@@ -41,6 +41,8 @@ should be reported as:
 
 ```shell
 1:15 Invalid modifier: "foo", got "Non-existent modifier: 'foo'"
+1:15 Invalid modifier: "foo", got "Non-existent modifier: 'foo'"
+1:15 Invalid modifier: "foo", got "Non-existent modifier: 'foo'"
 ```
 
 ## Rule source

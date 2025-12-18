@@ -330,6 +330,28 @@ should be reported as:
 
 and the following suggestions should be offered:
 
+- Change pseudo-class to contains
+
+  ```diff
+  ===================================================================
+  --- original
+  +++ fixed
+  @@ -1,1 +1,1 @@
+  -#?#*:contians(foo)
+  +#?#*:contains(foo)
+  ```
+
+- Change pseudo-class to -abp-contains
+
+  ```diff
+  ===================================================================
+  --- original
+  +++ fixed
+  @@ -1,1 +1,1 @@
+  -#?#*:contians(foo)
+  +#?#*:-abp-contains(foo)
+  ```
+
 ## Version
 
 This rule was added in AGLint version 4.0.0
