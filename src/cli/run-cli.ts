@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Main CLI execution logic.
  *
@@ -216,11 +215,11 @@ export async function runCli(context?: Partial<CliContext>): Promise<CliResult> 
             const file = matchedPatterns.files[0]!;
             const config = await tree.getResolvedConfig(file);
 
-            console.log(
-                inspect(config, {
+            ctx.stdout.write(
+                `${inspect(config, {
                     colors: useColors,
                     depth: Infinity,
-                }),
+                })}\n`,
             );
             return { exitCode: 0 };
         }
@@ -308,7 +307,7 @@ export async function runCli(context?: Partial<CliContext>): Promise<CliResult> 
         const useColors = options?.color ?? (ctx.stderr.isTTY ?? false);
         const errorMessage = prefix + await getFormattedError(error, { colors: useColors });
 
-        console.error(errorMessage);
+        ctx.stderr.write(`${errorMessage}\n`);
 
         return { exitCode: 2, error: errorMessage };
     }
