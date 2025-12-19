@@ -47,7 +47,7 @@ const main = async (): Promise<void> => {
         // Write the JSON schema to file
         await writeFile(
             outputFileLocation,
-            JSON.stringify(enrichedSchema, null, 2),
+            `${JSON.stringify(enrichedSchema, null, 2)}\n`,
             'utf-8',
         );
 
