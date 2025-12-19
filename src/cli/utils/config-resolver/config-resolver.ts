@@ -136,6 +136,7 @@ export class ConfigResolver {
         if (this.debug && isFirstTimeLoggingTarget) {
             const chainPaths = configChain.map((entry) => entry.path).join(' <- ');
             this.debug.log(`Config chain for ${targetPath} is: ${chainPaths}`);
+            this.loggedConfigs.add(targetPath);
         }
 
         // Start with base config
