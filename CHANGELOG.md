@@ -7,13 +7,15 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
 
-## Unreleased
+## [4.0.0-beta.5] - 2025-12-22
 
 ### Added
 
 - `no-invalid-scriptlets` linter rule.
 
-## [4.0.0-beta.4] - 2024-12-11
+[4.0.0-beta.5]: https://github.com/AdguardTeam/AGLint/compare/v4.0.0-beta.4...v4.0.0-beta.5
+
+## [4.0.0-beta.4] - 2025-12-11
 
 ### Fixed
 
