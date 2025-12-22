@@ -24,6 +24,12 @@
     "no-invalid-domains": "error",
     "no-invalid-hint-params": "error",
     "no-invalid-modifiers": "error",
+    "no-invalid-scriptlets": [
+      "error",
+      {
+        "fuzzyThreshold": 0.6
+      }
+    ],
     "no-short-rules": [
       "error",
       {

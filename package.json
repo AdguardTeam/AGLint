@@ -108,6 +108,11 @@
             "import": "./dist/rules/no-invalid-modifiers.js",
             "default": "./dist/rules/no-invalid-modifiers.js"
         },
+        "./rules/no-invalid-scriptlets": {
+            "types": "./dist/rules/no-invalid-scriptlets.d.ts",
+            "import": "./dist/rules/no-invalid-scriptlets.js",
+            "default": "./dist/rules/no-invalid-scriptlets.js"
+        },
         "./rules/no-short-rules": {
             "types": "./dist/rules/no-short-rules.d.ts",
             "import": "./dist/rules/no-short-rules.js",

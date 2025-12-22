@@ -16,6 +16,7 @@
 | [no-invalid-domains](./no-invalid-domains.md) | Disallows invalid domains | ✅ |  | 💡 |
 | [no-invalid-hint-params](./no-invalid-hint-params.md) | Checks if hints are parameterized correctly | ✅ |  |  |
 | [no-invalid-modifiers](./no-invalid-modifiers.md) | Checks modifiers validity for basic (network) rules | ✅ |  |  |
+| [no-invalid-scriptlets](./no-invalid-scriptlets.md) | Checks if scriptlets are valid based on compatibility tables |  |  | 💡 |
 | [no-short-rules](./no-short-rules.md) | Checks if a rule is too short | ✅ |  |  |
 | [no-unknown-hint-platforms](./no-unknown-hint-platforms.md) | Checks if platforms in related hints are known | ✅ |  |  |
 | [no-unknown-hints](./no-unknown-hints.md) | Checks if hints are known | ✅ |  |  |
