@@ -12,6 +12,7 @@
 | [no-duplicated-modifiers](./no-duplicated-modifiers.md) | Checks if a network rule contains multiple same modifiers | ✅ |  |  |
 | [no-excluded-rules](./no-excluded-rules.md) | Checks if any rule matches an excluded pattern |  | 🔧 |  |
 | [no-inconsistent-hint-platforms](./no-inconsistent-hint-platforms.md) | Checks if a platform targeted by a PLATFORM() hint is also excluded by a NOT_PLATFORM() hint at the same time | ✅ |  |  |
+| [no-invalid-cosmetic-separator](./no-invalid-cosmetic-separator.md) | Validates that rule separator matches selector/declaration capabilities | ✅ | 🔧 | 💡 |
 | [no-invalid-css-declaration](./no-invalid-css-declaration.md) | Checks if CSS declarations are valid | ✅ |  |  |
 | [no-invalid-domains](./no-invalid-domains.md) | Disallows invalid domains | ✅ |  | 💡 |
 | [no-invalid-hint-params](./no-invalid-hint-params.md) | Checks if hints are parameterized correctly | ✅ |  |  |

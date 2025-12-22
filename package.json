@@ -88,6 +88,11 @@
             "import": "./dist/rules/no-inconsistent-hint-platforms.js",
             "default": "./dist/rules/no-inconsistent-hint-platforms.js"
         },
+        "./rules/no-invalid-cosmetic-separator": {
+            "types": "./dist/rules/no-invalid-cosmetic-separator.d.ts",
+            "import": "./dist/rules/no-invalid-cosmetic-separator.js",
+            "default": "./dist/rules/no-invalid-cosmetic-separator.js"
+        },
         "./rules/no-invalid-css-declaration": {
             "types": "./dist/rules/no-invalid-css-declaration.d.ts",
             "import": "./dist/rules/no-invalid-css-declaration.js",

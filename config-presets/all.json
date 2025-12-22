@@ -20,6 +20,7 @@
       }
     ],
     "no-inconsistent-hint-platforms": "error",
+    "no-invalid-cosmetic-separator": "error",
     "no-invalid-css-declaration": "error",
     "no-invalid-domains": "error",
     "no-invalid-hint-params": "error",

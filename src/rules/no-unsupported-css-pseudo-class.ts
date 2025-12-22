@@ -17,6 +17,48 @@ import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
  *
  * Please keep this list sorted alphabetically.
  */
+export const SUPPORTED_EXT_CSS_PSEUDO_CLASSES = new Set([
+    /**
+     * Pseudo-classes :is(), and :not() may use native implementation.
+     *
+     * @see {@link https://github.com/AdguardTeam/ExtendedCss#extended-css-is}
+     * @see {@link https://github.com/AdguardTeam/ExtendedCss#extended-css-not}
+     */
+    /**
+     * :has() should also be conditionally considered as extended and should not be in this list,
+     * for details check: https://github.com/AdguardTeam/ExtendedCss#extended-css-has,
+     * but there is a bug with content blocker in safari:
+     * for details check: https://bugs.webkit.org/show_bug.cgi?id=248868.
+     *
+     * TODO: remove 'has' later.
+     */
+    '-abp-contains', // alias for 'contains'
+    '-abp-has', // alias for 'has'
+    'contains',
+    'has', // some browsers support 'has' natively
+    'has-text', // alias for 'contains'
+    'if',
+    'if-not',
+    'matches-attr',
+    'matches-css',
+    'matches-css-after', // deprecated, replaced by 'matches-css'
+    'matches-css-before', // deprecated, replaced by 'matches-css'
+    'matches-property',
+    'nth-ancestor',
+    'remove',
+    'upward',
+    'xpath',
+    'style',
+    'matches-media',
+]);
+
+/**
+ * Supported Extended CSS pseudo-classes.
+ *
+ * These pseudo-classes are not supported by browsers natively, so we need Extended CSS library to support them.
+ *
+ * Please keep this list sorted alphabetically.
+ */
 const SUPPORTED_ADG_PSEUDO_CLASSES: ReadonlySet<string> = new Set([
     /**
      * Pseudo-classes :is(), and :not() may use native implementation.
