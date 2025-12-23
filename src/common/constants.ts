@@ -215,3 +215,6 @@ export const SUPPORTED_PREPROCESSOR_DIRECTIVES = new Set([
     INCLUDE_DIRECTIVE,
     SAFARI_CB_AFFINITY_DIRECTIVE,
 ]);
+
+export const REMOVE_PROPERTY = 'remove';
+export const REMOVE_VALUE = 'true';

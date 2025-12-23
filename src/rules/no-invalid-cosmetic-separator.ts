@@ -7,6 +7,7 @@ import {
 } from '@adguard/agtree';
 import { type DeclarationPlain, type PseudoClassSelectorPlain } from '@adguard/ecss-tree';
 
+import { REMOVE_PROPERTY, REMOVE_VALUE } from '../common/constants';
 import { defineRule, LinterRuleType } from '../linter/rule';
 
 import { SUPPORTED_EXT_CSS_PSEUDO_CLASSES } from './no-unsupported-css-pseudo-class';
@@ -31,6 +32,10 @@ export default defineRule({
             {
                 name: 'Element hiding with extended selector',
                 code: '#?#div:contains(a)',
+            },
+            {
+                name: '`remove: true` with extended CSS injection separator',
+                code: '#?$#a[href^="/bnlink/?bnid="] { remove: true; }',
             },
         ],
         incorrectExamples: [
@@ -71,14 +76,14 @@ export default defineRule({
                 const currentSeparatorValue = currentRuleSeparator.value;
 
                 if (hasExtendedDeclarations) {
-                    let suggested: string;
+                    let suggestedSeparator: string;
 
                     switch (currentSeparatorValue) {
                         case CosmeticRuleSeparator.AdgExtendedCssInjection:
-                            suggested = CosmeticRuleSeparator.AdgExtendedCssInjection;
+                            suggestedSeparator = CosmeticRuleSeparator.AdgExtendedCssInjection;
                             break;
                         case CosmeticRuleSeparator.AdgExtendedCssInjectionException:
-                            suggested = CosmeticRuleSeparator.AdgExtendedCssInjectionException;
+                            suggestedSeparator = CosmeticRuleSeparator.AdgExtendedCssInjectionException;
                             break;
                         default:
                             return;
@@ -92,16 +97,16 @@ export default defineRule({
                     context.report({
                         messageId: 'removeOnlyWithExtended',
                         data: {
-                            required: suggested,
+                            required: suggestedSeparator,
                         },
                         node,
                         suggest: [
                             {
                                 messageId: 'changeSeparator',
                                 data: {
-                                    suggested,
+                                    suggested: suggestedSeparator,
                                 },
-                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggested),
+                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggestedSeparator),
                             },
                         ],
                     });
@@ -109,11 +114,11 @@ export default defineRule({
                 }
 
                 if (hasPseudoClassSelectors) {
-                    const suggested = currentRuleException
+                    const suggestedSeparator = currentRuleException
                         ? CosmeticRuleSeparator.ExtendedElementHidingException
                         : CosmeticRuleSeparator.ExtendedElementHiding;
 
-                    if (currentSeparatorValue === suggested) {
+                    if (currentSeparatorValue === suggestedSeparator) {
                         return;
                     }
 
@@ -126,22 +131,22 @@ export default defineRule({
                         messageId: 'useExtendedSeparator',
                         data: {
                             current: currentSeparatorValue,
-                            suggested,
+                            suggested: suggestedSeparator,
                         },
                         node,
                         suggest: [
                             {
                                 messageId: 'changeSeparator',
                                 data: {
-                                    suggested,
+                                    suggested: suggestedSeparator,
                                 },
-                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggested),
+                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggestedSeparator),
                             },
                         ],
                     });
                 } else if (currentSeparatorValue === CosmeticRuleSeparator.ExtendedElementHiding
                          || currentSeparatorValue === CosmeticRuleSeparator.ExtendedElementHidingException) {
-                    const suggested = currentRuleException
+                    const suggestedSeparator = currentRuleException
                         ? CosmeticRuleSeparator.ElementHidingException
                         : CosmeticRuleSeparator.ElementHiding;
 
@@ -154,16 +159,16 @@ export default defineRule({
                         messageId: 'useNativeSeparator',
                         data: {
                             current: currentSeparatorValue,
-                            suggested,
+                            suggested: suggestedSeparator,
                         },
                         node,
                         suggest: [
                             {
                                 messageId: 'changeSeparator',
                                 data: {
-                                    suggested,
+                                    suggested: suggestedSeparator,
                                 },
-                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggested),
+                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggestedSeparator),
                             },
                         ],
                     });
@@ -186,11 +191,11 @@ export default defineRule({
 
                 // Check if CSS injection rule needs extended separator
                 if (needsExtended) {
-                    const suggested = currentRuleException
+                    const suggestedSeparator = currentRuleException
                         ? CosmeticRuleSeparator.AdgExtendedCssInjectionException
                         : CosmeticRuleSeparator.AdgExtendedCssInjection;
 
-                    if (currentRuleSeparator.value === suggested) {
+                    if (currentRuleSeparator.value === suggestedSeparator) {
                         return;
                     }
 
@@ -205,15 +210,15 @@ export default defineRule({
                     context.report({
                         messageId,
                         data: {
-                            [dataKey]: suggested,
+                            [dataKey]: suggestedSeparator,
                             ...(messageId === 'useExtendedSeparator' && { current: currentRuleSeparator.value }),
                         },
                         node,
                         suggest: [
                             {
                                 messageId: 'changeSeparator',
-                                data: { suggested },
-                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggested),
+                                data: { suggested: suggestedSeparator },
+                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggestedSeparator),
                             },
                         ],
                     });
@@ -221,7 +226,7 @@ export default defineRule({
                     currentRuleSeparator.value === CosmeticRuleSeparator.AdgExtendedCssInjection
                     || currentRuleSeparator.value === CosmeticRuleSeparator.AdgExtendedCssInjectionException
                 ) {
-                    const suggested = currentRuleException
+                    const suggestedSeparator = currentRuleException
                         ? CosmeticRuleSeparator.AdgCssInjectionException
                         : CosmeticRuleSeparator.AdgCssInjection;
 
@@ -232,13 +237,13 @@ export default defineRule({
 
                     context.report({
                         messageId: 'useNativeSeparator',
-                        data: { current: currentRuleSeparator.value, suggested },
+                        data: { current: currentRuleSeparator.value, suggested: suggestedSeparator },
                         node,
                         suggest: [
                             {
                                 messageId: 'changeSeparator',
-                                data: { suggested },
-                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggested),
+                                data: { suggested: suggestedSeparator },
+                                fix: (fixer) => fixer.replaceWithText(separatorRange, suggestedSeparator),
                             },
                         ],
                     });
@@ -253,7 +258,7 @@ export default defineRule({
             },
 
             Declaration: (node: DeclarationPlain) => {
-                if (node.property !== 'remove') {
+                if (node.property !== REMOVE_PROPERTY) {
                     return;
                 }
 
@@ -261,7 +266,7 @@ export default defineRule({
                     node.value?.type === 'Value'
                     && node.value?.children.length === 1
                     && node.value.children[0]?.type === 'Identifier'
-                    && node.value.children[0].name === 'true'
+                    && node.value.children[0].name === REMOVE_VALUE
                 ) {
                     hasExtendedDeclarations = true;
                 }

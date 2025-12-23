@@ -1,5 +1,6 @@
 import { type DeclarationPlain } from '@adguard/ecss-tree';
 
+import { REMOVE_PROPERTY, REMOVE_VALUE } from '../common/constants';
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { validateDeclaration } from '../utils/css-utils/css-validator';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
@@ -36,13 +37,13 @@ export default defineRule({
         return {
             Declaration: (node: DeclarationPlain) => {
                 // special case: `remove` property
-                if (node.property === 'remove') {
+                if (node.property === REMOVE_VALUE) {
                     // its value should be `true`
                     if (
                         node.value?.type !== 'Value'
                         || node.value?.children.length !== 1
                         || node.value.children[0]?.type !== 'Identifier'
-                        || node.value.children[0].name !== 'true'
+                        || node.value.children[0].name !== REMOVE_PROPERTY
                     ) {
                         const position = context.sourceCode.getLinterPositionRangeFromOffsetRange([
                             node.loc!.start.offset,
