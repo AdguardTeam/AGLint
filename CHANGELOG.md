@@ -11,6 +11,16 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ### Added
 
+- Custom messages support for `no-excluded-rules` linter rule. [#275]
+- `no-invalid-cosmetic-separator` linter rule. [#193]
+
+[#275]: https://github.com/AdguardTeam/AGLint/issues/275
+[#193]: https://github.com/AdguardTeam/AGLint/issues/193
+
+## [4.0.0-beta.5] - 2025-12-22
+
+### Added
+
 - `no-invalid-scriptlets` linter rule.
 
 ## [4.0.0-beta.4] - 2024-12-11
