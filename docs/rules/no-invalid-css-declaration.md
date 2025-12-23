@@ -24,7 +24,11 @@ The following code
 #$?#body { remove: true; }
 ```
 
-should not be reported
+should be reported as:
+
+```shell
+2:11 Unknown property `remove`
+```
 
 ## Incorrect examples
 

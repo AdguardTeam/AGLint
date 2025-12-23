@@ -30,6 +30,16 @@ The following code
 
 should not be reported
 
+### `remove: true` with extended CSS injection separator
+
+The following code
+
+```adblock
+#?$#a[href^="/bnlink/?bnid="] { remove: true; }
+```
+
+should not be reported
+
 ## Incorrect examples
 
 Examples of incorrect code:
