@@ -259,8 +259,13 @@ const BOUNDARIES_PLUGIN_RULES = {
                 allow: ['common-folder', 'utils-folder'],
             },
             {
-                from: 'rules-folder',
-                allow: ['common-folder', 'linter-folder'],
+                from: 'rule-file',
+                allow: ['common-folder', 'utils-folder', 'linter-folder'],
+            },
+            {
+                from: 'rule-file',
+                disallow: ['rule-file'],
+                message: 'Rule file should not import other rule files, they should be independent',
             },
             {
                 from: 'test-folder',
@@ -339,9 +344,9 @@ module.exports = {
                 mode: 'folder',
             },
             {
-                type: 'rules-folder',
-                pattern: 'src/linter/rules',
-                mode: 'folder',
+                type: 'rule-file',
+                pattern: 'src/rules/*.ts',
+                mode: 'file',
             },
             {
                 type: 'common-folder',
