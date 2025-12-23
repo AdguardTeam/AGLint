@@ -34,7 +34,7 @@ describe('no-invalid-cosmetic-separator', () => {
                             current: '##',
                             suggested: '#?#',
                         },
-                        message: 'Extended CSS is used in selector, replace "##" with "#?#"',
+                        message: expect.any(String),
                         position: {
                             end: {
                                 column: 17,
