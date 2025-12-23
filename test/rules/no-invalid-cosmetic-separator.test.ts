@@ -15,6 +15,7 @@ describe('no-invalid-cosmetic-separator', () => {
             '##div:has(> table)',
             '#$?#a[href^="/bnlink/?bnid="] { remove: true; }',
             '#@#div',
+            '#?#div:contains(a)',
         ])("'%s'", async (rule) => {
             expect((await lint(rule, rulesConfig)).problems).toStrictEqual([]);
         });
@@ -34,7 +35,7 @@ describe('no-invalid-cosmetic-separator', () => {
                             current: '##',
                             suggested: '#?#',
                         },
-                        message: expect.any(String),
+                        message: 'Extended CSS is used in selector, replace "##" with "#?#"',
                         position: {
                             end: {
                                 column: 17,

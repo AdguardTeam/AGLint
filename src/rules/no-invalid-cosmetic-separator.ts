@@ -1,4 +1,10 @@
-import { CosmeticRuleSeparator } from '@adguard/agtree';
+import {
+    CosmeticRuleSeparator,
+    type CssInjectionRule,
+    type CssInjectionRuleBody,
+    type ElementHidingRule,
+    type Value,
+} from '@adguard/agtree';
 import { type DeclarationPlain, type PseudoClassSelectorPlain } from '@adguard/ecss-tree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
@@ -10,7 +16,7 @@ export default defineRule({
         type: LinterRuleType.Problem,
         docs: {
             name: 'no-invalid-cosmetic-separator',
-            description: 'Validates that rule separator matches selector/declaration capabilities',
+            description: 'Checks that rule separator matches selector/declaration capabilities',
             recommended: true,
         },
         messages: {
@@ -37,27 +43,27 @@ export default defineRule({
                 code: '##div:has(> table:contains(a))',
             },
             {
-                name: 'remove:true with native CSS injection separator',
+                name: '`remove: true` with native CSS injection separator',
                 code: '#$#a[href^="/bnlink/?bnid="] { remove: true; }',
             },
         ],
         version: '4.0.0',
     },
     create: (context) => {
-        let currentRuleSeparator: any = '';
+        let currentRuleSeparator: Value;
         let currentRuleException = false;
         let hasPseudoClassSelectors = false;
         let hasExtendedDeclarations = false;
 
         return {
-            ElementHidingRule: (node: any) => {
+            ElementHidingRule: (node: ElementHidingRule) => {
                 hasPseudoClassSelectors = false;
                 hasExtendedDeclarations = false;
                 currentRuleSeparator = node.separator;
-                currentRuleException = node.exception || false;
+                currentRuleException = !!node.exception;
             },
 
-            'ElementHidingRuleBody:exit': (node: any) => {
+            'ElementHidingRuleBody:exit': (node: ElementHidingRule) => {
                 if (!currentRuleSeparator) {
                     return;
                 }
@@ -78,6 +84,9 @@ export default defineRule({
                             return;
                     }
 
+                    if (currentRuleSeparator.start === undefined || currentRuleSeparator.end === undefined) {
+                        return;
+                    }
                     const separatorRange: [number, number] = [currentRuleSeparator.start, currentRuleSeparator.end];
 
                     context.report({
@@ -108,6 +117,9 @@ export default defineRule({
                         return;
                     }
 
+                    if (currentRuleSeparator.start === undefined || currentRuleSeparator.end === undefined) {
+                        return;
+                    }
                     const separatorRange: [number, number] = [currentRuleSeparator.start, currentRuleSeparator.end];
 
                     context.report({
@@ -133,6 +145,9 @@ export default defineRule({
                         ? CosmeticRuleSeparator.ElementHidingException
                         : CosmeticRuleSeparator.ElementHiding;
 
+                    if (currentRuleSeparator.start === undefined || currentRuleSeparator.end === undefined) {
+                        return;
+                    }
                     const separatorRange: [number, number] = [currentRuleSeparator.start, currentRuleSeparator.end];
 
                     context.report({
@@ -155,14 +170,14 @@ export default defineRule({
                 }
             },
 
-            CssInjectionRule: (node: any) => {
+            CssInjectionRule: (node: CssInjectionRule) => {
                 hasPseudoClassSelectors = false;
                 hasExtendedDeclarations = false;
                 currentRuleSeparator = node.separator;
-                currentRuleException = node.exception || false;
+                currentRuleException = !!node.exception;
             },
 
-            'CssInjectionRuleBody:exit': (node: any) => {
+            'CssInjectionRuleBody:exit': (node: CssInjectionRuleBody) => {
                 if (!currentRuleSeparator) {
                     return;
                 }
@@ -179,6 +194,9 @@ export default defineRule({
                         return;
                     }
 
+                    if (currentRuleSeparator.start === undefined || currentRuleSeparator.end === undefined) {
+                        return;
+                    }
                     const separatorRange: [number, number] = [currentRuleSeparator.start, currentRuleSeparator.end];
 
                     const messageId = hasExtendedDeclarations ? 'removeOnlyWithExtended' : 'useExtendedSeparator';
@@ -207,6 +225,9 @@ export default defineRule({
                         ? CosmeticRuleSeparator.AdgCssInjectionException
                         : CosmeticRuleSeparator.AdgCssInjection;
 
+                    if (currentRuleSeparator.start === undefined || currentRuleSeparator.end === undefined) {
+                        return;
+                    }
                     const separatorRange: [number, number] = [currentRuleSeparator.start, currentRuleSeparator.end];
 
                     context.report({
