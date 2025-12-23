@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 - `no-invalid-scriptlets` linter rule.
 
-## [4.0.0-beta.4] - 2024-12-11
+## [4.0.0-beta.4] - 2025-12-11
 
 ### Fixed
 
