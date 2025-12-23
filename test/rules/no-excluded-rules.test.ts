@@ -48,6 +48,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: 'example.com/exact/match/',
+                    customMessage: '',
                 },
                 fix: {
                     range: [24, 49],
@@ -87,6 +88,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: 'example.com/exact/match/',
+                    customMessage: '',
                 },
                 fix: {
                     range: [0, 25],
@@ -111,6 +113,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: 'example.com/exact/match/',
+                    customMessage: '',
                 },
                 fix: {
                     range: [49, 74],
@@ -135,6 +138,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: 'example.com/exact/match/',
+                    customMessage: '',
                 },
                 fix: {
                     range: [109, 133],
@@ -212,6 +216,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: 'example.com##.ad',
+                    customMessage: '',
                 },
                 fix: {
                     range: [0, 17],
@@ -236,6 +241,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: '||ads.example.com^',
+                    customMessage: '',
                 },
                 fix: {
                     range: [38, 57],
@@ -260,6 +266,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedRuleText',
                 data: {
                     ruleText: '@@||example.com/whitelist^',
+                    customMessage: '',
                 },
                 fix: {
                     range: [57, 83],
@@ -322,6 +329,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedPattern',
                 data: {
                     pattern: String.raw`/example\.com\/bad\/query\//`,
+                    customMessage: '',
                 },
                 fix: {
                     range: [24, 47],
@@ -361,6 +369,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedPattern',
                 data: {
                     pattern: String.raw`/example\.com\/bad\/query\//`,
+                    customMessage: '',
                 },
                 fix: {
                     range: [0, 23],
@@ -385,6 +394,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedPattern',
                 data: {
                     pattern: String.raw`/example\.com\/bad\/query\//`,
+                    customMessage: '',
                 },
                 fix: {
                     range: [47, 70],
@@ -409,6 +419,7 @@ describe('no-excluded-rules', () => {
                 messageId: 'excludedPattern',
                 data: {
                     pattern: String.raw`/example\.com\/bad\/query\//`,
+                    customMessage: '',
                 },
                 fix: {
                     range: [105, 127],
@@ -473,6 +484,7 @@ describe('no-excluded-rules', () => {
                 message: expect.any(String),
                 data: {
                     pattern: String.raw`/example\.(com|org)\/bad\/query\//`,
+                    customMessage: '',
                 },
                 fix: {
                     range: [24, 47],
@@ -501,6 +513,7 @@ describe('no-excluded-rules', () => {
                 },
                 data: {
                     pattern: String.raw`/example\.(com|org)\/bad\/query\//`,
+                    customMessage: '',
                 },
                 position: {
                     start: {
@@ -515,5 +528,133 @@ describe('no-excluded-rules', () => {
                 category: 'problem',
             },
         ]);
+    });
+
+    test('should use custom message for excluded rule text', async () => {
+        const customMessage = 'This rule is deprecated, please remove it';
+        const rulesConfig: LinterRulesConfig = {
+            'no-excluded-rules': [
+                LinterRuleSeverity.Error,
+                {
+                    excludedRuleTexts: [
+                        {
+                            pattern: 'example.com/exact/match/',
+                            message: customMessage,
+                        },
+                    ],
+                    excludedRegExpPatterns: [],
+                },
+            ],
+        };
+
+        const result = await lint(
+            [
+                'example.com/good/query/',
+                'example.com/exact/match/',
+                'example.com/another-not-bad/query/',
+            ].join(NEWLINE),
+            rulesConfig,
+        );
+
+        expect(result.problems).toHaveLength(1);
+        expect(result.problems[0]).toMatchObject({
+            ruleId: 'no-excluded-rules',
+            severity: LinterRuleSeverity.Error,
+            messageId: 'excludedRuleText',
+            data: {
+                ruleText: 'example.com/exact/match/',
+                customMessage: ` (${customMessage})`,
+            },
+        });
+        expect(result.problems[0]?.message).toContain('Rule matches an excluded rule text: example.com/exact/match/');
+        expect(result.problems[0]?.message).toContain(customMessage);
+    });
+
+    test('should use custom message for excluded pattern', async () => {
+        const customMessage = 'Rules for .org domains are not allowed in this filter list';
+        const rulesConfig: LinterRulesConfig = {
+            'no-excluded-rules': [
+                LinterRuleSeverity.Error,
+                {
+                    excludedRuleTexts: [],
+                    excludedRegExpPatterns: [
+                        {
+                            pattern: String.raw`\.org`,
+                            message: customMessage,
+                        },
+                    ],
+                },
+            ],
+        };
+
+        const result = await lint(
+            [
+                'example.com/good/query/',
+                'example.org/bad/query/',
+            ].join(NEWLINE),
+            rulesConfig,
+        );
+
+        expect(result.problems).toHaveLength(1);
+        expect(result.problems[0]).toMatchObject({
+            ruleId: 'no-excluded-rules',
+            severity: LinterRuleSeverity.Error,
+            messageId: 'excludedPattern',
+            data: {
+                pattern: String.raw`/\.org/`,
+                customMessage: ` (${customMessage})`,
+            },
+        });
+        expect(result.problems[0]?.message).toContain('Rule matches an excluded pattern:');
+        expect(result.problems[0]?.message).toContain(customMessage);
+    });
+
+    test('should mix string and object formats', async () => {
+        const customMessage = 'Custom deprecation message';
+        const rulesConfig: LinterRulesConfig = {
+            'no-excluded-rules': [
+                LinterRuleSeverity.Error,
+                {
+                    excludedRuleTexts: [
+                        'example.com/old/rule/',
+                        {
+                            pattern: 'example.com/deprecated/',
+                            message: customMessage,
+                        },
+                    ],
+                    excludedRegExpPatterns: [],
+                },
+            ],
+        };
+
+        const result = await lint(
+            [
+                'example.com/good/query/',
+                'example.com/old/rule/',
+                'example.com/deprecated/',
+            ].join(NEWLINE),
+            rulesConfig,
+        );
+
+        expect(result.problems).toHaveLength(2);
+        expect(result.problems[0]).toMatchObject({
+            messageId: 'excludedRuleText',
+            data: {
+                ruleText: 'example.com/old/rule/',
+                customMessage: '',
+            },
+        });
+        expect(result.problems[0]?.message).toContain('Rule matches an excluded rule text: example.com/old/rule/');
+        expect(result.problems[0]?.message).not.toContain(customMessage);
+
+        expect(result.problems[1]).toMatchObject({
+            messageId: 'excludedRuleText',
+            data: {
+                ruleText: 'example.com/deprecated/',
+                customMessage: ` (${customMessage})`,
+            },
+        });
+        expect(result.problems[1]?.message).toContain('Rule matches an excluded rule text: example.com/deprecated/');
+        expect(result.problems[1]?.message).toContain(customMessage);
     });
 });

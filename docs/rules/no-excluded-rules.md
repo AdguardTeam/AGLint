@@ -22,8 +22,14 @@ This rule can be configured using the following options.
 ```typescript
 [
   {
-    excludedRuleTexts: string[] // List of rule texts to exclude
-    excludedRegExpPatterns: string[] // List of RegExp patterns to exclude
+    excludedRuleTexts: string | {
+      pattern: string
+      message?: string | undefined
+    }[] // List of rule texts to exclude (string or {pattern, message})
+    excludedRegExpPatterns: string | {
+      pattern: string
+      message?: string | undefined
+    }[] // List of RegExp patterns to exclude (string or {pattern, message})
   }
 ]
 ```
@@ -53,9 +59,80 @@ This rule can be configured using the following options.
           "async": false,
           "item": {
             "kind": "schema",
-            "type": "string",
-            "expects": "string",
+            "type": "union",
+            "expects": "(string | Object)",
             "async": false,
+            "options": [
+              {
+                "kind": "schema",
+                "type": "string",
+                "expects": "string",
+                "async": false,
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                },
+                "pipe": [
+                  {
+                    "kind": "schema",
+                    "type": "string",
+                    "expects": "string",
+                    "async": false,
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  },
+                  {
+                    "kind": "transformation",
+                    "type": "transform",
+                    "async": false
+                  }
+                ]
+              },
+              {
+                "kind": "schema",
+                "type": "strict_object",
+                "expects": "Object",
+                "async": false,
+                "entries": {
+                  "pattern": {
+                    "kind": "schema",
+                    "type": "string",
+                    "expects": "string",
+                    "async": false,
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  },
+                  "message": {
+                    "kind": "schema",
+                    "type": "optional",
+                    "expects": "(string | undefined)",
+                    "async": false,
+                    "wrapped": {
+                      "kind": "schema",
+                      "type": "string",
+                      "expects": "string",
+                      "async": false,
+                      "~standard": {
+                        "version": 1,
+                        "vendor": "valibot"
+                      }
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  }
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                }
+              }
+            ],
             "~standard": {
               "version": 1,
               "vendor": "valibot"
@@ -73,9 +150,80 @@ This rule can be configured using the following options.
               "async": false,
               "item": {
                 "kind": "schema",
-                "type": "string",
-                "expects": "string",
+                "type": "union",
+                "expects": "(string | Object)",
                 "async": false,
+                "options": [
+                  {
+                    "kind": "schema",
+                    "type": "string",
+                    "expects": "string",
+                    "async": false,
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    },
+                    "pipe": [
+                      {
+                        "kind": "schema",
+                        "type": "string",
+                        "expects": "string",
+                        "async": false,
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      },
+                      {
+                        "kind": "transformation",
+                        "type": "transform",
+                        "async": false
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "schema",
+                    "type": "strict_object",
+                    "expects": "Object",
+                    "async": false,
+                    "entries": {
+                      "pattern": {
+                        "kind": "schema",
+                        "type": "string",
+                        "expects": "string",
+                        "async": false,
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      },
+                      "message": {
+                        "kind": "schema",
+                        "type": "optional",
+                        "expects": "(string | undefined)",
+                        "async": false,
+                        "wrapped": {
+                          "kind": "schema",
+                          "type": "string",
+                          "expects": "string",
+                          "async": false,
+                          "~standard": {
+                            "version": 1,
+                            "vendor": "valibot"
+                          }
+                        },
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      }
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  }
+                ],
                 "~standard": {
                   "version": 1,
                   "vendor": "valibot"
@@ -89,7 +237,7 @@ This rule can be configured using the following options.
             {
               "kind": "metadata",
               "type": "description",
-              "description": "List of rule texts to exclude"
+              "description": "List of rule texts to exclude (string or {pattern, message})"
             }
           ]
         },
@@ -100,50 +248,11 @@ This rule can be configured using the following options.
           "async": false,
           "item": {
             "kind": "schema",
-            "type": "string",
-            "expects": "string",
+            "type": "union",
+            "expects": "(string | Object)",
             "async": false,
-            "~standard": {
-              "version": 1,
-              "vendor": "valibot"
-            },
-            "pipe": [
+            "options": [
               {
-                "kind": "schema",
-                "type": "string",
-                "expects": "string",
-                "async": false,
-                "~standard": {
-                  "version": 1,
-                  "vendor": "valibot"
-                }
-              },
-              {
-                "kind": "validation",
-                "type": "min_length",
-                "async": false,
-                "expects": ">=1",
-                "requirement": 1,
-                "message": "RegExp pattern cannot be empty"
-              },
-              {
-                "kind": "transformation",
-                "type": "transform",
-                "async": false
-              }
-            ]
-          },
-          "~standard": {
-            "version": 1,
-            "vendor": "valibot"
-          },
-          "pipe": [
-            {
-              "kind": "schema",
-              "type": "array",
-              "expects": "Array",
-              "async": false,
-              "item": {
                 "kind": "schema",
                 "type": "string",
                 "expects": "string",
@@ -178,6 +287,251 @@ This rule can be configured using the following options.
                   }
                 ]
               },
+              {
+                "kind": "schema",
+                "type": "strict_object",
+                "expects": "Object",
+                "async": false,
+                "entries": {
+                  "pattern": {
+                    "kind": "schema",
+                    "type": "string",
+                    "expects": "string",
+                    "async": false,
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  },
+                  "message": {
+                    "kind": "schema",
+                    "type": "optional",
+                    "expects": "(string | undefined)",
+                    "async": false,
+                    "wrapped": {
+                      "kind": "schema",
+                      "type": "string",
+                      "expects": "string",
+                      "async": false,
+                      "~standard": {
+                        "version": 1,
+                        "vendor": "valibot"
+                      }
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  }
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                },
+                "pipe": [
+                  {
+                    "kind": "schema",
+                    "type": "strict_object",
+                    "expects": "Object",
+                    "async": false,
+                    "entries": {
+                      "pattern": {
+                        "kind": "schema",
+                        "type": "string",
+                        "expects": "string",
+                        "async": false,
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      },
+                      "message": {
+                        "kind": "schema",
+                        "type": "optional",
+                        "expects": "(string | undefined)",
+                        "async": false,
+                        "wrapped": {
+                          "kind": "schema",
+                          "type": "string",
+                          "expects": "string",
+                          "async": false,
+                          "~standard": {
+                            "version": 1,
+                            "vendor": "valibot"
+                          }
+                        },
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      }
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    }
+                  },
+                  {
+                    "kind": "transformation",
+                    "type": "transform",
+                    "async": false
+                  }
+                ]
+              }
+            ],
+            "~standard": {
+              "version": 1,
+              "vendor": "valibot"
+            }
+          },
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          },
+          "pipe": [
+            {
+              "kind": "schema",
+              "type": "array",
+              "expects": "Array",
+              "async": false,
+              "item": {
+                "kind": "schema",
+                "type": "union",
+                "expects": "(string | Object)",
+                "async": false,
+                "options": [
+                  {
+                    "kind": "schema",
+                    "type": "string",
+                    "expects": "string",
+                    "async": false,
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    },
+                    "pipe": [
+                      {
+                        "kind": "schema",
+                        "type": "string",
+                        "expects": "string",
+                        "async": false,
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      },
+                      {
+                        "kind": "validation",
+                        "type": "min_length",
+                        "async": false,
+                        "expects": ">=1",
+                        "requirement": 1,
+                        "message": "RegExp pattern cannot be empty"
+                      },
+                      {
+                        "kind": "transformation",
+                        "type": "transform",
+                        "async": false
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "schema",
+                    "type": "strict_object",
+                    "expects": "Object",
+                    "async": false,
+                    "entries": {
+                      "pattern": {
+                        "kind": "schema",
+                        "type": "string",
+                        "expects": "string",
+                        "async": false,
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      },
+                      "message": {
+                        "kind": "schema",
+                        "type": "optional",
+                        "expects": "(string | undefined)",
+                        "async": false,
+                        "wrapped": {
+                          "kind": "schema",
+                          "type": "string",
+                          "expects": "string",
+                          "async": false,
+                          "~standard": {
+                            "version": 1,
+                            "vendor": "valibot"
+                          }
+                        },
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      }
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "valibot"
+                    },
+                    "pipe": [
+                      {
+                        "kind": "schema",
+                        "type": "strict_object",
+                        "expects": "Object",
+                        "async": false,
+                        "entries": {
+                          "pattern": {
+                            "kind": "schema",
+                            "type": "string",
+                            "expects": "string",
+                            "async": false,
+                            "~standard": {
+                              "version": 1,
+                              "vendor": "valibot"
+                            }
+                          },
+                          "message": {
+                            "kind": "schema",
+                            "type": "optional",
+                            "expects": "(string | undefined)",
+                            "async": false,
+                            "wrapped": {
+                              "kind": "schema",
+                              "type": "string",
+                              "expects": "string",
+                              "async": false,
+                              "~standard": {
+                                "version": 1,
+                                "vendor": "valibot"
+                              }
+                            },
+                            "~standard": {
+                              "version": 1,
+                              "vendor": "valibot"
+                            }
+                          }
+                        },
+                        "~standard": {
+                          "version": 1,
+                          "vendor": "valibot"
+                        }
+                      },
+                      {
+                        "kind": "transformation",
+                        "type": "transform",
+                        "async": false
+                      }
+                    ]
+                  }
+                ],
+                "~standard": {
+                  "version": 1,
+                  "vendor": "valibot"
+                }
+              },
               "~standard": {
                 "version": 1,
                 "vendor": "valibot"
@@ -186,7 +540,7 @@ This rule can be configured using the following options.
             {
               "kind": "metadata",
               "type": "description",
-              "description": "List of RegExp patterns to exclude"
+              "description": "List of RegExp patterns to exclude (string or {pattern, message})"
             }
           ]
         }
@@ -311,6 +665,90 @@ should be reported as:
 
 ```shell
 2:0 Rule matches an excluded pattern: /\.org/
+```
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,2 +1,1 @@
+ ||example.com^
+-||example.org^
+```
+
+### Excluded rule with custom message (exact match)
+
+The following code
+
+```adblock
+||example.com^
+||example.org^
+```
+
+with the following rule config:
+
+```json
+[
+  {
+    "excludedRuleTexts": [
+      {
+        "pattern": "||example.com^",
+        "message": "This rule is deprecated, please remove it"
+      }
+    ],
+    "excludedRegExpPatterns": []
+  }
+]
+```
+
+should be reported as:
+
+```shell
+1:0 Rule matches an excluded rule text: ||example.com^ (This rule is deprecated, please remove it)
+```
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,2 +1,1 @@
+-||example.com^
+ ||example.org^
+```
+
+### Excluded pattern with custom message
+
+The following code
+
+```adblock
+||example.com^
+||example.org^
+```
+
+with the following rule config:
+
+```json
+[
+  {
+    "excludedRuleTexts": [],
+    "excludedRegExpPatterns": [
+      {
+        "pattern": "\\.org",
+        "message": "Rules for .org domains are not allowed in this filter list"
+      }
+    ]
+  }
+]
+```
+
+should be reported as:
+
+```shell
+2:0 Rule matches an excluded pattern: /\.org/ (Rules for .org domains are not allowed in this filter list)
 ```
 
 and should be fixed as:

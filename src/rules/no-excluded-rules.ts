@@ -15,30 +15,58 @@ export default defineRule({
             url: getBuiltInRuleDocumentationUrl('no-excluded-rules'),
         },
         messages: {
-            excludedRuleText: 'Rule matches an excluded rule text: {{ruleText}}',
-            excludedPattern: 'Rule matches an excluded pattern: {{pattern}}',
+            excludedRuleText: 'Rule matches an excluded rule text: {{ruleText}}{{customMessage}}',
+            excludedPattern: 'Rule matches an excluded pattern: {{pattern}}{{customMessage}}',
         },
         configSchema: v.tuple([
             v.strictObject({
                 excludedRuleTexts: v.pipe(
-                    v.array(v.string()),
-                    v.description('List of rule texts to exclude'),
+                    v.array(
+                        v.union([
+                            v.pipe(
+                                v.string(),
+                                v.transform((pattern) => ({ pattern, message: undefined })),
+                            ),
+                            v.strictObject({
+                                pattern: v.string(),
+                                message: v.optional(v.string()),
+                            }),
+                        ]),
+                    ),
+                    v.description('List of rule texts to exclude (string or {pattern, message})'),
                 ),
                 excludedRegExpPatterns: v.pipe(
                     v.array(
-                        v.pipe(
-                            v.string(),
-                            v.minLength(1, 'RegExp pattern cannot be empty'),
-                            v.transform((pattern) => {
-                                return new RegExp(
-                                    RegExpUtils.isRegexPattern(pattern)
-                                        ? pattern.slice(1, -1)
-                                        : pattern,
-                                );
-                            }),
-                        ),
+                        v.union([
+                            v.pipe(
+                                v.string(),
+                                v.minLength(1, 'RegExp pattern cannot be empty'),
+                                v.transform((pattern) => ({
+                                    pattern: new RegExp(
+                                        RegExpUtils.isRegexPattern(pattern)
+                                            ? pattern.slice(1, -1)
+                                            : pattern,
+                                    ),
+                                    message: undefined,
+                                })),
+                            ),
+                            v.pipe(
+                                v.strictObject({
+                                    pattern: v.string(),
+                                    message: v.optional(v.string()),
+                                }),
+                                v.transform((obj) => ({
+                                    pattern: new RegExp(
+                                        RegExpUtils.isRegexPattern(obj.pattern)
+                                            ? obj.pattern.slice(1, -1)
+                                            : obj.pattern,
+                                    ),
+                                    message: obj.message,
+                                })),
+                            ),
+                        ]),
                     ),
-                    v.description('List of RegExp patterns to exclude'),
+                    v.description('List of RegExp patterns to exclude (string or {pattern, message})'),
                 ),
             }),
         ]),
@@ -85,6 +113,42 @@ export default defineRule({
                     },
                 ],
             },
+            {
+                name: 'Excluded rule with custom message (exact match)',
+                code: [
+                    '||example.com^',
+                    '||example.org^',
+                ].join('\n'),
+                config: [
+                    {
+                        excludedRuleTexts: [
+                            {
+                                pattern: '||example.com^',
+                                message: 'This rule is deprecated, please remove it',
+                            },
+                        ],
+                        excludedRegExpPatterns: [],
+                    },
+                ],
+            },
+            {
+                name: 'Excluded pattern with custom message',
+                code: [
+                    '||example.com^',
+                    '||example.org^',
+                ].join('\n'),
+                config: [
+                    {
+                        excludedRuleTexts: [],
+                        excludedRegExpPatterns: [
+                            {
+                                pattern: '\\.org',
+                                message: 'Rules for .org domains are not allowed in this filter list',
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
         hasFix: true,
         version: '2.0.10',
@@ -113,28 +177,33 @@ export default defineRule({
 
             const { excludedRuleTexts } = context.config[0];
 
-            if (excludedRuleTexts.includes(ruleText)) {
-                context.report({
-                    messageId: 'excludedRuleText',
-                    data: {
-                        ruleText,
-                    },
-                    fix: getFixerFunction(node),
-                    node,
-                });
+            for (const item of excludedRuleTexts) {
+                if (item.pattern === ruleText) {
+                    context.report({
+                        messageId: 'excludedRuleText',
+                        data: {
+                            ruleText,
+                            customMessage: item.message ? ` (${item.message})` : '',
+                        },
+                        fix: getFixerFunction(node),
+                        node,
+                    });
+                    break;
+                }
             }
 
             const { excludedRegExpPatterns } = context.config[0];
 
-            for (const regExp of excludedRegExpPatterns) {
-                if (!regExp.test(ruleText)) {
+            for (const item of excludedRegExpPatterns) {
+                if (!item.pattern.test(ruleText)) {
                     continue;
                 }
 
                 context.report({
                     messageId: 'excludedPattern',
                     data: {
-                        pattern: regExp.toString(),
+                        pattern: item.pattern.toString(),
+                        customMessage: item.message ? ` (${item.message})` : '',
                     },
                     fix: getFixerFunction(node),
                     node,
