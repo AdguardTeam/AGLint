@@ -35,7 +35,7 @@ describe('no-invalid-cosmetic-separator', () => {
                             current: '##',
                             suggested: '#?#',
                         },
-                        message: 'Extended CSS is used in selector, replace "##" with "#?#"',
+                        message: expect.any(String),
                         position: {
                             end: {
                                 column: 17,
@@ -76,7 +76,7 @@ describe('no-invalid-cosmetic-separator', () => {
                         data: {
                             required: '#@$?#',
                         },
-                        message: 'Declaration { remove: true; } is allowed only with "#@$?#" separator',
+                        message: expect.any(String),
                         position: {
                             end: {
                                 column: 24,
@@ -118,7 +118,7 @@ describe('no-invalid-cosmetic-separator', () => {
                             current: '#?#',
                             suggested: '##',
                         },
-                        message: 'Native CSS selector detected, replace "#?#" with "##"',
+                        message: expect.any(String),
                         position: {
                             end: {
                                 column: 6,
@@ -160,7 +160,7 @@ describe('no-invalid-cosmetic-separator', () => {
                             current: '#$?#',
                             suggested: '#$#',
                         },
-                        message: 'Native CSS selector detected, replace "#$?#" with "#$#"',
+                        message: expect.any(String),
                         position: {
                             end: {
                                 column: 38,

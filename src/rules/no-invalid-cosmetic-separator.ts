@@ -257,7 +257,14 @@ export default defineRule({
                     return;
                 }
 
-                hasExtendedDeclarations = true;
+                if (
+                    node.value?.type === 'Value'
+                    && node.value?.children.length === 1
+                    && node.value.children[0]?.type === 'Identifier'
+                    && node.value.children[0].name === 'true'
+                ) {
+                    hasExtendedDeclarations = true;
+                }
             },
         };
     },

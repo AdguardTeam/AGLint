@@ -5,7 +5,7 @@
 
 ## Description
 
-Validates that rule separator matches selector/declaration capabilities
+Checks that rule separator matches selector/declaration capabilities
 
 ## Type
 
@@ -88,7 +88,7 @@ and the following suggestions should be offered:
   +#?#div:has(> table:contains(a))
   ```
 
-### remove:true with native CSS injection separator
+### `remove: true` with native CSS injection separator
 
 The following code
 
