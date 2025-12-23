@@ -37,13 +37,13 @@ export default defineRule({
         return {
             Declaration: (node: DeclarationPlain) => {
                 // special case: `remove` property
-                if (node.property === REMOVE_VALUE) {
+                if (node.property === REMOVE_PROPERTY) {
                     // its value should be `true`
                     if (
                         node.value?.type !== 'Value'
                         || node.value?.children.length !== 1
                         || node.value.children[0]?.type !== 'Identifier'
-                        || node.value.children[0].name !== REMOVE_PROPERTY
+                        || node.value.children[0].name !== REMOVE_VALUE
                     ) {
                         const position = context.sourceCode.getLinterPositionRangeFromOffsetRange([
                             node.loc!.start.offset,
