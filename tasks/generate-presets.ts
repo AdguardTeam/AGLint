@@ -19,12 +19,17 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Override severity or config for specific rules in preset generation.
- * If you want to change the default severity or config for a rule, add it here.
+ * Override the default severity or configuration for specific rules in preset generation.
  *
- * Examples:
- * - 'rule-name': 'error' (Override severity only).
- * - 'rule-name': ['warn', { option: true }] (Override severity with config).
+ * **Default behavior (without overrides):**
+ * - `Problem` type rules → severity: `"error"`.
+ * - Other type rules → severity: `"warn"`.
+ * - Rules with a config schema → `[severity, ...defaultConfig]`.
+ * - Rules without config → just the severity string.
+ *
+ * **Examples:**
+ * - `'rule-name': 'error'` - Override severity only (keeps default config if one exists).
+ * - `'rule-name': ['warn', { option: true }]` - Override severity AND config.
  */
 const RULE_OVERRIDES: Readonly<Record<string, LinterRuleConfig>> = {
     // TODO: Add overrides here
