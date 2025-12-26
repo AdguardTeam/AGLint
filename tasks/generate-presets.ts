@@ -28,6 +28,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  */
 const RULE_OVERRIDES: Readonly<Record<string, LinterRuleConfig>> = {
     // TODO: Add overrides here
+    'no-invalid-cosmetic-separator': ['warn'],
 };
 
 /**

@@ -16,6 +16,9 @@ describe('no-invalid-cosmetic-separator', () => {
             '#$?#a[href^="/bnlink/?bnid="] { remove: true; }',
             '#@#div',
             '#?#div:contains(a)',
+            'olaproducts.co.nz##body,html:style(height: auto !important; overflow: auto !important)',
+            'example.com##.foo { padding: 2px; }',
+            'example.com##div:matches-path(/foo/)',
         ])("'%s'", async (rule) => {
             expect((await lint(rule, rulesConfig)).problems).toStrictEqual([]);
         });

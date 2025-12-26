@@ -1,4 +1,5 @@
 import {
+    AdblockSyntax,
     CosmeticRuleSeparator,
     type CssInjectionRule,
     type CssInjectionRuleBody,
@@ -7,50 +8,13 @@ import {
 } from '@adguard/agtree';
 import { type DeclarationPlain, type PseudoClassSelectorPlain } from '@adguard/ecss-tree';
 
-import { REMOVE_PROPERTY, REMOVE_VALUE } from '../common/constants';
+import {
+    REMOVE_PROPERTY,
+    REMOVE_VALUE,
+    SUPPORTED_EXT_CSS_PSEUDO_CLASSES,
+    SUPPORTED_UBO_ACTION_OPERATORS,
+} from '../common/constants';
 import { defineRule, LinterRuleType } from '../linter/rule';
-
-/**
- * Supported Extended CSS pseudo-classes.
- *
- * These pseudo-classes are not supported by browsers natively, so we need Extended CSS library to support them.
- *
- * Please keep this list sorted alphabetically.
- */
-export const SUPPORTED_EXT_CSS_PSEUDO_CLASSES = new Set([
-    /**
-     * Pseudo-classes :is(), and :not() may use native implementation.
-     *
-     * @see {@link https://github.com/AdguardTeam/ExtendedCss#extended-css-is}
-     * @see {@link https://github.com/AdguardTeam/ExtendedCss#extended-css-not}
-     */
-    /**
-     * :has() should also be conditionally considered as extended and should not be in this list,
-     * for details check: https://github.com/AdguardTeam/ExtendedCss#extended-css-has,
-     * but there is a bug with content blocker in safari:
-     * for details check: https://bugs.webkit.org/show_bug.cgi?id=248868.
-     *
-     * TODO: remove 'has' later.
-     */
-    '-abp-contains', // alias for 'contains'
-    '-abp-has', // alias for 'has'
-    'contains',
-    'has', // some browsers support 'has' natively
-    'has-text', // alias for 'contains'
-    'if',
-    'if-not',
-    'matches-attr',
-    'matches-css',
-    'matches-css-after', // deprecated, replaced by 'matches-css'
-    'matches-css-before', // deprecated, replaced by 'matches-css'
-    'matches-property',
-    'nth-ancestor',
-    'remove',
-    'upward',
-    'xpath',
-    'style',
-    'matches-media',
-]);
 
 export default defineRule({
     meta: {
@@ -95,17 +59,27 @@ export default defineRule({
         version: '4.0.0',
     },
     create: (context) => {
+        let syntax: AdblockSyntax | undefined;
         let currentRuleSeparator: Value;
         let currentRuleException = false;
         let hasPseudoClassSelectors = false;
         let hasExtendedDeclarations = false;
 
+        const isUboPseudoAllowedWithNativeSeparator = (pseudoClassName: string): boolean => {
+            return pseudoClassName === 'matches-path' || SUPPORTED_UBO_ACTION_OPERATORS.has(pseudoClassName);
+        };
+
         return {
             ElementHidingRule: (node: ElementHidingRule) => {
+                syntax = node.syntax;
                 hasPseudoClassSelectors = false;
                 hasExtendedDeclarations = false;
                 currentRuleSeparator = node.separator;
                 currentRuleException = !!node.exception;
+            },
+
+            'ElementHidingRule:exit': () => {
+                syntax = undefined;
             },
 
             'ElementHidingRuleBody:exit': (node: ElementHidingRule) => {
@@ -216,10 +190,15 @@ export default defineRule({
             },
 
             CssInjectionRule: (node: CssInjectionRule) => {
+                syntax = node.syntax;
                 hasPseudoClassSelectors = false;
                 hasExtendedDeclarations = false;
                 currentRuleSeparator = node.separator;
                 currentRuleException = !!node.exception;
+            },
+
+            'CssInjectionRule:exit': () => {
+                syntax = undefined;
             },
 
             'CssInjectionRuleBody:exit': (node: CssInjectionRuleBody) => {
@@ -292,9 +271,15 @@ export default defineRule({
 
             PseudoClassSelector: (node: PseudoClassSelectorPlain) => {
                 const { name } = node;
-                if (SUPPORTED_EXT_CSS_PSEUDO_CLASSES.has(name) && name !== 'has') {
-                    hasPseudoClassSelectors = true;
+                if (!SUPPORTED_EXT_CSS_PSEUDO_CLASSES.has(name) || name === 'has') {
+                    return;
                 }
+
+                if (syntax === AdblockSyntax.Ubo && isUboPseudoAllowedWithNativeSeparator(name)) {
+                    return;
+                }
+
+                hasPseudoClassSelectors = true;
             },
 
             Declaration: (node: DeclarationPlain) => {
