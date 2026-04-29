@@ -1,0 +1,16 @@
+.git
+.idea
+.vscode
+.DS_Store
+.eslintcache
+*.tsbuildinfo
+build/
+dist/
+output/
+tmp/
+node_modules/
+# Dockerfile is passed explicitly via --file; excluding it here just keeps
+# it out of the build context (avoids cache busting on Dockerfile edits).
+Dockerfile*
+*.log
+*.tgz
