@@ -4,22 +4,19 @@ plan:
   project-key: AJL
   key: AGLINTTEST
   name: aglint - tests
-variables:
-  dockerNode: adguard/node-ssh:22.14--0
 
 stages:
-  - Build:
+  - Build and test:
       manual: false
       final: false
       jobs:
-        - Build
+        - Lint
+        - Test
 
-Build:
-  key: BUILD
-  docker:
-    image: '${bamboo.dockerNode}'
-    volumes:
-      ${system.PNPM_DIR}: "${bamboo.cachePnpm}"
+Lint:
+  key: LINT
+  other:
+    clean-working-dir: true
   tasks:
     - checkout:
         force-clean-build: true
@@ -27,34 +24,65 @@ Build:
         interpreter: SHELL
         scripts:
           - |-
-            set -e
-            set -x
+            set -ex
 
             # Fix mixed logs
             exec 2>&1
 
-            ls -laht
+            export DOCKER_BUILDKIT=1
 
-            # Set cache directory
-            pnpm config set store-dir ${bamboo.cachePnpm}
-
-            # Install dependencies
-            pnpm install
-
-            # Run checks
-            pnpm check-types
-            pnpm lint
-            pnpm test
-
-            # Build should be successful
-            pnpm build
+            docker build \
+              --file Dockerfile \
+              --progress plain \
+              --build-arg BUILD_RUN_ID=${bamboo.buildNumber} \
+              --target lint-output \
+              --output type=local,dest=output \
+              .
   final-tasks:
+    - script: &cleanup-script
+        interpreter: SHELL
+        scripts:
+          - "./bamboo-specs/scripts/cleanup.sh"
+  requirements: &requirements
+    - extension: 'true'
+
+Test:
+  key: TEST
+  other:
+    clean-working-dir: true
+  tasks:
+    - checkout:
+        force-clean-build: true
     - script:
         interpreter: SHELL
         scripts:
-          - "./bamboo-specs/scripts/cleanup.sh aglint.tgz"
-  requirements:
-    - adg-docker: true
+          - |-
+            set -ex
+
+            # Fix mixed logs
+            exec 2>&1
+
+            export DOCKER_BUILDKIT=1
+
+            docker build \
+              --file Dockerfile \
+              --progress plain \
+              --build-arg BUILD_RUN_ID=${bamboo.buildNumber} \
+              --target test-output \
+              --output type=local,dest=output \
+              .
+    - script:
+        interpreter: SHELL
+        scripts:
+          - |-
+            if [ -f output/exit-code.txt ]; then
+              exit $(cat output/exit-code.txt)
+            fi
+            echo "output/exit-code.txt not found"
+            exit 1
+  final-tasks:
+    - script: *cleanup-script
+  requirements: *requirements
 
 branches:
   create: for-pull-request
@@ -63,14 +91,7 @@ branches:
     after-inactive-days: '5'
   link-to-jira: true
 
-notifications:
-  - events:
-      - plan-status-changed
-    recipients:
-      - webhook:
-          name: Build webhook
-          url: http://prod.jirahub.service.eu.consul/v1/webhook/bamboo
-
 labels: []
+
 other:
   concurrent-build-plugin: system-default
