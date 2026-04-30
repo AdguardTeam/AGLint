@@ -156,6 +156,7 @@
     "scripts": {
         "prebuild": "rimraf dist",
         "build": "rollup --config rollup.config.ts --configPlugin typescript && tsx tasks/transform-dts.ts",
+        "postbuild": "tsx tasks/build-txt.ts",
         "check-types": "tsc",
         "clean": "rimraf dist",
         "coverage": "vitest --coverage",
