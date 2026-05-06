@@ -51,7 +51,7 @@ Build:
     - script:
         interpreter: SHELL
         scripts:
-          - "./bamboo-specs/scripts/cleanup.sh aglint.tgz"
+          - "./bamboo-specs/scripts/cleanup.sh output/artifacts/aglint.tgz"
   artifacts:
     - name: aglint.tgz
       location: output/artifacts
