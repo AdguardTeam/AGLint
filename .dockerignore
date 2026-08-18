@@ -15,9 +15,6 @@ Dockerfile*
 *.log
 *.tgz
 
-# Git hooks
-.husky
-
 # GitHub workflows
 .github/
 
