@@ -14,3 +14,15 @@ node_modules/
 Dockerfile*
 *.log
 *.tgz
+
+# Git hooks
+.husky
+
+# GitHub workflows
+.github/
+
+# SDD specs
+.sdd/
+
+# Test coverage
+coverage/

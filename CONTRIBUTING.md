@@ -44,6 +44,13 @@ During development, you can use the following commands (listed in `package.json`
 - `pnpm lint:ts` - lint the code with [ESLint][eslint].
 - `pnpm test` - run tests with [Vitest][vitest] (you can also run a specific test with `pnpm test <test-name>`)
 
+## Releasing
+
+`package.json` intentionally has no `version` field — the release version is
+derived from `CHANGELOG.md` and injected by CI before packing. Releases are
+fully automated via GitHub Actions, see [DEPLOYMENT.md](DEPLOYMENT.md) for
+the complete release pipeline documentation.
+
 [contribute]: https://adguard.com/contribute.html
 [eslint]: https://eslint.org/
 [vitest]: https://vitest.dev/
