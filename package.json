@@ -1,6 +1,5 @@
 {
     "name": "@adguard/aglint",
-    "version": "3.0.2",
     "description": "Universal adblock filter list linter.",
     "keywords": [
         "adblock",
@@ -32,16 +31,14 @@
         }
     },
     "files": [
-        "dist/**",
-        "!dist/build.txt"
+        "dist/**"
     ],
     "engines": {
         "node": ">=18"
     },
     "scripts": {
-        "build": "pnpm clean && pnpm build-txt && pnpm build-types && rollup --config rollup.config.ts --configPlugin typescript",
+        "build": "pnpm clean && pnpm build-types && rollup --config rollup.config.ts --configPlugin typescript",
         "build-types": "tsc --project tsconfig.build.json",
-        "build-txt": "tsx tasks/build-txt.ts",
         "check-types": "tsc",
         "clean": "rimraf dist",
         "coverage": "vitest --coverage",
@@ -49,7 +46,6 @@
         "lint:md": "markdownlint .",
         "lint:ts": "eslint . --cache --ext .ts",
         "prepare": "node .husky/install.mjs",
-        "increment": "pnpm version patch --no-git-tag-version",
         "test": "vitest"
     },
     "devDependencies": {

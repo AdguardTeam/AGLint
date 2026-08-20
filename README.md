@@ -24,6 +24,10 @@
 </p>
 <!-- markdownlint-restore -->
 
+> [!NOTE]
+> This package is developed in [AdGuardSoftwareLimited/ext-aglint][ext-aglint-repo].
+> The [AdguardTeam/AGLint] repository is a public mirror.
+
 Table of Contents:
 
 - [Introduction](#introduction)
@@ -962,6 +966,7 @@ You can find the detailed linter rule documentation [here][linter-rules-docs].
 ## Development & Contribution
 
 Please read the [CONTRIBUTING.md][contributing-url] file for details on how to contribute to this project.
+Releases are automated via GitHub Actions, see [DEPLOYMENT.md](DEPLOYMENT.md) for the release pipeline.
 
 ## Ideas & Questions
 
@@ -1013,6 +1018,8 @@ resources, please let us know.
 [agtree-pkg]: https://www.npmjs.com/package/@adguard/agtree
 [basic-rules-kb]: https://adguard.com/kb/general/ad-filtering/create-own-filters/#basic-rules
 [contributing-url]: https://github.com/AdguardTeam/AGLint/tree/master/CONTRIBUTING.md
+[ext-aglint-repo]: https://github.com/AdGuardSoftwareLimited/ext-aglint
+[AdguardTeam/AGLint]: https://github.com/AdguardTeam/AGLint
 [css-tree-docs]: https://github.com/csstree/csstree/tree/master/docs
 [es6-compat-table]: https://kangax.github.io/compat-table/es6/
 [eslint-config-file-formats]: https://eslint.org/docs/latest/use/configure/configuration-files#configuration-file-formats

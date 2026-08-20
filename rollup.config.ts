@@ -30,7 +30,6 @@ const REQUIRED_PKG_FIELDS = [
     'author',
     'homepage',
     'license',
-    'version',
 ];
 
 for (const field of REQUIRED_PKG_FIELDS) {
@@ -39,9 +38,14 @@ for (const field of REQUIRED_PKG_FIELDS) {
     }
 }
 
+// package.json intentionally has no "version" field in the repository —
+// CI injects the release version before building the package, so published
+// builds always carry the real version. Local/dev builds use a placeholder.
+const PKG_VERSION = typeof pkg.version === 'string' ? pkg.version : '0.0.0-dev';
+
 // Generate a banner with the current package & build info
 const BANNER = `/*
- * ${BASE_NAME} v${pkg.version} (build date: ${new Date().toUTCString()})
+ * ${BASE_NAME} v${PKG_VERSION} (build date: ${new Date().toUTCString()})
  * (c) ${new Date().getFullYear()} ${pkg.author}
  * Released under the ${pkg.license} license
  * ${pkg.homepage}
