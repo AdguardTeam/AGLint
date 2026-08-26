@@ -1,6 +1,5 @@
 {
     "name": "@adguard/aglint",
-    "version": "4.0.0-beta.5",
     "description": "Linter for adblock filter lists.",
     "keywords": [
         "adblock",
@@ -156,7 +155,6 @@
     "scripts": {
         "prebuild": "rimraf dist",
         "build": "rollup --config rollup.config.ts --configPlugin typescript && tsx tasks/transform-dts.ts",
-        "postbuild": "tsx tasks/build-txt.ts",
         "check-types": "tsc",
         "clean": "rimraf dist",
         "coverage": "vitest --coverage",

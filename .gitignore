@@ -16,3 +16,8 @@ node_modules/
 
 # Output directory for CI build
 output/
+
+# SDD specs
+.sdd/
+
+.idea

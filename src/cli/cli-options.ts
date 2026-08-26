@@ -1,8 +1,8 @@
 import { Command, Option } from 'commander';
 import * as v from 'valibot';
 
-import { version } from '../../package.json';
 import type { LinterRuleType } from '../linter/rule';
+import { version } from '../version';
 
 import { CACHE_FILE_NAME, LinterCacheStrategy } from './cache';
 import { DEFAULT_PATTERN, IGNORE_FILE_NAME, SUPPORTED_FILE_EXTENSIONS } from './constants';

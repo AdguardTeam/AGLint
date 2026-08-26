@@ -5,9 +5,9 @@ import path from 'node:path';
 import { hash as hashObject } from 'ohash';
 import * as v from 'valibot';
 
-import { version } from '../../package.json';
 import { type LinterConfig } from '../linter/config';
 import { type LinterResult, linterResultSchema } from '../linter/linter';
+import { version } from '../version';
 
 import { getLinterConfigHash } from './utils/config-hash';
 import { toPosix } from './utils/to-posix';

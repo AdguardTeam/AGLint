@@ -15,9 +15,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { inspect } from 'node:util';
 
-import { version } from '../../package.json';
 import { Debug } from '../utils/debug';
 import { getFormattedError } from '../utils/error';
+import { version } from '../version';
 
 import { LintResultCache } from './cache';
 import { buildCliProgram, enforceSoloOptions, type LinterCliConfig } from './cli-options';
