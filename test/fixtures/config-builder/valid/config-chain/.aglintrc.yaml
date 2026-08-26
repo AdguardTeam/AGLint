@@ -1,4 +1,0 @@
-rules:
-  'rule-1': 'warn'
-  'rule-4': ['error', 'never']
-  'rule-5': 'error'

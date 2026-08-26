@@ -1,6 +1,7 @@
 {
     "name": "@adguard/aglint",
-    "description": "Universal adblock filter list linter.",
+    "version": "4.0.0-beta.5",
+    "description": "Linter for adblock filter lists.",
     "keywords": [
         "adblock",
         "adguard",
@@ -20,51 +21,172 @@
         "url": "https://github.com/AdguardTeam/AGLint/issues"
     },
     "homepage": "https://github.com/AdguardTeam/AGLint#readme",
-    "bin": "dist/index.cli.js",
-    "main": "dist/index.node.js",
-    "module": "dist/index.node.js",
-    "types": "dist/types/index.node.d.ts",
+    "bin": "dist/cli/bin.js",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/types/index.d.ts",
     "exports": {
         ".": {
-            "types": "./dist/types/index.node.d.ts",
-            "import": "./dist/index.node.js"
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        },
+        "./linter": {
+            "types": "./dist/types/linter/index.d.ts",
+            "import": "./dist/linter/index.js",
+            "default": "./dist/linter/index.js"
+        },
+        "./cli": {
+            "types": "./dist/types/cli/index.d.ts",
+            "import": "./dist/cli/index.js",
+            "default": "./dist/cli/index.js"
+        },
+        "./config-presets/all": "./config-presets/all.json",
+        "./config-presets/recommended": "./config-presets/recommended.json",
+        "./rules/if-directive-balance": {
+            "types": "./dist/rules/if-directive-balance.d.ts",
+            "import": "./dist/rules/if-directive-balance.js",
+            "default": "./dist/rules/if-directive-balance.js"
+        },
+        "./rules/max-css-selectors": {
+            "types": "./dist/rules/max-css-selectors.d.ts",
+            "import": "./dist/rules/max-css-selectors.js",
+            "default": "./dist/rules/max-css-selectors.js"
+        },
+        "./rules/no-css-comments": {
+            "types": "./dist/rules/no-css-comments.d.ts",
+            "import": "./dist/rules/no-css-comments.js",
+            "default": "./dist/rules/no-css-comments.js"
+        },
+        "./rules/no-duplicated-css-declaration-props": {
+            "types": "./dist/rules/no-duplicated-css-declaration-props.d.ts",
+            "import": "./dist/rules/no-duplicated-css-declaration-props.js",
+            "default": "./dist/rules/no-duplicated-css-declaration-props.js"
+        },
+        "./rules/no-duplicated-hint-platforms": {
+            "types": "./dist/rules/no-duplicated-hint-platforms.d.ts",
+            "import": "./dist/rules/no-duplicated-hint-platforms.js",
+            "default": "./dist/rules/no-duplicated-hint-platforms.js"
+        },
+        "./rules/no-duplicated-hints": {
+            "types": "./dist/rules/no-duplicated-hints.d.ts",
+            "import": "./dist/rules/no-duplicated-hints.js",
+            "default": "./dist/rules/no-duplicated-hints.js"
+        },
+        "./rules/no-duplicated-modifiers": {
+            "types": "./dist/rules/no-duplicated-modifiers.d.ts",
+            "import": "./dist/rules/no-duplicated-modifiers.js",
+            "default": "./dist/rules/no-duplicated-modifiers.js"
+        },
+        "./rules/no-excluded-rules": {
+            "types": "./dist/rules/no-excluded-rules.d.ts",
+            "import": "./dist/rules/no-excluded-rules.js",
+            "default": "./dist/rules/no-excluded-rules.js"
+        },
+        "./rules/no-inconsistent-hint-platforms": {
+            "types": "./dist/rules/no-inconsistent-hint-platforms.d.ts",
+            "import": "./dist/rules/no-inconsistent-hint-platforms.js",
+            "default": "./dist/rules/no-inconsistent-hint-platforms.js"
+        },
+        "./rules/no-invalid-css-declaration": {
+            "types": "./dist/rules/no-invalid-css-declaration.d.ts",
+            "import": "./dist/rules/no-invalid-css-declaration.js",
+            "default": "./dist/rules/no-invalid-css-declaration.js"
+        },
+        "./rules/no-invalid-domains": {
+            "types": "./dist/rules/no-invalid-domains.d.ts",
+            "import": "./dist/rules/no-invalid-domains.js",
+            "default": "./dist/rules/no-invalid-domains.js"
+        },
+        "./rules/no-invalid-hint-params": {
+            "types": "./dist/rules/no-invalid-hint-params.d.ts",
+            "import": "./dist/rules/no-invalid-hint-params.js",
+            "default": "./dist/rules/no-invalid-hint-params.js"
+        },
+        "./rules/no-invalid-modifiers": {
+            "types": "./dist/rules/no-invalid-modifiers.d.ts",
+            "import": "./dist/rules/no-invalid-modifiers.js",
+            "default": "./dist/rules/no-invalid-modifiers.js"
+        },
+        "./rules/no-invalid-scriptlets": {
+            "types": "./dist/rules/no-invalid-scriptlets.d.ts",
+            "import": "./dist/rules/no-invalid-scriptlets.js",
+            "default": "./dist/rules/no-invalid-scriptlets.js"
+        },
+        "./rules/no-short-rules": {
+            "types": "./dist/rules/no-short-rules.d.ts",
+            "import": "./dist/rules/no-short-rules.js",
+            "default": "./dist/rules/no-short-rules.js"
+        },
+        "./rules/no-unknown-hint-platforms": {
+            "types": "./dist/rules/no-unknown-hint-platforms.d.ts",
+            "import": "./dist/rules/no-unknown-hint-platforms.js",
+            "default": "./dist/rules/no-unknown-hint-platforms.js"
+        },
+        "./rules/no-unknown-hints": {
+            "types": "./dist/rules/no-unknown-hints.d.ts",
+            "import": "./dist/rules/no-unknown-hints.js",
+            "default": "./dist/rules/no-unknown-hints.js"
+        },
+        "./rules/no-unknown-preprocessor-directives": {
+            "types": "./dist/rules/no-unknown-preprocessor-directives.d.ts",
+            "import": "./dist/rules/no-unknown-preprocessor-directives.js",
+            "default": "./dist/rules/no-unknown-preprocessor-directives.js"
+        },
+        "./rules/no-unsupported-css-pseudo-class": {
+            "types": "./dist/rules/no-unsupported-css-pseudo-class.d.ts",
+            "import": "./dist/rules/no-unsupported-css-pseudo-class.js",
+            "default": "./dist/rules/no-unsupported-css-pseudo-class.js"
+        },
+        "./rules/scriptlet-quotes": {
+            "types": "./dist/rules/scriptlet-quotes.d.ts",
+            "import": "./dist/rules/scriptlet-quotes.js",
+            "default": "./dist/rules/scriptlet-quotes.js"
         }
     },
     "files": [
-        "dist/**"
+        "dist/**",
+        "!dist/build.txt",
+        "config-presets/**",
+        "schema/**"
     ],
     "engines": {
-        "node": ">=18"
+        "node": ">=20"
     },
     "scripts": {
-        "build": "pnpm clean && pnpm build-types && rollup --config rollup.config.ts --configPlugin typescript",
-        "build-types": "tsc --project tsconfig.build.json",
+        "prebuild": "rimraf dist",
+        "build": "rollup --config rollup.config.ts --configPlugin typescript && tsx tasks/transform-dts.ts",
+        "postbuild": "tsx tasks/build-txt.ts",
         "check-types": "tsc",
         "clean": "rimraf dist",
         "coverage": "vitest --coverage",
-        "lint": "pnpm check-types && pnpm lint:ts && pnpm lint:md",
-        "lint:md": "markdownlint .",
-        "lint:ts": "eslint . --cache --ext .ts",
-        "prepare": "node .husky/install.mjs",
-        "test": "vitest"
+        "lint": "pnpm check-types && pnpm lint:code && pnpm lint:md",
+        "lint:md": "markdownlint-cli2 --config .markdownlint-cli2.jsonc",
+        "lint:code": "eslint . --cache --ext .ts --ext .js",
+        "prepare": "node .husky/install.js",
+        "increment": "pnpm version patch --no-git-tag-version",
+        "test": "vitest",
+        "rules:update": "npx tsx tasks/generate-rule-exports.ts && npx tsx tasks/generate-rules-readme.ts && npx tsx tasks/generate-presets.ts",
+        "schema:generate": "npx tsx tasks/generate-config-schema.ts"
     },
     "devDependencies": {
-        "@adguard/eslint-plugin-logger-context": "^1.0.1",
-        "@babel/core": "^7.22.5",
-        "@babel/preset-env": "^7.22.5",
         "@rollup/plugin-commonjs": "^25.0.2",
         "@rollup/plugin-json": "^6.0.0",
         "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-replace": "^6.0.3",
         "@rollup/plugin-typescript": "^12.1.2",
-        "@swc/core": "^1.3.74",
         "@types/clone-deep": "^4.0.1",
-        "@types/fs-extra": "^11.0.1",
-        "@types/js-yaml": "^4.0.5",
+        "@types/esquery": "^1.5.4",
+        "@types/glob-parent": "^5.1.3",
+        "@types/is-glob": "^4.0.4",
         "@types/node": "^18.11.7",
+        "@types/object-inspect": "^1.13.0",
         "@types/text-table": "^0.2.2",
         "@typescript-eslint/eslint-plugin": "^5.60.1",
         "@typescript-eslint/parser": "^5.60.1",
+        "@vitest/coverage-v8": "4.0.15",
         "ci-info": "^4.0.0",
+        "diff": "^8.0.2",
         "eslint": "^8.57.1",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-airbnb-typescript": "^17.0.0",
@@ -76,34 +198,45 @@
         "husky": "^9.0.7",
         "jsdoc": "^4.0.2",
         "lint-staged": "^16.2.0",
-        "markdownlint": "^0.30.0",
-        "markdownlint-cli": "^0.35.0",
+        "markdownlint": "^0.39.0",
+        "markdownlint-cli2": "^0.18.1",
         "rimraf": "^5.0.1",
         "rollup": "^4.41.0",
         "rollup-plugin-node-externals": "^6.1.1",
-        "ts-node": "^10.9.1",
+        "ts-morph": "^27.0.2",
         "tsc-files": "^1.1.4",
         "tsx": "^4.7.0",
         "typescript": "^5.8.3",
-        "vitest": "^3.1.3"
+        "vitest": "^4.0.15"
     },
     "dependencies": {
-        "@adguard/agtree": "3.3.1",
-        "@adguard/ecss-tree": "^1.1.0",
-        "@inquirer/checkbox": "^1.3.7",
-        "@inquirer/select": "^1.2.7",
-        "chalk": "4.1.2",
+        "@adguard/agtree": "^3.4.1",
+        "@adguard/ecss-tree": "^2.0.1",
+        "@inquirer/checkbox": "^4.3.0",
+        "@inquirer/confirm": "^6.0.1",
+        "@inquirer/select": "^4.4.0",
+        "@valibot/to-json-schema": "^1.3.0",
+        "chalk": "5.6.2",
         "clone-deep": "^4.0.1",
-        "commander": "^11.0.0",
+        "commander": "^14.0.1",
         "deepmerge": "^4.3.1",
-        "fast-deep-equal": "^3.1.3",
-        "fs-extra": "^11.1.1",
+        "detect-indent": "^7.0.2",
+        "detect-newline": "^4.0.1",
+        "esquery": "^1.6.0",
+        "fast-fuzzy": "^1.12.0",
+        "fast-glob": "^3.3.3",
+        "glob-parent": "^6.0.2",
         "ignore": "^5.2.4",
         "inflection": "^2.0.1",
-        "js-yaml": "^4.1.0",
+        "is-glob": "^4.0.3",
+        "micromustache": "^8.0.3",
+        "object-inspect": "^1.13.4",
+        "ohash": "^2.0.11",
+        "piscina": "^5.1.3",
         "strip-ansi": "6.0.1",
-        "superstruct": "^2.0.2",
         "terminal-link": "2.1.1",
-        "text-table": "^0.2.0"
+        "text-table": "^0.2.0",
+        "valibot": "^1.1.0",
+        "yaml": "^2.8.1"
     }
 }

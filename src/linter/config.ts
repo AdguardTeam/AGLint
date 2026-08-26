@@ -1,119 +1,221 @@
-/**
- * Linter configuration.
- */
+import { AdblockSyntax, getAllPlatformNames, PLATFORM_NEGATION } from '@adguard/agtree';
+import * as v from 'valibot';
 
-import { AdblockSyntax } from '@adguard/agtree';
-import merge from 'deepmerge';
-import {
-    array,
-    boolean,
-    enums,
-    object,
-    optional,
-    record,
-    string,
-} from 'superstruct';
-
-import { type LinterConfig } from './common';
 import { linterRuleConfigSchema } from './rule';
+import { anyNodeSchema } from './source-code/visitor-collection';
 
 /**
- * Superstruct schema for the linter rules config object.
+ * Default key name used to identify node types in ASTs.
  */
-export const linterRulesSchema = optional(record(string(), linterRuleConfigSchema));
+export const DEFAULT_TYPE_KEY = 'type';
 
 /**
- * Superstruct schema for the linter config object properties. It is necessary to
- * separate this from the schema for the whole config object because we reuse it
- * in the CLI config object.
+ * Default key name used to access child nodes in ASTs.
  */
-export const linterConfigPropsSchema = {
-    root: optional(boolean()),
-    extends: optional(array(string())),
-    allowInlineConfig: optional(boolean()),
-    syntax: optional(array(enums([
-        AdblockSyntax.Common,
-        AdblockSyntax.Adg,
-        AdblockSyntax.Ubo,
-        AdblockSyntax.Abp,
-    ]))),
-    rules: linterRulesSchema,
-};
+export const DEFAULT_CHILD_KEYS = ['children'];
+
+const parseFunctionSchema = v.pipe(
+    v.function(),
+    v.args(v.tuple([
+        // source
+        v.pipe(v.string()),
+        // offset
+        v.pipe(v.number()),
+        // line
+        v.pipe(v.number()),
+        // lineStartOffset
+        v.pipe(v.number()),
+    ])),
+    v.returns(anyNodeSchema),
+);
+
+const getOffsetFromNodeSchema = v.pipe(
+    v.function(),
+    v.args(v.tuple([
+        // node
+        v.pipe(anyNodeSchema),
+    ])),
+    v.returns(v.number()),
+);
 
 /**
- * Superstruct schema for the linter rule config (used for validation).
- */
-export const linterConfigSchema = object(linterConfigPropsSchema);
-
-/**
- * Default linter configuration.
- */
-export const defaultLinterConfig: LinterConfig = {
-    allowInlineConfig: true,
-    syntax: [AdblockSyntax.Common],
-};
-
-/**
- * Merges two configuration objects using deepmerge. Practically, this means that
- * the `extend` object will be merged into the `initial` object.
+ * Retrieves a character offset (either start or end) from a given AST node.
  *
- * @param initial The initial config object.
- * @param extend The config object to extend the initial config with.
+ * Used by sub-parsers to determine which portion of the main source
+ * corresponds to a particular node.
  *
- * @returns The merged config object.
+ * @param node The AST node from which to extract the offset.
+ *
+ * @returns The absolute character offset within the source code.
+ */
+export type GetOffsetFromNode = v.InferOutput<typeof getOffsetFromNodeSchema>;
+
+const parserSchema = v.object({
+    /**
+     * Optional human-readable name of the parser.
+     * Used primarily for debugging and logging.
+     */
+    name: v.optional(v.string()),
+
+    /**
+     * The function used to parse a given source slice into a sub-AST.
+     */
+    parse: parseFunctionSchema,
+
+    /**
+     * The key used to identify node types within the sub-AST.
+     * For example, "type" for ESTree-like ASTs.
+     */
+    nodeTypeKey: v.string(),
+
+    /**
+     * The key (or keys) used to access arrays of child nodes within the sub-AST.
+     * For example, ["children"], ["body"], or ["children", "comments"] for multiple keys.
+     */
+    childNodeKeys: v.array(v.string()),
+
+    /**
+     * Optional function that returns the start offset of a node in the main source.
+     * Used to determine the slice of code passed to the sub-parser.
+     */
+    getStartOffset: v.optional(getOffsetFromNodeSchema),
+
+    /**
+     * Optional function that returns the end offset of a node in the main source.
+     * Used to determine the slice of code passed to the sub-parser.
+     */
+    getEndOffset: v.optional(getOffsetFromNodeSchema),
+});
+
+/**
+ * Defines a sub-parser configuration, which describes how a specific parser
+ * should process a subset of the main AST.
+ *
+ * Each parser is associated with a unique `namespace` and is invoked
+ * when a node matches a registered selector.
+ */
+export type Parser = v.InferOutput<typeof parserSchema>;
+
+/**
+ * Defines the signature of a sub-parser function.
+ * A sub-parser takes a source code slice and contextual offset information,
+ * and returns an AST object representing the parsed structure.
+ *
+ * @param source The portion of source code to parse.
+ * @param offset The absolute start offset of the source slice in the original file.
+ * @param line The zero-based line number corresponding to the slice start position.
+ * @param lineStartOffset The absolute offset of the line start that contains the slice start.
+ *
+ * @returns The parsed AST object.
+ */
+export type ParseFunction = v.InferOutput<typeof parseFunctionSchema>;
+
+/**
+ * Schema for validating the rules configuration object.
+ */
+export const linterRulesConfigSchema = v.record(v.string(), linterRuleConfigSchema);
+
+/**
+ * Configuration object mapping rule names to their settings.
  *
  * @example
- * If you have the following config (called `initial` parameter):
- * ```json
- * {
- *   "syntax": ["Common"],
- *   "rules": {
- *     "rule1": "error",
- *     "rule2": "warn"
- *   }
- * }
- * ```
- * And you want to extend it with the following config (called `extend` parameter):
- * ```json
- * {
- *   "syntax": ["AdGuard"],
- *   "rules": {
- *     "rule2": "off",
- *   },
- * }
- * ```
- * The result will be:
- * ```json
- * {
- *   "syntax": ["AdGuard"],
- *   "rules": {
- *     "rule1": "error",
- *     "rule2": "off"
- *   }
- * }
+ * ```typescript
+ * const rulesConfig: LinterRulesConfig = {
+ *   'no-short-rules': 'error',
+ *   'scriptlet-quotes': ['warn', { prefer: 'double' }]
+ * };
  * ```
  */
-export function mergeConfigs(initial: LinterConfig, extend: Partial<LinterConfig>): LinterConfig {
-    return merge(initial, extend, {
-        // https://github.com/TehShrike/deepmerge#options
-        arrayMerge: (_, sourceArray) => sourceArray,
-    });
-}
+export type LinterRulesConfig = v.InferOutput<typeof linterRulesConfigSchema>;
 
 /**
- * Merges two configuration objects using deepmerge.merge().
- * Practically, this means that the `extend` object will be merged into the `initial` object.
- *
- * It is very similar to {@link mergeConfigs|mergeConfigs()} function, but the order of parameters is reversed.
- *
- * @param extend The config object to extend the initial config with.
- * @param initial The initial config object.
- *
- * @returns The merged config object.
+ * Schema for validating the sub-parsers configuration object.
  */
-export function mergeConfigsReverse(extend: Partial<LinterConfig>, initial: LinterConfig): LinterConfig {
-    return merge(extend, initial, {
-        // https://github.com/TehShrike/deepmerge#options
-        arrayMerge: (_, sourceArray) => sourceArray,
-    });
-}
+export const linterSubParsersConfigSchema = v.record(v.string(), parserSchema);
+
+/**
+ * Configuration object mapping CSS selectors to sub-parser definitions.
+ *
+ * Each key is a selector that identifies which AST nodes should be parsed
+ * by the corresponding sub-parser.
+ *
+ * @example
+ * ```typescript
+ * const subParsers: LinterSubParsersConfig = {
+ *   'ElementHidingRuleBody > Value.selectorList': cssParser,
+ *   'CssInjectionRuleBody > Value.declarationList': cssParser
+ * };
+ * ```
+ */
+export type LinterSubParsersConfig = v.InferOutput<typeof linterSubParsersConfigSchema>;
+
+const adblockSyntaxSchema = v.enum(AdblockSyntax);
+
+/**
+ * Schema for validating an array of adblock syntax types.
+ */
+export const syntaxArraySchema = v.array(adblockSyntaxSchema);
+
+const platformNames = getAllPlatformNames();
+
+/**
+ * Schema for validating an array of compatibility platforms.
+ */
+export const platformSchema = v.picklist([
+    ...platformNames.specificPlatformNames,
+    ...platformNames.genericPlatformNames,
+    ...platformNames.specificPlatformNames.map((platform) => `${PLATFORM_NEGATION}${platform}`),
+    ...platformNames.genericPlatformNames.map((platform) => `${PLATFORM_NEGATION}${platform}`),
+]);
+
+/**
+ * Schema for validating an array of platforms.
+ */
+export const platformsSchema = v.array(platformSchema);
+
+/**
+ * Schema for validating the complete linter configuration.
+ */
+export const linterConfigSchema = v.object({
+    /**
+     * Map of rule names to their configurations.
+     */
+    rules: linterRulesConfigSchema,
+
+    /**
+     * Whether inline configuration comments are allowed.
+     * Defaults to true.
+     */
+    allowInlineConfig: v.optional(v.boolean(), true),
+
+    /**
+     * Array of compatibility supported platforms.
+     */
+    platforms: v.optional(platformsSchema, []),
+
+    /**
+     * Whether to report unused disable directives as problems.
+     * Defaults to false.
+     */
+    reportUnusedDisableDirectives: v.optional(v.boolean(), false),
+
+    /**
+     * Severity level for unused disable directive problems.
+     * Only applies when reportUnusedDisableDirectives is true.
+     * Defaults to 'warn'.
+     */
+    unusedDisableDirectivesSeverity: v.optional(
+        v.union([v.literal('warn'), v.literal('error')]),
+        'warn',
+    ),
+});
+
+/**
+ * Linter configuration before validation and default value application.
+ */
+export type LinterConfig = v.InferInput<typeof linterConfigSchema>;
+
+/**
+ * Linter configuration after validation with all defaults applied.
+ */
+export type LinterConfigParsed = v.InferOutput<typeof linterConfigSchema>;

@@ -1,6 +1,0 @@
-! should be reported as a parsing error (AGLint is enabled for this rule)
-example.com#%#//scriptlet('missing-closing-parenthesis'
-
-! shouldn't be reported as a parsing error (AGLint is disabled for this rule)
-! aglint-disable-next-line
-example.com#%#//scriptlet('missing-closing-parenthesis'

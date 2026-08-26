@@ -1,2893 +1,1171 @@
-import {
-    AdblockSyntax,
-    type AnyRule,
-    FilterListParser,
-    RuleParser,
-} from '@adguard/agtree';
-import merge from 'deepmerge';
-import * as ss from 'superstruct';
-import { type Struct } from 'superstruct';
-import {
-    describe,
-    expect,
-    it,
-    test,
-} from 'vitest';
+import { GenericPlatform } from '@adguard/agtree';
+import { type ReadonlyRecord } from '@adguard/ecss-tree';
+import * as v from 'valibot';
+import { describe, expect, test } from 'vitest';
 
-import { EMPTY, NEWLINE } from '../../src/common/constants';
-import { Linter, type LinterRuleData } from '../../src/linter';
-import { type LinterConfig, type LinterRule } from '../../src/linter/common';
-import { defaultLinterRules } from '../../src/linter/rules';
-import { IfClosed } from '../../src/linter/rules/if-closed';
-import { InvalidModifiers } from '../../src/linter/rules/invalid-modifiers';
-import { UnknownPreProcessorDirectives } from '../../src/linter/rules/unknown-preprocessor-directives';
-import { SEVERITY, type SeverityName, type SeverityValue } from '../../src/linter/severity';
+import { type LinterConfig } from '../../src/linter/config';
+import { defaultSubParsers } from '../../src/linter/default-subparsers';
+import { type LinterResult, lint as lintFn } from '../../src/linter/linter';
+import { defineRule, LinterRuleSeverity, LinterRuleType } from '../../src/linter/rule';
+import { type LinterRule } from '../../src/linter/rule';
+import { type LinterRuleLoader } from '../../src/linter/rule-registry/rule-loader';
 
-const demoRule: LinterRule = {
+// Test rule that reports on all network rules
+const testRuleNetworkRule = defineRule({
     meta: {
-        severity: SEVERITY.warn,
-        config: {
-            default: {
-                a: 1,
-                b: 2,
+        type: LinterRuleType.Problem,
+        docs: { name: 'test-network-rule', description: 'Test rule for network rules', recommended: false },
+        messages: { networkRuleDetected: 'Network rule detected' },
+    },
+    create: (context) => ({
+        '[category=Network]': (node) => {
+            context.report({ messageId: 'networkRuleDetected', node });
+        },
+    }),
+});
+
+// Test rule that reports on all cosmetic rules
+const testRuleCosmeticRule = defineRule({
+    meta: {
+        type: LinterRuleType.Problem,
+        docs: { name: 'test-cosmetic-rule', description: 'Test rule for cosmetic rules', recommended: false },
+        messages: { cosmeticRuleDetected: 'Cosmetic rule detected' },
+    },
+    create: (context) => ({
+        '[category=Cosmetic]': (node) => {
+            context.report({ messageId: 'cosmeticRuleDetected', node });
+        },
+    }),
+});
+
+// Test rule that reports warnings on comments
+const testRuleCommentWarning = defineRule({
+    meta: {
+        type: LinterRuleType.Problem,
+        docs: { name: 'test-comment-warning', description: 'Test rule for comments', recommended: false },
+        messages: { commentDetected: 'Comment detected' },
+    },
+    create: (context) => ({
+        '[category=Comment]:not(ConfigCommentRule)': (node) => {
+            context.report({ messageId: 'commentDetected', node });
+        },
+    }),
+});
+
+// Test rule with configurable options to test inline config modifications
+const testRuleConfigurable = defineRule({
+    meta: {
+        type: LinterRuleType.Problem,
+        docs: {
+            name: 'test-configurable-rule',
+            description: 'Test rule with configurable options',
+            recommended: false,
+        },
+        messages: {
+            networkRuleDetected:
+                'Network rule detected with minLength={{minLength}} and requireDomain={{requireDomain}}',
+        },
+        configSchema: v.tuple([
+            v.strictObject({
+                minLength: v.pipe(
+                    v.optional(v.number(), 5),
+                    v.minValue(1),
+                    v.description('Minimum length of the network rule pattern'),
+                ),
+                requireDomain: v.pipe(
+                    v.optional(v.boolean(), false),
+                    v.description('Whether to require a domain in the rule'),
+                ),
+            }),
+        ]),
+        defaultConfig: [
+            {
+                minLength: 5,
+                requireDomain: false,
             },
-            schema: ss.object({
-                a: ss.number(),
-                b: ss.number(),
-            }) as Struct,
-        },
+        ],
     },
-    events: {},
-};
+    create: (context) => ({
+        '[category=Network]': (node: any) => {
+            // Read config during visitor execution, not at creation time
+            // This allows inline config comments to take effect
+            const { minLength, requireDomain } = context.config[0];
 
-const demoRuleNoConfig: LinterRule = {
-    meta: {
-        severity: SEVERITY.warn,
-    },
-    events: {},
-};
+            const nodeText = context.sourceCode.getSlicedPart(node.start, node.end);
 
-const demoRuleEverythingIsProblem1: LinterRule = {
-    meta: {
-        severity: SEVERITY.warn,
-    },
-    events: {
-        onRule: (context) => {
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
+            // Check minLength
+            if (nodeText.length < minLength) {
+                return;
+            }
+
+            // Check requireDomain
+            if (requireDomain && !nodeText.includes('.')) {
+                return;
+            }
 
             context.report({
-                message: 'Problem1',
-                position: {
-                    startLine: line,
-                    startColumn: 0,
-                    endLine: line,
-                    endColumn: raw.length,
-                },
+                messageId: 'networkRuleDetected',
+                data: { minLength, requireDomain },
+                node,
             });
         },
-    },
+    }),
+});
+
+const testRules: ReadonlyRecord<string, LinterRule<any, any>> = {
+    'test-network-rule': testRuleNetworkRule,
+    'test-cosmetic-rule': testRuleCosmeticRule,
+    'test-comment-warning': testRuleCommentWarning,
+    'test-configurable-rule': testRuleConfigurable,
 };
 
-const demoRuleEverythingIsProblem2: LinterRule = {
-    meta: {
-        severity: SEVERITY.warn,
-    },
-    events: {
-        onRule: (context) => {
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
-
-            context.report({
-                message: 'Problem2',
-                position: {
-                    startLine: line,
-                    startColumn: 0,
-                    endLine: line,
-                    endColumn: raw.length,
-                },
-            });
-        },
-    },
-};
-
-const demoRuleEverythingIsProblem3: LinterRule = {
-    meta: {
-        severity: SEVERITY.warn,
-        config: {
-            default: {
-                message: 'Problem3',
-            },
-            schema: ss.object({
-                message: ss.string(),
-            }) as Struct,
-        },
-    },
-    events: {
-        onRule: (context) => {
-            const raw = context.getActualAdblockRuleRaw();
-            const line = context.getActualLine();
-            const { message } = context.config as { message: string };
-
-            context.report({
-                message,
-                position: {
-                    startLine: line,
-                    startColumn: 0,
-                    endLine: line,
-                    endColumn: raw.length,
-                },
-            });
-        },
-    },
-};
-
-describe('Linter', () => {
-    test('addDefaultRules', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        linter.addDefaultRules();
-
-        expect(linter.getRules().size).toEqual(defaultLinterRules.size);
-
-        for (const [ruleName, rule] of defaultLinterRules) {
-            expect(linter.hasRule(ruleName)).toBeTruthy();
-            expect(linter.getRule(ruleName)).toEqual(rule);
+const createRuleLoader = (additionalRules?: Record<string, LinterRule<any, any>>): LinterRuleLoader => {
+    const allRules = { ...testRules, ...additionalRules };
+    return async (ruleName: string) => {
+        const rule = allRules[ruleName];
+        if (!rule) {
+            throw new Error(`Rule not found: ${ruleName}`);
         }
+        return rule;
+    };
+};
+
+const lint = async (
+    content: string,
+    config: LinterConfig,
+    ruleLoader?: LinterRuleLoader,
+): Promise<LinterResult> => {
+    return lintFn({
+        fileProps: { content },
+        config: {
+            ...config,
+            // Only set default platforms if not already specified in config
+            platforms: config.platforms ?? ['adg_any'],
+        },
+        loadRule: ruleLoader ?? createRuleLoader(),
+        subParsers: defaultSubParsers,
     });
+};
 
-    test('setRuleConfig', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        // Invalid rule name
-        expect(() => linter.setRuleConfig('rule-100', 'off')).toThrowError('Rule "rule-100" doesn\'t exist');
-
-        // Invalid severity
-        expect(() => linter.setRuleConfig('rule-1', <SeverityValue>-1)).toThrowError(/^Invalid severity/);
-        expect(() => linter.setRuleConfig('rule-1', <SeverityName>'off2')).toThrowError(/^Invalid severity/);
-
-        // Invalid config
-        expect(() => linter.setRuleConfig('rule-1', ['off', 'a'])).toThrowError(/^Invalid config/);
-        expect(() => linter.setRuleConfig('rule-1', ['off', { a: 1, b: '2' }])).toThrowError(/^Invalid config/);
-        expect(() => linter.setRuleConfig('rule-1', ['off', [{ a: 1, b: 2 }]])).toThrowError(/^Invalid config/);
-
-        // Invalid severity and config
-        expect(() => linter.setRuleConfig('rule-1', [<SeverityValue>-1, 'a'])).toThrowError(/^Invalid severity/);
-        expect(() => linter.setRuleConfig('rule-1', [<SeverityName>'off2', 'a'])).toThrowError(/^Invalid severity/);
-
-        // Config not supported by rule
-        // eslint-disable-next-line max-len
-        expect(() => linter.setRuleConfig('rule-2', ['off', 'a'])).toThrowError('Rule "rule-2" doesn\'t support config');
-
-        // Just severity
-        linter.setRuleConfig('rule-1', 'off');
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 0);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 'warn');
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 1);
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 'error');
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 2);
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 'fatal');
-        expect(linter.getRuleConfig('rule-1')).toEqual([3, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', 3);
-        expect(linter.getRuleConfig('rule-1')).toEqual([3, { a: 1, b: 2 }]);
-
-        // Just severity (as array)
-        linter.setRuleConfig('rule-1', ['off']);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', [0]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', ['warn']);
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', [1]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', ['error']);
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', [2]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', ['fatal']);
-        expect(linter.getRuleConfig('rule-1')).toEqual([3, { a: 1, b: 2 }]);
-
-        linter.setRuleConfig('rule-1', [3]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([3, { a: 1, b: 2 }]);
-
-        // Severity and config
-        linter.setRuleConfig('rule-1', ['off', { a: 100, b: 100 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 100, b: 100 }]);
-
-        linter.setRuleConfig('rule-1', [0, { a: 100, b: 100 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 100, b: 100 }]);
-
-        linter.setRuleConfig('rule-1', ['warn', { a: 200, b: 200 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 200, b: 200 }]);
-
-        linter.setRuleConfig('rule-1', [1, { a: 200, b: 200 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 200, b: 200 }]);
-
-        linter.setRuleConfig('rule-1', ['error', { a: 300, b: 300 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 300, b: 300 }]);
-
-        linter.setRuleConfig('rule-1', [2, { a: 300, b: 300 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 300, b: 300 }]);
-
-        linter.setRuleConfig('rule-1', ['fatal', { a: 400, b: 400 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([3, { a: 400, b: 400 }]);
-
-        linter.setRuleConfig('rule-1', [3, { a: 400, b: 400 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([3, { a: 400, b: 400 }]);
-    });
-
-    test('applyRulesConfig', () => {
-        const linter = new Linter(false);
-
-        // Initially no rules
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.addRule('rule-3', demoRule);
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-3')).toBeTruthy();
-
-        linter.addRule('rule-4', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(4);
-        expect(linter.hasRule('rule-4')).toBeTruthy();
-
-        // Non-existent rule
-        expect(() => linter.applyRulesConfig({
-            'rule-100': 'off',
-        })).toThrowError('Rule "rule-100" doesn\'t exist');
-
-        // Invalid severity
-        expect(() => linter.applyRulesConfig({
-            'rule-1': <SeverityName>'off2',
-        })).toThrowError(/^Invalid severity/);
-
-        expect(() => linter.applyRulesConfig({
-            'rule-1': <SeverityValue>-1,
-        })).toThrowError(/^Invalid severity/);
-
-        // Invalid config
-        expect(() => linter.applyRulesConfig({
-            'rule-1': ['off', { a: 1, b: 2, c: 3 }],
-        })).toThrowError(/^Invalid config/);
-
-        // Invalid severity and config
-        expect(() => linter.applyRulesConfig({
-            'rule-1': [<SeverityName>'off2', { a: 1, b: 2, c: 3 }],
-        })).toThrowError(/^Invalid severity/);
-
-        // Config not supported by rule
-        expect(() => linter.applyRulesConfig({
-            'rule-4': ['off', { a: 1, b: 2 }],
-        })).toThrowError('Rule "rule-4" doesn\'t support config');
-
-        // Valid severity
-        linter.applyRulesConfig({
-            'rule-1': 'off',
-            'rule-2': 'warn',
-            'rule-3': 'error',
+describe('Linter E2E Tests', () => {
+    describe('basic linting functionality', () => {
+        test('should lint empty content', async () => {
+            const result = await lint('', { rules: {}, allowInlineConfig: true });
+            expect(result.problems).toHaveLength(0);
+            expect(result.errorCount).toBe(0);
+            expect(result.warningCount).toBe(0);
+            expect(result.fatalErrorCount).toBe(0);
         });
 
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-2')).toEqual([1, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-3')).toEqual([2, { a: 1, b: 2 }]);
-
-        linter.applyRulesConfig({
-            'rule-1': 2,
-            'rule-2': 1,
-            'rule-3': 0,
-        });
-
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-2')).toEqual([1, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-3')).toEqual([0, { a: 1, b: 2 }]);
-
-        linter.applyRulesConfig({
-            'rule-1': ['off'],
-            'rule-2': ['warn'],
-            'rule-3': ['error'],
-        });
-
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-2')).toEqual([1, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-3')).toEqual([2, { a: 1, b: 2 }]);
-
-        linter.applyRulesConfig({
-            'rule-1': [2],
-            'rule-2': [1],
-            'rule-3': [0],
-        });
-
-        expect(linter.getRuleConfig('rule-1')).toEqual([2, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-2')).toEqual([1, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-3')).toEqual([0, { a: 1, b: 2 }]);
-
-        // Valid severity and config
-        linter.applyRulesConfig({
-            'rule-1': ['off', { a: 100, b: 100 }],
-            'rule-2': ['warn', { a: 200, b: 200 }],
-            'rule-3': ['error', { a: 300, b: 300 }],
-        });
-
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 100, b: 100 }]);
-        expect(linter.getRuleConfig('rule-2')).toEqual([1, { a: 200, b: 200 }]);
-        expect(linter.getRuleConfig('rule-3')).toEqual([2, { a: 300, b: 300 }]);
-    });
-
-    test('addConfigPreset & applyConfigExtensions', () => {
-        // Prepare two demo presets
-        const preset1: LinterConfig = {
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                'rule-1': 'off',
-                'rule-2': 'warn',
-                'rule-3': 'error',
-            },
-        };
-
-        const preset2: LinterConfig = {
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                'rule-3': 'off',
-                'rule-4': 'warn',
-                'rule-5': 'error',
-            },
-        };
-
-        // Create linter
-        const linter = new Linter(false);
-
-        // Add demo presets
-        linter.addConfigPreset('preset-1', preset1);
-        linter.addConfigPreset('preset-2', preset2);
-
-        // Should throw error if preset already exists
-        expect(() => linter.addConfigPreset('preset-1', preset1)).toThrowError(
-            'Config preset "preset-1" already exists',
-        );
-
-        // Should throw error if preset doesn't exist
-        expect(() => linter.applyConfigExtensions({
-            syntax: [AdblockSyntax.Common],
-            extends: ['preset-100'],
-            allowInlineConfig: true,
-        })).toThrowError('Config preset "preset-100" doesn\'t exist');
-
-        // Should throw error if the config is invalid
-        // We need to disable the type check here because we're passing an invalid config
-        expect(() => linter.applyConfigExtensions({
-            extends: ['preset-1'],
-            allowInlineConfig: true,
-            someUnknownProperty: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any)).toThrowError(
-            'Invalid linter config: "someUnknownProperty" is unknown in the config schema, please remove it',
-        );
-
-        // Should merge presets properly if they exist
-        expect(
-            linter.applyConfigExtensions({
-                syntax: [AdblockSyntax.Common],
-                extends: ['preset-1'],
+        test('should detect problems with enabled rules', async () => {
+            const result = await lint('example.com##.ad', {
+                rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
                 allowInlineConfig: true,
-            }),
-        ).toEqual({
-            allowInlineConfig: true,
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                'rule-1': 'off',
-                'rule-2': 'warn',
-                'rule-3': 'error',
-            },
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]).toMatchObject({
+                ruleId: 'test-cosmetic-rule',
+                severity: LinterRuleSeverity.Error,
+                message: 'Cosmetic rule detected',
+            });
+            expect(result.errorCount).toBe(1);
         });
 
-        expect(
-            linter.applyConfigExtensions({
-                syntax: [AdblockSyntax.Common],
-                extends: ['preset-2'],
+        test('should not report problems for disabled rules', async () => {
+            const result = await lint('example.com##.ad', {
+                rules: { 'test-cosmetic-rule': LinterRuleSeverity.Off },
                 allowInlineConfig: true,
-            }),
-        ).toEqual({
-            allowInlineConfig: true,
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                'rule-3': 'off',
-                'rule-4': 'warn',
-                'rule-5': 'error',
-            },
+            });
+            expect(result.problems).toHaveLength(0);
         });
 
-        // Should merge multiple presets properly if they exist
-        // Presets are merged in order, so the last preset will override the previous ones,
-        // this is why the rule-3 severity is 'off' instead of 'error'
-        expect(
-            linter.applyConfigExtensions({
-                syntax: [AdblockSyntax.Common],
-                extends: ['preset-1', 'preset-2'],
-                allowInlineConfig: true,
-            }),
-        ).toEqual({
-            // extends: ['preset-1', 'preset-2'],
-            allowInlineConfig: true,
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                'rule-1': 'off',
-                'rule-2': 'warn',
-                'rule-3': 'off',
-                'rule-4': 'warn',
-                'rule-5': 'error',
-            },
-        });
-
-        // Complicated case: preset-2 override preset-1
-        // but user config's rules should override both presets
-        expect(
-            linter.applyConfigExtensions({
-                syntax: [AdblockSyntax.Common],
-                extends: ['preset-1', 'preset-2'],
-                allowInlineConfig: true,
-                rules: {
-                    'rule-1': 'error',
-                    'rule-100': 'error',
-                },
-            }),
-        ).toEqual({
-            // extends: ['preset-1', 'preset-2'],
-            allowInlineConfig: true,
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                // overridden by the rules from the config
-                'rule-1': 'error',
-                'rule-100': 'error',
-                'rule-2': 'warn',
-                // overridden by preset-2
-                'rule-3': 'off',
-                'rule-4': 'warn',
-                'rule-5': 'error',
-            },
-        });
-
-        // Override the syntax
-        expect(
-            linter.applyConfigExtensions({
-                extends: ['preset-1'],
-                syntax: [AdblockSyntax.Adg],
-            }),
-        ).toEqual({
-            syntax: [AdblockSyntax.Adg],
-            rules: {
-                'rule-1': 'off',
-                'rule-2': 'warn',
-                'rule-3': 'error',
-            },
-        });
-    });
-
-    test('setConfig', () => {
-        const linter = new Linter(false);
-
-        // Initially no rules
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.addRule('rule-3', demoRule);
-
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-3')).toBeTruthy();
-
-        // Set config
-        linter.setConfig({
-            syntax: [AdblockSyntax.Common],
-            rules: {
-                'rule-1': 'off',
-                'rule-2': 'warn',
-                'rule-3': 'error',
-            },
-        });
-
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-2')).toEqual([1, { a: 1, b: 2 }]);
-        expect(linter.getRuleConfig('rule-3')).toEqual([2, { a: 1, b: 2 }]);
-    });
-
-    test('addRule', () => {
-        const linter = new Linter(false);
-
-        // Initially no rules
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.addRule('rule-3', demoRule);
-
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-3')).toBeTruthy();
-
-        // Duplicate rule
-        expect(() => linter.addRule('rule-1', demoRule)).toThrowError('Rule with name "rule-1" already exists');
-    });
-
-    test('addRuleEx', () => {
-        const linter = new Linter(false);
-
-        // Initially no rules
-        expect(linter.getRules().size).toEqual(0);
-
-        // Invalid severity override
-        expect(() => linter.addRuleEx('rule-1', <LinterRuleData>{
-            rule: demoRule,
-            severityOverride: <SeverityName>'aaa',
-            storage: {},
-        })).toThrowError(/^Invalid severity/);
-
-        // Invalid config override
-        expect(() => linter.addRuleEx('rule-1', <LinterRuleData>{
-            rule: demoRule,
-            configOverride: { a: 1, b: 2, c: 3 },
-            storage: {},
-        })).toThrowError(/^Invalid config/);
-
-        // Rule doesn't support config
-        expect(() => linter.addRuleEx('rule-1', <LinterRuleData>{
-            rule: demoRuleNoConfig,
-            configOverride: { a: 1, b: 2 },
-            storage: {},
-        })).toThrowError('Rule "rule-1" doesn\'t support config');
-
-        // Add rule without overrides
-        linter.addRuleEx('rule-1', <LinterRuleData>{
-            rule: demoRule,
-            storage: {},
-        });
-
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        // Add rule with overrides
-        linter.addRuleEx('rule-2', <LinterRuleData>{
-            rule: demoRule,
-            severityOverride: 'error',
-            configOverride: { a: 100, b: 100 },
-            storage: {},
-        });
-
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-        expect(linter.getRuleConfig('rule-2')).toEqual([2, { a: 100, b: 100 }]);
-    });
-
-    test('resetRuleConfig', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        // Change config
-        linter.setRuleConfig('rule-1', ['off', { a: 100, b: 100 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 100, b: 100 }]);
-
-        // Reset config
-        linter.resetRuleConfig('rule-1');
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 1, b: 2 }]);
-
-        // Rule doesn't exist
-        expect(() => linter.resetRuleConfig('rule-100')).toThrowError('Rule with name "rule-100" doesn\'t exist');
-
-        // Rule doesn't support config
-        expect(() => linter.resetRuleConfig('rule-2')).toThrowError('Rule "rule-2" doesn\'t support config');
-    });
-
-    test('getRuleConfig', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        // Change config and get it
-        linter.setRuleConfig('rule-1', ['off', { a: 100, b: 100 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([0, { a: 100, b: 100 }]);
-
-        linter.setRuleConfig('rule-1', ['warn', { a: 200, b: 200 }]);
-        expect(linter.getRuleConfig('rule-1')).toEqual([1, { a: 200, b: 200 }]);
-
-        // Rule doesn't exist
-        expect(() => linter.getRuleConfig('rule-100')).toThrowError('Rule with name "rule-100" doesn\'t exist');
-
-        // Rule doesn't support config
-        expect(() => linter.getRuleConfig('rule-2')).toThrowError('Rule "rule-2" doesn\'t support config');
-    });
-
-    test('getRule', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        expect(linter.getRule('rule-1')).toEqual(demoRule);
-
-        expect(linter.getRule('rule-100')).toBeUndefined();
-    });
-
-    test('getRules', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.addRule('rule-3', demoRule);
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-3')).toBeTruthy();
-
-        linter.addRule('rule-4', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(4);
-        expect(linter.hasRule('rule-4')).toBeTruthy();
-
-        // Get all rules
-        expect(linter.getRules().size).toEqual(4);
-        expect(linter.getRules().get('rule-1')).toHaveProperty('rule', demoRule);
-        expect(linter.getRules().get('rule-2')).toHaveProperty('rule', demoRule);
-        expect(linter.getRules().get('rule-3')).toHaveProperty('rule', demoRule);
-        expect(linter.getRules().get('rule-4')).toHaveProperty('rule', demoRuleNoConfig);
-    });
-
-    test('hasRule', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.addRule('rule-3', demoRule);
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-3')).toBeTruthy();
-
-        linter.addRule('rule-4', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(4);
-        expect(linter.hasRule('rule-4')).toBeTruthy();
-    });
-
-    test('removeRule', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.addRule('rule-3', demoRule);
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-3')).toBeTruthy();
-
-        linter.addRule('rule-4', demoRuleNoConfig);
-        expect(linter.getRules().size).toEqual(4);
-        expect(linter.hasRule('rule-4')).toBeTruthy();
-
-        // Remove rules
-        linter.removeRule('rule-1');
-        expect(linter.getRules().size).toEqual(3);
-        expect(linter.hasRule('rule-1')).toBeFalsy();
-
-        linter.removeRule('rule-2');
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeFalsy();
-
-        linter.removeRule('rule-3');
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-3')).toBeFalsy();
-
-        linter.removeRule('rule-4');
-        expect(linter.getRules().size).toEqual(0);
-        expect(linter.hasRule('rule-4')).toBeFalsy();
-
-        // Remove non-existent rule
-        expect(() => linter.removeRule('rule-5')).toThrowError('Rule with name "rule-5" does not exist');
-        expect(() => linter.removeRule('rule-4')).toThrowError('Rule with name "rule-4" does not exist');
-        expect(() => linter.removeRule('rule-1')).toThrowError('Rule with name "rule-1" does not exist');
-    });
-
-    test('disableRule', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.disableRule('rule-1');
-        expect(linter.getRules().get('rule-1')).toHaveProperty('severityOverride', 0);
-
-        linter.disableRule('rule-2');
-        expect(linter.getRules().get('rule-2')).toHaveProperty('severityOverride', 0);
-
-        // Disable non-existent rule
-        expect(() => linter.disableRule('rule-100')).toThrowError('Rule with name "rule-100" does not exist');
-    });
-
-    test('isRuleDisabled', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.disableRule('rule-1');
-        expect(linter.getRules().get('rule-1')).toHaveProperty('severityOverride', 0);
-        expect(linter.isRuleDisabled('rule-1')).toBeTruthy();
-
-        linter.disableRule('rule-2');
-        expect(linter.getRules().get('rule-2')).toHaveProperty('severityOverride', 0);
-        expect(linter.isRuleDisabled('rule-2')).toBeTruthy();
-
-        // Non-existent rule
-        expect(linter.isRuleDisabled('rule-100')).toBeFalsy();
-    });
-
-    test('enableRule', () => {
-        const linter = new Linter(false);
-
-        expect(linter.getRules().size).toEqual(0);
-
-        // Add demo rules
-        linter.addRule('rule-1', demoRule);
-        expect(linter.getRules().size).toEqual(1);
-        expect(linter.hasRule('rule-1')).toBeTruthy();
-
-        linter.addRule('rule-2', demoRule);
-        expect(linter.getRules().size).toEqual(2);
-        expect(linter.hasRule('rule-2')).toBeTruthy();
-
-        linter.disableRule('rule-1');
-        expect(linter.getRules().get('rule-1')).toHaveProperty('severityOverride', 0);
-        expect(linter.isRuleDisabled('rule-1')).toBeTruthy();
-
-        linter.disableRule('rule-2');
-        expect(linter.getRules().get('rule-2')).toHaveProperty('severityOverride', 0);
-        expect(linter.isRuleDisabled('rule-2')).toBeTruthy();
-
-        linter.enableRule('rule-1');
-        expect(linter.isRuleDisabled('rule-1')).toBeFalsy();
-
-        linter.enableRule('rule-2');
-        expect(linter.isRuleDisabled('rule-2')).toBeFalsy();
-
-        // Enable non-existent rule
-        expect(() => linter.enableRule('rule-100')).toThrowError('Rule with name "rule-100" does not exist');
-    });
-
-    test('lint detect parsing issues as fatal errors', () => {
-        const linter = new Linter(false);
-
-        // 1 invalid rule
-        expect(
-            linter.lint(
+        test('should handle multiple rules', async () => {
+            const result = await lint(
                 [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 5,
-                        startColumn: 16,
-                        endLine: 5,
-                        endColumn: 27,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 1,
-        });
-
-        // Many invalid rules
-        expect(
-            linter.lint(
-                [
-                    '[AdGuard; uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                    'example.com##+jsaopr, test)', // Missing opening bracket
-                    'example.com##+js...', // Invalid scriptlet rule, missing opening bracket
+                    '||example.com^',
+                    'example.com##.ad',
                     '! comment',
-                    '||example.net^$third-party',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
+                ].join('\n'),
                 {
-                    severity: 3,
-                    // eslint-disable-next-line max-len
-                    message: "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 4,
-                        startColumn: 16,
-                        endLine: 4,
-                        endColumn: 27,
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-comment-warning': LinterRuleSeverity.Warning,
                     },
+                    allowInlineConfig: true,
                 },
-                {
-                    severity: 3,
-                    // eslint-disable-next-line max-len
-                    message: "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no opening parentheses '(' found",
-                    position: {
-                        startLine: 5,
-                        startColumn: 16,
-                        endLine: 5,
-                        endColumn: 27,
-                    },
-                },
-                {
-                    severity: 3,
-                    // eslint-disable-next-line max-len
-                    message: "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no opening parentheses '(' found",
-                    position: {
-                        startLine: 6,
-                        startColumn: 16,
-                        endLine: 6,
-                        endColumn: 19,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 3,
+            );
+            expect(result.problems).toHaveLength(3);
+            expect(result.errorCount).toBe(2);
+            expect(result.warningCount).toBe(1);
         });
-    });
 
-    describe('lint detects invalid modifiers in network rules', () => {
-        it('no agent comment (common), not existent modifier', () => {
-            const linter = new Linter(false);
-            linter.addRule('invalid-modifiers', InvalidModifiers);
+        test('should differentiate between warnings and errors', async () => {
+            const result = await lint(
+                [
+                    '! comment 1',
+                    '! comment 2',
+                    'example.com##.ad',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            expect(result.problems).toHaveLength(3);
+            expect(result.warningCount).toBe(2);
+            expect(result.errorCount).toBe(1);
+        });
 
-            expect(
-                linter.lint(
-                    [
-                        // no agent comment -- common check
-                        'example.org##.ad',
-                        // Not existent modifier
-                        '||example.org^$protobuf',
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [
-                    {
-                        severity: SEVERITY.error,
-                        message:
-                            "Non-existent modifier: 'protobuf'",
-                        position: {
-                            startLine: 2,
-                            startColumn: 15,
-                            endLine: 2,
-                            endColumn: 23,
+        test('should pass platforms', async () => {
+            let platform: number | undefined;
+
+            await lint(
+                '',
+                {
+                    rules: {
+                        'test-platform': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                    platforms: ['adg_any'],
+                },
+                createRuleLoader({
+                    'test-platform': defineRule({
+                        meta: {
+                            type: LinterRuleType.Layout,
+                            docs: { name: 'test-platform', description: 'Test rule for platforms', recommended: false },
                         },
-                    },
-                ],
-                warningCount: 0,
-                errorCount: 1,
-                fatalErrorCount: 0,
-            });
-        });
-
-        it('specific agent comment, only exception modifier in blocking rule', () => {
-            const linter = new Linter(false);
-            linter.addRule('invalid-modifiers', InvalidModifiers);
-
-            expect(
-                linter.lint(
-                    [
-                        // specific agent comment
-                        '[AdGuard]',
-                        'example.org##.ad',
-                        // Only exception modifiers in blocking rule
-                        '||example.org^$generichide',
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [
-                    {
-                        severity: SEVERITY.error,
-                        message:
-                            "Only exception rules may contain the modifier: 'generichide'",
-                        position: {
-                            startLine: 3,
-                            startColumn: 15,
-                            endLine: 3,
-                            endColumn: 26,
+                        create: (context) => {
+                            platform = context.platforms;
+                            return {
+                                '*': () => {
+                                    // do nothing
+                                },
+                            };
                         },
-                    },
-                ],
-                warningCount: 0,
-                errorCount: 1,
-                fatalErrorCount: 0,
-            });
-        });
-
-        it('specific agent comment, deprecated modifier', () => {
-            const linter = new Linter(false);
-            linter.addRule('invalid-modifiers', InvalidModifiers);
-
-            expect(
-                linter.lint(
-                    [
-                        // specific agent comment
-                        '[AdGuard]',
-                        'example.org##.ad',
-                        // deprecated modifier
-                        '||example.org^$mp4',
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [
-                    {
-                        severity: SEVERITY.warn,
-                        message:
-                            // eslint-disable-next-line max-len
-                            'Rules with `$mp4` are still supported and being converted into `$redirect=noopmp4-1s` now but the support shall be removed in the future.',
-                        position: {
-                            startLine: 3,
-                            startColumn: 15,
-                            endLine: 3,
-                            endColumn: 18,
-                        },
-                    },
-                ],
-                warningCount: 1,
-                errorCount: 0,
-                fatalErrorCount: 0,
-            });
-        });
-
-        it('disable linter for network rule modifier validation', () => {
-            const linter = new Linter(false);
-            linter.addRule('invalid-modifiers', InvalidModifiers);
-
-            expect(
-                linter.lint(
-                    [
-                        '[AdGuard]',
-                        '! aglint-disable-next-line',
-                        '||example.org^$generichide', // Only exception modifiers in blocking rule
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [],
-                warningCount: 0,
-                errorCount: 0,
-                fatalErrorCount: 0,
-            });
-        });
-
-        it('disable specific rule for network rule modifier validation', () => {
-            const linter = new Linter(false);
-            linter.addRule('invalid-modifiers', InvalidModifiers);
-
-            expect(
-                linter.lint(
-                    [
-                        '[AdGuard]',
-                        '! aglint-disable-next-line invalid-modifiers',
-                        '||example.org^$generichide', // Only exception modifiers in blocking rule
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [],
-                warningCount: 0,
-                errorCount: 0,
-                fatalErrorCount: 0,
-            });
-        });
-
-        it('wrong aglint rule disabled for invalid modifier', () => {
-            const linter = new Linter(false);
-            linter.addRule('invalid-modifiers', InvalidModifiers);
-
-            expect(
-                linter.lint(
-                    [
-                        '[AdGuard]',
-                        '! aglint-disable-next-line invalid-domain-list',
-                        '||example.org^$generichide', // Only exception modifiers in blocking rule
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [
-                    {
-                        severity: SEVERITY.error,
-                        message:
-                            "Only exception rules may contain the modifier: 'generichide'",
-                        position: {
-                            startLine: 3,
-                            startColumn: 15,
-                            endLine: 3,
-                            endColumn: 26,
-                        },
-                    },
-                ],
-                warningCount: 0,
-                errorCount: 1,
-                fatalErrorCount: 0,
-            });
-        });
-    });
-
-    describe('lint detects pre-processor directives', () => {
-        it('unknown ifelse directive', () => {
-            const linter = new Linter(false);
-            linter.addRule('if-closed', IfClosed);
-            linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
-
-            expect(
-                linter.lint(
-                    [
-                        'rule0',
-                        '!#if (condition1)',
-                        'rule1',
-                        '!#ifelse (condition2)',
-                        'rule2',
-                        '!#endif',
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [
-                    {
-                        rule: 'unknown-preprocessor-directives',
-                        severity: 2,
-                        message: 'Unknown preprocessor directive "ifelse"',
-                        position: {
-                            startLine: 4,
-                            startColumn: 2,
-                            endLine: 4,
-                            endColumn: 8,
-                        },
-                    },
-                ],
-                warningCount: 0,
-                errorCount: 1,
-                fatalErrorCount: 0,
-            });
-        });
-
-        it('invalid includes and unclosed if', () => {
-            const linter = new Linter(false);
-            linter.addRule('if-closed', IfClosed);
-            linter.addRule('unknown-preprocessor-directives', UnknownPreProcessorDirectives);
-
-            expect(
-                linter.lint(
-                    [
-                        'rule0',
-                        '!#if (condition1)',
-                        '!#includes https://raw.example.com/file1.txt',
-                        'rule1',
-                        '!#else',
-                        'rule2',
-                    ].join(NEWLINE),
-                ),
-            ).toMatchObject({
-                problems: [
-                    {
-                        rule: 'unknown-preprocessor-directives',
-                        severity: 2,
-                        message: 'Unknown preprocessor directive "includes"',
-                        position: {
-                            startLine: 3,
-                            startColumn: 2,
-                            endLine: 3,
-                            endColumn: 10,
-                        },
-                    },
-                    {
-                        rule: 'if-closed',
-                        severity: 2,
-                        message: 'Unclosed "if" directive',
-                        position: {
-                            startLine: 2,
-                            startColumn: 0,
-                            endLine: 2,
-                            endColumn: 17,
-                        },
-                    },
-                ],
-                warningCount: 0,
-                errorCount: 2,
-                fatalErrorCount: 0,
-            });
-        });
-    });
-
-    test("lint ignores inline config comments if they aren't allowed in the linter config", () => {
-        const linter = new Linter(false, {
-            syntax: [AdblockSyntax.Common],
-            allowInlineConfig: false,
-        });
-
-        // Invalid rule found
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable-next-line',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 6,
-                        startColumn: 16,
-                        endLine: 6,
-                        endColumn: 27,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 1,
-        });
-
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 6,
-                        startColumn: 16,
-                        endLine: 6,
-                        endColumn: 27,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 1,
-        });
-    });
-
-    test('lint uses config comments properly', () => {
-        const linter = new Linter(false);
-
-        // Don't report invalid rule if it preceded by aglint-disable-next-line
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable-next-line',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Don't report invalid rule if it preceded by aglint-disable
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable',
-                    'example.com##+js(aopr, test', // Missing closing bracket
-                    '! aglint-enable',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // If another rules isn't preceded by aglint-disable-next-line, report it
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable-next-line',
-                    'example.com##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    'example.net##+js(aopr, test', // Missing closing bracket (should be reported)
-                    'example.org##+js(aopr, test', // Missing closing bracket (should be reported)
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 7,
-                        startColumn: 16,
-                        endLine: 7,
-                        endColumn: 27,
-                    },
-                },
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 8,
-                        startColumn: 16,
-                        endLine: 8,
-                        endColumn: 27,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 2,
-        });
-
-        // Disable rule block with aglint-disable
-        expect(
-            linter.lint(
-                [
-                    '[uBlock Origin]',
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable',
-                    'example.com##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    'example.net##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    'example.org##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    '! aglint-enable',
-                    'example.hu##+js(aopr, test', // Missing closing bracket (should be reported)
-                    'example.sk##+js(aopr, test', // Missing closing bracket (should be reported)
-                    '! aglint-disable',
-                    'example.com##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    'example.net##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    'example.org##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    '! aglint-enable',
-                    'example.hu##+js(aopr, test', // Missing closing bracket (should be reported)
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 10,
-                        startColumn: 15,
-                        endLine: 10,
-                        endColumn: 26,
-                    },
-                },
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 11,
-                        startColumn: 15,
-                        endLine: 11,
-                        endColumn: 26,
-                    },
-                },
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 17,
-                        startColumn: 15,
-                        endLine: 17,
-                        endColumn: 26,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 3,
-        });
-
-        // Disable rule block with aglint-disable and enable single rule with aglint-enable-next-line
-        expect(
-            linter.lint(
-                [
-                    'example.org##.ad',
-                    '@@||example.org^$generichide',
-                    'example.com##+js(aopr, test)',
-                    '! aglint-disable',
-                    'example.com##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    '! aglint-enable-next-line',
-                    'example.net##+js(aopr, test', // Missing closing bracket (should be reported)
-                    'example.org##+js(aopr, test', // Missing closing bracket (should be skipped)
-                    '! aglint-enable',
-                    'example.biz##+js(aopr, test', // Missing closing bracket (should be reported)
-                    'example.com##+js(aopr, test', // Missing closing bracket (should be reported)
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 7,
-                        startColumn: 16,
-                        endLine: 7,
-                        endColumn: 27,
-                    },
-                },
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 10,
-                        startColumn: 16,
-                        endLine: 10,
-                        endColumn: 27,
-                    },
-                },
-                {
-                    severity: SEVERITY.fatal,
-                    message:
-                        // eslint-disable-next-line max-len
-                        "Cannot parse adblock rule due to the following error: Invalid uBO scriptlet call, no closing parentheses ')' found",
-                    position: {
-                        startLine: 11,
-                        startColumn: 16,
-                        endLine: 11,
-                        endColumn: 27,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 3,
-        });
-    });
-
-    test('aglint-disable-next-line inline config comment', () => {
-        const linter = new Linter(false);
-
-        linter.addRule('rule-1', demoRuleEverythingIsProblem1);
-        linter.addRule('rule-2', demoRuleEverythingIsProblem2);
-
-        // Both rules are enabled
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 4,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable rule-1
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable-next-line rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable-next-line rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 4,
-                        startColumn: 0,
-                        endLine: 4,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable rule-2
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable-next-line rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable-next-line rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 4,
-                        startColumn: 0,
-                        endLine: 4,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable rule-1 and rule-2 for the first line only
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable-next-line rule-1, rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 3,
-                        startColumn: 0,
-                        endLine: 3,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 3,
-                        startColumn: 0,
-                        endLine: 3,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable rule-1 and rule-2 for both lines
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable-next-line rule-1, rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable-next-line rule-1, rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-    });
-
-    test('aglint-enable-next-line inline config comment', () => {
-        const linter = new Linter(false);
-
-        linter.addRule('rule-1', demoRuleEverythingIsProblem1);
-        linter.addRule('rule-2', demoRuleEverythingIsProblem2);
-
-        linter.disableRule('rule-1');
-        linter.disableRule('rule-2');
-
-        // No rules are enabled
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Enable rule-1
-        expect(
-            linter.lint(
-                [
-                    '! aglint-enable-next-line rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-enable-next-line rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 4,
-                        startColumn: 0,
-                        endLine: 4,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Enable rule-2
-        expect(
-            linter.lint(
-                [
-                    '! aglint-enable-next-line rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-enable-next-line rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 4,
-                        startColumn: 0,
-                        endLine: 4,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Enable rule-1 and rule-2 for the first line only
-        expect(
-            linter.lint(
-                [
-                    '! aglint-enable-next-line rule-1, rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Enable rule-1 and rule-2 for both lines
-        expect(
-            linter.lint(
-                [
-                    '! aglint-enable-next-line rule-1, rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-enable-next-line rule-1, rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 4,
-                        startColumn: 0,
-                        endLine: 4,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 4,
-                        startColumn: 0,
-                        endLine: 4,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 4,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-    });
-
-    test('aglint-disable inline config comment', () => {
-        const linter = new Linter(false);
-
-        linter.addRule('rule-1', demoRuleEverythingIsProblem1);
-        linter.addRule('rule-2', demoRuleEverythingIsProblem2);
-
-        // Disable at start (should not report problems at all, because linter is disabled from the start)
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [],
-            warningCount: 0,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disabled from second line (should report problem on first line)
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disabled from third line (should report problem on first and second line)
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 4,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable rule-1 for this file
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 2,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 3,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 4,
-                    },
-                },
-            ],
-            warningCount: 3,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable rule-2 later
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 2,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 3,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-    });
-
-    test('aglint-enable inline config comment', () => {
-        const linter = new Linter(false);
-
-        linter.addRule('rule-1', demoRuleEverythingIsProblem1);
-        linter.addRule('rule-2', demoRuleEverythingIsProblem2);
-
-        // Disable at start and enable before last line
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-enable',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable, then re-enable, then disable again, then re-enable again
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable',
-                    '! aglint-enable',
-                    '! aglint-disable',
-                    '! aglint-enable',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 6,
-                        startColumn: 0,
-                        endLine: 6,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 6,
-                        startColumn: 0,
-                        endLine: 6,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 4,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Complicated case
-        expect(
-            linter.lint(
-                [
-                    '! aglint-disable',
-                    '! aglint-enable',
-                    '! aglint-disable',
-                    '! aglint-enable',
-                    '! aglint-disable rule-1',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-enable rule-1',
-                    '! aglint-disable rule-2',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 6,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    position: {
-                        startLine: 9,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-    });
-
-    test('aglint inline config comment', () => {
-        const linter = new Linter(false);
-
-        linter.addRule('rule-1', demoRuleEverythingIsProblem1);
-        linter.addRule('rule-2', demoRuleEverythingIsProblem2);
-
-        // Disable at start and enable before last line
-        expect(
-            linter.lint(
-                [
-                    '! aglint "rule-1": "off", "rule-2": "off"',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint "rule-1": "warn", "rule-2": "warn"',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Disable, then re-enable, then disable again, then re-enable again
-        expect(
-            linter.lint(
-                [
-                    '! aglint "rule-1": "off", "rule-2": "off"',
-                    '! aglint "rule-1": "warn", "rule-2": "warn"',
-                    '! aglint "rule-1": "off", "rule-2": "off"',
-                    '! aglint "rule-1": "warn", "rule-2": "warn"',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 5,
-                        startColumn: 0,
-                        endLine: 5,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 6,
-                        startColumn: 0,
-                        endLine: 6,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem2',
-                    position: {
-                        startLine: 6,
-                        startColumn: 0,
-                        endLine: 6,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 4,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Complicated case
-        expect(
-            linter.lint(
-                [
-                    '! aglint "rule-1": "off", "rule-2": "off"',
-                    '! aglint "rule-1": "warn", "rule-2": "warn"',
-                    '! aglint "rule-1": "off", "rule-2": "off"',
-                    '! aglint "rule-1": "warn", "rule-2": "warn"',
-                    '! aglint "rule-1": "off"',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint "rule-1": "warn"',
-                    '! aglint "rule-2": "off"',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    position: {
-                        startLine: 6,
-                    },
-                },
-                {
-                    rule: 'rule-1',
-                    position: {
-                        startLine: 9,
-                    },
-                },
-            ],
-            warningCount: 2,
-            errorCount: 0,
-            fatalErrorCount: 0,
-        });
-
-        // Overwrite rule severity & config
-        linter.addRule('rule-3', demoRuleEverythingIsProblem3);
-
-        expect(
-            linter.lint(
-                [
-                    // eslint-disable-next-line max-len
-                    '! aglint "rule-1": "off", "rule-2": "off", "rule-3": ["error", { message: "Custom message for rule-3" }]',
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-3',
-                    severity: 2,
-                    message: 'Custom message for rule-3',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                },
-                {
-                    rule: 'rule-3',
-                    severity: 2,
-                    message: 'Custom message for rule-3',
-                    position: {
-                        startLine: 3,
-                        startColumn: 0,
-                        endLine: 3,
-                        endColumn: 25,
-                    },
-                },
-            ],
-            warningCount: 0,
-            errorCount: 2,
-            fatalErrorCount: 0,
-        });
-    });
-
-    test('fixable interface (single line fix)', () => {
-        const linter = new Linter(false);
-
-        const fix1 = merge<AnyRule>(
-            RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com'),
-            { raws: { nl: 'lf' } },
-        );
-
-        const rule1: LinterRule = {
-            meta: {
-                severity: SEVERITY.error,
-            },
-            events: {
-                onRule: (context) => {
-                    const raw = context.getActualAdblockRuleRaw();
-                    const line = context.getActualLine();
-
-                    context.report({
-                        message: 'Fixable problem 1',
-                        position: {
-                            startLine: line,
-                            startColumn: 0,
-                            endLine: line,
-                            endColumn: raw.length,
-                        },
-                        fix: fix1,
-                    });
-                },
-            },
-        };
-
-        linter.addRule('rule-1', rule1);
-
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable-next-line',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-
-                // Enable fix
-                true,
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 2,
-                    message: 'Fixable problem 1',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                    fix: fix1,
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 2,
-                    message: 'Fixable problem 1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                    fix: fix1,
-                },
-            ],
-            warningCount: 0,
-            errorCount: 2,
-            fatalErrorCount: 0,
-            fixed: [
-                // First fix
-                'aaa.js$script,redirect=noopjs,domain=example.com',
-                // Second fix
-                'aaa.js$script,redirect=noopjs,domain=example.com',
-                // Remaining lines
-                '! aglint-disable-next-line',
-                'abcdefghijklmnopqrstuvxyz',
-            ].join(NEWLINE),
-        });
-    });
-
-    test('fixable interface (multiple line fix)', () => {
-        const linter = new Linter(false);
-
-        const fix2 = [
-            merge<AnyRule>(
-                RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com'),
-                { raws: { nl: 'lf' } },
-            ),
-
-            merge<AnyRule>(
-                RuleParser.parse('bbb.js$script,redirect=noopjs,domain=example.com'),
-                { raws: { nl: 'lf' } },
-            ),
-
-            merge<AnyRule>(
-                RuleParser.parse('ccc.js$script,redirect=noopjs,domain=example.com'),
-                { raws: { nl: 'lf' } },
-            ),
-        ];
-
-        const rule2: LinterRule = {
-            meta: {
-                severity: SEVERITY.error,
-            },
-            events: {
-                onRule: (context) => {
-                    const raw = context.getActualAdblockRuleRaw();
-                    const line = context.getActualLine();
-
-                    context.report({
-                        message: 'Fixable problem 2',
-                        position: {
-                            startLine: line,
-                            startColumn: 0,
-                            endLine: line,
-                            endColumn: raw.length,
-                        },
-                        fix: fix2,
-                    });
-                },
-            },
-        };
-
-        linter.addRule('rule-2', rule2);
-
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz\n',
-                    'abcdefghijklmnopqrstuvxyz\n',
-                    '! aglint-disable-next-line\r\n',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(EMPTY),
-
-                // Enable fix
-                true,
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    severity: 2,
-                    message: 'Fixable problem 2',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                    fix: fix2,
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 2,
-                    message: 'Fixable problem 2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                    fix: fix2,
-                },
-            ],
-            warningCount: 0,
-            errorCount: 2,
-            fatalErrorCount: 0,
-            fixed: [
-                // First fix
-                'aaa.js$script,redirect=noopjs,domain=example.com\n',
-                'bbb.js$script,redirect=noopjs,domain=example.com\n',
-                'ccc.js$script,redirect=noopjs,domain=example.com\n',
-                // Second fix
-                'aaa.js$script,redirect=noopjs,domain=example.com\n',
-                'bbb.js$script,redirect=noopjs,domain=example.com\n',
-                'ccc.js$script,redirect=noopjs,domain=example.com\n',
-                // Remaining lines
-                '! aglint-disable-next-line\r\n',
-                'abcdefghijklmnopqrstuvxyz',
-            ].join(EMPTY),
-        });
-    });
-
-    test('fixable interface (conflicting fixes)', () => {
-        const linter = new Linter(false);
-
-        const fix1 = RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com');
-
-        const rule1: LinterRule = {
-            meta: {
-                severity: SEVERITY.error,
-            },
-            events: {
-                onRule: (context) => {
-                    const raw = context.getActualAdblockRuleRaw();
-                    const line = context.getActualLine();
-
-                    context.report({
-                        message: 'Fixable problem 1',
-                        position: {
-                            startLine: line,
-                            startColumn: 0,
-                            endLine: line,
-                            endColumn: raw.length,
-                        },
-                        fix: fix1,
-                    });
-                },
-            },
-        };
-
-        const fix2 = [
-            RuleParser.parse('aaa.js$script,redirect=noopjs,domain=example.com'),
-            RuleParser.parse('bbb.js$script,redirect=noopjs,domain=example.com'),
-            RuleParser.parse('ccc.js$script,redirect=noopjs,domain=example.com'),
-        ];
-
-        const rule2: LinterRule = {
-            meta: {
-                severity: SEVERITY.error,
-            },
-            events: {
-                onRule: (context) => {
-                    const raw = context.getActualAdblockRuleRaw();
-                    const line = context.getActualLine();
-
-                    context.report({
-                        message: 'Fixable problem 2',
-                        position: {
-                            startLine: line,
-                            startColumn: 0,
-                            endLine: line,
-                            endColumn: raw.length,
-                        },
-                        fix: fix2,
-                    });
-                },
-            },
-        };
-
-        linter.addRule('rule-1', rule1);
-        linter.addRule('rule-2', rule2);
-
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                    'abcdefghijklmnopqrstuvxyz',
-                    '! aglint-disable-next-line',
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-
-                // Enable fix
-                true,
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-1',
-                    severity: 2,
-                    message: 'Fixable problem 1',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                    fix: fix1,
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 2,
-                    message: 'Fixable problem 2',
-                    position: {
-                        startLine: 1,
-                        startColumn: 0,
-                        endLine: 1,
-                        endColumn: 25,
-                    },
-                    fix: fix2,
-                },
-                {
-                    rule: 'rule-1',
-                    severity: 2,
-                    message: 'Fixable problem 1',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                    fix: fix1,
-                },
-                {
-                    rule: 'rule-2',
-                    severity: 2,
-                    message: 'Fixable problem 2',
-                    position: {
-                        startLine: 2,
-                        startColumn: 0,
-                        endLine: 2,
-                        endColumn: 25,
-                    },
-                    fix: fix2,
-                },
-            ],
-            warningCount: 0,
-            errorCount: 4,
-            fatalErrorCount: 0,
-            fixed: [
-                // Fixing should be skipped, because there are conflicting fixes
-                'abcdefghijklmnopqrstuvxyz',
-                'abcdefghijklmnopqrstuvxyz',
-                '! aglint-disable-next-line',
-                'abcdefghijklmnopqrstuvxyz',
-            ].join(NEWLINE),
-        });
-    });
-
-    test('rule with different severities', () => {
-        const linter = new Linter(false);
-
-        linter.addRule('rule-1', demoRuleEverythingIsProblem1);
-        linter.setRuleConfig('rule-1', 'off');
-
-        linter.addRule('rule-2', demoRuleEverythingIsProblem1);
-        linter.setRuleConfig('rule-2', 'warn');
-
-        linter.addRule('rule-3', demoRuleEverythingIsProblem1);
-        linter.setRuleConfig('rule-3', 'error');
-
-        linter.addRule('rule-4', demoRuleEverythingIsProblem1);
-        linter.setRuleConfig('rule-4', 'fatal');
-
-        // Disable at start and enable before last line
-        expect(
-            linter.lint(
-                [
-                    'abcdefghijklmnopqrstuvxyz',
-                ].join(NEWLINE),
-            ),
-        ).toMatchObject({
-            problems: [
-                {
-                    rule: 'rule-2',
-                    severity: 1,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 1,
-                    },
-                },
-                {
-                    rule: 'rule-3',
-                    severity: 2,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 1,
-                    },
-                },
-                {
-                    rule: 'rule-4',
-                    severity: 3,
-                    message: 'Problem1',
-                    position: {
-                        startLine: 1,
-                    },
-                },
-            ],
-            warningCount: 1,
-            errorCount: 1,
-            fatalErrorCount: 1,
-        });
-    });
-
-    test('rule context getters', () => {
-        const linter = new Linter(false);
-
-        let config: LinterConfig | null = null;
-        let content: string | null = null;
-        const rawRules: (string | undefined)[] = [];
-        const astRules: (AnyRule | undefined)[] = [];
-        const lines: number[] = [];
-        let receivedConfig: object | null = null;
-
-        const rule = <LinterRule>{
-            meta: {
-                severity: SEVERITY.warn,
-                config: {
-                    default: {
-                        a: 1,
-                    },
-                    schema: ss.object({
-                        a: ss.number(),
                     }),
+                }),
+            );
+            expect(platform).toBe(GenericPlatform.AdgAny);
+        });
+
+        test('should throw on invalid platforms', async () => {
+            await expect(
+                lint(
+                    '',
+                    {
+                        rules: {},
+                        allowInlineConfig: true,
+                        platforms: ['adg_any2'],
+                    },
+                ),
+            ).rejects.toThrow('adg_any2');
+        });
+    });
+
+    describe('inline configuration (! aglint)', () => {
+        test('should apply inline rule configuration', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint "test-cosmetic-rule": "error"',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Warning }, allowInlineConfig: true },
+            );
+
+            expect(result.problems).toHaveLength(2);
+
+            expect(result.problems[0]!.position.start.line).toBe(1);
+            expect(result.problems[0]!.severity).toBe(LinterRuleSeverity.Warning);
+
+            expect(result.problems[1]!.position.start.line).toBe(3);
+            expect(result.problems[1]!.severity).toBe(LinterRuleSeverity.Error);
+        });
+
+        test('should turn off rule via inline config', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint "test-cosmetic-rule": "off"',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+        });
+
+        test('should change severity via inline config', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint "test-cosmetic-rule": "warn"',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.severity).toBe(LinterRuleSeverity.Error);
+            expect(result.problems[1]?.severity).toBe(LinterRuleSeverity.Warning);
+            expect(result.errorCount).toBe(1);
+            expect(result.warningCount).toBe(1);
+        });
+
+        test('should configure multiple rules via inline config', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    'example.com##.ad',
+                    '! aglint "test-network-rule": "off", "test-cosmetic-rule": "off"',
+                    '||example.net^',
+                    'example.net##.banner',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
                 },
-            },
-            events: {
-                onRule: (context) => {
-                    config = context.getLinterConfig();
-                    content = context.getFilterListContent();
-                    rawRules.push(context.getActualAdblockRuleRaw());
-                    astRules.push(context.getActualAdblockRuleAst());
-                    lines.push(context.getActualLine());
-                    receivedConfig = <object>context.config;
+            );
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[1]?.position.start.line).toBe(2);
+        });
+
+        test('should ignore inline config when allowInlineConfig is false', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint "test-cosmetic-rule": "off"',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: false },
+            );
+            expect(result.problems).toHaveLength(2);
+        });
+
+        test('should modify rule options via inline config', async () => {
+            const result = await lint(
+                [
+                    '||a.com^',
+                    '! aglint "test-configurable-rule": ["error", { "minLength": 10 }]',
+                    '||b.com^',
+                    '||verylongdomain.com^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5 }] },
+                    allowInlineConfig: true,
                 },
-            },
-        };
+            );
 
-        linter.addRule('rule-1', rule);
+            // First rule matches default minLength: 5 (7 chars: ||a.com^)
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.message).toContain('minLength=5');
 
-        const filterListRawRules = [
-            '||example.com$script,third-party',
-            'example.net^$important',
-            'example.org/ads.js^$script,third-party',
-        ];
+            // After inline config, only rules with minLength >= 10 are reported
+            // ||verylongdomain.com^ is 20 chars
+            expect(result.problems[1]?.position.start.line).toBe(4);
+            expect(result.problems[1]?.message).toContain('minLength=10');
+        });
 
-        const filterList = filterListRawRules.join(NEWLINE);
+        test('should merge rule options via inline config', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint "test-configurable-rule": ["error", { "requireDomain": true }]',
+                    '||test.org^',
+                    '||block^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5, requireDomain: false }] },
+                    allowInlineConfig: true,
+                },
+            );
 
-        linter.lint(filterList);
+            // First rule: minLength=5, requireDomain=false (should match)
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.message).toContain('requireDomain=false');
 
-        expect(config).toMatchObject(linter.getConfig());
-        expect(content).toBe(filterList);
-        expect(rawRules).toMatchObject(filterListRawRules);
-        expect(astRules).toMatchObject(FilterListParser.parse(filterList).children);
-        expect(lines).toMatchObject(Array.from({ length: filterListRawRules.length }, (_, i) => i + 1));
-        expect(receivedConfig).toEqual({ a: 1 });
+            // After inline config: minLength=5 (inherited), requireDomain=true
+            // ||test.org^ has domain, so it matches
+            expect(result.problems[1]?.position.start.line).toBe(3);
+            expect(result.problems[1]?.message).toContain('requireDomain=true');
+
+            // ||block^ has no domain (no dot), so it's filtered out
+        });
+
+        test('should handle multiple inline config changes with options', async () => {
+            const result = await lint(
+                [
+                    '||a.com^',
+                    '! aglint "test-configurable-rule": ["error", { "minLength": 15 }]',
+                    '||b.com^',
+                    '||verylongdomain.com^',
+                    '! aglint "test-configurable-rule": ["warn", { "minLength": 5, "requireDomain": true }]',
+                    '||c.com^',
+                    '||block^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5, requireDomain: false }] },
+                    allowInlineConfig: true,
+                },
+            );
+
+            expect(result.problems).toHaveLength(3);
+
+            // First rule: minLength=5, requireDomain=false
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.severity).toBe(LinterRuleSeverity.Error);
+            expect(result.problems[0]?.message).toContain('minLength=5');
+
+            // After first inline config: minLength=15
+            // Only ||verylongdomain.com^ (20 chars) matches
+            expect(result.problems[1]?.position.start.line).toBe(4);
+            expect(result.problems[1]?.severity).toBe(LinterRuleSeverity.Error);
+            expect(result.problems[1]?.message).toContain('minLength=15');
+
+            // After second inline config: severity=warn, minLength=5, requireDomain=true
+            // ||c.com^ has domain and is long enough
+            expect(result.problems[2]?.position.start.line).toBe(6);
+            expect(result.problems[2]?.severity).toBe(LinterRuleSeverity.Warning);
+            expect(result.problems[2]?.message).toContain('minLength=5');
+            expect(result.problems[2]?.message).toContain('requireDomain=true');
+
+            // ||block^ has no domain, so it's filtered out
+        });
+
+        test('should preserve config immutability with inline changes', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint "test-configurable-rule": ["error", { "minLength": 20 }]',
+                    '||test.org^',
+                ].join('\n'),
+                {
+                    rules: { 'test-configurable-rule': ['error', { minLength: 5 }] },
+                    allowInlineConfig: true,
+                },
+            );
+
+            // Both rules should be processed - first with minLength=5, second with minLength=20
+            // ||example.com^ is 14 chars, so it matches minLength=5
+            // ||test.org^ is 11 chars, doesn't match minLength=20
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[0]?.message).toContain('minLength=5');
+        });
+
+        test('should not process inline config when allowInlineConfig is undefined', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint "test-cosmetic-rule": "off"',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: false },
+            );
+            expect(result.problems).toHaveLength(2);
+        });
+    });
+
+    describe('disable-next-line directive', () => {
+        test('should disable all rules for next line', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable-next-line',
+                    'example.com##.banner',
+                    'example.com##.popup',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[1]?.position.start.line).toBe(4);
+        });
+
+        test('should disable specific rule for next line', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    'example.com##.ad',
+                    '! aglint-disable-next-line test-network-rule',
+                    '||example.net^',
+                    'example.net##.banner',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            expect(result.problems).toHaveLength(3);
+            const lines = result.problems.map((p) => p.position.start.line);
+            expect(lines).toEqual([1, 2, 5]);
+        });
+
+        test('should disable multiple specific rules for next line', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable-next-line test-network-rule, test-cosmetic-rule',
+                    '||example.net^',
+                    '! aglint-disable-next-line test-network-rule, test-cosmetic-rule',
+                    'example.net##.banner',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]!.position.start.line).toBe(1);
+        });
+    });
+
+    describe('disable/enable directives', () => {
+        test('should disable all rules from directive until end', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    'example.com##.popup',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]!.position.start.line).toBe(1);
+        });
+
+        test('should disable and re-enable all rules', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    '! aglint-enable',
+                    'example.com##.footer',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[1]?.position.start.line).toBe(5);
+        });
+
+        test('should disable specific rules in region', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    'example.com##.ad',
+                    '! aglint-disable test-network-rule',
+                    '||example.net^',
+                    'example.net##.banner',
+                    '! aglint-enable test-network-rule',
+                    'example.org',
+                    'example.org##.footer',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            const networkProblems = result.problems.filter((p) => p.ruleId === 'test-network-rule');
+            expect(networkProblems).toHaveLength(2);
+            expect(networkProblems[0]!.position.start.line).toBe(1);
+            expect(networkProblems[1]!.position.start.line).toBe(7);
+        });
+
+        test('should handle multiple disable/enable pairs', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    '! aglint-enable',
+                    'example.com##.popup',
+                    '! aglint-disable',
+                    'example.com##.footer',
+                    '! aglint-enable',
+                    'example.com##.sidebar',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(3);
+            const lines = result.problems.map((p) => p.position!.start.line);
+            expect(lines).toEqual([1, 5, 9]);
+        });
+
+        test('should disable multiple specific rules', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    'example.com##.ad',
+                    '! comment',
+                    '! aglint-disable test-network-rule, test-cosmetic-rule, test-comment-warning',
+                    '||example.net^',
+                    'example.net##.banner',
+                    '! another',
+                    '! aglint-enable test-network-rule, test-cosmetic-rule, test-comment-warning',
+                    'example.org',
+                    'example.org##.footer',
+                    '! final',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            expect(result.problems).toHaveLength(6);
+            const lines = result.problems.map((p) => p.position!.start.line).sort((a, b) => (a ?? 0) - (b ?? 0));
+            expect(lines).toEqual([1, 2, 3, 9, 10, 11]);
+        });
+    });
+
+    describe('disable directives with inline config interaction', () => {
+        test('should disable rules changed by inline config', async () => {
+            const result = await lint(
+                [
+                    '! aglint "test-cosmetic-rule": "error"',
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Warning }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]!.position.start.line).toBe(2);
+            expect(result.problems[0]!.severity).toBe(LinterRuleSeverity.Error);
+        });
+
+        test('should handle inline config after disable directive', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    '! aglint "test-cosmetic-rule": "off"',
+                    'example.com##.popup',
+                    '! aglint-enable',
+                    'example.com##.footer',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]!.position.start.line).toBe(1);
+        });
+    });
+
+    describe('fatal errors', () => {
+        test('should handle syntactically invalid rules', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '##[invalid syntax',
+                    'example.net##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems.length).toBeGreaterThan(0);
+            expect(result.fatalErrorCount).toBeGreaterThan(0);
+        });
+
+        test('should disable fatal errors by default', async () => {
+            const result = await lint(
+                [
+                    '! aglint-disable',
+                    '##[invalid syntax',
+                    'example.com##.ad',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.fatalErrorCount).toBe(0);
+        });
+    });
+
+    describe('edge cases and special scenarios', () => {
+        test('should handle empty lines', async () => {
+            const result = await lint(
+                'example.com##.ad\n\n\nexample.com##.banner',
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(2);
+        });
+
+        test('should handle consecutive disable-next-line directives', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable-next-line',
+                    '! aglint-disable-next-line',
+                    'example.com##.banner',
+                    'example.com##.popup',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(2);
+            expect(result.problems[0]?.position.start.line).toBe(1);
+            expect(result.problems[1]?.position.start.line).toBe(5);
+        });
+
+        test('should handle rules with no problems', async () => {
+            const result = await lint(
+                [
+                    '! just a comment',
+                    '! another comment',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(0);
+        });
+
+        test('should handle disable without enable', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    'example.com##.popup',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(1);
+            expect(result.problems[0]!.position.start.line).toBe(1);
+        });
+
+        test('should handle enable without disable', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-enable',
+                    'example.com##.banner',
+                ].join('\n'),
+                { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
+            );
+            expect(result.problems).toHaveLength(2);
+        });
+
+        test('should handle mixed content with various directives', async () => {
+            const result = await lint(
+                [
+                    '! Header comment',
+                    '||example.com^',
+                    'example.com##.ad',
+                    '! aglint "test-network-rule": "warn"',
+                    '! aglint-disable-next-line test-cosmetic-rule',
+                    'example.net##.banner',
+                    '||example.net^',
+                    '! aglint-disable',
+                    'example.org',
+                    'example.org##.popup',
+                    '! aglint-enable',
+                    '! Final',
+                    'example.com##.footer',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            expect(result.problems.length).toBeGreaterThan(0);
+            expect(result.errorCount).toBeGreaterThan(0);
+            expect(result.warningCount).toBeGreaterThan(0);
+        });
+    });
+
+    describe('problem counting', () => {
+        test('should correctly count errors, warnings, and fatal errors', async () => {
+            const result = await lint(
+                [
+                    '! comment 1',
+                    '! comment 2',
+                    'example.com##.ad',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            expect(result.problems).toHaveLength(4);
+            expect(result.warningCount).toBe(2);
+            expect(result.errorCount).toBe(2);
+            expect(result.fatalErrorCount).toBe(0);
+        });
+
+        test('should verify sum of counts matches total problems', async () => {
+            const result = await lint(
+                [
+                    '! comment',
+                    'example.com',
+                    'example.com##.ad',
+                    '##[invalid',
+                ].join('\n'),
+                {
+                    rules: {
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                    },
+                    allowInlineConfig: true,
+                },
+            );
+            const total = result.errorCount + result.warningCount + result.fatalErrorCount;
+            expect(result.problems).toHaveLength(total);
+        });
+    });
+
+    describe('file properties', () => {
+        test('should accept filePath and cwd', async () => {
+            const result = await lintFn({
+                fileProps: {
+                    content: 'example.com##.ad',
+                    filePath: '/test/file.txt',
+                    cwd: '/test',
+                },
+                config: {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+            });
+            expect(result.problems).toHaveLength(1);
+        });
+    });
+
+    describe('unused disable directives', () => {
+        test('should not report unused directives by default', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+            );
+
+            // Only reports the actual rule violations, not unused directives
+            expect(result.problems.every((p) => p.ruleId !== 'unused-disable-directive')).toBe(true);
+        });
+
+        test('should report unused disable-all directive as warning', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive');
+            expect(unusedProblems[0]?.severity).toBe(LinterRuleSeverity.Warning);
+        });
+
+        test('should report unused disable-all directive as error when configured', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                    unusedDisableDirectivesSeverity: 'error',
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.severity).toBe(LinterRuleSeverity.Error);
+        });
+
+        test('should report unused specific rule directive', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint-disable test-cosmetic-rule',
+                    '||example.net^',
+                ].join('\n'),
+                {
+                    rules: { 'test-network-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive for rule: test-cosmetic-rule');
+        });
+
+        test('should report unused disable-next-line directive', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable-next-line',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive');
+        });
+
+        test('should not report used disable directive', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable',
+                    'example.com##.banner',
+                    'example.com##.popup',
+                ].join('\n'),
+                {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(0);
+
+            // Should have filtered out the actual rule problems
+            const ruleProblems = result.problems.filter((p) => p.ruleId !== 'unused-disable-directive');
+            expect(ruleProblems).toHaveLength(1); // Only the first one before disable
+        });
+
+        test('should report unused specific rule while used rules are fine', async () => {
+            const result = await lint(
+                [
+                    '||example.com^',
+                    '! aglint-disable test-network-rule, test-cosmetic-rule',
+                    '||example.net^',
+                    '||example.org^',
+                ].join('\n'),
+                {
+                    rules: { 'test-network-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1);
+            expect(unusedProblems[0]?.message).toBe('Unused disable directive for rule: test-cosmetic-rule');
+
+            // Should have filtered out the network rule problems
+            const ruleProblems = result.problems.filter((p) => p.ruleId !== 'unused-disable-directive');
+            expect(ruleProblems).toHaveLength(1); // Only the first network rule
+        });
+
+        test('should not report enable directives as unused', async () => {
+            const result = await lint(
+                [
+                    '! aglint-enable',
+                    'example.com##.ad',
+                ].join('\n'),
+                {
+                    rules: {},
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(0);
+        });
+
+        test('should combine unused directive problems with rule problems', async () => {
+            const result = await lint(
+                [
+                    'example.com##.ad',
+                    '! aglint-disable test-network-rule',
+                    'example.com##.banner',
+                ].join('\n'),
+                {
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                    reportUnusedDisableDirectives: true,
+                },
+            );
+
+            // Should have both cosmetic rule problems and the unused directive problem
+            expect(result.problems).toHaveLength(3);
+
+            const ruleProblems = result.problems.filter((p) => p.ruleId === 'test-cosmetic-rule');
+            expect(ruleProblems).toHaveLength(2); // Both cosmetic rules should be reported
+
+            const unusedProblems = result.problems.filter((p) => p.ruleId === 'unused-disable-directive');
+            expect(unusedProblems).toHaveLength(1); // The network rule disable is unused
+
+            expect(result.warningCount).toBe(1); // The unused directive warning
+            expect(result.errorCount).toBe(2); // The two cosmetic rule errors
+        });
+    });
+
+    describe('includeMetadata option', () => {
+        test('should not include metadata by default', async () => {
+            const result = await lint('example.com##.ad', {
+                rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                allowInlineConfig: true,
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.metadata).toBeUndefined();
+        });
+
+        test('should include metadata when option is true', async () => {
+            const result = await lintFn({
+                fileProps: { content: 'example.com##.ad' },
+                config: {
+                    platforms: ['adg_any'],
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.metadata).toBeDefined();
+            expect(result.metadata).toHaveProperty('test-cosmetic-rule');
+            expect(result.metadata!['test-cosmetic-rule']).toHaveProperty('type');
+            expect(result.metadata!['test-cosmetic-rule']!.type).toBe(LinterRuleType.Problem);
+            expect(result.metadata!['test-cosmetic-rule']).toHaveProperty('docs');
+            expect(result.metadata!['test-cosmetic-rule']!.docs.name).toBe('test-cosmetic-rule');
+        });
+
+        test('should include metadata for all rules with problems', async () => {
+            const result = await lintFn({
+                fileProps: {
+                    content: [
+                        '||example.com^',
+                        'example.com##.ad',
+                        '! comment',
+                    ].join('\n'),
+                },
+                config: {
+                    platforms: ['adg_any'],
+                    rules: {
+                        'test-network-rule': LinterRuleSeverity.Error,
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-comment-warning': LinterRuleSeverity.Warning,
+                    },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(3);
+            expect(result.metadata).toBeDefined();
+            expect(Object.keys(result.metadata!)).toHaveLength(3);
+            expect(result.metadata).toHaveProperty('test-network-rule');
+            expect(result.metadata).toHaveProperty('test-cosmetic-rule');
+            expect(result.metadata).toHaveProperty('test-comment-warning');
+        });
+
+        test('should not include metadata for rules with no problems', async () => {
+            const result = await lintFn({
+                fileProps: { content: 'example.com##.ad' },
+                config: {
+                    platforms: ['adg_any'],
+                    rules: {
+                        'test-cosmetic-rule': LinterRuleSeverity.Error,
+                        'test-network-rule': LinterRuleSeverity.Error, // Enabled but no violations
+                    },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(1);
+            expect(result.metadata).toBeDefined();
+            expect(Object.keys(result.metadata!)).toHaveLength(1);
+            expect(result.metadata).toHaveProperty('test-cosmetic-rule');
+            expect(result.metadata).not.toHaveProperty('test-network-rule');
+        });
+
+        test('should handle empty metadata when no problems found', async () => {
+            const result = await lintFn({
+                fileProps: { content: '! just a comment' },
+                config: {
+                    platforms: ['adg_any'],
+                    rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error },
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            expect(result.problems).toHaveLength(0);
+            expect(result.metadata).toBeDefined();
+            expect(Object.keys(result.metadata!)).toHaveLength(0);
+        });
+
+        test('should skip metadata for problems without ruleId', async () => {
+            const result = await lintFn({
+                fileProps: { content: '##[invalid syntax' },
+                config: {
+                    platforms: ['adg_any'],
+                    rules: {},
+                    allowInlineConfig: true,
+                },
+                loadRule: createRuleLoader(),
+                subParsers: defaultSubParsers,
+                includeMetadata: true,
+            });
+            // Fatal errors don't have ruleId
+            expect(result.problems.length).toBeGreaterThan(0);
+            expect(result.metadata).toBeDefined();
+            // Should be empty since fatal errors have no ruleId
+            expect(Object.keys(result.metadata!)).toHaveLength(0);
+        });
     });
 });

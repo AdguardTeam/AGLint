@@ -11,8 +11,9 @@ import path from 'node:path';
 const makeRelative = (file) => path.relative(process.cwd(), file);
 
 export default {
-    '**/*.md': 'markdownlint',
-    '**/*.js': 'eslint',
+    // ignore 'globs' option from '.markdownlint-cli2.jsonc', and pass files as arguments
+    '**/*.md': 'pnpm lint:md --no-globs',
+    '**/*.js': 'eslint --cache',
     '**/*.ts': [
         // Type-check only the staged TS files while still honoring tsconfig
         'tsc-files --noEmit',
@@ -21,6 +22,6 @@ export default {
         (files) => `vitest related --run ${files.map(makeRelative).join(' ')}`,
 
         // Lint the staged TS files
-        'eslint',
+        'eslint --cache',
     ],
 };

@@ -1,5 +1,0 @@
-! should be fixed
-##.class1, .class2, #id1
-
-! aglint-disable-next-line
-##.class1, .class2, #id1

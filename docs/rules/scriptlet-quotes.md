@@ -1,0 +1,293 @@
+<!-- markdownlint-disable -->
+# `scriptlet-quotes`
+
+## Description
+
+Checks quotes in scriptlet
+
+## Type
+
+Problem. Identifies parts that causes errors or confusing behavior. High priority fix.
+
+## Automatic issue fixing
+
+- Some reported problems can be fixed automatically 🔧
+
+## Options
+
+This rule can be configured using the following options.
+
+### Options overview
+
+```typescript
+[
+  {
+    adg: "none" | "single" | "double" | "backtick"
+    ubo: "none" | "single" | "double" | "backtick"
+    abp: "none" | "single" | "double" | "backtick"
+    disallowCurlyQuotes: boolean
+  }
+]
+```
+
+### Options valibot schema
+
+<details>
+<summary>Click to expand</summary>
+
+```typescript
+{
+  "kind": "schema",
+  "type": "tuple",
+  "expects": "Array",
+  "async": false,
+  "items": [
+    {
+      "kind": "schema",
+      "type": "strict_object",
+      "expects": "Object",
+      "async": false,
+      "entries": {
+        "adg": {
+          "kind": "schema",
+          "type": "enum",
+          "expects": "(\"none\" | \"single\" | \"double\" | \"backtick\")",
+          "async": false,
+          "enum": {
+            "None": "none",
+            "Single": "single",
+            "Double": "double",
+            "Backtick": "backtick"
+          },
+          "options": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ],
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        },
+        "ubo": {
+          "kind": "schema",
+          "type": "enum",
+          "expects": "(\"none\" | \"single\" | \"double\" | \"backtick\")",
+          "async": false,
+          "enum": {
+            "None": "none",
+            "Single": "single",
+            "Double": "double",
+            "Backtick": "backtick"
+          },
+          "options": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ],
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        },
+        "abp": {
+          "kind": "schema",
+          "type": "enum",
+          "expects": "(\"none\" | \"single\" | \"double\" | \"backtick\")",
+          "async": false,
+          "enum": {
+            "None": "none",
+            "Single": "single",
+            "Double": "double",
+            "Backtick": "backtick"
+          },
+          "options": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ],
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        },
+        "disallowCurlyQuotes": {
+          "kind": "schema",
+          "type": "boolean",
+          "expects": "boolean",
+          "async": false,
+          "~standard": {
+            "version": 1,
+            "vendor": "valibot"
+          }
+        }
+      },
+      "~standard": {
+        "version": 1,
+        "vendor": "valibot"
+      }
+    }
+  ],
+  "~standard": {
+    "version": 1,
+    "vendor": "valibot"
+  }
+}
+```
+
+</details>
+
+### Options JSON schema
+
+<details>
+<summary>Click to expand</summary>
+
+```typescript
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": [
+    {
+      "type": "object",
+      "properties": {
+        "adg": {
+          "enum": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ]
+        },
+        "ubo": {
+          "enum": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ]
+        },
+        "abp": {
+          "enum": [
+            "none",
+            "single",
+            "double",
+            "backtick"
+          ]
+        },
+        "disallowCurlyQuotes": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "adg",
+        "ubo",
+        "abp",
+        "disallowCurlyQuotes"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "minItems": 1
+}
+```
+
+</details>
+
+### Default options
+
+```json
+[
+  {
+    "adg": "double",
+    "ubo": "none",
+    "abp": "none",
+    "disallowCurlyQuotes": true
+  }
+]
+```
+
+## Correct examples
+
+Examples of correct code:
+
+### Correct quotes
+
+The following code
+
+```adblock
+#%#//scriptlet("scriptlet-name", "arg1", "arg2")
+```
+
+with the following rule config:
+
+```json
+[
+  {
+    "adg": "double",
+    "ubo": "none",
+    "abp": "none",
+    "disallowCurlyQuotes": true
+  }
+]
+```
+
+should not be reported
+
+## Incorrect examples
+
+Examples of incorrect code:
+
+### Single quotes instead of double quotes
+
+The following code
+
+```adblock
+#%#//scriptlet('scriptlet-name', 'arg1', 'arg2')
+```
+
+with the following rule config:
+
+```json
+[
+  {
+    "adg": "double",
+    "ubo": "none",
+    "abp": "none",
+    "disallowCurlyQuotes": true
+  }
+]
+```
+
+should be reported as:
+
+```shell
+1:15 Scriptlet argument should be quoted with double, but single was found
+1:33 Scriptlet argument should be quoted with double, but single was found
+1:41 Scriptlet argument should be quoted with double, but single was found
+```
+
+and should be fixed as:
+
+```diff
+===================================================================
+--- original
++++ fixed
+@@ -1,1 +1,1 @@
+-#%#//scriptlet('scriptlet-name', 'arg1', 'arg2')
++#%#//scriptlet("scriptlet-name", "arg1", "arg2")
+```
+
+## Version
+
+This rule was added in AGLint version 4.0.0
+
+## Rule source
+
+https://github.com/AdguardTeam/AGLint/blob/master/src/rules/scriptlet-quotes.ts
+
+## Test cases
+
+https://github.com/AdguardTeam/AGLint/blob/master/test/rules/scriptlet-quotes.test.ts

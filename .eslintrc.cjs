@@ -25,10 +25,6 @@ const ESLINT_RULES = {
             ignoreUrls: true,
             ignoreTrailingComments: false,
             ignoreComments: false,
-            /**
-             * Ignore calls to logger, e.g. logger.error(), because of the long string.
-             */
-            ignorePattern: 'logger\\.',
         },
     ],
     // Sort members of import statements, e.g. `import { B, A } from 'module';` -> `import { A, B } from 'module';`
@@ -244,28 +240,38 @@ const N_PLUGIN_RULES = {
  */
 const BOUNDARIES_PLUGIN_RULES = {
     'boundaries/element-types': ['error', {
-        default: 'allow',
+        default: 'disallow',
         rules: [
-            // Do not allow too general imports in tests, e.g. import something from `src` directly.
+            {
+                from: 'common-folder',
+                allow: [],
+            },
+            {
+                from: 'utils-folder',
+                allow: ['common-folder'],
+            },
+            {
+                from: 'cli-folder',
+                allow: ['common-folder', 'utils-folder', 'linter-folder'],
+            },
+            {
+                from: 'linter-folder',
+                allow: ['common-folder', 'utils-folder'],
+            },
+            {
+                from: 'rule-file',
+                allow: ['common-folder', 'utils-folder', 'linter-folder'],
+            },
+            {
+                from: 'rule-file',
+                disallow: ['rule-file'],
+                message: 'Rule file should not import other rule files, they should be independent',
+            },
             {
                 from: 'test-folder',
-                disallow: ['src-index'],
-                message: 'Do not import directly from src/. Use specific submodules like src/utils instead.',
+                allow: ['common-folder', 'cli-folder', 'utils-folder', 'rules-folder', 'linter-folder'],
             },
-            // TODO: Add more rules, like helpers only can import helpers, etc.
         ],
-    }],
-};
-
-/**
- * Logger context plugin rules.
- *
- * @see {@link https://github.com/AdguardTeam/tsurlfilter/tree/master/packages/eslint-plugin-logger-context#readme}
- */
-const LOGGER_CONTEXT_PLUGIN_RULES = {
-    // Check that every logger call has a context tag.
-    '@adguard/logger-context/require-logger-context': ['error', {
-        contextModuleName: 'tsurl',
     }],
 };
 
@@ -299,7 +305,6 @@ module.exports = {
     plugins: [
         'import',
         'import-newlines',
-        '@adguard/logger-context',
         '@typescript-eslint',
         'n',
         'boundaries',
@@ -319,13 +324,33 @@ module.exports = {
     settings: {
         'boundaries/elements': [
             {
-                type: 'src-index',
-                pattern: 'src/index.ts',
+                type: 'test-folder',
+                pattern: 'test',
+                mode: 'folder',
+            },
+            {
+                type: 'linter-folder',
+                pattern: 'src/linter',
+                mode: 'folder',
+            },
+            {
+                type: 'cli-folder',
+                pattern: 'src/cli',
+                mode: 'folder',
+            },
+            {
+                type: 'utils-folder',
+                pattern: 'src/utils',
+                mode: 'folder',
+            },
+            {
+                type: 'rule-file',
+                pattern: 'src/rules/*.ts',
                 mode: 'file',
             },
             {
-                type: 'test-folder',
-                pattern: 'test',
+                type: 'common-folder',
+                pattern: 'src/common',
                 mode: 'folder',
             },
         ],
@@ -337,6 +362,5 @@ module.exports = {
         JSDOC_PLUGIN_RULES,
         N_PLUGIN_RULES,
         BOUNDARIES_PLUGIN_RULES,
-        LOGGER_CONTEXT_PLUGIN_RULES,
     ),
 };

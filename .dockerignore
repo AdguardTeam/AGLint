@@ -14,12 +14,3 @@ node_modules/
 Dockerfile*
 *.log
 *.tgz
-
-# GitHub workflows
-.github/
-
-# SDD specs
-.sdd/
-
-# Test coverage
-coverage/

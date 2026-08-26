@@ -1,13 +1,16 @@
-# Multi-stage Dockerfile for aglint
+# Multi-stage Dockerfile for aglint CI optimization
 # Dependencies are cached until package.json/pnpm-lock.yaml change
 # Each stage can be built independently via --target
 
-FROM adguard/node-ssh:22.22--0 AS base
+FROM adguard/node-ssh:22.14--0 AS base
 SHELL ["/bin/bash", "-lc"]
+
+RUN npm install -g pnpm@10.7.1
 
 WORKDIR /aglint
 
-# pnpm store directory — set once here, no need for pnpm config set in every RUN
+# Use the npm_config_ prefix to set pnpm store-dir; this is the correct env var
+# that pnpm reads — ENV PNPM_STORE is ignored by pnpm.
 ENV npm_config_store_dir=/pnpm-store
 
 # ============================================================================
@@ -16,64 +19,80 @@ ENV npm_config_store_dir=/pnpm-store
 # ============================================================================
 FROM base AS deps
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
-# --ignore-scripts: skips husky install (prepare script) which must not run
-# inside Docker (no git hooks needed in CI)
+# --ignore-scripts: package.json has "prepare": "node .husky/install.mjs"
+# which must not run inside Docker (no git hooks needed in CI).
 RUN --mount=type=cache,target=/pnpm-store,id=aglint-pnpm \
-    pnpm install \
-        --frozen-lockfile \
-        --ignore-scripts \
-        --prefer-offline
+    pnpm install --frozen-lockfile --ignore-scripts
 
 # ============================================================================
 # Stage: source
-# Full source copy — parent for all lint/test/build stages
+# Cached until source code changes
 # ============================================================================
 FROM deps AS source
 
 COPY . /aglint
 
 # ============================================================================
-# Stage: test-output
-# Runs lint, builds the library, and runs vitest unit tests.
-# Used as the CI validation target: `docker build --target test-output .`
-# fails if lint, build, or tests fail.
+# Stage: lint
+# Runs type checking and linting (includes markdownlint via pnpm lint)
 # ============================================================================
-FROM source AS test-output
+FROM source AS lint
 
 # BUILD_RUN_ID is written to a temp file to bust the BuildKit cache for each
-# CI build run, ensuring this stage is never served from a stale cache.
+# Bamboo build run, ensuring this stage is never served from a stale cache.
 ARG BUILD_RUN_ID=""
 
 RUN --mount=type=cache,target=/pnpm-store,id=aglint-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
+    mkdir -p /out && \
     pnpm lint && \
-    pnpm build && \
-    pnpm test
+    touch /out/lint.txt
+
+FROM scratch AS lint-output
+COPY --from=lint /out/ /
 
 # ============================================================================
-# Stage: build
-# Builds the library and creates the npm package tarball for publishing
+# Stage: test
+# Runs type checking and vitest
 # ============================================================================
-FROM source AS build
+FROM source AS test
 
 # BUILD_RUN_ID is written to a temp file to bust the BuildKit cache for each
-# CI build run, ensuring this stage is never served from a stale cache.
+# Bamboo build run, ensuring this stage is never served from a stale cache.
 ARG BUILD_RUN_ID=""
 
-# Optional package version for local builds. CI injects the release version
-# into package.json before building the image; locally this arg is required
-# because package.json has no version field and pnpm pack needs one.
-ARG VERSION=""
+# Suppress the original exit code so Docker commits the layer with exit-code.txt.
+# See bamboo-specs/test.yaml for how exit-code.txt is consumed.
+RUN --mount=type=cache,target=/pnpm-store,id=aglint-pnpm \
+    echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
+    mkdir -p /out && \
+    pnpm check-types && pnpm test ; \
+    echo $? > /out/exit-code.txt
+
+FROM scratch AS test-output
+COPY --from=test /out/ /
+
+# ============================================================================
+# Stage: full-build
+# Runs quality gates then builds library and packs .tgz for npm publish
+# ============================================================================
+FROM source AS full-build
+
+# BUILD_RUN_ID is written to a temp file to bust the BuildKit cache for each
+# Bamboo build run, ensuring this stage is never served from a stale cache.
+ARG BUILD_RUN_ID=""
 
 RUN --mount=type=cache,target=/pnpm-store,id=aglint-pnpm \
     echo "${BUILD_RUN_ID}" > /tmp/.build-run-id && \
-    if [ -n "${VERSION}" ]; then npm pkg set version="${VERSION}"; fi && \
+    pnpm check-types && \
+    pnpm lint && \
+    pnpm test && \
     pnpm build && \
-    pnpm pack --out aglint.tgz && \
     mkdir -p /out/artifacts && \
-    mv aglint.tgz /out/artifacts/
+    pnpm pack --out /out/artifacts/aglint.tgz && \
+    cp dist/build.txt /out/artifacts/
 
-FROM scratch AS build-output
-COPY --from=build /out/artifacts/ /
+FROM scratch AS full-build-output
+COPY --from=full-build /out/ /

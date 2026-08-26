@@ -1,0 +1,196 @@
+import * as v from 'valibot';
+
+import { type ModuleDebug } from '../utils/debug';
+
+import { type LinterConfig, linterConfigSchema, type LinterSubParsersConfig } from './config';
+import { createReportFn } from './core/report';
+import { createLinterRuntime } from './core/runtime';
+import { type LinterFileProps } from './file-props';
+import { linterProblemSchema } from './linter-problem';
+import { createConfigCommentVisitor } from './phase/inline-config';
+import { applyDisableDirectives, summarize, UNUSED_DISABLE_DIRECTIVE_RULE_ID } from './phase/postprocess';
+import { runWalk } from './phase/walk';
+import { linterRuleMetaSerializableSchema } from './rule';
+import { type LinterRuleLoader } from './rule-registry/rule-loader';
+
+export const linterResultSchema = v.object({
+    /**
+     * Array of problems detected by the linter.
+     */
+    problems: v.array(linterProblemSchema),
+    /**
+     * Metadata of the rules that were run (JSON-serializable).
+     */
+    metadata: v.optional(v.record(v.string(), linterRuleMetaSerializableSchema)),
+    /**
+     * Count of warnings (just for convenience, can be calculated from problems array).
+     */
+    warningCount: v.number(),
+    /**
+     * Count of errors (just for convenience, can be calculated from problems array).
+     */
+    errorCount: v.number(),
+    /**
+     * Count of fatal errors (just for convenience, can be calculated from problems array).
+     */
+    fatalErrorCount: v.number(),
+});
+
+/**
+ * Represents a linter result that is returned by the `lint` method.
+ */
+export type LinterResult = v.InferOutput<typeof linterResultSchema>;
+
+/**
+ * Options for running the linter on a file.
+ */
+export type LinterRunOptions = {
+    /**
+     * Properties of the file to lint (content, path, working directory).
+     */
+    fileProps: LinterFileProps;
+
+    /**
+     * Linter configuration specifying which rules to run and how.
+     */
+    config: LinterConfig;
+
+    /**
+     * Function to dynamically load rule modules by name.
+     */
+    loadRule: LinterRuleLoader;
+
+    /**
+     * Optional sub-parsers for handling embedded syntaxes (e.g., CSS).
+     */
+    subParsers?: LinterSubParsersConfig;
+
+    /**
+     * Optional module debugger for logging.
+     */
+    debug?: ModuleDebug;
+
+    /**
+     * Whether to include metadata of the rules that were run.
+     */
+    includeMetadata?: boolean;
+};
+
+const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
+
+/**
+ * Lints a file according to the provided configuration and returns problems found.
+ *
+ * This is the main entry point for linting. The function:
+ * 1. Validates and parses the configuration
+ * 2. Creates a linter runtime environment
+ * 3. Loads all configured rules
+ * 4. Processes inline config comments (if enabled)
+ * 5. Walks the AST and triggers rule visitors
+ * 6. Applies disable directives to filter problems
+ * 7. Summarizes results by severity.
+ *
+ * @param options Linter run options including file props, config, and rule loader.
+ *
+ * @returns Promise resolving to linter result with problems and severity counts.
+ *
+ * @throws Error if configuration is invalid.
+ * @throws Error if a required rule cannot be loaded.
+ *
+ * @example
+ * ```typescript
+ * const result = await lint({
+ *   fileProps: {
+ *     content: 'example.com##.ad',
+ *     filePath: 'filters.txt'
+ *   },
+ *   config: {
+ *     rules: {
+ *       'no-short-rules': 'error',
+ *       'no-invalid-css': ['warn', { strict: true }]
+ *     }
+ *   },
+ *   loadRule: async (name) => import(`./rules/${name}`)
+ * });
+ *
+ * console.log(`Found ${result.errorCount} errors and ${result.warningCount} warnings`);
+ * ```
+ */
+export async function lint(options: LinterRunOptions): Promise<LinterResult> {
+    const { debug } = options;
+    const filePath = options.fileProps.filePath || 'unknown';
+    const startTime = Date.now();
+
+    if (debug) {
+        debug.log(`Linting ${filePath}`);
+    }
+
+    // Parse and validate config
+    const parsedConfig = v.parse(linterConfigSchema, options.config);
+
+    // Create runtime (includes source code parsing)
+    const runtime = createLinterRuntime(
+        options.fileProps,
+        parsedConfig,
+        options.loadRule,
+        options.subParsers ?? {},
+        debug,
+    );
+
+    const report = createReportFn(runtime);
+    runtime.ruleRegistry.setReporter(report);
+
+    // Inline config comments
+    const { onConfigComment, disabled } = createConfigCommentVisitor(runtime);
+
+    if (parsedConfig.allowInlineConfig) {
+        runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
+    }
+
+    // Load rules
+    await runtime.ruleRegistry.loadRules();
+
+    // AST walk
+    runWalk(runtime);
+
+    // Apply disable directives
+    applyDisableDirectives(
+        runtime.problems,
+        disabled,
+        parsedConfig.reportUnusedDisableDirectives,
+        parsedConfig.unusedDisableDirectivesSeverity,
+    );
+
+    const counts = summarize(runtime.problems);
+    const totalTime = Date.now() - startTime;
+
+    if (debug) {
+        debug.log(
+            `Lint completed for ${filePath} in ${totalTime}ms: `
+            + `${counts.errorCount} error(s), ${counts.warningCount} warning(s), `
+            + `${counts.fatalErrorCount} fatal`,
+        );
+    }
+
+    const result: LinterResult = {
+        problems: runtime.problems,
+        ...counts,
+    };
+
+    if (options.includeMetadata) {
+        result.metadata = {};
+
+        // iterate over problems and add metadata for each rule
+        for (const problem of runtime.problems) {
+            if (!problem.ruleId || problem.ruleId === UNUSED_DISABLE_DIRECTIVE_RULE_ID) {
+                continue;
+            }
+
+            if (!result.metadata[problem.ruleId]) {
+                result.metadata[problem.ruleId] = runtime.ruleRegistry.getRuleMeta(problem.ruleId);
+            }
+        }
+    }
+
+    return result;
+}

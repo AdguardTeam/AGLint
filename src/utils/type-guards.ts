@@ -63,3 +63,14 @@ export const isString = (value: unknown): value is string => {
 export const isArrayOfUint8Arrays = (value: unknown): value is Uint8Array[] => {
     return Array.isArray(value) && value.every((chunk) => chunk instanceof Uint8Array);
 };
+
+/**
+ * Checks whether the given value is an object.
+ *
+ * @param value Value to check.
+ *
+ * @returns `true` if the value is an object, `false` otherwise.
+ */
+export const isObject = (value: unknown): value is Record<string, unknown> => {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+};

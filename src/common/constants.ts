@@ -2,8 +2,6 @@
  * @file Constant values used by all parts of the library.
  */
 
-export const REPO_URL = 'https://github.com/AdguardTeam/AGLint';
-
 // General
 export const EMPTY = '';
 export const SPACE = ' ';
