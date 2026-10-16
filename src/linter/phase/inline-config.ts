@@ -1,8 +1,9 @@
-import { type ConfigCommentRule } from '@adguard/agtree';
+import { type CommentRule } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { getErrorMessage } from '../../utils/error';
 import { linterRulesConfigSchema } from '../config';
+import { parseConfigComment } from '../config-comment';
 import { LinterConfigCommentType } from '../config-comment-type';
 import { type LinterRuntime } from '../core/runtime';
 import { LinterRuleSeverity } from '../rule';
@@ -30,11 +31,6 @@ export type DisableComment = {
      * If omitted, the directive applies to all rules.
      */
     ruleId?: string;
-
-    /**
-     * The AST node representing the comment.
-     */
-    commentNode: ConfigCommentRule;
 };
 
 /**
@@ -49,38 +45,66 @@ export type DisableComment = {
  * @param runtime The linter runtime environment.
  *
  * @returns An object containing:
- * - `onConfigComment`: Visitor function to attach to ConfigCommentRule nodes
+ * - `onComment`: Visitor function to attach to CommentRule nodes
  * - `disabled`: Array of disable directives found during traversal.
  */
 export function createConfigCommentVisitor(runtime: LinterRuntime) {
     const disabled: DisableComment[] = [];
-    const toPos = (node: any) => {
-        const range = runtime.getOffsetRangeForNode(node)!;
-        return runtime.sourceCode.getLinterPositionRangeFromOffsetRange(range)!;
+
+    const toPos = (node: { start?: number; end?: number }) => {
+        const range = runtime.getOffsetRangeForNode(node);
+
+        if (!range) {
+            return null;
+        }
+
+        return runtime.sourceCode.getLinterPositionRangeFromOffsetRange(range);
     };
 
-    const onConfigComment = (node: ConfigCommentRule) => {
-        const cmd = node.command.value;
+    const reportError = (message: string, node: { start?: number; end?: number }) => {
+        const position = toPos(node);
+
+        if (!position) {
+            return;
+        }
+
+        runtime.problems.push({
+            severity: LinterRuleSeverity.Error,
+            message,
+            position,
+            fatal: true,
+        });
+    };
+
+    const onComment = (node: CommentRule) => {
+        let parsed;
+
+        try {
+            parsed = parseConfigComment(node);
+        } catch (e) {
+            reportError(getErrorMessage(e), node);
+            return;
+        }
+
+        if (!parsed) {
+            return;
+        }
+
+        const cmd = parsed.command.value;
 
         if (cmd === LinterConfigCommentType.Main) {
-            // e.g. `! aglint` - it does not make sense, so we just ignore it
-            if (!node.params || node.params.type !== 'ConfigNode') {
+            // e.g. `! aglint "rule": "off"` - apply config from this point
+            if (!parsed.params || parsed.params.type !== 'ConfigNode') {
                 return;
             }
 
-            // Apply config comment
-            // e.g. `! aglint "rule-1": ["warn", { "option1": "value1" }], "rule-2": "off"`
             try {
-                const rulesConfig = v.parse(linterRulesConfigSchema, node.params.value);
+                const rulesConfig = v.parse(linterRulesConfigSchema, parsed.params.value);
                 runtime.ruleRegistry.applyConfig(rulesConfig);
             } catch (e) {
-                runtime.problems.push({
-                    severity: LinterRuleSeverity.Error,
-                    message: getErrorMessage(e),
-                    position: toPos(node),
-                    fatal: true,
-                });
+                reportError(getErrorMessage(e), node);
             }
+
             return;
         }
 
@@ -94,18 +118,23 @@ export function createConfigCommentVisitor(runtime: LinterRuntime) {
 
         // Disable / Enable / DisableNextLine
         const push = (ruleId?: string) => {
+            const position = toPos(parsed.params && ruleId ? parsed.params : node);
+
+            if (!position) {
+                return;
+            }
+
             disabled.push({
                 command: cmd,
-                position: toPos(node.params && ruleId ? node.params : node),
+                position,
                 ruleId,
-                commentNode: node,
             });
         };
 
-        if (node.params?.type === 'ParameterList') {
-            // e.g. `! aglint-disable rule-1 rule-2`
-            for (const p of node.params.children) {
-                if (p) push(p.value);
+        if (parsed.params?.type === 'ParameterList') {
+            // e.g. `! aglint-disable rule-1, rule-2`
+            for (const p of parsed.params.children) {
+                push(p.value);
             }
         } else {
             // e.g. `! aglint-disable`
@@ -113,5 +142,5 @@ export function createConfigCommentVisitor(runtime: LinterRuntime) {
         }
     };
 
-    return { onConfigComment, disabled };
+    return { onComment, disabled };
 }

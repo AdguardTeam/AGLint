@@ -50,11 +50,11 @@ export default defineRule({
         const { minLength } = context.config[0];
 
         const handler = (node: AnyCosmeticRule | AnyNetworkRule) => {
-            const sourceText = node.raws?.text;
-
-            if (!sourceText) {
+            if (node.start === undefined || node.end === undefined) {
                 return;
             }
+
+            const sourceText = context.sourceCode.getSlicedPart(node.start, node.end);
             const ruleTextTrimmed = sourceText.trim();
 
             if (ruleTextTrimmed.length < minLength) {

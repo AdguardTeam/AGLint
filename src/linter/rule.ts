@@ -1,4 +1,4 @@
-import { type PlatformsByProduct } from '@adguard/agtree';
+import { type Platform } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { type ModuleDebug } from '../utils/debug';
@@ -447,8 +447,7 @@ export type LinterRuleBaseContext = {
     filePath?: string;
     cwd?: string;
     sourceCode: LinterSourceCode;
-    platforms: number;
-    platformsByProduct: PlatformsByProduct;
+    platforms: Platform[];
     getOffsetRangeForNode(node: any): LinterOffsetRange | null;
     debug?: ModuleDebug;
 };

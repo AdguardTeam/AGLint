@@ -1,31 +1,17 @@
 import {
-    AdblockSyntax,
+    hasProduct,
+    type Parameter,
     QuoteType,
     QuoteUtils,
     type ScriptletInjectionRule,
-    type Value,
+    SYNTAX_ABP,
+    SYNTAX_ADG,
+    SYNTAX_UBO,
 } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
-
-export const OPEN_CURLY_DOUBLE_QUOTE = '“';
-export const CLOSE_CURLY_DOUBLE_QUOTE = '”';
-export const OPEN_CURLY_SINGLE_QUOTE = '‘';
-export const CLOSE_CURLY_SINGLE_QUOTE = '’';
-
-/**
- * Check if a string is curly (smart) quoted.
- *
- * @param value The string to check.
- *
- * @returns True if the string is curly quoted, false otherwise.
- */
-const isCurlyQuoted = (value: string): boolean => {
-    return (value.startsWith(OPEN_CURLY_SINGLE_QUOTE) && value.endsWith(CLOSE_CURLY_SINGLE_QUOTE))
-        || (value.startsWith(OPEN_CURLY_DOUBLE_QUOTE) && value.endsWith(CLOSE_CURLY_DOUBLE_QUOTE));
-};
 
 export default defineRule({
     meta: {
@@ -39,14 +25,12 @@ export default defineRule({
         },
         messages: {
             unexpectedQuote: 'Scriptlet argument should be quoted with {{quote}}, but {{actualQuote}} was found',
-            curlyQuotesDisallowed: 'Curly quotes are disallowed',
         },
         configSchema: v.tuple([
             v.strictObject({
                 adg: v.enum(QuoteType),
                 ubo: v.enum(QuoteType),
                 abp: v.enum(QuoteType),
-                disallowCurlyQuotes: v.boolean(),
             }),
         ]),
         defaultConfig: [
@@ -54,7 +38,6 @@ export default defineRule({
                 adg: QuoteType.Double,
                 ubo: QuoteType.None,
                 abp: QuoteType.None,
-                disallowCurlyQuotes: true,
             },
         ],
         hasFix: true,
@@ -73,33 +56,40 @@ export default defineRule({
         version: '4.0.0',
     },
     create: (context) => {
-        let syntax: AdblockSyntax | undefined;
-        const checkScriptletArguments = (expectedQuoteType: QuoteType, scriptletArgument: Value<string>) => {
-            // special case: disallow curly quotes on demand
-            // note: QuoteUtils does not handle curly quotes, its just important at linter level,
-            // not at parser level
-            if (context.config[0].disallowCurlyQuotes && isCurlyQuoted(scriptletArgument.value)) {
-                context.report({
-                    messageId: 'curlyQuotesDisallowed',
-                    node: scriptletArgument,
-                    fix(fixer) {
-                        const range = context.getOffsetRangeForNode(scriptletArgument);
-                        if (!range) {
-                            return null;
-                        }
-                        const { value } = scriptletArgument;
-                        return fixer.replaceWithText(
-                            range,
-                            QuoteUtils.setStringQuoteType(value.slice(1, -1), expectedQuoteType),
-                        );
-                    },
-                });
+        let syntax: ScriptletInjectionRule['syntax'] | undefined;
+
+        /**
+         * Returns the expected quote type for the current rule syntax.
+         *
+         * @returns Expected quote type, or undefined for unknown syntax.
+         */
+        const getExpectedQuoteType = (): QuoteType | undefined => {
+            if (syntax === undefined) {
+                return undefined;
             }
-            // handle regular quotes
-            const actualQuoteType = QuoteUtils.getStringQuoteType(scriptletArgument.value);
+
+            if (hasProduct(syntax, SYNTAX_ADG)) {
+                return context.config[0].adg;
+            }
+
+            if (hasProduct(syntax, SYNTAX_UBO)) {
+                return context.config[0].ubo;
+            }
+
+            if (hasProduct(syntax, SYNTAX_ABP)) {
+                return context.config[0].abp;
+            }
+
+            return undefined;
+        };
+
+        const checkScriptletArguments = (expectedQuoteType: QuoteType, scriptletArgument: Parameter) => {
+            const actualQuoteType = scriptletArgument.quoteType;
+
             if (actualQuoteType === expectedQuoteType) {
                 return;
             }
+
             context.report({
                 messageId: 'unexpectedQuote',
                 data: {
@@ -109,18 +99,19 @@ export default defineRule({
                 node: scriptletArgument,
                 fix(fixer) {
                     const range = context.getOffsetRangeForNode(scriptletArgument);
+
                     if (!range) {
                         return null;
                     }
-                    const { value } = scriptletArgument;
 
                     return fixer.replaceWithText(
                         range,
-                        QuoteUtils.setStringQuoteType(value, expectedQuoteType),
+                        QuoteUtils.setStringQuoteType(scriptletArgument.value, expectedQuoteType),
                     );
                 },
             });
         };
+
         return {
             ScriptletInjectionRule: (node: ScriptletInjectionRule) => {
                 syntax = node.syntax;
@@ -128,18 +119,11 @@ export default defineRule({
             'ScriptletInjectionRule:exit': () => {
                 syntax = undefined;
             },
-            'ScriptletInjectionRule ParameterList Value': (node: Value<string>) => {
-                switch (syntax) {
-                    case AdblockSyntax.Adg:
-                        checkScriptletArguments(context.config[0].adg, node);
-                        break;
-                    case AdblockSyntax.Ubo:
-                        checkScriptletArguments(context.config[0].ubo, node);
-                        break;
-                    case AdblockSyntax.Abp:
-                        checkScriptletArguments(context.config[0].abp, node);
-                        break;
-                    default:
+            'ScriptletInjectionRule ParameterList Parameter': (node: Parameter) => {
+                const expectedQuoteType = getExpectedQuoteType();
+
+                if (expectedQuoteType !== undefined) {
+                    checkScriptletArguments(expectedQuoteType, node);
                 }
             },
         };

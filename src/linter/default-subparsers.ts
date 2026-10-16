@@ -1,4 +1,3 @@
-// import { defaultParserOptions, DomainListParser } from '@adguard/agtree/parser';
 import {
     type Comment,
     type CssNode,
@@ -83,27 +82,8 @@ const createCssParser = (context: string): Parser => {
  * allowing linter rules to analyze CSS-specific patterns within filter rules.
  */
 export const defaultSubParsers: LinterSubParsersConfig = {
-    'ElementHidingRuleBody > Value.selectorList': createCssParser('selectorList'),
-    'CssInjectionRuleBody > Value.selectorList': createCssParser('selectorList'),
-    'ElementHidingRuleBody > Value.declarationList': createCssParser('declarationList'),
-    'CssInjectionRuleBody > Value.declarationList': createCssParser('declarationList'),
+    'ElementHidingRuleBody > Raw.selectorList': createCssParser('selectorList'),
+    'CssInjectionRuleBody > Raw.selectorList': createCssParser('selectorList'),
+    'CssInjectionRuleBody > Raw.declarationList': createCssParser('declarationList'),
     'CssInjectionRuleBody > Value.mediaQueryList': createCssParser('mediaQueryList'),
-
-    // TODO: Enable it later
-    // Problematic with regex values in domain modifiers,
-    // their parsing should be improved, see https://github.com/AdguardTeam/tsurlfilter/issues/121
-
-    // 'Modifier[name.value="domain"] > Value.value': {
-    //     name: '@adguard/agtree',
-    //     parse: ((source: string, offset: number) => {
-    //         return DomainListParser.parse(
-    //             source,
-    //             defaultParserOptions,
-    //             offset,
-    //             '|',
-    //         );
-    //     }),
-    //     nodeTypeKey: 'type',
-    //     childNodeKeys: ['children'],
-    // },
 };

@@ -173,7 +173,11 @@ export default defineRule({
         };
 
         const handler = (node: AnyRule) => {
-            const ruleText = node.raws!.text!;
+            if (node.start === undefined || node.end === undefined) {
+                return;
+            }
+
+            const ruleText = context.sourceCode.getSlicedPart(node.start, node.end);
 
             const { excludedRuleTexts } = context.config[0];
 

@@ -1,6 +1,6 @@
-import { AdblockSyntax, getAllPlatformNames, PLATFORM_NEGATION } from '@adguard/agtree';
 import * as v from 'valibot';
 
+import { getPlatformNames } from './platforms';
 import { linterRuleConfigSchema } from './rule';
 import { anyNodeSchema } from './source-code/visitor-collection';
 
@@ -142,21 +142,14 @@ export const linterSubParsersConfigSchema = v.record(v.string(), parserSchema);
  * @example
  * ```typescript
  * const subParsers: LinterSubParsersConfig = {
- *   'ElementHidingRuleBody > Value.selectorList': cssParser,
- *   'CssInjectionRuleBody > Value.declarationList': cssParser
+ *   'ElementHidingRuleBody > Raw.selectorList': cssParser,
+ *   'CssInjectionRuleBody > Raw.declarationList': cssParser
  * };
  * ```
  */
 export type LinterSubParsersConfig = v.InferOutput<typeof linterSubParsersConfigSchema>;
 
-const adblockSyntaxSchema = v.enum(AdblockSyntax);
-
-/**
- * Schema for validating an array of adblock syntax types.
- */
-export const syntaxArraySchema = v.array(adblockSyntaxSchema);
-
-const platformNames = getAllPlatformNames();
+const platformNames = getPlatformNames();
 
 /**
  * Schema for validating an array of compatibility platforms.
@@ -164,8 +157,8 @@ const platformNames = getAllPlatformNames();
 export const platformSchema = v.picklist([
     ...platformNames.specificPlatformNames,
     ...platformNames.genericPlatformNames,
-    ...platformNames.specificPlatformNames.map((platform) => `${PLATFORM_NEGATION}${platform}`),
-    ...platformNames.genericPlatformNames.map((platform) => `${PLATFORM_NEGATION}${platform}`),
+    ...platformNames.specificPlatformNames.map((platform) => `~${platform}`),
+    ...platformNames.genericPlatformNames.map((platform) => `~${platform}`),
 ]);
 
 /**

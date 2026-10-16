@@ -11,7 +11,6 @@ const rulesConfig: LinterRulesConfig = {
         adg: QuoteType.Double,
         ubo: QuoteType.None,
         abp: QuoteType.None,
-        disallowCurlyQuotes: true,
     }],
 };
 
@@ -19,10 +18,6 @@ describe('scriptlet-quotes', () => {
     test('should ignore non-problematic cases', async () => {
         expect((await lint(
             'example.com,~example.net#%#//scriptlet("scriptlet0", "arg0", "arg1")',
-            rulesConfig,
-        )).problems).toStrictEqual([]);
-        expect((await lint(
-            'example.com,~example.net##+js(‘scriptlet0‘, ‘arg0‘, ‘arg1‘)',
             rulesConfig,
         )).problems).toStrictEqual([]);
         expect((await lint(
@@ -127,36 +122,22 @@ describe('scriptlet-quotes', () => {
         ]);
     });
 
-    test('should detect problematic cases', async () => {
+    test('treats curly quotes as plain values for ABP syntax', async () => {
         expect((await lint(
             // eslint-disable-next-line @typescript-eslint/quotes
             "example.com,~example.net#$#‘scriptlet0’ ‘arg0 arg1’",
             rulesConfig,
-        )).problems).toStrictEqual([{
-            category: 'problem',
-            data: undefined,
-            fix: {
-                range: [
-                    27,
-                    39,
-                ],
-                text: 'scriptlet0',
-            },
-            message: expect.any(String),
-            messageId: 'curlyQuotesDisallowed',
-            position: {
-                end: {
-                    column: 39,
-                    line: 1,
-                },
-                start: {
-                    column: 27,
-                    line: 1,
-                },
-            },
-            ruleId: 'scriptlet-quotes',
-            severity: 2,
-        }]);
+        )).problems).toStrictEqual([]);
+    });
+
+    test('reports ADG curly quotes as a fatal parse error', async () => {
+        const result = await lint(
+            'example.com,~example.net#%#//scriptlet(“scriptlet0”)',
+            rulesConfig,
+        );
+
+        expect(result.fatalErrorCount).toBe(1);
+        expect(result.problems[0]!.message).toContain('expected quote');
     });
 
     test('should fix single quotes to double quotes in ADG scriptlets', async () => {
@@ -167,18 +148,6 @@ describe('scriptlet-quotes', () => {
 
         expect(result.fixedSource).toBe(
             'example.com,~example.net#%#//scriptlet("scriptlet0", "arg0", "arg1")',
-        );
-    });
-
-    test('should fix curly quotes in ABP scriptlets', async () => {
-        const result = await lintWithFixes(
-            // eslint-disable-next-line @typescript-eslint/quotes
-            "example.com,~example.net#$#'scriptlet0' 'arg0 arg1'",
-            rulesConfig,
-        );
-
-        expect(result.fixedSource).toBe(
-            'example.com,~example.net#$#scriptlet0 arg0 arg1',
         );
     });
 
@@ -198,13 +167,5 @@ describe('scriptlet-quotes', () => {
         const result = await lintWithFixes(input, rulesConfig);
 
         expect(result.fixedSource).toBe(input);
-    });
-    test('should not modify content when no fixes are needed', async () => {
-        const input = 'example.com,~example.net##+js(‘scriptlet0’, ‘arg0’, ‘arg1’)';
-        const result = await lintWithFixes(input, rulesConfig);
-
-        expect(result.fixedSource).toBe(
-            'example.com,~example.net##+js(scriptlet0, arg0, arg1)',
-        );
     });
 });

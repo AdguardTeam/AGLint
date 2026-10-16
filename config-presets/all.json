@@ -50,8 +50,7 @@
       {
         "adg": "double",
         "ubo": "none",
-        "abp": "none",
-        "disallowCurlyQuotes": true
+        "abp": "none"
       }
     ]
   }

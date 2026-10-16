@@ -344,11 +344,11 @@ Here are some frequently used node types in adblock filter rules:
 - **Network Rules**: `NetworkRule`, `HostRule`
 - **Cosmetic Rules**: `CssInjectionRule`, `ElementHidingRule`, `ScriptletInjectionRule`, `HtmlFilteringRule`,
   `JsInjectionRule`
-- **Comment Rules**: `CommentRule`, `HintCommentRule`, `ConfigCommentRule`, `MetadataCommentRule`,
-  `PreProcessorCommentRule`
+- **Comment Rules**: `CommentRule`, `HintCommentRule`, `MetadataCommentRule`, `PreProcessorCommentRule`
+  (inline `! aglint ...` configuration is parsed by AGLint and is not emitted as an AST node)
 - **CSS Selectors**: `SelectorList`, `Selector`, `PseudoClassSelector`, `AttributeSelector`
-- **Hints**: `Hint`, `HintValue`
-- **Others**: `Value`, `ParameterList`, `Modifier`, `ModifierList`
+- **Hints**: `Hint`, `ParameterList`, `Parameter`
+- **Others**: `Value`, `Modifier`, `ModifierList`
 
 ### Helper Functions
 

@@ -3,6 +3,7 @@
         "**/*.md"
     ],
     "ignores": [
+        ".sdd",
         "node_modules"
     ],
     "config": {

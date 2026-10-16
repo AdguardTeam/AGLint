@@ -10,11 +10,10 @@ import { fileURLToPath } from 'node:url';
 
 import {
     AdblockProduct,
-    getHumanReadablePlatformName,
     getHumanReadableProductName,
-    getProductSpecificPlatforms,
-    PLATFORM_SEPARATOR,
-    stringifyPlatforms,
+    Platform,
+    PlatformExpressionEvaluator,
+    ProductCode,
 } from '@adguard/agtree';
 import checkbox, { Separator } from '@inquirer/checkbox';
 import confirm from '@inquirer/confirm';
@@ -45,6 +44,18 @@ import { fileExists } from './utils/file-exists';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Converts selected concrete platforms into configuration values,
+ * collapsing complete groups into generic wildcard names.
+ *
+ * @param platforms Selected platforms.
+ *
+ * @returns Platform names to write into the configuration file.
+ */
+export const platformsToConfigValues = (platforms: Platform[]): string[] => {
+    return PlatformExpressionEvaluator.optimize(platforms).map((platform) => platform.toString());
+};
 
 /**
  * Linter CLI initialization wizard.
@@ -324,29 +335,30 @@ export class LinterCliInitWizard {
      * @returns Selected platforms.
      */
     private static async promptPlatforms(products: AdblockProduct[]): Promise<string[]> {
-        const specificPlatformsArray = await checkbox({
+        const productCodes: Record<AdblockProduct, ProductCode> = {
+            [AdblockProduct.Adg]: ProductCode.Adg,
+            [AdblockProduct.Ubo]: ProductCode.Ubo,
+            [AdblockProduct.Abp]: ProductCode.Abp,
+        };
+
+        const selectedPlatforms = await checkbox({
             // eslint-disable-next-line max-len
             message: `Select which platform(s) you want to support for the selected ${inflect('product', products.length)}.\n`,
             choices: products.flatMap((product) => {
                 return [
                     new Separator(`--- ${getHumanReadableProductName(product)} ---`),
-                    ...getProductSpecificPlatforms(product).map((platform) => {
-                        const rawPlatform = getHumanReadablePlatformName(platform);
-                        return {
-                            name: rawPlatform,
+                    ...Platform.getAllConcretePlatforms()
+                        .filter((platform) => platform.product === productCodes[product])
+                        .map((platform) => ({
+                            name: platform.toHumanReadable(),
                             value: platform,
-                        };
-                    }),
+                        })),
                 ];
             }),
             required: true,
         });
 
-        const platforms = specificPlatformsArray.reduce((acc, platform) => {
-            return acc | platform;
-        }, 0);
-
-        return stringifyPlatforms(platforms).split(PLATFORM_SEPARATOR);
+        return platformsToConfigValues(selectedPlatforms);
     }
 
     /**

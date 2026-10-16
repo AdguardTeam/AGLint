@@ -25,7 +25,6 @@ This rule can be configured using the following options.
     adg: "none" | "single" | "double" | "backtick"
     ubo: "none" | "single" | "double" | "backtick"
     abp: "none" | "single" | "double" | "backtick"
-    disallowCurlyQuotes: boolean
   }
 ]
 ```
@@ -113,16 +112,6 @@ This rule can be configured using the following options.
             "version": 1,
             "vendor": "valibot"
           }
-        },
-        "disallowCurlyQuotes": {
-          "kind": "schema",
-          "type": "boolean",
-          "expects": "boolean",
-          "async": false,
-          "~standard": {
-            "version": 1,
-            "vendor": "valibot"
-          }
         }
       },
       "~standard": {
@@ -176,16 +165,12 @@ This rule can be configured using the following options.
             "double",
             "backtick"
           ]
-        },
-        "disallowCurlyQuotes": {
-          "type": "boolean"
         }
       },
       "required": [
         "adg",
         "ubo",
-        "abp",
-        "disallowCurlyQuotes"
+        "abp"
       ],
       "additionalProperties": false
     }
@@ -203,8 +188,7 @@ This rule can be configured using the following options.
   {
     "adg": "double",
     "ubo": "none",
-    "abp": "none",
-    "disallowCurlyQuotes": true
+    "abp": "none"
   }
 ]
 ```
@@ -228,8 +212,7 @@ with the following rule config:
   {
     "adg": "double",
     "ubo": "none",
-    "abp": "none",
-    "disallowCurlyQuotes": true
+    "abp": "none"
   }
 ]
 ```
@@ -255,8 +238,7 @@ with the following rule config:
   {
     "adg": "double",
     "ubo": "none",
-    "abp": "none",
-    "disallowCurlyQuotes": true
+    "abp": "none"
   }
 ]
 ```

@@ -1,14 +1,8 @@
-import {
-    type AnyPlatform,
-    getPlatformsByProduct,
-    parseRawPlatforms,
-    PLATFORM_SEPARATOR,
-} from '@adguard/agtree';
-
 import { type ModuleDebug } from '../../utils/debug';
 import { type LinterConfigParsed, type LinterSubParsersConfig } from '../config';
 import { type LinterFileProps } from '../file-props';
 import { type LinterProblem } from '../linter-problem';
+import { parsePlatformExpression } from '../platforms';
 import { type LinterRuleBaseContext, LinterRuleSeverity } from '../rule';
 import { type LinterRuleLoader } from '../rule-registry/rule-loader';
 import { LinterRuleRegistry } from '../rule-registry/rule-registry';
@@ -138,18 +132,13 @@ export function createLinterRuntime(
         return [start, end];
     };
 
-    let platforms: AnyPlatform = 0;
-
-    if (config.platforms.length > 0) {
-        platforms = parseRawPlatforms(config.platforms.join(PLATFORM_SEPARATOR));
-    }
+    const platforms = parsePlatformExpression(config.platforms);
 
     const baseContext: LinterRuleBaseContext = {
         filePath: file.filePath,
         cwd: file.cwd,
         sourceCode,
         platforms,
-        platformsByProduct: getPlatformsByProduct(platforms),
         getOffsetRangeForNode,
         debug,
     } as LinterRuleBaseContext;

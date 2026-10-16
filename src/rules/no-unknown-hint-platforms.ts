@@ -1,4 +1,4 @@
-import { type Value } from '@adguard/agtree';
+import { type Parameter } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
@@ -46,7 +46,7 @@ export default defineRule({
         ],
     },
     create: (context) => {
-        const handler = (node: Value) => {
+        const handler = (node: Parameter) => {
             if (KNOWN_PLATFORMS.has(node.value)) {
                 return;
             }
@@ -61,8 +61,8 @@ export default defineRule({
         };
 
         return {
-            'Hint[name.value="PLATFORM"] > ParameterList > Value': handler,
-            'Hint[name.value="NOT_PLATFORM"] > ParameterList > Value': handler,
+            'Hint[name.value="PLATFORM"] > ParameterList > Parameter': handler,
+            'Hint[name.value="NOT_PLATFORM"] > ParameterList > Parameter': handler,
         };
     },
 });

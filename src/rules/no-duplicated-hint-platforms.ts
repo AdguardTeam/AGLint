@@ -1,4 +1,4 @@
-import { type Hint, type ParameterList, type Value } from '@adguard/agtree';
+import { type Hint, type Parameter, type ParameterList } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
@@ -53,7 +53,7 @@ export default defineRule({
             'Hint:exit': () => {
                 history = null;
             },
-            'Hint > ParameterList > Value': (node: Value, parent: ParameterList) => {
+            'Hint > ParameterList > Parameter': (node: Parameter, parent: ParameterList) => {
                 if (!history) {
                     return;
                 }

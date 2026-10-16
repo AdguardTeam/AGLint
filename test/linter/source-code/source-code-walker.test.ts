@@ -234,6 +234,24 @@ describe('LinterSourceCodeWalker', () => {
             expect(secondCallCount).toBe(firstCallCount * 2);
         });
 
+        it('parses CSS from v5 Raw selector list nodes', () => {
+            const sourceCode = new LinterSourceCode('example.com##.ad');
+            const parse = vi.fn();
+            const walker = new LinterSourceCodeWalker(sourceCode, {
+                'ElementHidingRuleBody > Raw.selectorList': {
+                    name: 'fake',
+                    parse,
+                    nodeTypeKey: 'type',
+                    childNodeKeys: ['children'],
+                },
+            });
+
+            walker.walk({});
+
+            expect(parse).toHaveBeenCalledTimes(1);
+            expect(parse.mock.calls[0]![0]).toBe('.ad');
+        });
+
         it('handles multiple sub-parsers for different selectors', () => {
             const source = 'example.com##.ad { color: red; }';
             const sourceCode = new LinterSourceCode(source);

@@ -1,8 +1,8 @@
 import {
-    GenericPlatform,
     type Modifier,
     modifierValidator,
     type NetworkRule,
+    Platform,
 } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
@@ -46,8 +46,8 @@ export default defineRule({
          * @param platform The platform to validate against.
          * @param node The modifier node to validate.
          */
-        const validateModifierForPlatform = (platform: number, node: Modifier) => {
-            const validationResult = modifierValidator.validate(platform, node, isExceptionRule);
+        const validateModifierForPlatform = (platform: Platform, node: Modifier) => {
+            const validationResult = modifierValidator.validate([platform], node, isExceptionRule);
 
             if (validationResult.valid && !validationResult.warn) {
                 return;
@@ -79,17 +79,14 @@ export default defineRule({
             },
             'NetworkRule Modifier': (node: Modifier) => {
                 // If no platform specified, validate against generic "any" platform
-                if (context.platforms === 0) {
-                    validateModifierForPlatform(GenericPlatform.Any, node);
+                if (context.platforms.length === 0) {
+                    validateModifierForPlatform(Platform.Any, node);
                     return;
                 }
 
                 // Validate against all configured platforms
-                const platformsByProduct = Object.values(context.platformsByProduct);
-                platformsByProduct.forEach((platforms) => {
-                    platforms.forEach((platform) => {
-                        validateModifierForPlatform(platform, node);
-                    });
+                context.platforms.forEach((platform) => {
+                    validateModifierForPlatform(platform, node);
                 });
             },
         };

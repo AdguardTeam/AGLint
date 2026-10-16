@@ -31,6 +31,36 @@ describe('LinterSourceCode', () => {
             });
             expect(errorCalled).toBe(true);
         });
+
+        it('reports precise positions for syntax errors', () => {
+            const errors: Array<{ message: string; location: any }> = [];
+
+            new LinterSourceCode('||example.com^\n#%#//scriptlet(', (error) => {
+                errors.push(error as { message: string; location: any });
+            });
+
+            expect(errors).toHaveLength(1);
+            expect(errors[0]!.message).toBe("Invalid ADG scriptlet call, no closing parentheses ')' found");
+            expect(errors[0]!.location).toEqual({
+                start: { line: 2, column: 14 },
+                end: { line: 2, column: 15 },
+            });
+        });
+
+        it('reports errors without offsets using the rule span', () => {
+            const errors: Array<{ message: string; location: any }> = [];
+
+            new LinterSourceCode('example.com##', (error) => {
+                errors.push(error as { message: string; location: any });
+            });
+
+            expect(errors).toHaveLength(1);
+            expect(errors[0]!.message).toBe('Element hiding rule has empty body');
+            expect(errors[0]!.location).toEqual({
+                start: { line: 1, column: 0 },
+                end: { line: 1, column: 13 },
+            });
+        });
     });
 
     describe('getPositionFromOffset', () => {

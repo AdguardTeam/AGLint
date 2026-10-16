@@ -1,12 +1,14 @@
 import {
-    AdblockSyntax,
-    GenericPlatform,
-    getHumanReadablePlatformName,
+    hasProduct,
+    type Parameter,
+    Platform,
     QuoteUtils,
     type ScriptletInjectionRule,
     type ScriptletInjectionRuleBody,
     scriptletsCompatibilityTable,
-    type Value,
+    SYNTAX_ABP,
+    SYNTAX_ADG,
+    SYNTAX_UBO,
 } from '@adguard/agtree';
 import { search } from 'fast-fuzzy';
 import * as v from 'valibot';
@@ -15,33 +17,26 @@ import { defineRule, LinterRuleType } from '../linter/rule';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
 
 /**
- * Product level platform.
- */
-type ProductLevelPlatform = typeof GenericPlatform.AdgAny
-    | typeof GenericPlatform.AbpAny
-    | typeof GenericPlatform.UboAny;
-
-/**
- * Converts syntax to product level platform.
+ * Converts rule syntax flags to a product-level platform.
  *
- * @param syntax Syntax.
+ * @param syntax Rule syntax flags.
  *
- * @returns Product level platform or null if syntax is not supported.
+ * @returns Product-level platform or null if the syntax is not supported.
  */
-const convertSyntaxToProductLevelPlatform = (syntax: AdblockSyntax): ProductLevelPlatform | null => {
-    switch (syntax) {
-        case AdblockSyntax.Abp:
-            return GenericPlatform.AbpAny;
-
-        case AdblockSyntax.Ubo:
-            return GenericPlatform.UboAny;
-
-        case AdblockSyntax.Adg:
-            return GenericPlatform.AdgAny;
-
-        default:
-            return null;
+const convertSyntaxToProductLevelPlatform = (syntax: ScriptletInjectionRule['syntax']): Platform | null => {
+    if (hasProduct(syntax, SYNTAX_ADG)) {
+        return Platform.AdgAny;
     }
+
+    if (hasProduct(syntax, SYNTAX_UBO)) {
+        return Platform.UboAny;
+    }
+
+    if (hasProduct(syntax, SYNTAX_ABP)) {
+        return Platform.AbpAny;
+    }
+
+    return null;
 };
 
 export default defineRule({
@@ -130,27 +125,27 @@ export default defineRule({
     create: (context) => {
         const config = context.config[0];
         const regexCache = new Map<string, RegExp>();
-        const nameCache = new Map<ProductLevelPlatform, string[]>();
+        const nameCache = new Map<string, string[]>();
 
         let scriptletName: string | null = null;
         let scriptletRuleBody: ScriptletInjectionRuleBody | null = null;
-        let platform: ProductLevelPlatform | null = null;
-        let scriptletData: ReturnType<typeof scriptletsCompatibilityTable.getFirst> | null = null;
+        let platform: Platform | null = null;
+        let scriptletData: ReturnType<typeof scriptletsCompatibilityTable.query> = null;
         let parameterIndex = 0;
 
-        const getScriptletNames = (targetPlatform: ProductLevelPlatform): string[] => {
-            if (!nameCache.has(targetPlatform)) {
-                const scriptletTables = scriptletsCompatibilityTable.getAllMultiple(targetPlatform);
-                const allScriptletNames = scriptletTables.flatMap((table) => {
-                    const scriptlets = Object.values(table);
-                    return scriptlets.flatMap((scriptlet) => {
-                        return scriptlet.aliases ? [scriptlet.name, ...scriptlet.aliases] : [scriptlet.name];
-                    });
+        const getScriptletNames = (targetPlatform: Platform): string[] => {
+            const cacheKey = targetPlatform.toString();
+
+            if (!nameCache.has(cacheKey)) {
+                const scriptlets = [...scriptletsCompatibilityTable.getAll(targetPlatform).values()].flat();
+                const allScriptletNames = scriptlets.flatMap((scriptlet) => {
+                    return scriptlet.aliases ? [scriptlet.name, ...scriptlet.aliases] : [scriptlet.name];
                 });
-                const names = Array.from(new Set(allScriptletNames));
-                nameCache.set(targetPlatform, names);
+
+                nameCache.set(cacheKey, Array.from(new Set(allScriptletNames)));
             }
-            return nameCache.get(targetPlatform)!;
+
+            return nameCache.get(cacheKey)!;
         };
 
         return {
@@ -230,16 +225,16 @@ export default defineRule({
                     }
                 }
             },
-            'ScriptletInjectionRule ParameterList Value': (node: Value<string>) => {
+            'ScriptletInjectionRule ParameterList Parameter': (node: Parameter) => {
                 if (platform === null) {
                     return;
                 }
 
-                const valueUnquoted = QuoteUtils.removeQuotes(node.value);
+                const valueUnquoted = node.value;
 
                 if (scriptletName === null) {
                     scriptletName = valueUnquoted;
-                    scriptletData = scriptletsCompatibilityTable.getFirst(scriptletName, platform);
+                    scriptletData = scriptletsCompatibilityTable.query(scriptletName, platform);
 
                     if (scriptletData === null) {
                         const range = context.getOffsetRangeForNode(node);
@@ -257,13 +252,13 @@ export default defineRule({
                             },
                         );
 
-                        const actualQuote = QuoteUtils.getStringQuoteType(node.value);
+                        const actualQuote = node.quoteType;
 
                         context.report({
                             messageId: 'unknownScriptlet',
                             data: {
                                 scriptlet: scriptletName,
-                                platform: getHumanReadablePlatformName(platform),
+                                platform: platform.toHumanReadable(),
                             },
                             node: scriptletRuleBody,
                             suggest: possibleMatches.map((match) => ({

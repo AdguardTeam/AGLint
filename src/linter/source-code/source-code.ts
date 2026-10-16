@@ -1,5 +1,4 @@
-import { AdblockSyntaxError, type FilterList, FilterListParser } from '@adguard/agtree';
-import { defaultParserOptions } from '@adguard/agtree/parser';
+import { AdblockSyntaxError, type FilterList, FilterListPipeline } from '@adguard/agtree';
 import * as v from 'valibot';
 
 import { CR, FF, LF } from '../../common/constants';
@@ -126,26 +125,33 @@ export class LinterSourceCode {
 
         this.lineMeta = LinterSourceCode.computeLineMetadata(this.source);
 
-        const parsedAst = FilterListParser.parse(this.source, {
-            ...defaultParserOptions,
+        const parsedAst = new FilterListPipeline().parse(this.source, {
+            isLocIncluded: true,
             tolerant: true,
-            onParseError: (error: unknown) => {
+            onParseError: (error: unknown, ruleStart: number, ruleEnd: number) => {
                 if (!this.onParseError) {
                     return;
                 }
 
                 if (error instanceof AdblockSyntaxError) {
-                    this.onParseError(new LinterSourceCodeError(
-                        error.message,
-                        this.getLinterPositionRangeFromOffsetRange([
-                            error.start,
-                            error.end,
-                        ])!,
-                    ));
+                    const range = this.getLinterPositionRangeFromOffsetRange([
+                        error.start,
+                        error.end,
+                    ]);
+
+                    if (range) {
+                        this.onParseError(new LinterSourceCodeError(error.message, range));
+                    }
+
                     return;
                 }
 
-                this.onParseError(error);
+                const range = this.getLinterPositionRangeFromOffsetRange([ruleStart, ruleEnd]);
+
+                if (range) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    this.onParseError(new LinterSourceCodeError(message, range));
+                }
             },
         });
 

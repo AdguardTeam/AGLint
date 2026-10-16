@@ -76,7 +76,7 @@ export type LinterRunOptions = {
     includeMetadata?: boolean;
 };
 
-const CONFIG_COMMENT_SELECTOR = 'ConfigCommentRule';
+const CONFIG_COMMENT_SELECTOR = 'CommentRule';
 
 /**
  * Lints a file according to the provided configuration and returns problems found.
@@ -141,10 +141,10 @@ export async function lint(options: LinterRunOptions): Promise<LinterResult> {
     runtime.ruleRegistry.setReporter(report);
 
     // Inline config comments
-    const { onConfigComment, disabled } = createConfigCommentVisitor(runtime);
+    const { onComment, disabled } = createConfigCommentVisitor(runtime);
 
     if (parsedConfig.allowInlineConfig) {
-        runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onConfigComment);
+        runtime.visitors.addVisitor(CONFIG_COMMENT_SELECTOR, onComment);
     }
 
     // Load rules

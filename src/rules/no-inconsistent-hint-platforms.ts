@@ -1,4 +1,4 @@
-import { type Value } from '@adguard/agtree';
+import { type Parameter } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
 import { getBuiltInRuleDocumentationUrl } from '../utils/repo-url';
@@ -35,8 +35,8 @@ export default defineRule({
         ],
     },
     create: (context) => {
-        const platforms: Value[] = [];
-        const notPlatforms: Value[] = [];
+        const platforms: Parameter[] = [];
+        const notPlatforms: Parameter[] = [];
 
         return {
             'HintCommentRule:exit': () => {
@@ -58,10 +58,10 @@ export default defineRule({
                 platforms.length = 0;
                 notPlatforms.length = 0;
             },
-            'Hint[name.value="PLATFORM"] > ParameterList > Value': (node: Value) => {
+            'Hint[name.value="PLATFORM"] > ParameterList > Parameter': (node: Parameter) => {
                 platforms.push(node);
             },
-            'Hint[name.value="NOT_PLATFORM"] > ParameterList > Value': (node: Value) => {
+            'Hint[name.value="NOT_PLATFORM"] > ParameterList > Parameter': (node: Parameter) => {
                 notPlatforms.push(node);
             },
         };

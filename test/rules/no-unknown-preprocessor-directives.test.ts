@@ -27,6 +27,17 @@ describe('no-unknown-preprocessor-directives', () => {
         await expect(
             lint('!#safari_cb_affinity(general,privacy)', rulesConfig),
         ).resolves.toHaveProperty('problems', []);
+
+        // `!###...` decorative separators are comments, not directives
+        await expect(
+            lint('!######################################################', rulesConfig),
+        ).resolves.toHaveProperty('problems', []);
+        await expect(
+            lint('!######### Block useless widgets #######################', rulesConfig),
+        ).resolves.toHaveProperty('problems', []);
+        await expect(
+            lint('!##div[data-google-av-itpl]', rulesConfig),
+        ).resolves.toHaveProperty('problems', []);
     });
 
     it('should detect problematic cases', async () => {

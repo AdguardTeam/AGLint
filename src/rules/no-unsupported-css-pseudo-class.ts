@@ -1,4 +1,4 @@
-import { GenericPlatform } from '@adguard/agtree';
+import { ProductCode } from '@adguard/agtree';
 import { type PseudoClassSelectorPlain } from '@adguard/ecss-tree';
 import { search } from 'fast-fuzzy';
 import * as v from 'valibot';
@@ -209,15 +209,15 @@ export default defineRule({
             ...(config.additionalSupportedExtCssPseudoClasses ?? []),
         ]);
 
-        if (context.platforms & GenericPlatform.AbpAny) {
+        if (context.platforms.some((platform) => platform.isProduct(ProductCode.Abp))) {
             SUPPORTED_ABP_PSEUDO_CLASSES.forEach((cls) => allSupportedPseudoClassesSet.add(cls));
         }
 
-        if (context.platforms & GenericPlatform.AdgAny) {
+        if (context.platforms.some((platform) => platform.isProduct(ProductCode.Adg))) {
             SUPPORTED_ADG_PSEUDO_CLASSES.forEach((cls) => allSupportedPseudoClassesSet.add(cls));
         }
 
-        if (context.platforms & GenericPlatform.UboAny) {
+        if (context.platforms.some((platform) => platform.isProduct(ProductCode.Ubo))) {
             SUPPORTED_UBO_PSEUDO_CLASSES.forEach((cls) => allSupportedPseudoClassesSet.add(cls));
         }
 

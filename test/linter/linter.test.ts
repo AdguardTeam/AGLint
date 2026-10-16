@@ -1,4 +1,4 @@
-import { GenericPlatform } from '@adguard/agtree';
+import { Platform } from '@adguard/agtree';
 import { type ReadonlyRecord } from '@adguard/ecss-tree';
 import * as v from 'valibot';
 import { describe, expect, test } from 'vitest';
@@ -221,7 +221,7 @@ describe('Linter E2E Tests', () => {
         });
 
         test('should pass platforms', async () => {
-            let platform: number | undefined;
+            let platforms: Platform[] | undefined;
 
             await lint(
                 '',
@@ -239,7 +239,7 @@ describe('Linter E2E Tests', () => {
                             docs: { name: 'test-platform', description: 'Test rule for platforms', recommended: false },
                         },
                         create: (context) => {
-                            platform = context.platforms;
+                            platforms = context.platforms;
                             return {
                                 '*': () => {
                                     // do nothing
@@ -249,7 +249,7 @@ describe('Linter E2E Tests', () => {
                     }),
                 }),
             );
-            expect(platform).toBe(GenericPlatform.AdgAny);
+            expect(platforms).toEqual([Platform.AdgAny]);
         });
 
         test('should throw on invalid platforms', async () => {
@@ -263,6 +263,25 @@ describe('Linter E2E Tests', () => {
                     },
                 ),
             ).rejects.toThrow('adg_any2');
+        });
+
+        test('should accept v5 and legacy platform names', async () => {
+            const results = await Promise.all(
+                ['adg_any', 'adg_ext_chrome_mv3', 'adg_ext_chromium', 'adg_safari_any'].map(async (platform) => {
+                    return lint(
+                        '',
+                        {
+                            rules: {},
+                            allowInlineConfig: true,
+                            platforms: [platform],
+                        },
+                    );
+                }),
+            );
+
+            results.forEach((result) => {
+                expect(result).toBeDefined();
+            });
         });
     });
 
@@ -636,9 +655,11 @@ describe('Linter E2E Tests', () => {
                     allowInlineConfig: true,
                 },
             );
-            expect(result.problems).toHaveLength(6);
+            // The `! aglint-disable` directive on line 4 is a plain CommentRule in v5,
+            // so it is flagged like any other comment.
+            expect(result.problems).toHaveLength(7);
             const lines = result.problems.map((p) => p.position!.start.line).sort((a, b) => (a ?? 0) - (b ?? 0));
-            expect(lines).toEqual([1, 2, 3, 9, 10, 11]);
+            expect(lines).toEqual([1, 2, 3, 4, 9, 10, 11]);
         });
     });
 
@@ -681,7 +702,7 @@ describe('Linter E2E Tests', () => {
             const result = await lint(
                 [
                     'example.com##.ad',
-                    '##[invalid syntax',
+                    'example.com##',
                     'example.net##.banner',
                 ].join('\n'),
                 { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
@@ -694,7 +715,7 @@ describe('Linter E2E Tests', () => {
             const result = await lint(
                 [
                     '! aglint-disable',
-                    '##[invalid syntax',
+                    'example.com##',
                     'example.com##.ad',
                 ].join('\n'),
                 { rules: { 'test-cosmetic-rule': LinterRuleSeverity.Error }, allowInlineConfig: true },
@@ -1151,7 +1172,7 @@ describe('Linter E2E Tests', () => {
 
         test('should skip metadata for problems without ruleId', async () => {
             const result = await lintFn({
-                fileProps: { content: '##[invalid syntax' },
+                fileProps: { content: 'example.com##' },
                 config: {
                     platforms: ['adg_any'],
                     rules: {},

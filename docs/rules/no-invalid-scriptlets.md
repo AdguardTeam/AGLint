@@ -285,7 +285,7 @@ with the following rule config:
 should be reported as:
 
 ```shell
-1:3 Unknown scriptlet 'unknown-scriptlet' for 'Any AdBlock / Adblock Plus product'
+1:3 Unknown scriptlet 'unknown-scriptlet' for 'Any Adblock Plus product'
 ```
 
 and the following suggestions should be offered:

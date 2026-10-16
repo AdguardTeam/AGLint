@@ -48,16 +48,11 @@ The configuration file should be a valid JSON or YAML file. The following option
 - `root` — defaults to `false`, flag that indicates
   whether the current configuration is the main config configuration which can be enabled by `true` value;
   otherwise the linter will search for the configuration in parent directories.
-- `syntax` — array of strings, specifies the syntax of the filter lists.
-  If there is an `Agent` type comment in a filter list, the linter will use the syntax specified in the comment.
-  If not set, parsed by AGTree `syntax` value will be used.
-  Possible values:
-    - `Common` — Common filter list syntax (default);
-    - `AdGuard` — AdGuard filter list syntax;
-    - `UblockOrigin` — uBlock filter list syntax;
-    - `AdblockPlus` — Adblock Plus filter list syntax.
 - `allowInlineConfig` — enable or disable inline config comments, e.g. `! aglint-disable-next-line`;
   defaults to `true`.
+- `platforms` — array of platforms to validate rules against, e.g. `["adg_any"]`.
+  Defaults to `[]`, i.e. no platform-specific validation.
+  Possible values are listed in the [configuration schema](../schema/aglint-config.schema.json).
 - `extends` — an array of configuration presets to extend, e.g. `["preset-1", "preset-2"]`.
   See [Configuration presets](#configuration-presets) for more info.
   Defaults to `[]`, i.e. no presets.
