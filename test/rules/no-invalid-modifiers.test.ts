@@ -31,7 +31,8 @@ describe('no-invalid-modifiers', () => {
     });
 
     it('validates redirect values with wildcard platforms', async () => {
-        // Valid redirect with a product-level wildcard must not throw
+        // A product-level wildcard expands to concrete platforms; content
+        // blockers do not support `redirect`.
         const result = await lint(
             '||example.com^$redirect=noop.txt',
             rulesConfig,
@@ -39,7 +40,10 @@ describe('no-invalid-modifiers', () => {
             ['adg_any'],
         );
 
-        expect(result.problems).toStrictEqual([]);
+        expect(result.problems).toHaveLength(3);
+        expect(
+            result.problems.every((problem) => problem.message.includes('Content Blocker')),
+        ).toBe(true);
     });
 
     it('validates redirect values with no configured platforms', async () => {
@@ -50,5 +54,31 @@ describe('no-invalid-modifiers', () => {
         );
 
         expect(result.problems).toStrictEqual([]);
+    });
+
+    it('reports each distinct validation error only once', async () => {
+        const result = await lint(
+            '||example.com^$unknown-modifier',
+            rulesConfig,
+            undefined,
+            ['any'],
+        );
+
+        expect(result.problems).toHaveLength(1);
+    });
+
+    it('expands wildcard platforms before validation', async () => {
+        // `stealth` is not supported by MV3 platforms, which are part of `adg_ext_any`.
+        const result = await lint(
+            '||example.com^$stealth',
+            rulesConfig,
+            undefined,
+            ['adg_ext_any'],
+        );
+
+        expect(result.problems.some((problem) => (
+            problem.message.includes('stealth')
+            && problem.message.includes('Chrome MV3')
+        ))).toBe(true);
     });
 });

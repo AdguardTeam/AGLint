@@ -3,6 +3,7 @@ import {
     modifierValidator,
     type NetworkRule,
     Platform,
+    PlatformExpressionEvaluator,
 } from '@adguard/agtree';
 
 import { defineRule, LinterRuleType } from '../linter/rule';
@@ -40,36 +41,6 @@ export default defineRule({
     create: (context) => {
         let isExceptionRule = false;
 
-        /**
-         * Validates a modifier against a specific platform.
-         *
-         * @param platform The platform to validate against.
-         * @param node The modifier node to validate.
-         */
-        const validateModifierForPlatform = (platform: Platform, node: Modifier) => {
-            const validationResult = modifierValidator.validate([platform], node, isExceptionRule);
-
-            if (validationResult.valid && !validationResult.warn) {
-                return;
-            }
-
-            // TODO (David): Include warnings somewhere else.
-            // We validate too many things in validator at once thus
-            // its hard to split it to multiple linter rules.
-            if (validationResult.warn) {
-                return;
-            }
-
-            context.report({
-                messageId: 'invalidModifier',
-                data: {
-                    modifier: node.name.value,
-                    validationError: validationResult.error,
-                },
-                node,
-            });
-        };
-
         return {
             NetworkRule: (node: NetworkRule) => {
                 isExceptionRule = node.exception;
@@ -78,16 +49,50 @@ export default defineRule({
                 isExceptionRule = false;
             },
             'NetworkRule Modifier': (node: Modifier) => {
-                // If no platform specified, validate against generic "any" platform
-                if (context.platforms.length === 0) {
-                    validateModifierForPlatform(Platform.Any, node);
-                    return;
-                }
+                // If no platform specified, validate against the generic "any"
+                // platform. Otherwise, expand wildcards to their concrete
+                // platforms, since platform-specific data (e.g. MV3) may differ.
+                const platformsToValidate = context.platforms.length === 0
+                    ? [Platform.Any]
+                    : context.platforms.flatMap((platform) => (
+                        platform.isWildcard
+                            ? PlatformExpressionEvaluator.evaluate(platform.toString())
+                            : [platform]
+                    ));
 
-                // Validate against all configured platforms
-                context.platforms.forEach((platform) => {
-                    validateModifierForPlatform(platform, node);
+                // The same validation error can be produced for several
+                // platforms, so report each distinct error only once.
+                const errors = new Set<string>();
+
+                platformsToValidate.forEach((platform) => {
+                    const validationResult = modifierValidator.validate(
+                        [platform],
+                        node,
+                        isExceptionRule,
+                    );
+
+                    // TODO (David): Include warnings somewhere else.
+                    // We validate too many things in validator at once thus
+                    // its hard to split it to multiple linter rules.
+                    if (
+                        !validationResult.valid
+                        && !validationResult.warn
+                        && validationResult.error
+                    ) {
+                        errors.add(validationResult.error);
+                    }
                 });
+
+                for (const validationError of errors) {
+                    context.report({
+                        messageId: 'invalidModifier',
+                        data: {
+                            modifier: node.name.value,
+                            validationError,
+                        },
+                        node,
+                    });
+                }
             },
         };
     },

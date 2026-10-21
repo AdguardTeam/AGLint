@@ -62,6 +62,29 @@ describe('parseConfigComment', () => {
         expect(source.slice(parsed!.comment!.start, parsed!.comment!.end)).toBe('-- comment');
     });
 
+    it('does not treat a `--` inside a value as a comment marker', () => {
+        const source = '! aglint "no-excluded-rules": ["warn", { "excludedRuleTexts": ["example.com##.foo--bar"] }]';
+        const parsed = parseConfigComment(parseComment(source));
+
+        expect(parsed?.comment).toBeUndefined();
+        expect(parsed?.params).toMatchObject({
+            type: 'ConfigNode',
+            value: {
+                'no-excluded-rules': ['warn', { excludedRuleTexts: ['example.com##.foo--bar'] }],
+            },
+        });
+    });
+
+    it('throws when a rule has no value', () => {
+        expect(() => parseConfigComment(parseComment('! aglint "no-short-rules":')))
+            .toThrow('Missing rule value');
+    });
+
+    it('throws when a rule severity is missing', () => {
+        expect(() => parseConfigComment(parseComment('! aglint "no-short-rules": [, { "x": 1 }]')))
+            .toThrow('Missing rule severity');
+    });
+
     it('throws for an empty configuration', () => {
         expect(() => parseConfigComment(parseComment('! aglint'))).toThrow('Empty AGLint config');
     });

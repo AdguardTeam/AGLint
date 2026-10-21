@@ -168,7 +168,14 @@ export default defineRule({
             ScriptletInjectionRuleBody: (node: ScriptletInjectionRuleBody) => {
                 scriptletRuleBody = node;
             },
-            'ScriptletInjectionRuleBody:exit': () => {
+            // Each scriptlet call has its own parameter list (e.g. ABP rules can
+            // contain several calls), so the per-call state is reset here.
+            'ScriptletInjectionRule ParameterList': () => {
+                scriptletName = null;
+                scriptletData = null;
+                parameterIndex = 0;
+            },
+            'ScriptletInjectionRule ParameterList:exit': () => {
                 if (!scriptletData) {
                     return;
                 }

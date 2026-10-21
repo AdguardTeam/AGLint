@@ -104,9 +104,31 @@ export default defineRule({
                         return null;
                     }
 
+                    // AGTree's ADG scriptlet parser rejects backtick-quoted arguments.
+                    if (
+                        expectedQuoteType === QuoteType.Backtick
+                        && syntax !== undefined
+                        && hasProduct(syntax, SYNTAX_ADG)
+                    ) {
+                        return null;
+                    }
+
+                    // Dropping quotes would merge arguments separated by a comma (uBO)
+                    // or whitespace (ABP).
+                    if (
+                        expectedQuoteType === QuoteType.None
+                        && /[,\s]/.test(scriptletArgument.value)
+                    ) {
+                        return null;
+                    }
+
+                    // `Parameter.value` is already unquoted and unescaped, so the fix
+                    // is built from the source slice to preserve quotes inside the value.
+                    const sourceText = context.sourceCode.getSlicedPart(range[0], range[1]);
+
                     return fixer.replaceWithText(
                         range,
-                        QuoteUtils.setStringQuoteType(scriptletArgument.value, expectedQuoteType),
+                        QuoteUtils.setStringQuoteType(sourceText, expectedQuoteType),
                     );
                 },
             });

@@ -15,9 +15,15 @@ The format is based on [Keep a Changelog], and this project adheres to [Semantic
 
 ### Changed
 
+- Updated [@adguard/agtree] to v5, which changes the accepted `platforms` values
+  and scriptlet/comment parsing.
+
 ### Deprecated
 
 ### Removed
+
+- The `syntax` configuration option in favor of `platforms`.
+- The `disallowCurlyQuotes` option of the `scriptlet-quotes` rule.
 
 ### Fixed
 

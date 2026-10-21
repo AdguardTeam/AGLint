@@ -168,4 +168,35 @@ describe('scriptlet-quotes', () => {
 
         expect(result.fixedSource).toBe(input);
     });
+
+    test('preserves quoted content when fixing quotes', async () => {
+        const input = "example.org#%#//scriptlet('trusted-set-constant', 'ads_stop', '\"true\"')";
+        const result = await lintWithFixes(input, rulesConfig);
+
+        expect(result.fixedSource).toBe(
+            'example.org#%#//scriptlet("trusted-set-constant", "ads_stop", "\\"true\\"")',
+        );
+    });
+
+    test('does not apply a backtick fix for ADG scriptlets', async () => {
+        const input = "example.com#%#//scriptlet('set-constant', 'foo', 'bar')";
+        const result = await lintWithFixes(input, {
+            'scriptlet-quotes': [LinterRuleSeverity.Error, {
+                adg: QuoteType.Backtick,
+                ubo: QuoteType.None,
+                abp: QuoteType.None,
+            }],
+        });
+
+        expect(result.fixedSource).toBe(input);
+        expect(result.problems.length).toBeGreaterThan(0);
+    });
+
+    test('does not drop quotes that keep argument boundaries', async () => {
+        const input = "example.com##+js(set-constant, 'a,b', c)";
+        const result = await lintWithFixes(input, rulesConfig);
+
+        expect(result.fixedSource).toBe(input);
+        expect(result.problems.length).toBeGreaterThan(0);
+    });
 });

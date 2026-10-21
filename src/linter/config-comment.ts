@@ -85,19 +85,120 @@ const trimEnd = (text: string, end: number): number => {
 };
 
 /**
+ * Checks that every rule entry in an inline configuration has an explicit value.
+ *
+ * `levn` silently substitutes `0` (off) for a missing severity, so entries like
+ * `"rule":` or `"rule": [, { ... }]` would disable a rule without an error.
+ * The source text is validated before parsing to keep the previous, strict
+ * behaviour.
+ *
+ * @param configText Configuration object body (without the surrounding braces).
+ *
+ * @throws Error if a rule entry has no value or its severity is missing.
+ */
+const assertEveryRuleHasValue = (configText: string): void => {
+    let depth = 0;
+    let quote: string | null = null;
+    let awaitingValue = false;
+    let awaitingArrayItem = false;
+
+    for (let i = 0; i < configText.length; i += 1) {
+        const char = configText[i];
+
+        if (quote !== null) {
+            if (char === '\\') {
+                i += 1;
+            } else if (char === quote) {
+                quote = null;
+            }
+
+            continue;
+        }
+
+        if (char === '"' || char === '\'' || char === '`') {
+            awaitingValue = false;
+            awaitingArrayItem = false;
+            quote = char;
+            continue;
+        }
+
+        if (isSpace(char)) {
+            continue;
+        }
+
+        if (awaitingValue) {
+            if (char === ',' || char === '}') {
+                throw new Error('Missing rule value in AGLint config');
+            }
+
+            awaitingValue = false;
+
+            if (char === '[') {
+                awaitingArrayItem = true;
+                depth += 1;
+                continue;
+            }
+
+            if (char === '{') {
+                depth += 1;
+            }
+
+            continue;
+        }
+
+        if (awaitingArrayItem) {
+            if (char === ',' || char === ']') {
+                throw new Error('Missing rule severity in AGLint config');
+            }
+
+            awaitingArrayItem = false;
+
+            if (char === '{' || char === '[') {
+                depth += 1;
+            }
+
+            continue;
+        }
+
+        if (char === '{' || char === '[') {
+            depth += 1;
+            continue;
+        }
+
+        if (char === '}' || char === ']') {
+            depth -= 1;
+            continue;
+        }
+
+        if (char === ':' && depth === 0) {
+            awaitingValue = true;
+        }
+    }
+
+    if (awaitingValue) {
+        throw new Error('Missing rule value in AGLint config');
+    }
+
+    if (awaitingArrayItem) {
+        throw new Error('Missing rule severity in AGLint config');
+    }
+};
+
+/**
  * Parses an inline AGLint configuration comment.
  *
  * AGTree v5 no longer produces `ConfigCommentRule` nodes, so AGLint parses its
  * own command language from a plain `CommentRule`. The syntax mirrors the
  * legacy AGTree parser: `! Aglint ...`, `! Aglint-disable ...`,
  * `! Aglint-enable ...`, `! Aglint-disable-next-line ...`, with an optional
- * trailing comment after `--`..
+ * trailing comment after `--`.
  *
  * @param node Comment rule produced by AGTree.
  *
  * @returns Parsed comment, or null if the comment is not an AGLint command.
  *
- * @throws Error for malformed or empty configuration objects.
+ * @throws Error for malformed or empty configuration objects, or for rule
+ * entries without a value.
  */
 export const parseConfigComment = (node: CommentRule): ParsedConfigComment | null => {
     const text = node.text.value;
@@ -120,7 +221,12 @@ export const parseConfigComment = (node: CommentRule): ParsedConfigComment | nul
         offset += 1;
     }
 
-    const commentStart = text.indexOf('--', offset);
+    // A `--` glued to the previous token is part of a value (e.g. a BEM class
+    // name), not the start of the trailing comment.
+    const markerIdx = text.indexOf('--', offset);
+    const commentStart = markerIdx !== -1 && (markerIdx === offset || isSpace(text[markerIdx - 1]))
+        ? markerIdx
+        : -1;
     const paramsEnd = commentStart === -1 ? trimEnd(text, text.length) : trimEnd(text, commentStart);
 
     let comment: ParsedConfigCommentValue | undefined;
@@ -136,7 +242,10 @@ export const parseConfigComment = (node: CommentRule): ParsedConfigComment | nul
     let params: ParsedConfigComment['params'];
 
     if (command.value === 'aglint') {
-        const value = levn.parse('Object', text.slice(offset, paramsEnd)) as object;
+        const configText = text.slice(offset, paramsEnd);
+        assertEveryRuleHasValue(configText);
+
+        const value = levn.parse('Object', configText) as object;
 
         if (Object.keys(value).length === 0) {
             throw new Error('Empty AGLint config');

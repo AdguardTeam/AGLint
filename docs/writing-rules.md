@@ -152,8 +152,7 @@ The `context` object is passed to the `create` function and provides:
 - **`id`**: The rule ID (string)
 - **`sourceCode`**: `LinterSourceCode` object for accessing the source text and AST
 - **`config`**: Typed configuration array based on your `configSchema`
-- **`platforms`**: Bitmask of target platforms
-- **`platformsByProduct`**: Platform information by product
+- **`platforms`**: Array of target platforms (`Platform[]`)
 - **`filePath`**: (Optional) Path to the file being linted
 - **`cwd`**: (Optional) Current working directory
 - **`debug`**: (Optional) Debug utilities
@@ -255,13 +254,13 @@ Select nodes that are descendants of other nodes (like CSS descendant combinator
 ```typescript
 create: (context) => {
     return {
-        // Any Value node inside a ParameterList
-        'ParameterList Value': (node) => {
-            // Handle parameter values
+        // Any Parameter node inside a ParameterList
+        'ParameterList Parameter': (node) => {
+            // Handle parameters
         },
         
-        // ScriptletInjectionRule's ParameterList Values
-        'ScriptletInjectionRule ParameterList Value': (node) => {
+        // ScriptletInjectionRule's ParameterList Parameters
+        'ScriptletInjectionRule ParameterList Parameter': (node) => {
             // More specific selection
         },
     };
@@ -275,8 +274,8 @@ Select direct children only (like CSS `>` combinator):
 ```typescript
 create: (context) => {
     return {
-        // Direct child Value of ParameterList only
-        'ParameterList > Value': (node) => {
+        // Direct child Parameter of ParameterList only
+        'ParameterList > Parameter': (node) => {
             // Only direct children, not nested deeper
         },
     };
@@ -345,7 +344,8 @@ Here are some frequently used node types in adblock filter rules:
 - **Cosmetic Rules**: `CssInjectionRule`, `ElementHidingRule`, `ScriptletInjectionRule`, `HtmlFilteringRule`,
   `JsInjectionRule`
 - **Comment Rules**: `CommentRule`, `HintCommentRule`, `MetadataCommentRule`, `PreProcessorCommentRule`
-  (inline `! aglint ...` configuration is parsed by AGLint and is not emitted as an AST node)
+  (inline `! aglint ...` configuration appears as a plain `CommentRule` — AGTree v5 has no dedicated
+  `ConfigCommentRule` node, so `CommentRule` visitors see it)
 - **CSS Selectors**: `SelectorList`, `Selector`, `PseudoClassSelector`, `AttributeSelector`
 - **Hints**: `Hint`, `ParameterList`, `Parameter`
 - **Others**: `Value`, `Modifier`, `ModifierList`
@@ -733,11 +733,11 @@ export default defineRule({
         const { minLength } = context.config[0];
         
         const handler = (node: AnyCosmeticRule | AnyNetworkRule) => {
-            const sourceText = node.raws?.text;
-            if (!sourceText) {
+            if (node.start === undefined || node.end === undefined) {
                 return;
             }
             
+            const sourceText = context.sourceCode.getSlicedPart(node.start, node.end);
             const ruleTextTrimmed = sourceText.trim();
             
             if (ruleTextTrimmed.length < minLength) {
@@ -1003,11 +1003,11 @@ Use descriptive messages with helpful context:
 Be as specific as possible to avoid unnecessary visitor calls:
 
 ```typescript
-// ✅ Good - Only visits Value nodes in ParameterList
-'ParameterList > Value': (node) => { },
+// ✅ Good - Only visits Parameter nodes in ParameterList
+'ParameterList > Parameter': (node) => { },
 
-// ❌ Bad - Visits all Value nodes everywhere
-'Value': (node) => { },
+// ❌ Bad - Visits all Parameter nodes everywhere
+'Parameter': (node) => { },
 ```
 
 ### 4. Clean Up State
@@ -1035,11 +1035,11 @@ Always check for null/undefined before accessing properties:
 
 ```typescript
 const handler = (node) => {
-    const sourceText = node.raws?.text; // ✅ Optional chaining
-    if (!sourceText) {
+    if (node.start === undefined || node.end === undefined) {
         return; // ✅ Early return
     }
-    
+
+    const sourceText = context.sourceCode.getSlicedPart(node.start, node.end);
     // Process sourceText
 };
 ```

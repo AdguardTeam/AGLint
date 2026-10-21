@@ -46,8 +46,11 @@ describe('parsePlatformExpression', () => {
     it('expands the legacy chromium alias', () => {
         expect(parsePlatformExpression(['adg_ext_chromium']).map(String)).toEqual([
             'adg_ext_chrome',
+            'adg_ext_chrome_mv3',
             'adg_ext_opera',
+            'adg_ext_opera_mv3',
             'adg_ext_edge',
+            'adg_ext_edge_mv3',
         ]);
     });
 
@@ -64,6 +67,20 @@ describe('parsePlatformExpression', () => {
             'adg_ext_any',
             'adg_os_any',
         ]);
+    });
+
+    it('applies negation to the expanded chromium alias', () => {
+        expect(parsePlatformExpression(['adg_any', '~adg_ext_chromium']).map(String)).toEqual([
+            'adg_cb_any',
+            'adg_ext_firefox',
+            'adg_ext_firefox_mv3',
+            'adg_os_any',
+        ]);
+    });
+
+    it('throws when the platform expression cancels out', () => {
+        expect(() => parsePlatformExpression(['adg_any', '~adg_any']))
+            .toThrow('No platforms specified');
     });
 
     it('throws for an unknown platform', () => {

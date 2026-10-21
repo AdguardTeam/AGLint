@@ -83,7 +83,7 @@ describe('deepFreeze', () => {
     });
 
     it('freezes Date objects (though mutator methods can still change internal time value)', () => {
-        const d = new Date('2020-01-01T00:00:00Z');
+        const d = new Date(2020, 0, 1);
         const frozen = deepFreeze({ d }).d;
 
         expect(Object.isFrozen(frozen)).toBe(true);

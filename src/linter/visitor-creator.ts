@@ -80,7 +80,6 @@ export const createVisitorsForAnyCommentRule = (
     return {
         AgentCommentRule: visitor,
         CommentRule: visitor,
-        ConfigCommentRule: visitor,
         HintCommentRule: visitor,
         MetadataCommentRule: visitor,
         PreProcessorCommentRule: visitor,
@@ -100,7 +99,6 @@ export const createExitVisitorsForAnyCommentRule = (
     return {
         'AgentCommentRule:exit': visitor,
         'CommentRule:exit': visitor,
-        'ConfigCommentRule:exit': visitor,
         'HintCommentRule:exit': visitor,
         'MetadataCommentRule:exit': visitor,
         'PreProcessorCommentRule:exit': visitor,

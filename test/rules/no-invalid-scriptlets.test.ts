@@ -48,6 +48,13 @@ describe('no-invalid-scriptlets', () => {
             await expect(
                 lint('example.com#$#abort-on-property-read foo', rulesConfig),
             ).resolves.toHaveProperty('problems', []);
+
+            await expect(
+                lint(
+                    'example.com#$#abort-on-property-read foo; abort-on-property-write bar',
+                    rulesConfig,
+                ),
+            ).resolves.toHaveProperty('problems', []);
         });
     });
 

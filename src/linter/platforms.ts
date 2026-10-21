@@ -10,9 +10,30 @@ import { Platform, PlatformExpressionEvaluator, type ProductCode } from '@adguar
  * Each alias is expanded to the equivalent v5 platform identifiers.
  */
 const LEGACY_PLATFORM_ALIASES: ReadonlyMap<string, readonly string[]> = new Map([
-    ['adg_ext_chromium', ['adg_ext_chrome', 'adg_ext_opera', 'adg_ext_edge']],
-    ['ubo_ext_chromium', ['ubo_ext_chrome', 'ubo_ext_opera', 'ubo_ext_edge']],
-    ['abp_ext_chromium', ['abp_ext_chrome', 'abp_ext_opera', 'abp_ext_edge']],
+    ['adg_ext_chromium', [
+        'adg_ext_chrome',
+        'adg_ext_chrome_mv3',
+        'adg_ext_opera',
+        'adg_ext_opera_mv3',
+        'adg_ext_edge',
+        'adg_ext_edge_mv3',
+    ]],
+    ['ubo_ext_chromium', [
+        'ubo_ext_chrome',
+        'ubo_ext_chrome_mv3',
+        'ubo_ext_opera',
+        'ubo_ext_opera_mv3',
+        'ubo_ext_edge',
+        'ubo_ext_edge_mv3',
+    ]],
+    ['abp_ext_chromium', [
+        'abp_ext_chrome',
+        'abp_ext_chrome_mv3',
+        'abp_ext_opera',
+        'abp_ext_opera_mv3',
+        'abp_ext_edge',
+        'abp_ext_edge_mv3',
+    ]],
     ['adg_safari_any', ['adg_cb_safari', 'adg_cb_ios']],
 ]);
 
@@ -111,7 +132,8 @@ function normalizePlatformEntry(entry: string): string[] {
  *
  * @returns Optimized `Platform` list (wildcards where possible), empty for no configuration.
  *
- * @throws Error if a platform name is unknown or the expression is invalid.
+ * @throws Error if a platform name is unknown, the expression is invalid, or
+ * the expression cancels out.
  */
 export function parsePlatformExpression(entries: readonly string[]): Platform[] {
     if (entries.length === 0) {
@@ -136,7 +158,11 @@ export function parsePlatformExpression(entries: readonly string[]): Platform[] 
         .flatMap((entry) => normalizePlatformEntry(entry))
         .join('|');
 
-    return PlatformExpressionEvaluator.optimize(
-        PlatformExpressionEvaluator.evaluate(expression),
-    );
+    const evaluated = PlatformExpressionEvaluator.evaluate(expression);
+
+    if (evaluated.length === 0) {
+        throw new Error('No platforms specified');
+    }
+
+    return PlatformExpressionEvaluator.optimize(evaluated);
 }

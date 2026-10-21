@@ -53,10 +53,12 @@ The configuration file should be a valid JSON or YAML file. The following option
 - `platforms` — array of platforms to validate rules against, e.g. `["adg_any"]`.
   Defaults to `[]`, i.e. no platform-specific validation.
   Possible values are listed in the [configuration schema](../schema/aglint-config.schema.json).
+  Negations (`~`) apply to the whole list, so the order of entries does not matter
+  and a platform excluded by one entry cannot be re-added by another.
 - `extends` — an array of configuration presets to extend, e.g. `["preset-1", "preset-2"]`.
   See [Configuration presets](#configuration-presets) for more info.
   Defaults to `[]`, i.e. no presets.
-  Preset's syntax and rules can be overridden by the user config.
+  Preset's rules can be overridden by the user config.
 - `rules` — an object with configured [linter rules](./rules/README.md)
   according to [configuration rule structure](#configuration-rule-structure).
 
@@ -134,12 +136,7 @@ Currently, there are two built-in presets available (click on the name to see th
   This option maybe too strict for most projects.
 
 > [!NOTE]
-> Presets contain `syntax` and `rules` which shall be overridden if they are specified in the config.
-
-> [!NOTE]
-> All presets have `syntax` property set to `Common` a default value.
-> You may need to specify it in your [configuration file](#configuration-file-structure)
-> for better linting, e.g. modifiers validation.
+> Presets contain `rules`, which are overridden when specified in the config.
 
 > [!NOTE]
 > We are planning to add more presets in the future,
@@ -158,8 +155,8 @@ It simply extends the `aglint:recommended` preset and specifies the `root` optio
     root: true
     extends:
         - aglint:recommended
-    syntax:
-        - Common
+    platforms:
+        - adg_any
     ```
 
 - JSON syntax — `.aglintrc.json`:
@@ -170,8 +167,8 @@ It simply extends the `aglint:recommended` preset and specifies the `root` optio
         "extends": [
             "aglint:recommended"
         ],
-        "syntax": [
-            "Common"
+        "platforms": [
+            "adg_any"
         ]
     }
     ```
