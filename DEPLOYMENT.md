@@ -95,7 +95,7 @@ raised to the consumer.
 
 ## Docker Build
 
-The `Dockerfile` uses multi-stage builds based on `adguard/node-ssh:22.22--0`:
+The `Dockerfile` uses multi-stage builds based on `adguard/node-ssh:22.23--0`:
 
 | Stage                    | Purpose           | Key Steps                                                          |
 | ------------------------ | ----------------- | ------------------------------------------------------------------ |
